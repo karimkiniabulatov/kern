@@ -19,7 +19,6 @@ type Renderer struct {
 	termHeight  int
 	lastData    map[string]interface{}
 	initialized bool
-	lineCount   int
 }
 
 func NewRenderer(cfg *config.Config) *Renderer {
@@ -43,74 +42,47 @@ func (r *Renderer) Render(data map[string]interface{}) {
 		r.lastData[module] = moduleData
 	}
 
-	// Рассчитываем общее количество строк для фиксированного вывода
-	totalLines := r.calculateTotalLines()
-	
-	// Очищаем только необходимое пространство
+	// Перемещаем курсор в начало
 	if !r.initialized {
 		fmt.Print("\033[2J") // Полная очистка только при первом запуске
 		r.initialized = true
 	}
-	
-	// Перемещаем курсор в начало и очищаем нужное количество строк
-	fmt.Printf("\033[H\033[%dS", totalLines)
-	fmt.Print("\033[H")
+	fmt.Print("\033[H") // Курсор в начало
 
 	// Рендерим все модули в фиксированном порядке
 	r.renderHeader()
 	
-	if diskData, exists := r.lastData["disk"]; exists {
-		r.renderDisk(diskData)
+	// Рендерим только включенные модули
+	if r.config.ShowDisk {
+		if diskData, exists := r.lastData["disk"]; exists {
+			r.renderDisk(diskData)
+			fmt.Println()
+		}
 	}
 	
-	if memData, exists := r.lastData["mem"]; exists {
-		r.renderMemory(memData)
+	if r.config.ShowMem {
+		if memData, exists := r.lastData["mem"]; exists {
+			r.renderMemory(memData)
+			fmt.Println()
+		}
 	}
 	
-	if netData, exists := r.lastData["net"]; exists {
-		r.renderNetwork(netData)
+	if r.config.ShowNet {
+		if netData, exists := r.lastData["net"]; exists {
+			r.renderNetwork(netData)
+			fmt.Println()
+		}
 	}
 	
-	if cpuData, exists := r.lastData["cpu"]; exists {
-		r.renderCPU(cpuData)
+	if r.config.ShowCPU {
+		if cpuData, exists := r.lastData["cpu"]; exists {
+			r.renderCPU(cpuData)
+			fmt.Println()
+		}
 	}
 
 	// Подсказка для выхода
-	fmt.Printf("\n\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m\n", r.config.RefreshRate)
-}
-
-func (r *Renderer) calculateTotalLines() int {
-	lines := 4 // header + footer
-	
-	if _, exists := r.lastData["disk"]; exists {
-		if disks, ok := r.lastData["disk"].([]disk.DiskInfo); ok {
-			lines += 3 + len(disks) // header + separator + lines
-		}
-	}
-	
-	if _, exists := r.lastData["mem"]; exists {
-		lines += 6 // header + separator + RAM + Swap
-	}
-	
-	if _, exists := r.lastData["net"]; exists {
-		if networks, ok := r.lastData["net"].([]net.NetworkInfo); ok {
-			lines += 3 + len(networks) // header + separator + lines
-		}
-	}
-	
-	if _, exists := r.lastData["cpu"]; exists {
-		if cpuInfo, ok := r.lastData["cpu"].(*cpu.CPUInfo); ok {
-			lines += 3 // header + separator
-			if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-				// Для детального режима - одна строка на каждые 2 потока
-				lines += (len(cpuInfo.CoreUsage) + 1) / 2
-			} else {
-				lines += 2 // основная строка + общая загрузка
-			}
-		}
-	}
-	
-	return lines
+	fmt.Printf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m\n", r.config.RefreshRate)
 }
 
 func (r *Renderer) renderHeader() {
@@ -120,7 +92,6 @@ func (r *Renderer) renderHeader() {
 	
 	fmt.Printf("\033[1;36m%s%s\033[0m\n", strings.Repeat(" ", padding), title)
 	fmt.Println(strings.Repeat("=", r.termWidth))
-	fmt.Println()
 }
 
 func (r *Renderer) renderCPU(data interface{}) {
@@ -129,18 +100,16 @@ func (r *Renderer) renderCPU(data interface{}) {
 	
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		// Основная информация о процессоре
+		model := truncateString(cpuInfo.Model, 20)
+		coresInfo := fmt.Sprintf("%d cores, %d threads", cpuInfo.Cores, cpuInfo.Threads)
+		
 		fmt.Printf("  \033[36m%-20s\033[0m  %-18s  \033[38;5;215m%5.1f%%\033[0m     %-12s  %-12s\n", 
-			truncateString(cpuInfo.Model, 20),
-			fmt.Sprintf("%d cores, %d threads", cpuInfo.Cores, cpuInfo.Threads),
-			cpuInfo.Usage,
-			cpuInfo.Vendor,
-			cpuInfo.Architecture)
+			model, coresInfo, cpuInfo.Usage, cpuInfo.Vendor, cpuInfo.Architecture)
 
 		if r.config.DetailedCPU {
 			// Детальный режим - показываем все ядра/потоки
 			if len(cpuInfo.CoreUsage) > 0 {
 				for i, usage := range cpuInfo.CoreUsage {
-					// Группируем логические ядра по физическим (2 потока на ядро)
 					if i%2 == 0 {
 						coreNum := i / 2
 						var usage1, usage2 float64
@@ -169,7 +138,6 @@ func (r *Renderer) renderCPU(data interface{}) {
 		}
 	}
 	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
-	fmt.Println()
 }
 
 func (r *Renderer) renderMemory(data interface{}) {
@@ -190,7 +158,6 @@ func (r *Renderer) renderMemory(data interface{}) {
 		}
 	}
 	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────\033[0m")
-	fmt.Println()
 }
 
 func (r *Renderer) renderDisk(data interface{}) {
@@ -211,18 +178,15 @@ func (r *Renderer) renderDisk(data interface{}) {
 					mountPoint = "ROOT"
 				}
 				
+				fs := truncateString(d.Filesystem, 14)
+				mp := truncateString(mountPoint, 18)
+				
 				fmt.Printf("  \033[36m%-14s\033[0m  %-18s  %-8s  %s   \033[38;5;216m%5.1f%%\033[0m     %-10s\n",
-					truncateString(d.Filesystem, 14),
-					truncateString(mountPoint, 18),
-					d.Size,
-					graph,
-					d.UsePercent,
-					devType)
+					fs, mp, d.Size, graph, d.UsePercent, devType)
 			}
 		}
 	}
 	fmt.Println("\033[34m──────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
-	fmt.Println()
 }
 
 func (r *Renderer) renderNetwork(data interface{}) {
@@ -243,18 +207,17 @@ func (r *Renderer) renderNetwork(data interface{}) {
 				
 				speedInfo := fmt.Sprintf("%s↓/%s↑", net.RXSpeed, net.TXSpeed)
 				
+				iface := truncateString(net.Interface, 14)
+				ip := truncateString(net.IPAddress, 18)
+				mac := truncateString(net.MACAddress, 18)
+				speed := truncateString(speedInfo, 18)
+				
 				fmt.Printf("  %-14s  %-18s  %-18s  %-18s  %s   \033[38;5;165m%5.1f%%\033[0m\n",
-					truncateString(net.Interface, 14),
-					truncateString(net.IPAddress, 18),
-					truncateString(net.MACAddress, 18),
-					truncateString(speedInfo, 18),
-					graph,
-					activity)
+					iface, ip, mac, speed, graph, activity)
 			}
 		}
 	}
 	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
-	fmt.Println()
 }
 
 // Вспомогательные методы для создания графиков

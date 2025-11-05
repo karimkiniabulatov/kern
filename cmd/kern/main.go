@@ -24,7 +24,7 @@ var (
 	flagCPU      = flag.Bool("c", false, "Show CPU information")
 	flagMem      = flag.Bool("m", false, "Show memory information")
 	flagNet      = flag.Bool("n", false, "Show network information")
-	flagAll      = flag.Bool("a", true, "Show all information")
+	flagAll      = flag.Bool("a", false, "Show all information")
 	flagRefresh  = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang     = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
 	flagRemote   = flag.Int("r", 0, "Start remote API on specified port")
@@ -41,7 +41,7 @@ func main() {
 	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
 	flag.BoolVar(flagMem, "mem", false, "Show memory information")
 	flag.BoolVar(flagNet, "net", false, "Show network information")
-	flag.BoolVar(flagAll, "all", true, "Show all information")
+	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 
 	flag.Usage = func() {
@@ -81,12 +81,17 @@ func main() {
 		return
 	}
 
-	// Если не указаны конкретные модули, показываем все
-	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet {
-		*flagAll = true
-	}
+	// Определяем какие модули показывать
+	showDisk := *flagDisk || *flagAll || (!*flagCPU && !*flagMem && !*flagNet && !*flagDisk && !*flagNet)
+	showCPU := *flagCPU || *flagAll || (!*flagDisk && !*flagMem && !*flagNet && !*flagCPU && !*flagNet)
+	showMem := *flagMem || *flagAll || (!*flagDisk && !*flagCPU && !*flagNet && !*flagMem && !*flagNet)
+	showNet := *flagNet || *flagAll || (!*flagDisk && !*flagCPU && !*flagMem && !*flagNet && !*flagDisk)
 
-	// Передаем флаг detailed в конфиг
+	// Передаем флаги в конфиг
+	cfg.ShowDisk = showDisk
+	cfg.ShowCPU = showCPU
+	cfg.ShowMem = showMem
+	cfg.ShowNet = showNet
 	cfg.DetailedCPU = *flagDetailed
 
 	// Запускаем мониторинг
@@ -111,7 +116,7 @@ func runMonitor(cfg *config.Config) {
 	keyChan := make(chan rune, 1)
 	go readKeys(keyChan)
 
-	ticker := time.NewTicker(time.Duration(*flagRefresh) * time.Second)
+	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
 	defer ticker.Stop()
 
 	// Initial render
@@ -158,45 +163,31 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		err    error
 	}
 
-	modules := make(map[string]bool)
-	if *flagAll || *flagDisk {
-		modules["disk"] = true
-	}
-	if *flagAll || *flagCPU {
-		modules["cpu"] = true
-	}
-	if *flagAll || *flagMem {
-		modules["mem"] = true
-	}
-	if *flagAll || *flagNet {
-		modules["net"] = true
-	}
+	resultChan := make(chan result, 4)
 
-	resultChan := make(chan result, len(modules))
-
-	// Launch goroutines for each enabled module
-	if modules["disk"] {
+	// Launch goroutines only for enabled modules
+	if cfg.ShowDisk {
 		go func() {
 			data, err := disk.Summary()
 			resultChan <- result{"disk", data, err}
 		}()
 	}
 
-	if modules["cpu"] {
+	if cfg.ShowCPU {
 		go func() {
 			data, err := cpu.Summary()
 			resultChan <- result{"cpu", data, err}
 		}()
 	}
 
-	if modules["mem"] {
+	if cfg.ShowMem {
 		go func() {
 			data, err := mem.Summary()
 			resultChan <- result{"mem", data, err}
 		}()
 	}
 
-	if modules["net"] {
+	if cfg.ShowNet {
 		go func() {
 			data, err := net.Summary()
 			resultChan <- result{"net", data, err}
@@ -205,7 +196,13 @@ func collectData(cfg *config.Config) map[string]interface{} {
 
 	// Collect results
 	results := make(map[string]interface{})
-	for i := 0; i < len(modules); i++ {
+	moduleCount := 0
+	if cfg.ShowDisk { moduleCount++ }
+	if cfg.ShowCPU { moduleCount++ }
+	if cfg.ShowMem { moduleCount++ }
+	if cfg.ShowNet { moduleCount++ }
+
+	for i := 0; i < moduleCount; i++ {
 		res := <-resultChan
 		if res.err != nil {
 			results[res.module] = map[string]string{"error": res.err.Error()}

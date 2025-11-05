@@ -185,3 +185,31 @@ Issues: GitHub Issues
 Questions: Check existing issues or create new one
 
 Enjoy monitoring your system with kern! 🎯
+
+
+## 🚨 Troubleshooting
+
+### Man page not working:
+```bash
+# Install man page manually
+sudo cp man/kern.1 /usr/local/share/man/man1/
+sudo mandb
+man kern
+Command not found after installation:
+bash
+# Add Go bin to PATH
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
+source ~/.bashrc
+No colors or broken display:
+bash
+# Check terminal support
+echo $TERM
+
+# Try basic mode
+kern --help
+🐛 Known Issues
+Language support: Basic multi-language framework implemented (EN/RU)
+
+Man page: Requires manual installation on some systems
+
+Terminal compatibility: Some advanced Unicode characters may not display correctly

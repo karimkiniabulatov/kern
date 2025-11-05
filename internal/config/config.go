@@ -11,7 +11,11 @@ type Config struct {
 	RefreshRate int    `json:"refresh_rate"`
 	Colors      bool   `json:"colors"`
 	Theme       string `json:"theme"`
-	DetailedCPU bool   `json:"detailed_cpu"` // Добавляем флаг для детального CPU
+	DetailedCPU bool   `json:"detailed_cpu"`
+	ShowDisk    bool   `json:"show_disk"`
+	ShowCPU     bool   `json:"show_cpu"`
+	ShowMem     bool   `json:"show_mem"`
+	ShowNet     bool   `json:"show_net"`
 }
 
 func Load(language string) (*Config, error) {
@@ -78,5 +82,9 @@ func getDefaultConfig(language string) *Config {
 		Colors:      true,
 		Theme:       "default",
 		DetailedCPU: false,
+		ShowDisk:    true,
+		ShowCPU:     true,
+		ShowMem:     true,
+		ShowNet:     true,
 	}
 }

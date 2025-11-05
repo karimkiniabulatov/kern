@@ -52,6 +52,11 @@ go build -o kern ./cmd/kern
 echo "Installing globally..."
 go install ./cmd/kern
 
+# Install man page
+echo "Installing man page..."
+sudo mkdir -p /usr/local/share/man/man1
+sudo cp man/kern.1 /usr/local/share/man/man1/ 2>/dev/null && echo "Man page installed" || echo "Man page installation failed - continuing..."
+
 # Check where kern was installed
 KERN_PATH="$(go env GOPATH)/bin/kern"
 if [ -f "$KERN_PATH" ]; then
@@ -75,6 +80,10 @@ echo "Usage examples:"
 echo "  ./kern                    # Run local binary"
 echo "  kern                      # Run global installation (if in PATH)"
 echo "  kern --cpu --mem          # Show only CPU and memory"
+echo "  kern --disk               # Show only disk information"
+echo "  kern --net                # Show only network information"
 echo "  kern --refresh=5 -l ru    # 5 sec refresh with Russian interface"
 echo "  kern --detailed           # Show detailed CPU core information"
 echo "  kern --help               # Show help"
+echo ""
+echo "To view manual: man kern"
