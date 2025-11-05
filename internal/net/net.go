@@ -1,6 +1,7 @@
 package net
 
 import (
+	"fmt"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -234,9 +235,4 @@ func formatSpeed(bytesPerSec float64) string {
 	}
 
 	return fmt.Sprintf("%.1f%s", value, units[unitIndex])
-}
-
-// Вспомогательная функция для форматирования
-func fmt.Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, a...)
 }

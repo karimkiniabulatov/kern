@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -215,9 +216,4 @@ func getPerCoreUsage() []float64 {
 		usagePerCore[i] = usage
 	}
 	return usagePerCore
-}
-
-// Вспомогательная функция для форматирования
-func fmt.Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, a...)
 }

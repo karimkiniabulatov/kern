@@ -41,49 +41,49 @@ func main() {
 		return
 	}
 
-	// Загружаем конфигурацию
+	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Если указан порт для remote, запускаем сервер
+	// If no specific module is selected, show all
+	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet {
+		*flagAll = true
+	}
+
+	// If remote mode is enabled, start the remote server and exit
 	if *flagRemote != 0 {
 		startRemoteServer(cfg, *flagRemote)
 		return
 	}
 
-	// Если не указаны конкретные модули, показываем все
-	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet {
-		*flagAll = true
-	}
-
-	// Запускаем мониторинг
+	// Start the main monitoring loop
 	runMonitor(cfg)
 }
 
 func runMonitor(cfg *config.Config) {
-	// Настраиваем обработку сигналов
+	// Set up signal handling for graceful shutdown
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Инициализируем UI
+	// Initialize UI
 	renderer := ui.NewRenderer(cfg)
 
-	// Настраиваем неблокирующее чтение ввода
+	// Set up non-blocking input reading
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err == nil {
 		defer term.Restore(int(os.Stdin.Fd()), oldState)
 	}
 
-	// Канал для клавиш
+	// Channel for keyboard input
 	keyChan := make(chan rune, 1)
 	go readKeys(keyChan)
 
 	ticker := time.NewTicker(time.Duration(*flagRefresh) * time.Second)
 	defer ticker.Stop()
 
-	// Первый рендер
+	// Initial render
 	results := collectData(cfg)
 	renderer.Render(results)
 
@@ -119,7 +119,7 @@ func readKeys(keyChan chan rune) {
 		}
 	}
 }
-///второе обновление от main до сюда
+
 func collectData(cfg *config.Config) map[string]interface{} {
 	type result struct {
 		module string
