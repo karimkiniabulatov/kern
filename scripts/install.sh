@@ -41,18 +41,23 @@ done
 
 # Update Go dependencies and install
 echo "Building kern..."
-cd "$(dirname "$0")/.."  # Перейти в корень проекта
+cd "$(dirname "$0")/.."
 go mod tidy
 
-# Сначала собираем локально для проверки
+# Build locally for testing
 echo "Building local binary..."
 go build -o kern ./cmd/kern
 
-# Затем устанавливаем глобально
+# Install globally
 echo "Installing globally..."
 go install ./cmd/kern
 
-# Проверяем есть ли путь в PATH
+# Check where kern was installed
+KERN_PATH="$(go env GOPATH)/bin/kern"
+if [ -f "$KERN_PATH" ]; then
+    echo "kern installed successfully at: $KERN_PATH"
+    
+    # Check if the path is in PATH
     if [[ ":$PATH:" != *":$(go env GOPATH)/bin:"* ]]; then
         echo "Adding GOPATH/bin to PATH..."
         echo "export PATH=\$PATH:$(go env GOPATH)/bin" >> ~/.bashrc
