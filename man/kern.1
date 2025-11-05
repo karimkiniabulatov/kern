@@ -3,7 +3,7 @@
 kern \- real-time system monitoring tool
 .SH SYNOPSIS
 .B kern
-[\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR]
+[\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
 .SH DESCRIPTION
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
@@ -41,6 +41,9 @@ Set interface language. Supported languages: en, ru, zh, es, fr, de, ja, ko, it,
 .TP
 .B \-r \fIPORT\fR
 Start remote API server on specified port.
+.TP
+.B \-\-detailed
+Show detailed CPU core information (individual core usage).
 .SH INTERACTIVE COMMANDS
 .TP
 .B q
@@ -55,6 +58,9 @@ Monitor only disk and memory usage.
 .TP
 .B kern \-\-refresh=5 \-l ru
 Update every 5 seconds with Russian interface.
+.TP
+.B kern \-\-detailed
+Show detailed CPU core information.
 .TP
 .B kern \-r 26001
 Start remote API server on port 26001.
@@ -73,6 +79,6 @@ Returns 0 on success, 1 on error.
 .SH BUGS
 Report bugs at https://github.com/karimkiniabulatov/kern/issues
 .SH AUTHOR
-Karim Kiniabulatov
+Karim Kinia Bulatov
 .SH LICENSE
 GNU GPLv3
