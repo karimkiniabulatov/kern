@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"os" //добавлено
 	"os/exec"
 	"strconv"
 	"strings"

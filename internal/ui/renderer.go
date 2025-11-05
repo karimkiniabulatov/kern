@@ -3,7 +3,10 @@ package ui
 import (
 	"fmt"
 	"strings"
-
+	"github.com/karimkiniabulatov/kern/internal/cpu"    // Добавлено
+	"github.com/karimkiniabulatov/kern/internal/disk"   // Добавлено 
+	"github.com/karimkiniabulatov/kern/internal/mem"    // Добавлено
+	"github.com/karimkiniabulatov/kern/internal/net"    // Добавлено
 	"github.com/karimkiniabulatov/kern/internal/config"
 	"github.com/mattn/go-runewidth"
 	"golang.org/x/term"
