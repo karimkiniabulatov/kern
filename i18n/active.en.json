@@ -1,0 +1,41 @@
+{
+"disk_title": "Disk Information",
+"disk_filesystem": "Filesystem",
+"disk_size": "Size",
+"disk_used": "Used",
+"disk_available": "Available",
+"disk_use_percent": "Use%",
+"disk_mounted_on": "Mounted on",
+
+"cpu_title": "CPU Information",
+"cpu_model": "Model",
+"cpu_cores": "Cores",
+"cpu_threads": "Threads",
+"cpu_usage": "Usage",
+"cpu_frequency": "Frequency",
+"cpu_load1": "Load (1 min)",
+"cpu_load5": "Load (5 min)",
+"cpu_load15": "Load (15 min)",
+
+"mem_title": "Memory Information",
+"mem_total": "Total",
+"mem_used": "Used",
+"mem_free": "Free",
+"mem_available": "Available",
+"mem_swap_total": "Swap Total",
+"mem_swap_used": "Swap Used",
+"mem_swap_free": "Swap Free",
+
+"net_title": "Network Information",
+"net_interface": "Interface",
+"net_rx_bytes": "RX Bytes",
+"net_tx_bytes": "TX Bytes",
+"net_status": "Status",
+"net_status_up": "UP",
+"net_status_down": "DOWN",
+
+"common_refresh": "Refresh",
+"common_seconds": "sec.",
+"common_error": "Error",
+"common_unknown": "Unknown"
+}

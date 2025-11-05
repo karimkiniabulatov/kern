@@ -1,0 +1,41 @@
+{
+"disk_title": "Дисковая информация",
+"disk_filesystem": "Файловая система",
+"disk_size": "Размер",
+"disk_used": "Использовано",
+"disk_available": "Доступно",
+"disk_use_percent": "Использовано",
+"disk_mounted_on": "Точка монтирования",
+
+"cpu_title": "Информация о процессоре",
+"cpu_model": "Модель",
+"cpu_cores": "Ядер",
+"cpu_threads": "Потоков",
+"cpu_usage": "Использование",
+"cpu_frequency": "Частота",
+"cpu_load1": "Загрузка (1 мин)",
+"cpu_load5": "Загрузка (5 мин)",
+"cpu_load15": "Загрузка (15 мин)",
+
+"mem_title": "Информация о памяти",
+"mem_total": "Всего",
+"mem_used": "Использовано",
+"mem_free": "Свободно",
+"mem_available": "Доступно",
+"mem_swap_total": "Общий своп",
+"mem_swap_used": "Использовано свопа",
+"mem_swap_free": "Свободно свопа",
+
+"net_title": "Сетевая информация",
+"net_interface": "Интерфейс",
+"net_rx_bytes": "Принято",
+"net_tx_bytes": "Передано",
+"net_status": "Статус",
+"net_status_up": "Включен",
+"net_status_down": "Выключен",
+
+"common_refresh": "Обновление",
+"common_seconds": "сек.",
+"common_error": "Ошибка",
+"common_unknown": "Неизвестно"
+}

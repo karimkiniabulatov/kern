@@ -1,0 +1,75 @@
+### man/kern.1
+```man
+.TH KERN 1 "2025-01-01" "kern" "System Monitoring Tool"
+.SH NAME
+kern \- real-time system monitoring tool
+.SH SYNOPSIS
+.B kern
+[\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR]
+.SH DESCRIPTION
+.B kern
+is a comprehensive system monitoring tool that provides real-time information
+about disk usage, CPU performance, memory utilization, and network statistics.
+It features a colorful terminal interface with auto-refresh capabilities.
+.SH OPTIONS
+.TP
+.B \-a, \-\-all
+Show all system information (default).
+.TP
+.B \-c, \-\-cpu
+Show CPU information only.
+.TP
+.B \-d, \-\-disk
+Show disk information only.
+.TP
+.B \-h, \-\-help
+Show help message.
+.TP
+.B \-m, \-\-mem
+Show memory information only.
+.TP
+.B \-n, \-\-net
+Show network information only.
+.TP
+.B \-v, \-\-version
+Show version information.
+.TP
+.B \-\-refresh=\fISECONDS\fR
+Set refresh interval in seconds (default: 2).
+.TP
+.B \-l \fILANG\fR
+Set interface language (e.g., 'ru' for Russian).
+.TP
+.B \-r \fIPORT\fR
+Start remote API server on specified port.
+.SH EXAMPLES
+.TP
+.B kern
+Monitor all system resources with default settings.
+.TP
+.B kern \-d \-m
+Monitor only disk and memory usage.
+.TP
+.B kern \-\-refresh=5 \-l ru
+Update every 5 seconds with Russian interface.
+.TP
+.B kern \-r 26001
+Start remote API server on port 26001.
+.SH FILES
+.TP
+.I ~/.config/kern/kern.json
+Configuration file storing user preferences.
+.SH EXIT STATUS
+Returns 0 on success, 1 on error.
+.SH SEE ALSO
+.BR top (1),
+.BR htop (1),
+.BR df (1),
+.BR free (1),
+.BR lscpu (1)
+.SH BUGS
+Report bugs at https://github.com/karimkiniabulatov/kern/issues
+.SH AUTHOR
+Karim Kiniabulatov
+.SH LICENSE
+GNU GPLv3
