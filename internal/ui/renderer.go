@@ -91,12 +91,18 @@ func (r *Renderer) renderHeader() {
 	padding := (r.termWidth - width) / 2
 	
 	fmt.Printf("\033[1;36m%s%s\033[0m\n", strings.Repeat(" ", padding), title)
-	fmt.Println(strings.Repeat("=", r.termWidth))
+	r.renderSeparator()
+}
+
+func (r *Renderer) renderSeparator() {
+	// Упрощенный разделитель - фиксированной длины
+	separator := strings.Repeat("─", 60)
+	fmt.Printf("\033[34m%s\033[0m\n", separator)
 }
 
 func (r *Renderer) renderCPU(data interface{}) {
 	fmt.Println("\033[1;34mCPU Information:\033[0m")
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 	
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		// Основная информация о процессоре
@@ -137,12 +143,12 @@ func (r *Renderer) renderCPU(data interface{}) {
 			fmt.Printf("  Overall Usage        -                  %s   \033[38;5;215m%5.1f%%\033[0m\n", graph, cpuInfo.Usage)
 		}
 	}
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 }
 
 func (r *Renderer) renderMemory(data interface{}) {
 	fmt.Println("\033[1;34mMemory Information:\033[0m")
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 	
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		// RAM
@@ -157,12 +163,12 @@ func (r *Renderer) renderMemory(data interface{}) {
 				"Swap", memInfo.SwapTotal, memInfo.SwapUsed, memInfo.SwapFree, swapGraph, memInfo.SwapUsagePercent)
 		}
 	}
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 }
 
 func (r *Renderer) renderDisk(data interface{}) {
 	fmt.Println("\033[1;34mDisk Information:\033[0m")
-	fmt.Println("\033[34m──────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 	
 	if disks, ok := data.([]disk.DiskInfo); ok {
 		for _, d := range disks {
@@ -186,12 +192,12 @@ func (r *Renderer) renderDisk(data interface{}) {
 			}
 		}
 	}
-	fmt.Println("\033[34m──────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 }
 
 func (r *Renderer) renderNetwork(data interface{}) {
 	fmt.Println("\033[1;34mNetwork Information:\033[0m")
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 	
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		for _, net := range networks {
@@ -217,7 +223,7 @@ func (r *Renderer) renderNetwork(data interface{}) {
 			}
 		}
 	}
-	fmt.Println("\033[34m────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\033[0m")
+	r.renderSeparator()
 }
 
 // Вспомогательные методы для создания графиков

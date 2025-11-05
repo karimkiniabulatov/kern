@@ -52,10 +52,16 @@ go build -o kern ./cmd/kern
 echo "Installing globally..."
 go install ./cmd/kern
 
-# Install man page
+# Install man page with proper permissions
 echo "Installing man page..."
-sudo mkdir -p /usr/local/share/man/man1
-sudo cp man/kern.1 /usr/local/share/man/man1/ 2>/dev/null && echo "Man page installed" || echo "Man page installation failed - continuing..."
+if command -v install &> /dev/null; then
+    sudo install -g 0 -o 0 -m 0644 man/kern.1 /usr/local/share/man/man1/kern.1 2>/dev/null && \
+    sudo mandb >/dev/null 2>&1 && echo "Man page installed successfully" || echo "Man page installation failed - continuing..."
+else
+    sudo mkdir -p /usr/local/share/man/man1
+    sudo cp man/kern.1 /usr/local/share/man/man1/ 2>/dev/null && \
+    sudo mandb >/dev/null 2>&1 && echo "Man page installed successfully" || echo "Man page installation failed - continuing..."
+fi
 
 # Check where kern was installed
 KERN_PATH="$(go env GOPATH)/bin/kern"

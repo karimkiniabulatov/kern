@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/karimkiniabulatov/kern/internal/i18n"
 )
 
 type Config struct {
@@ -16,6 +18,10 @@ type Config struct {
 	ShowCPU     bool   `json:"show_cpu"`
 	ShowMem     bool   `json:"show_mem"`
 	ShowNet     bool   `json:"show_net"`
+}
+
+func (c *Config) T(key string) string {
+	return i18n.GetTranslation(c.Language, key)
 }
 
 func Load(language string) (*Config, error) {

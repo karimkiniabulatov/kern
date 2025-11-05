@@ -12,6 +12,8 @@ var translations = map[string]map[string]string{
 		"seconds":         "seconds",
 		"overall_usage":   "Overall Usage",
 		"core":            "Core",
+		"ram":             "RAM",
+		"swap":            "Swap",
 	},
 	"ru": {
 		"title":           "kern - Мониторинг системы",
@@ -24,6 +26,8 @@ var translations = map[string]map[string]string{
 		"seconds":         "секунд",
 		"overall_usage":   "Общая загрузка",
 		"core":            "Ядро",
+		"ram":             "ОЗУ",
+		"swap":            "Своп",
 	},
 }
 
