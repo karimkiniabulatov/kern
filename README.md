@@ -29,6 +29,7 @@ go install github.com/karimkiniabulatov/kern@latest
 # Or clone and build
 git clone https://github.com/karimkiniabulatov/kern
 cd kern
+chmod +x ./scripts/install.sh
 ./scripts/install.sh
 
 kern                    # Full system monitoring (default)
