@@ -1,0 +1,92 @@
+{
+  "language": "日本語",
+  "language_code": "ja",
+  "translations": {
+    "common": {
+      "title": "kern - システム監視",
+      "refresh": "更新",
+      "seconds": "秒",
+      "error": "エラー",
+      "unknown": "不明",
+      "total": "合計",
+      "used": "使用済み",
+      "free": "空き",
+      "available": "利用可能",
+      "status": "ステータス",
+      "up": "オン",
+      "down": "オフ"
+    },
+    "cpu": {
+      "title": "プロセッサ情報",
+      "model": "モデル",
+      "cores": "コア数",
+      "threads": "スレッド数",
+      "usage": "使用率",
+      "frequency": "周波数",
+      "load": "負荷",
+      "load_1min": "1分",
+      "load_5min": "5分", 
+      "load_15min": "15分",
+      "load_average": "平均負荷"
+    },
+    "memory": {
+      "title": "メモリ情報",
+      "ram": "RAM",
+      "swap": "スワップ",
+      "physical": "物理メモリ",
+      "virtual": "仮想メモリ"
+    },
+    "disk": {
+      "title": "ディスク情報",
+      "filesystem": "ファイルシステム",
+      "size": "サイズ",
+      "mounted": "マウントポイント",
+      "usage": "使用率",
+      "storage": "ストレージ"
+    },
+    "network": {
+      "title": "ネットワーク情報",
+      "interface": "インターフェース",
+      "received": "受信",
+      "sent": "送信",
+      "bytes": "バイト",
+      "packets": "パケット",
+      "errors": "エラー",
+      "network_interfaces": "ネットワークインターフェース"
+    },
+    "ui": {
+      "histogram": "ヒストグラム",
+      "vertical": "垂直",
+      "horizontal": "水平",
+      "loading": "読み込み中...",
+      "no_data": "データなし",
+      "percent": "パーセント"
+    },
+    "commands": {
+      "help": "ヘルプ",
+      "version": "バージョン",
+      "all": "全情報",
+      "disk_only": "ディスクのみ",
+      "cpu_only": "プロセッサのみ",
+      "memory_only": "メモリのみ",
+      "network_only": "ネットワークのみ",
+      "refresh_rate": "更新間隔",
+      "language": "言語",
+      "remote": "リモートモード",
+      "port": "ポート"
+    },
+    "errors": {
+      "command_not_found": "コマンドが見つかりません：%s",
+      "invalid_port": "無効なポート：%d",
+      "invalid_refresh": "無効な更新間隔：%d",
+      "config_load_failed": "設定の読み込みに失敗しました",
+      "module_failed": "モジュール %s エラー：%v"
+    },
+    "status": {
+      "monitoring_started": "監視を開始しました",
+      "updating_every": "%d 秒ごとに更新",
+      "press_ctrl_c": "Ctrl+Cで終了",
+      "remote_mode": "ポート %d でリモートモード"
+    }
+  }
+}

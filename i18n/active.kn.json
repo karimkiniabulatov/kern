@@ -1,0 +1,92 @@
+{
+  "language": "ಕನ್ನಡ",
+  "language_code": "kn",
+  "translations": {
+    "common": {
+      "title": "kern - ಸಿಸ್ಟಮ್ ಮಾನಿಟರಿಂಗ್",
+      "refresh": "ರಿಫ್ರೆಶ್",
+      "seconds": "ಸೆಕೆಂಡುಗಳು",
+      "error": "ದೋಷ",
+      "unknown": "ಅಜ್ಞಾತ",
+      "total": "ಒಟ್ಟು",
+      "used": "ಬಳಸಲಾಗಿದೆ",
+      "free": "ಉಚಿತ",
+      "available": "ಲಭ್ಯವಿದೆ",
+      "status": "ಸ್ಥಿತಿ",
+      "up": "ಚಾಲೂ",
+      "down": "ಆಫ್"
+    },
+    "cpu": {
+      "title": "ಪ್ರೊಸೆಸರ್ ಮಾಹಿತಿ",
+      "model": "ಮಾದರಿ",
+      "cores": "ಕೋರ್ಗಳು",
+      "threads": "ಥ್ರೆಡ್ಗಳು",
+      "usage": "ಬಳಕೆ",
+      "frequency": "ಫ್ರೀಕ್ವೆನ್ಸಿ",
+      "load": "ಲೋಡ್",
+      "load_1min": "1 ನಿಮಿಷ",
+      "load_5min": "5 ನಿಮಿಷ", 
+      "load_15min": "15 ನಿಮಿಷ",
+      "load_average": "ಸರಾಸರಿ ಲೋಡ್"
+    },
+    "memory": {
+      "title": "ಮೆಮೊರಿ ಮಾಹಿತಿ",
+      "ram": "RAM",
+      "swap": "ಸ್ವಾಪ್",
+      "physical": "ಭೌತಿಕ ಮೆಮೊರಿ",
+      "virtual": "ವರ್ಚುವಲ್ ಮೆಮೊರಿ"
+    },
+    "disk": {
+      "title": "ಡಿಸ್ಕ್ ಮಾಹಿತಿ",
+      "filesystem": "ಫೈಲ್ ಸಿಸ್ಟಮ್",
+      "size": "ಗಾತ್ರ",
+      "mounted": "ಮೌಂಟ್ ಪಾಯಿಂಟ್",
+      "usage": "ಬಳಕೆ",
+      "storage": "ಸ್ಟೋರೇಜ್"
+    },
+    "network": {
+      "title": "ನೆಟ್ವರ್ಕ್ ಮಾಹಿತಿ",
+      "interface": "ಇಂಟರ್ಫೇಸ್",
+      "received": "ಪಡೆದ",
+      "sent": "ಕಳುಹಿಸಲಾಗಿದೆ",
+      "bytes": "ಬೈಟ್ಗಳು",
+      "packets": "ಪ್ಯಾಕೆಟ್ಗಳು",
+      "errors": "ದೋಷಗಳು",
+      "network_interfaces": "ನೆಟ್ವರ್ಕ್ ಇಂಟರ್ಫೇಸ್ಗಳು"
+    },
+    "ui": {
+      "histogram": "ಹಿಸ್ಟೋಗ್ರಾಂ",
+      "vertical": "ಲಂಬ",
+      "horizontal": "ಅಡ್ಡ",
+      "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+      "no_data": "ಡೇಟಾ ಇಲ್ಲ",
+      "percent": "ಶೇಕಡಾ"
+    },
+    "commands": {
+      "help": "ಸಹಾಯ",
+      "version": "ವೆರ್ಷನ್",
+      "all": "ಎಲ್ಲಾ ಮಾಹಿತಿ",
+      "disk_only": "ಡಿಸ್ಕ್ ಮಾತ್ರ",
+      "cpu_only": "ಪ್ರೊಸೆಸರ್ ಮಾತ್ರ",
+      "memory_only": "ಮೆಮೊರಿ ಮಾತ್ರ",
+      "network_only": "ನೆಟ್ವರ್ಕ್ ಮಾತ್ರ",
+      "refresh_rate": "ರಿಫ್ರೆಶ್ ರೇಟ್",
+      "language": "ಭಾಷೆ",
+      "remote": "ರಿಮೋಟ್ ಮೋಡ್",
+      "port": "ಪೋರ್ಟ್"
+    },
+    "errors": {
+      "command_not_found": "ಕಮಾಂಡ್ ಕಂಡುಬಂದಿಲ್ಲ: %s",
+      "invalid_port": "ಅಮಾನ್ಯ ಪೋರ್ಟ್: %d",
+      "invalid_refresh": "ಅಮಾನ್ಯ ರಿಫ್ರೆಶ್ ರೇಟ್: %d",
+      "config_load_failed": "ಕಾನ್ಫಿಗರೇಶನ್ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ",
+      "module_failed": "ಮಾಡ್ಯೂಲ್ %s ದೋಷ: %v"
+    },
+    "status": {
+      "monitoring_started": "ಮಾನಿಟರಿಂಗ್ ಪ್ರಾರಂಭವಾಗಿದೆ",
+      "updating_every": "ಪ್ರತಿ %d ಸೆಕೆಂಡ್ಗಳಿಗೆ ಅಪ್ಡೇಟ್ ಆಗುತ್ತಿದೆ",
+      "press_ctrl_c": "ನಿರ್ಗಮಿಸಲು Ctrl+C ಒತ್ತಿರಿ",
+      "remote_mode": "ಪೋರ್ಟ್ %d ನಲ್ಲಿ ರಿಮೋಟ್ ಮೋಡ್"
+    }
+  }
+}

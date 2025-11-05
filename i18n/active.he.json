@@ -1,0 +1,92 @@
+{
+  "language": "עברית",
+  "language_code": "he",
+  "translations": {
+    "common": {
+      "title": "kern - ניטור מערכת",
+      "refresh": "רענון",
+      "seconds": "שניות",
+      "error": "שגיאה",
+      "unknown": "לא ידוע",
+      "total": "סה\"כ",
+      "used": "משומש",
+      "free": "חופשי",
+      "available": "זמין",
+      "status": "סטטוס",
+      "up": "פועל",
+      "down": "כבוי"
+    },
+    "cpu": {
+      "title": "מידע על המעבד",
+      "model": "דגם",
+      "cores": "ליבות",
+      "threads": "תהליכונים",
+      "usage": "שימוש",
+      "frequency": "תדירות",
+      "load": "עומס",
+      "load_1min": "1 דקה",
+      "load_5min": "5 דקות", 
+      "load_15min": "15 דקות",
+      "load_average": "עומס ממוצע"
+    },
+    "memory": {
+      "title": "מידע על הזיכרון",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "זיכרון פיזי",
+      "virtual": "זיכרון וירטואלי"
+    },
+    "disk": {
+      "title": "מידע על הדיסק",
+      "filesystem": "מערכת קבצים",
+      "size": "גודל",
+      "mounted": "נקודת עגינה",
+      "usage": "שימוש",
+      "storage": "אחסון"
+    },
+    "network": {
+      "title": "מידע על הרשת",
+      "interface": "ממשק",
+      "received": "התקבל",
+      "sent": "נשלח",
+      "bytes": "בייטים",
+      "packets": "מנות",
+      "errors": "שגיאות",
+      "network_interfaces": "ממשקי רשת"
+    },
+    "ui": {
+      "histogram": "היסטוגרמה",
+      "vertical": "אנכי",
+      "horizontal": "אופקי",
+      "loading": "טוען...",
+      "no_data": "אין נתונים",
+      "percent": "אחוזים"
+    },
+    "commands": {
+      "help": "עזרה",
+      "version": "גרסה",
+      "all": "כל המידע",
+      "disk_only": "רק דיסק",
+      "cpu_only": "רק מעבד",
+      "memory_only": "רק זיכרון",
+      "network_only": "רק רשת",
+      "refresh_rate": "מרווח רענון",
+      "language": "שפה",
+      "remote": "מצב מרוחק",
+      "port": "פורט"
+    },
+    "errors": {
+      "command_not_found": "הפקודה לא נמצאה: %s",
+      "invalid_port": "פורט לא תקין: %d",
+      "invalid_refresh": "מרווח רענון לא תקין: %d",
+      "config_load_failed": "טעינת התצורה נכשלה",
+      "module_failed": "שגיאת מודול %s: %v"
+    },
+    "status": {
+      "monitoring_started": "הניטור החל",
+      "updating_every": "מתעדכן כל %d שניות",
+      "press_ctrl_c": "לחץ Ctrl+C כדי לצאת",
+      "remote_mode": "מצב מרוחק בפורט %d"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "Lietuvių",
+  "language_code": "lt",
+  "translations": {
+    "common": {
+      "title": "kern - Sistemos stebėjimas",
+      "refresh": "Atnaujinti",
+      "seconds": "sek",
+      "error": "Klaida",
+      "unknown": "Nežinoma",
+      "total": "Iš viso",
+      "used": "Naudojama",
+      "free": "Laisva",
+      "available": "Prieinama",
+      "status": "Būsena",
+      "up": "ĮJUNGTA",
+      "down": "IŠJUNGTA"
+    },
+    "cpu": {
+      "title": "Procesoriaus informacija",
+      "model": "Modelis",
+      "cores": "Branduoliai",
+      "threads": "Siūlai",
+      "usage": "Naudojimas",
+      "frequency": "Dažnis",
+      "load": "Apkrova",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Vidutinė apkrova"
+    },
+    "memory": {
+      "title": "Atminties informacija",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fizinė atmintis",
+      "virtual": "Virtuali atmintis"
+    },
+    "disk": {
+      "title": "Disko informacija",
+      "filesystem": "Failų sistema",
+      "size": "Dydis",
+      "mounted": "Prijungimo taškas",
+      "usage": "Naudojimas",
+      "storage": "Saugykla"
+    },
+    "network": {
+      "title": "Tinklo informacija",
+      "interface": "Sąsaja",
+      "received": "Gauta",
+      "sent": "Išsiųsta",
+      "bytes": "baitų",
+      "packets": "paketų",
+      "errors": "Klaidos",
+      "network_interfaces": "Tinklo sąsajos"
+    },
+    "ui": {
+      "histogram": "Histograma",
+      "vertical": "Vertikaliai",
+      "horizontal": "Horizontaliai",
+      "loading": "Įkeliama...",
+      "no_data": "Nėra duomenų",
+      "percent": "procentų"
+    },
+    "commands": {
+      "help": "Pagalba",
+      "version": "Versija",
+      "all": "Visa informacija",
+      "disk_only": "Tik diskas",
+      "cpu_only": "Tik procesorius",
+      "memory_only": "Tik atmintis",
+      "network_only": "Tik tinklas",
+      "refresh_rate": "Atnaujinimo dažnumas",
+      "language": "Kalba",
+      "remote": "Nuotolinis režimas",
+      "port": "Prievadas"
+    },
+    "errors": {
+      "command_not_found": "Komanda nerasta: %s",
+      "invalid_port": "Netinkamas prievadas: %d",
+      "invalid_refresh": "Netinkamas atnaujinimo dažnumas: %d",
+      "config_load_failed": "Nepavyko įkelti konfigūracijos",
+      "module_failed": "Modulio %s klaida: %v"
+    },
+    "status": {
+      "monitoring_started": "Stebėjimas pradėtas",
+      "updating_every": "Atnaujinama kas %d sekundės",
+      "press_ctrl_c": "Paspauskite Ctrl+C, kad išeitumėte",
+      "remote_mode": "Nuotolinis režimas prievade %d"
+    }
+  }
+}

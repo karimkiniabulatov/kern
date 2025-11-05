@@ -1,41 +1,92 @@
 {
-"disk_title": "Disk Information",
-"disk_filesystem": "Filesystem",
-"disk_size": "Size",
-"disk_used": "Used",
-"disk_available": "Available",
-"disk_use_percent": "Use%",
-"disk_mounted_on": "Mounted on",
-
-"cpu_title": "CPU Information",
-"cpu_model": "Model",
-"cpu_cores": "Cores",
-"cpu_threads": "Threads",
-"cpu_usage": "Usage",
-"cpu_frequency": "Frequency",
-"cpu_load1": "Load (1 min)",
-"cpu_load5": "Load (5 min)",
-"cpu_load15": "Load (15 min)",
-
-"mem_title": "Memory Information",
-"mem_total": "Total",
-"mem_used": "Used",
-"mem_free": "Free",
-"mem_available": "Available",
-"mem_swap_total": "Swap Total",
-"mem_swap_used": "Swap Used",
-"mem_swap_free": "Swap Free",
-
-"net_title": "Network Information",
-"net_interface": "Interface",
-"net_rx_bytes": "RX Bytes",
-"net_tx_bytes": "TX Bytes",
-"net_status": "Status",
-"net_status_up": "UP",
-"net_status_down": "DOWN",
-
-"common_refresh": "Refresh",
-"common_seconds": "sec.",
-"common_error": "Error",
-"common_unknown": "Unknown"
+  "language": "English", 
+  "language_code": "en",
+  "translations": {
+    "common": {
+      "title": "kern - System Monitor",
+      "refresh": "Refresh",
+      "seconds": "sec",
+      "error": "Error",
+      "unknown": "Unknown",
+      "total": "Total",
+      "used": "Used", 
+      "free": "Free",
+      "available": "Available",
+      "status": "Status",
+      "up": "UP",
+      "down": "DOWN"
+    },
+    "cpu": {
+      "title": "CPU Information",
+      "model": "Model",
+      "cores": "Cores",
+      "threads": "Threads",
+      "usage": "Usage",
+      "frequency": "Frequency", 
+      "load": "Load",
+      "load_1min": "1 min",
+      "load_5min": "5 min",
+      "load_15min": "15 min",
+      "load_average": "Load Average"
+    },
+    "memory": {
+      "title": "Memory Information", 
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Physical Memory",
+      "virtual": "Virtual Memory"
+    },
+    "disk": {
+      "title": "Disk Information",
+      "filesystem": "Filesystem",
+      "size": "Size",
+      "mounted": "Mounted on", 
+      "usage": "Usage",
+      "storage": "Storage"
+    },
+    "network": {
+      "title": "Network Information",
+      "interface": "Interface",
+      "received": "Received",
+      "sent": "Sent",
+      "bytes": "bytes",
+      "packets": "packets",
+      "errors": "Errors",
+      "network_interfaces": "Network Interfaces"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Vertical", 
+      "horizontal": "Horizontal",
+      "loading": "Loading...",
+      "no_data": "No data",
+      "percent": "percent"
+    },
+    "commands": {
+      "help": "Help",
+      "version": "Version",
+      "all": "All information",
+      "disk_only": "Disk only",
+      "cpu_only": "CPU only",
+      "memory_only": "Memory only", 
+      "network_only": "Network only",
+      "refresh_rate": "Refresh rate",
+      "language": "Language",
+      "remote": "Remote mode",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Command not found: %s",
+      "invalid_port": "Invalid port: %d",
+      "invalid_refresh": "Invalid refresh interval: %d", 
+      "config_load_failed": "Failed to load configuration",
+      "module_failed": "Module %s failed: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitoring started",
+      "updating_every": "Updating every %d seconds", 
+      "press_ctrl_c": "Press Ctrl+C to exit",
+      "remote_mode": "Remote mode on port %d"
+    }
+  }
 }

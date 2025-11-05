@@ -1,0 +1,92 @@
+{
+  "language": "Tiếng Việt",
+  "language_code": "vi",
+  "translations": {
+    "common": {
+      "title": "kern - Giám sát Hệ thống",
+      "refresh": "Làm mới",
+      "seconds": "giây",
+      "error": "Lỗi",
+      "unknown": "Không xác định",
+      "total": "Tổng",
+      "used": "Đã dùng",
+      "free": "Trống",
+      "available": "Khả dụng",
+      "status": "Trạng thái",
+      "up": "BẬT",
+      "down": "TẮT"
+    },
+    "cpu": {
+      "title": "Thông tin Bộ xử lý",
+      "model": "Mẫu",
+      "cores": "Lõi",
+      "threads": "Luồng",
+      "usage": "Sử dụng",
+      "frequency": "Tần số",
+      "load": "Tải",
+      "load_1min": "1 phút",
+      "load_5min": "5 phút", 
+      "load_15min": "15 phút",
+      "load_average": "Tải trung bình"
+    },
+    "memory": {
+      "title": "Thông tin Bộ nhớ",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Bộ nhớ vật lý",
+      "virtual": "Bộ nhớ ảo"
+    },
+    "disk": {
+      "title": "Thông tin Đĩa",
+      "filesystem": "Hệ thống tệp",
+      "size": "Kích thước",
+      "mounted": "Điểm gắn kết",
+      "usage": "Sử dụng",
+      "storage": "Lưu trữ"
+    },
+    "network": {
+      "title": "Thông tin Mạng",
+      "interface": "Giao diện",
+      "received": "Đã nhận",
+      "sent": "Đã gửi",
+      "bytes": "byte",
+      "packets": "gói tin",
+      "errors": "Lỗi",
+      "network_interfaces": "Giao diện mạng"
+    },
+    "ui": {
+      "histogram": "Biểu đồ",
+      "vertical": "Dọc",
+      "horizontal": "Ngang",
+      "loading": "Đang tải...",
+      "no_data": "Không có dữ liệu",
+      "percent": "phần trăm"
+    },
+    "commands": {
+      "help": "Trợ giúp",
+      "version": "Phiên bản",
+      "all": "Tất cả thông tin",
+      "disk_only": "Chỉ đĩa",
+      "cpu_only": "Chỉ bộ xử lý",
+      "memory_only": "Chỉ bộ nhớ",
+      "network_only": "Chỉ mạng",
+      "refresh_rate": "Khoảng thời gian làm mới",
+      "language": "Ngôn ngữ",
+      "remote": "Chế độ từ xa",
+      "port": "Cổng"
+    },
+    "errors": {
+      "command_not_found": "Không tìm thấy lệnh: %s",
+      "invalid_port": "Cổng không hợp lệ: %d",
+      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d",
+      "config_load_failed": "Không thể tải cấu hình",
+      "module_failed": "Lỗi mô-đun %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Đã bắt đầu giám sát",
+      "updating_every": "Cập nhật mỗi %d giây",
+      "press_ctrl_c": "Nhấn Ctrl+C để thoát",
+      "remote_mode": "Chế độ từ xa trên cổng %d"
+    }
+  }
+}

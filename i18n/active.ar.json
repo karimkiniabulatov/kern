@@ -1,0 +1,92 @@
+{
+  "language": "العربية",
+  "language_code": "ar",
+  "translations": {
+    "common": {
+      "title": "kern - مراقبة النظام",
+      "refresh": "تحديث",
+      "seconds": "ثانية",
+      "error": "خطأ",
+      "unknown": "غير معروف",
+      "total": "الإجمالي",
+      "used": "مستخدم",
+      "free": "حر",
+      "available": "متاح",
+      "status": "الحالة",
+      "up": "تشغيل",
+      "down": "إيقاف"
+    },
+    "cpu": {
+      "title": "معلومات المعالج",
+      "model": "الموديل",
+      "cores": "النوى",
+      "threads": "الخيوط",
+      "usage": "الاستخدام",
+      "frequency": "التردد",
+      "load": "الحمل",
+      "load_1min": "1 دقيقة",
+      "load_5min": "5 دقائق", 
+      "load_15min": "15 دقيقة",
+      "load_average": "متوسط الحمل"
+    },
+    "memory": {
+      "title": "معلومات الذاكرة",
+      "ram": "الذاكرة العشوائية",
+      "swap": "المبادلة",
+      "physical": "الذارة الفعلية",
+      "virtual": "الذاكرة الافتراضية"
+    },
+    "disk": {
+      "title": "معلومات القرص",
+      "filesystem": "نظام الملفات",
+      "size": "الحجم",
+      "mounted": "نقطة التركيب",
+      "usage": "الاستخدام",
+      "storage": "التخزين"
+    },
+    "network": {
+      "title": "معلومات الشبكة",
+      "interface": "الواجهة",
+      "received": "مستلم",
+      "sent": "مرسل",
+      "bytes": "بايت",
+      "packets": "حزم",
+      "errors": "أخطاء",
+      "network_interfaces": "واجهات الشبكة"
+    },
+    "ui": {
+      "histogram": "مدرج تكراري",
+      "vertical": "عمودي",
+      "horizontal": "أفقي",
+      "loading": "جاري التحميل...",
+      "no_data": "لا توجد بيانات",
+      "percent": "بالمائة"
+    },
+    "commands": {
+      "help": "مساعدة",
+      "version": "الإصدار",
+      "all": "جميع المعلومات",
+      "disk_only": "القرص فقط",
+      "cpu_only": "المعالج فقط",
+      "memory_only": "الذاكرة فقط",
+      "network_only": "الشبكة فقط",
+      "refresh_rate": "معدل التحديث",
+      "language": "اللغة",
+      "remote": "الوضع البعيد",
+      "port": "المنفذ"
+    },
+    "errors": {
+      "command_not_found": "الأمر غير موجود: %s",
+      "invalid_port": "منفذ غير صالح: %d",
+      "invalid_refresh": "معدل تحديث غير صالح: %d",
+      "config_load_failed": "فشل تحميل الإعدادات",
+      "module_failed": "خطأ في الوحدة %s: %v"
+    },
+    "status": {
+      "monitoring_started": "بدأ المراقبة",
+      "updating_every": "التحديث كل %d ثانية",
+      "press_ctrl_c": "اضغط Ctrl+C للخروج",
+      "remote_mode": "الوضع البعيد على المنفذ %d"
+    }
+  }
+}

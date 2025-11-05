@@ -1,0 +1,92 @@
+{
+  "language": "Türkçe",
+  "language_code": "tr",
+  "translations": {
+    "common": {
+      "title": "kern - Sistem İzleme",
+      "refresh": "Yenile",
+      "seconds": "sn",
+      "error": "Hata",
+      "unknown": "Bilinmeyen",
+      "total": "Toplam",
+      "used": "Kullanılan",
+      "free": "Boş",
+      "available": "Kullanılabilir",
+      "status": "Durum",
+      "up": "AÇIK",
+      "down": "KAPALI"
+    },
+    "cpu": {
+      "title": "İşlemci Bilgisi",
+      "model": "Model",
+      "cores": "Çekirdek",
+      "threads": "İş Parçacığı",
+      "usage": "Kullanım",
+      "frequency": "Frekans",
+      "load": "Yük",
+      "load_1min": "1 dk",
+      "load_5min": "5 dk", 
+      "load_15min": "15 dk",
+      "load_average": "Ortalama yük"
+    },
+    "memory": {
+      "title": "Bellek Bilgisi",
+      "ram": "RAM",
+      "swap": "Takas",
+      "physical": "Fiziksel bellek",
+      "virtual": "Sanal bellek"
+    },
+    "disk": {
+      "title": "Disk Bilgisi",
+      "filesystem": "Dosya sistemi",
+      "size": "Boyut",
+      "mounted": "Bağlama noktası",
+      "usage": "Kullanım",
+      "storage": "Depolama"
+    },
+    "network": {
+      "title": "Ağ Bilgisi",
+      "interface": "Arayüz",
+      "received": "Alınan",
+      "sent": "Gönderilen",
+      "bytes": "bayt",
+      "packets": "paket",
+      "errors": "Hatalar",
+      "network_interfaces": "Ağ arayüzleri"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Dikey",
+      "horizontal": "Yatay",
+      "loading": "Yükleniyor...",
+      "no_data": "Veri yok",
+      "percent": "yüzde"
+    },
+    "commands": {
+      "help": "Yardım",
+      "version": "Sürüm",
+      "all": "Tüm bilgiler",
+      "disk_only": "Sadece disk",
+      "cpu_only": "Sadece işlemci",
+      "memory_only": "Sadece bellek",
+      "network_only": "Sadece ağ",
+      "refresh_rate": "Yenileme aralığı",
+      "language": "Dil",
+      "remote": "Uzak mod",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Komut bulunamadı: %s",
+      "invalid_port": "Geçersiz port: %d",
+      "invalid_refresh": "Geçersiz yenileme aralığı: %d",
+      "config_load_failed": "Yapılandırma yüklenemedi",
+      "module_failed": "%s modül hatası: %v"
+    },
+    "status": {
+      "monitoring_started": "İzleme başlatıldı",
+      "updating_every": "Her %d saniyede bir güncelleniyor",
+      "press_ctrl_c": "Çıkmak için Ctrl+C'ye basın",
+      "remote_mode": "%d portunda uzak mod"
+    }
+  }
+}

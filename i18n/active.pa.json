@@ -1,0 +1,92 @@
+{
+  "language": "ਪੰਜਾਬੀ",
+  "language_code": "pa",
+  "translations": {
+    "common": {
+      "title": "kern - ਸਿਸਟਮ ਮਾਨੀਟਰਿੰਗ",
+      "refresh": "ਰਿਫਰੈਸ਼",
+      "seconds": "ਸਕਿੰਟ",
+      "error": "ਗਲਤੀ",
+      "unknown": "ਅਣਜਾਣ",
+      "total": "ਕੁੱਲ",
+      "used": "ਵਰਤਿਆ",
+      "free": "ਮੁਫ਼ਤ",
+      "available": "ਉਪਲਬਧ",
+      "status": "ਸਥਿਤੀ",
+      "up": "ਚਾਲੂ",
+      "down": "ਬੰਦ"
+    },
+    "cpu": {
+      "title": "ਪ੍ਰੋਸੈਸਰ ਜਾਣਕਾਰੀ",
+      "model": "ਮਾਡਲ",
+      "cores": "ਕੋਰ",
+      "threads": "ਥ੍ਰੈਡ",
+      "usage": "ਵਰਤੋਂ",
+      "frequency": "ਫ੍ਰੀਕੁਐਂਸੀ",
+      "load": "ਲੋਡ",
+      "load_1min": "1 ਮਿੰਟ",
+      "load_5min": "5 ਮਿੰਟ", 
+      "load_15min": "15 ਮਿੰਟ",
+      "load_average": "ਔਸਤ ਲੋਡ"
+    },
+    "memory": {
+      "title": "ਮੈਮੋਰੀ ਜਾਣਕਾਰੀ",
+      "ram": "RAM",
+      "swap": "ਸਵੈਪ",
+      "physical": "ਫਿਜ਼ੀਕਲ ਮੈਮੋਰੀ",
+      "virtual": "ਵਰਚੁਅਲ ਮੈਮੋਰੀ"
+    },
+    "disk": {
+      "title": "ਡਿਸਕ ਜਾਣਕਾਰੀ",
+      "filesystem": "ਫਾਈਲ ਸਿਸਟਮ",
+      "size": "ਆਕਾਰ",
+      "mounted": "ਮਾਊਂਟ ਪੁਆਇੰਟ",
+      "usage": "ਵਰਤੋਂ",
+      "storage": "ਸਟੋਰੇਜ"
+    },
+    "network": {
+      "title": "ਨੈੱਟਵਰਕ ਜਾਣਕਾਰੀ",
+      "interface": "ਇੰਟਰਫੇਸ",
+      "received": "ਪ੍ਰਾਪਤ",
+      "sent": "ਭੇਜਿਆ",
+      "bytes": "ਬਾਈਟ",
+      "packets": "ਪੈਕੇਟ",
+      "errors": "ਗਲਤੀਆਂ",
+      "network_interfaces": "ਨੈੱਟਵਰਕ ਇੰਟਰਫੇਸ"
+    },
+    "ui": {
+      "histogram": "ਹਿਸਟੋਗ੍ਰਾਮ",
+      "vertical": "ਖੜ੍ਹਵੀਂ",
+      "horizontal": "ਖਿਤਿਜੀ",
+      "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...",
+      "no_data": "ਕੋਈ ਡੇਟਾ ਨਹੀਂ",
+      "percent": "ਪ੍ਰਤੀਸ਼ਤ"
+    },
+    "commands": {
+      "help": "ਮਦਦ",
+      "version": "ਵਰਜਨ",
+      "all": "ਸਾਰੀ ਜਾਣਕਾਰੀ",
+      "disk_only": "ਸਿਰਫ਼ ਡਿਸਕ",
+      "cpu_only": "ਸਿਰਫ਼ ਪ੍ਰੋਸੈਸਰ",
+      "memory_only": "ਸਿਰਫ਼ ਮੈਮੋਰੀ",
+      "network_only": "ਸਿਰਫ਼ ਨੈੱਟਵਰਕ",
+      "refresh_rate": "ਰਿਫਰੈਸ਼ ਰੇਟ",
+      "language": "ਭਾਸ਼ਾ",
+      "remote": "ਰਿਮੋਟ ਮੋਡ",
+      "port": "ਪੋਰਟ"
+    },
+    "errors": {
+      "command_not_found": "ਕਮਾਂਡ ਨਹੀਂ ਮਿਲੀ: %s",
+      "invalid_port": "ਅਵੈਧ ਪੋਰਟ: %d",
+      "invalid_refresh": "ਅਵੈਧ ਰਿਫਰੈਸ਼ ਰੇਟ: %d",
+      "config_load_failed": "ਕੌਂਫਿਗਰੇਸ਼ਨ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਫਲ",
+      "module_failed": "ਮੋਡਿਊਲ %s ਗਲਤੀ: %v"
+    },
+    "status": {
+      "monitoring_started": "ਮਾਨੀਟਰਿੰਗ ਸ਼ੁਰੂ ਹੋਈ",
+      "updating_every": "ਹਰ %d ਸਕਿੰਟ ਵਿੱਚ ਅੱਪਡੇਟ ਹੋ ਰਿਹਾ ਹੈ",
+      "press_ctrl_c": "ਬਾਹਰ ਨਿਕਲਣ ਲਈ Ctrl+C ਦਬਾਓ",
+      "remote_mode": "ਪੋਰਟ %d 'ਤੇ ਰਿਮੋਟ ਮੋਡ"
+    }
+  }
+}

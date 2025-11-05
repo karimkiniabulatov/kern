@@ -1,0 +1,92 @@
+{
+  "language": "Français",
+  "language_code": "fr",
+  "translations": {
+    "common": {
+      "title": "kern - Surveillance Système",
+      "refresh": "Actualiser",
+      "seconds": "sec",
+      "error": "Erreur",
+      "unknown": "Inconnu",
+      "total": "Total",
+      "used": "Utilisé",
+      "free": "Libre",
+      "available": "Disponible",
+      "status": "Statut",
+      "up": "ACTIF",
+      "down": "INACTIF"
+    },
+    "cpu": {
+      "title": "Informations Processeur",
+      "model": "Modèle",
+      "cores": "Cœurs",
+      "threads": "Threads",
+      "usage": "Utilisation",
+      "frequency": "Fréquence",
+      "load": "Charge",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Charge moyenne"
+    },
+    "memory": {
+      "title": "Informations Mémoire",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Mémoire physique",
+      "virtual": "Mémoire virtuelle"
+    },
+    "disk": {
+      "title": "Informations Disque",
+      "filesystem": "Système de fichiers",
+      "size": "Taille",
+      "mounted": "Point de montage",
+      "usage": "Utilisation",
+      "storage": "Stockage"
+    },
+    "network": {
+      "title": "Informations Réseau",
+      "interface": "Interface",
+      "received": "Reçu",
+      "sent": "Envoyé",
+      "bytes": "octets",
+      "packets": "paquets",
+      "errors": "Erreurs",
+      "network_interfaces": "Interfaces réseau"
+    },
+    "ui": {
+      "histogram": "Histogramme",
+      "vertical": "Vertical",
+      "horizontal": "Horizontal",
+      "loading": "Chargement...",
+      "no_data": "Aucune donnée",
+      "percent": "pourcentage"
+    },
+    "commands": {
+      "help": "Aide",
+      "version": "Version",
+      "all": "Toutes les informations",
+      "disk_only": "Disque uniquement",
+      "cpu_only": "Processeur uniquement",
+      "memory_only": "Mémoire uniquement",
+      "network_only": "Réseau uniquement",
+      "refresh_rate": "Intervalle de rafraîchissement",
+      "language": "Langue",
+      "remote": "Mode distant",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Commande non trouvée : %s",
+      "invalid_port": "Port invalide : %d",
+      "invalid_refresh": "Intervalle de rafraîchissement invalide : %d",
+      "config_load_failed": "Échec du chargement de la configuration",
+      "module_failed": "Erreur du module %s : %v"
+    },
+    "status": {
+      "monitoring_started": "Surveillance démarrée",
+      "updating_every": "Mise à jour toutes les %d secondes",
+      "press_ctrl_c": "Appuyez sur Ctrl+C pour quitter",
+      "remote_mode": "Mode distant sur le port %d"
+    }
+  }
+}

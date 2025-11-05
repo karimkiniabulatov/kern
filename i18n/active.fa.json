@@ -1,0 +1,92 @@
+{
+  "language": "فارسی",
+  "language_code": "fa",
+  "translations": {
+    "common": {
+      "title": "kern - مانیتورینگ سیستم",
+      "refresh": "بروزرسانی",
+      "seconds": "ثانیه",
+      "error": "خطا",
+      "unknown": "ناشناخته",
+      "total": "کل",
+      "used": "استفاده شده",
+      "free": "آزاد",
+      "available": "در دسترس",
+      "status": "وضعیت",
+      "up": "روشن",
+      "down": "خاموش"
+    },
+    "cpu": {
+      "title": "اطلاعات پردازنده",
+      "model": "مدل",
+      "cores": "هسته‌ها",
+      "threads": "رشته‌ها",
+      "usage": "مصرف",
+      "frequency": "فرکانس",
+      "load": "بار",
+      "load_1min": "1 دقیقه",
+      "load_5min": "5 دقیقه", 
+      "load_15min": "15 دقیقه",
+      "load_average": "میانگین بار"
+    },
+    "memory": {
+      "title": "اطلاعات حافظه",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "حافظه فیزیکی",
+      "virtual": "حافظه مجازی"
+    },
+    "disk": {
+      "title": "اطلاعات دیسک",
+      "filesystem": "سیستم فایل",
+      "size": "اندازه",
+      "mounted": "نقطه مونت",
+      "usage": "مصرف",
+      "storage": "ذخیره‌سازی"
+    },
+    "network": {
+      "title": "اطلاعات شبکه",
+      "interface": "اینترفیس",
+      "received": "دریافتی",
+      "sent": "ارسال شده",
+      "bytes": "بایت",
+      "packets": "بسته",
+      "errors": "خطاها",
+      "network_interfaces": "اینترفیس‌های شبکه"
+    },
+    "ui": {
+      "histogram": "هیستوگرام",
+      "vertical": "عمودی",
+      "horizontal": "افقی",
+      "loading": "در حال بارگذاری...",
+      "no_data": "داده‌ای موجود نیست",
+      "percent": "درصد"
+    },
+    "commands": {
+      "help": "راهنما",
+      "version": "نسخه",
+      "all": "همه اطلاعات",
+      "disk_only": "فقط دیسک",
+      "cpu_only": "فقط پردازنده",
+      "memory_only": "فقط حافظه",
+      "network_only": "فقط شبکه",
+      "refresh_rate": "بازه بروزرسانی",
+      "language": "زبان",
+      "remote": "حالت راه دور",
+      "port": "پورت"
+    },
+    "errors": {
+      "command_not_found": "دستور یافت نشد: %s",
+      "invalid_port": "پورت نامعتبر: %d",
+      "invalid_refresh": "بازه بروزرسانی نامعتبر: %d",
+      "config_load_failed": "بارگذاری پیکربندی ناموفق بود",
+      "module_failed": "خطای ماژول %s: %v"
+    },
+    "status": {
+      "monitoring_started": "مانیتورینگ آغاز شد",
+      "updating_every": "بروزرسانی هر %d ثانیه",
+      "press_ctrl_c": "برای خروج Ctrl+C را فشار دهید",
+      "remote_mode": "حالت راه دور روی پورت %d"
+    }
+  }
+}

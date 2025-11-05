@@ -1,0 +1,92 @@
+{
+  "language": "Deutsch",
+  "language_code": "de",
+  "translations": {
+    "common": {
+      "title": "kern - Systemüberwachung",
+      "refresh": "Aktualisieren",
+      "seconds": "Sek",
+      "error": "Fehler",
+      "unknown": "Unbekannt",
+      "total": "Gesamt",
+      "used": "Verwendet",
+      "free": "Frei",
+      "available": "Verfügbar",
+      "status": "Status",
+      "up": "EIN",
+      "down": "AUS"
+    },
+    "cpu": {
+      "title": "Prozessorinformationen",
+      "model": "Modell",
+      "cores": "Kerne",
+      "threads": "Threads",
+      "usage": "Nutzung",
+      "frequency": "Frequenz",
+      "load": "Last",
+      "load_1min": "1 Min",
+      "load_5min": "5 Min", 
+      "load_15min": "15 Min",
+      "load_average": "Durchschnittslast"
+    },
+    "memory": {
+      "title": "Speicherinformationen",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Physischer Speicher",
+      "virtual": "Virtueller Speicher"
+    },
+    "disk": {
+      "title": "Festplatteninformationen",
+      "filesystem": "Dateisystem",
+      "size": "Größe",
+      "mounted": "Einhängepunkt",
+      "usage": "Nutzung",
+      "storage": "Speicher"
+    },
+    "network": {
+      "title": "Netzwerkinformationen",
+      "interface": "Schnittstelle",
+      "received": "Empfangen",
+      "sent": "Gesendet",
+      "bytes": "Bytes",
+      "packets": "Pakete",
+      "errors": "Fehler",
+      "network_interfaces": "Netzwerkschnittstellen"
+    },
+    "ui": {
+      "histogram": "Histogramm",
+      "vertical": "Vertikal",
+      "horizontal": "Horizontal",
+      "loading": "Lädt...",
+      "no_data": "Keine Daten",
+      "percent": "Prozent"
+    },
+    "commands": {
+      "help": "Hilfe",
+      "version": "Version",
+      "all": "Alle Informationen",
+      "disk_only": "Nur Festplatte",
+      "cpu_only": "Nur Prozessor",
+      "memory_only": "Nur Speicher",
+      "network_only": "Nur Netzwerk",
+      "refresh_rate": "Aktualisierungsintervall",
+      "language": "Sprache",
+      "remote": "Fernmodus",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Befehl nicht gefunden: %s",
+      "invalid_port": "Ungültiger Port: %d",
+      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d",
+      "config_load_failed": "Konfiguration konnte nicht geladen werden",
+      "module_failed": "Modul %s Fehler: %v"
+    },
+    "status": {
+      "monitoring_started": "Überwachung gestartet",
+      "updating_every": "Aktualisiere alle %d Sekunden",
+      "press_ctrl_c": "Drücken Sie Ctrl+C zum Beenden",
+      "remote_mode": "Fernmodus auf Port %d"
+    }
+  }
+}

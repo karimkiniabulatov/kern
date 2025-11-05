@@ -1,0 +1,92 @@
+{
+  "language": "Slovenčina",
+  "language_code": "sk",
+  "translations": {
+    "common": {
+      "title": "kern - Monitorovanie systému",
+      "refresh": "Obnoviť",
+      "seconds": "sek",
+      "error": "Chyba",
+      "unknown": "Neznáme",
+      "total": "Celkom",
+      "used": "Použité",
+      "free": "Voľné",
+      "available": "Dostupné",
+      "status": "Stav",
+      "up": "ZAPNUTÉ",
+      "down": "VYPNUTÉ"
+    },
+    "cpu": {
+      "title": "Informácie o procesore",
+      "model": "Model",
+      "cores": "Jadrá",
+      "threads": "Vlákna",
+      "usage": "Využitie",
+      "frequency": "Frekvencia",
+      "load": "Zaťaženie",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Priemerné zaťaženie"
+    },
+    "memory": {
+      "title": "Informácie o pamäti",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fyzická pamäť",
+      "virtual": "Virtuálna pamäť"
+    },
+    "disk": {
+      "title": "Informácie o disku",
+      "filesystem": "Súborový systém",
+      "size": "Veľkosť",
+      "mounted": "Prípojný bod",
+      "usage": "Využitie",
+      "storage": "Úložisko"
+    },
+    "network": {
+      "title": "Informácie o sieti",
+      "interface": "Rozhranie",
+      "received": "Prijaté",
+      "sent": "Odoslané",
+      "bytes": "bajtov",
+      "packets": "paketov",
+      "errors": "Chyby",
+      "network_interfaces": "Sieťové rozhrania"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Zvislý",
+      "horizontal": "Vodorovný",
+      "loading": "Načítava sa...",
+      "no_data": "Žiadne dáta",
+      "percent": "percent"
+    },
+    "commands": {
+      "help": "Pomoc",
+      "version": "Verzia",
+      "all": "Všetky informácie",
+      "disk_only": "Iba disk",
+      "cpu_only": "Iba procesor",
+      "memory_only": "Iba pamäť",
+      "network_only": "Iba sieť",
+      "refresh_rate": "Interval obnovenia",
+      "language": "Jazyk",
+      "remote": "Vzdialený režim",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Príkaz nebol nájdený: %s",
+      "invalid_port": "Neplatný port: %d",
+      "invalid_refresh": "Neplatný interval obnovenia: %d",
+      "config_load_failed": "Nepodarilo sa načítať konfiguráciu",
+      "module_failed": "Chyba modulu %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitorovanie spustené",
+      "updating_every": "Aktualizácia každých %d sekúnd",
+      "press_ctrl_c": "Stlačte Ctrl+C pre ukončenie",
+      "remote_mode": "Vzdialený režim na porte %d"
+    }
+  }
+}

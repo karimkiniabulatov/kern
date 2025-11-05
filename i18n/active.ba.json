@@ -1,0 +1,92 @@
+{
+  "language": "Башҡорт",
+  "language_code": "ba",
+  "translations": {
+    "common": {
+      "title": "kern - Система мониторингы",
+      "refresh": "Яңыртыу",
+      "seconds": "сек",
+      "error": "Хата",
+      "unknown": "Билгеһеҙ",
+      "total": "Барлығы",
+      "used": "Ҡулланылған",
+      "free": "Буш",
+      "available": "Мөмкин",
+      "status": "Хәл",
+      "up": "ЭШЛӘЙ",
+      "down": "ТУҠТАТЫЛҒАН"
+    },
+    "cpu": {
+      "title": "Процессор тураһында мәғлүмәт",
+      "model": "Модель",
+      "cores": "Ядролар",
+      "threads": "Һептар",
+      "usage": "Файҙаланыу",
+      "frequency": "Ешлыҡ",
+      "load": "Йөк",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин", 
+      "load_15min": "15 мин",
+      "load_average": "Уртаса йөк"
+    },
+    "memory": {
+      "title": "Хәтер тураһында мәғлүмәт",
+      "ram": "RAM",
+      "swap": "Своп",
+      "physical": "Физик хәтер",
+      "virtual": "Виртуаль хәтер"
+    },
+    "disk": {
+      "title": "Диск тураһында мәғлүмәт",
+      "filesystem": "Файл системаһы",
+      "size": "Күләм",
+      "mounted": "Теркәлеү нөктәһе",
+      "usage": "Файҙаланыу",
+      "storage": "Хранилище"
+    },
+    "network": {
+      "title": "Сесть тураһында мәғлүмәт",
+      "interface": "Интерфейс",
+      "received": "Алынған",
+      "sent": "Ебәрелгән",
+      "bytes": "байт",
+      "packets": "пакет",
+      "errors": "Хаталар",
+      "network_interfaces": "Сесть интерфейстары"
+    },
+    "ui": {
+      "histogram": "Гистограмма",
+      "vertical": "Вертикаль",
+      "horizontal": "Горизонталь",
+      "loading": "Йөкләү...",
+      "no_data": "Мәғлүмәт юҡ",
+      "percent": "процент"
+    },
+    "commands": {
+      "help": "Ярҙам",
+      "version": "Версия",
+      "all": "Бөтә мәғлүмәт",
+      "disk_only": "Баҫҡа диск",
+      "cpu_only": "Баҫҡа процессор",
+      "memory_only": "Баҫҡа хәтер",
+      "network_only": "Баҫҡа сесть",
+      "refresh_rate": "Яңыртыу аралығы",
+      "language": "Тел",
+      "remote": "Сығанаҡ режимы",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команда табылманы: %s",
+      "invalid_port": "Яраҡһыҙ порт: %d",
+      "invalid_refresh": "Яраҡһыҙ яңыртыу аралығы: %d",
+      "config_load_failed": "Конфигурация йөкләү хатаһы",
+      "module_failed": "Модуль %s хатаһы: %v"
+    },
+    "status": {
+      "monitoring_started": "Мониторинг башланды",
+      "updating_every": "Һәр %d секундта яңыртыу",
+      "press_ctrl_c": "Сығыу өсөн Ctrl+C баҫығыҙ",
+      "remote_mode": "%d портында сығанаҡ режимы"
+    }
+  }
+}

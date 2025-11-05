@@ -3,22 +3,24 @@ package mem
 import (
 	"os/exec"
 	"regexp"
-	//"strconv" удалено
+	"strconv"
 	"strings"
 )
 
 type MemoryInfo struct {
-	Total     string
-	Used      string
-	Free      string
-	Available string
-	SwapTotal string
-	SwapUsed  string
-	SwapFree  string
+	Total           string
+	Used            string
+	Free            string
+	Available       string
+	SwapTotal       string
+	SwapUsed        string
+	SwapFree        string
+	UsagePercent    float64
+	SwapUsagePercent float64
 }
 
 func Summary() (*MemoryInfo, error) {
-	// Use free command to get memory information
+	// Используем free для получения информации о памяти
 	cmd := exec.Command("free", "-h")
 	output, err := cmd.Output()
 	if err != nil {
@@ -32,7 +34,14 @@ func parseFreeOutput(output string) (*MemoryInfo, error) {
 	lines := strings.Split(output, "\n")
 	info := &MemoryInfo{}
 
-	// Parse memory line
+	// Получаем raw данные для расчета процентов
+	cmdRaw := exec.Command("free")
+	outputRaw, err := cmdRaw.Output()
+	if err == nil {
+		info.UsagePercent, info.SwapUsagePercent = calculateUsagePercent(string(outputRaw))
+	}
+
+	// Парсим основную память
 	if len(lines) >= 2 {
 		memFields := parseFreeLine(lines[1])
 		if len(memFields) >= 7 {
@@ -43,7 +52,7 @@ func parseFreeOutput(output string) (*MemoryInfo, error) {
 		}
 	}
 
-	// Parse swap line
+	// Парсим swap
 	if len(lines) >= 3 {
 		swapFields := parseFreeLine(lines[2])
 		if len(swapFields) >= 5 {
@@ -60,4 +69,35 @@ func parseFreeLine(line string) []string {
 	re := regexp.MustCompile(`\s+`)
 	fields := re.Split(strings.TrimSpace(line), -1)
 	return fields
+}
+
+func calculateUsagePercent(output string) (float64, float64) {
+	lines := strings.Split(output, "\n")
+	var memPercent, swapPercent float64
+
+	// Memory usage
+	if len(lines) >= 2 {
+		memFields := parseFreeLine(lines[1])
+		if len(memFields) >= 7 {
+			total, _ := strconv.ParseFloat(memFields[1], 64)
+			used, _ := strconv.ParseFloat(memFields[2], 64)
+			if total > 0 {
+				memPercent = (used / total) * 100
+			}
+		}
+	}
+
+	// Swap usage
+	if len(lines) >= 3 {
+		swapFields := parseFreeLine(lines[2])
+		if len(swapFields) >= 5 {
+			total, _ := strconv.ParseFloat(swapFields[1], 64)
+			used, _ := strconv.ParseFloat(swapFields[2], 64)
+			if total > 0 {
+				swapPercent = (used / total) * 100
+			}
+		}
+	}
+
+	return memPercent, swapPercent
 }

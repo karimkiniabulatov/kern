@@ -1,0 +1,92 @@
+{
+  "language": "Magyar",
+  "language_code": "hu",
+  "translations": {
+    "common": {
+      "title": "kern - Rendszerfigyelés",
+      "refresh": "Frissítés",
+      "seconds": "mp",
+      "error": "Hiba",
+      "unknown": "Ismeretlen",
+      "total": "Összesen",
+      "used": "Használt",
+      "free": "Szabad",
+      "available": "Elérhető",
+      "status": "Állapot",
+      "up": "BE",
+      "down": "KI"
+    },
+    "cpu": {
+      "title": "Processzor információk",
+      "model": "Modell",
+      "cores": "Magok",
+      "threads": "Szálak",
+      "usage": "Kihasználtság",
+      "frequency": "Frekvencia",
+      "load": "Terhelés",
+      "load_1min": "1 perc",
+      "load_5min": "5 perc", 
+      "load_15min": "15 perc",
+      "load_average": "Átlagos terhelés"
+    },
+    "memory": {
+      "title": "Memória információk",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fizikai memória",
+      "virtual": "Virtuális memória"
+    },
+    "disk": {
+      "title": "Lemez információk",
+      "filesystem": "Fájlrendszer",
+      "size": "Méret",
+      "mounted": "Csatolási pont",
+      "usage": "Kihasználtság",
+      "storage": "Tároló"
+    },
+    "network": {
+      "title": "Hálózat információk",
+      "interface": "Interfész",
+      "received": "Fogadott",
+      "sent": "Küldött",
+      "bytes": "bájt",
+      "packets": "csomag",
+      "errors": "Hibák",
+      "network_interfaces": "Hálózati interfészek"
+    },
+    "ui": {
+      "histogram": "Hisztogram",
+      "vertical": "Függőleges",
+      "horizontal": "Vízszintes",
+      "loading": "Betöltés...",
+      "no_data": "Nincs adat",
+      "percent": "százalék"
+    },
+    "commands": {
+      "help": "Súgó",
+      "version": "Verzió",
+      "all": "Minden információ",
+      "disk_only": "Csak lemez",
+      "cpu_only": "Csak processzor",
+      "memory_only": "Csak memória",
+      "network_only": "Csak hálózat",
+      "refresh_rate": "Frissítési időköz",
+      "language": "Nyelv",
+      "remote": "Távoli mód",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Parancs nem található: %s",
+      "invalid_port": "Érvénytelen port: %d",
+      "invalid_refresh": "Érvénytelen frissítési időköz: %d",
+      "config_load_failed": "A konfiguráció betöltése sikertelen",
+      "module_failed": "%s modul hibája: %v"
+    },
+    "status": {
+      "monitoring_started": "Figyelés elindítva",
+      "updating_every": "Frissítés %d másodpercenként",
+      "press_ctrl_c": "Nyomja meg a Ctrl+C-t a kilépéshez",
+      "remote_mode": "Távoli mód a %d porton"
+    }
+  }
+}

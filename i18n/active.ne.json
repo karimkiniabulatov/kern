@@ -1,0 +1,92 @@
+{
+  "language": "नेपाली",
+  "language_code": "ne",
+  "translations": {
+    "common": {
+      "title": "kern - प्रणाली मोनिटरिङ",
+      "refresh": "रिफ्रेस",
+      "seconds": "सेकेन्ड",
+      "error": "त्रुटि",
+      "unknown": "अज्ञात",
+      "total": "कुल",
+      "used": "प्रयोग गरिएको",
+      "free": "खाली",
+      "available": "उपलब्ध",
+      "status": "स्थिति",
+      "up": "सक्रिय",
+      "down": "निष्क्रिय"
+    },
+    "cpu": {
+      "title": "प्रोसेसर जानकारी",
+      "model": "मोडेल",
+      "cores": "कोर",
+      "threads": "थ्रेड",
+      "usage": "प्रयोग",
+      "frequency": "आवृत्ति",
+      "load": "लोड",
+      "load_1min": "1 मिनेट",
+      "load_5min": "5 मिनेट", 
+      "load_15min": "15 मिनेट",
+      "load_average": "औसत लोड"
+    },
+    "memory": {
+      "title": "मेमोरी जानकारी",
+      "ram": "RAM",
+      "swap": "स्व्याप",
+      "physical": "भौतिक मेमोरी",
+      "virtual": "भर्चुअल मेमोरी"
+    },
+    "disk": {
+      "title": "डिस्क जानकारी",
+      "filesystem": "फाइल प्रणाली",
+      "size": "आकार",
+      "mounted": "माउन्ट पोइन्ट",
+      "usage": "प्रयोग",
+      "storage": "भण्डारण"
+    },
+    "network": {
+      "title": "नेटवर्क जानकारी",
+      "interface": "इन्टरफेस",
+      "received": "प्राप्त",
+      "sent": "पठाइएको",
+      "bytes": "बाइट",
+      "packets": "प्याकेट",
+      "errors": "त्रुटिहरू",
+      "network_interfaces": "नेटवर्क इन्टरफेस"
+    },
+    "ui": {
+      "histogram": "हिस्टोग्राम",
+      "vertical": "ठाडो",
+      "horizontal": "तेर्सो",
+      "loading": "लोड हुँदै...",
+      "no_data": "कुनै डाटा छैन",
+      "percent": "प्रतिशत"
+    },
+    "commands": {
+      "help": "मद्दत",
+      "version": "संस्करण",
+      "all": "सबै जानकारी",
+      "disk_only": "डिस्क मात्र",
+      "cpu_only": "प्रोसेसर मात्र",
+      "memory_only": "मेमोरी मात्र",
+      "network_only": "नेटवर्क मात्र",
+      "refresh_rate": "रिफ्रेस दर",
+      "language": "भाषा",
+      "remote": "रिमोट मोड",
+      "port": "पोर्ट"
+    },
+    "errors": {
+      "command_not_found": "आदेश भेटिएन: %s",
+      "invalid_port": "अमान्य पोर्ट: %d",
+      "invalid_refresh": "अमान्य रिफ्रेस दर: %d",
+      "config_load_failed": "कन्फिगरेसन लोड गर्न असफल",
+      "module_failed": "मोड्युल %s त्रुटि: %v"
+    },
+    "status": {
+      "monitoring_started": "मोनिटरिङ सुरु भयो",
+      "updating_every": "हरेक %d सेकेन्डमा अद्यावधिक हुँदै",
+      "press_ctrl_c": "निस्कनको लागि Ctrl+C थिच्नुहोस्",
+      "remote_mode": "पोर्ट %d मा रिमोट मोड"
+    }
+  }
+}

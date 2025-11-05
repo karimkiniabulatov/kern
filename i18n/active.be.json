@@ -1,0 +1,92 @@
+{
+  "language": "Беларуская",
+  "language_code": "be",
+  "translations": {
+    "common": {
+      "title": "kern - Маніторынг сістэмы",
+      "refresh": "Абнавіць",
+      "seconds": "сек",
+      "error": "Памылка",
+      "unknown": "Невядома",
+      "total": "Усяго",
+      "used": "Выкарыстана",
+      "free": "Вольна",
+      "available": "Даступна",
+      "status": "Статус",
+      "up": "УКЛ",
+      "down": "ВЫКЛ"
+    },
+    "cpu": {
+      "title": "Інфармацыя пра працэсар",
+      "model": "Мадэль",
+      "cores": "Ядры",
+      "threads": "Струмы",
+      "usage": "Выкарыстанне",
+      "frequency": "Частата",
+      "load": "Нагрузка",
+      "load_1min": "1 хв",
+      "load_5min": "5 хв", 
+      "load_15min": "15 хв",
+      "load_average": "Сярэдняя нагрузка"
+    },
+    "memory": {
+      "title": "Інфармацыя пра памяць",
+      "ram": "АЗП",
+      "swap": "Своп",
+      "physical": "Фізічная памяць",
+      "virtual": "Віртуальная памяць"
+    },
+    "disk": {
+      "title": "Інфармацыя пра дыск",
+      "filesystem": "Файлавая сістэма",
+      "size": "Памер",
+      "mounted": "Кропка мацавання",
+      "usage": "Выкарыстанне",
+      "storage": "Сховішча"
+    },
+    "network": {
+      "title": "Сеткавая інфармацыя",
+      "interface": "Інтэрфейс",
+      "received": "Атрымана",
+      "sent": "Адпраўлена",
+      "bytes": "байт",
+      "packets": "пакет",
+      "errors": "Памылкі",
+      "network_interfaces": "Сеткавыя інтэрфейсы"
+    },
+    "ui": {
+      "histogram": "Гістаграма",
+      "vertical": "Вертыкальны",
+      "horizontal": "Гарызантальны",
+      "loading": "Загрузка...",
+      "no_data": "Няма дадзеных",
+      "percent": "працэнт"
+    },
+    "commands": {
+      "help": "Дапамога",
+      "version": "Версія",
+      "all": "Уся інфармацыя",
+      "disk_only": "Толькі дыск",
+      "cpu_only": "Толькі працэсар",
+      "memory_only": "Толькі памяць",
+      "network_only": "Толькі сетка",
+      "refresh_rate": "Інтэрвал абнаўлення",
+      "language": "Мова",
+      "remote": "Выдалены рэжым",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Каманда не знойдзена: %s",
+      "invalid_port": "Несапраўдны порт: %d",
+      "invalid_refresh": "Несапраўдны інтэрвал абнаўлення: %d",
+      "config_load_failed": "Не ўдалося загрузіць канфігурацыю",
+      "module_failed": "Памылка модуля %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Маніторынг пачаты",
+      "updating_every": "Абнаўленне кожныя %d секунд",
+      "press_ctrl_c": "Націсніце Ctrl+C для выхаду",
+      "remote_mode": "Выдалены рэжым на порце %d"
+    }
+  }
+}

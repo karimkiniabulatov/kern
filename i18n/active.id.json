@@ -1,0 +1,92 @@
+{
+  "language": "Bahasa Indonesia",
+  "language_code": "id",
+  "translations": {
+    "common": {
+      "title": "kern - Pemantauan Sistem",
+      "refresh": "Muat ulang",
+      "seconds": "detik",
+      "error": "Kesalahan",
+      "unknown": "Tidak diketahui",
+      "total": "Total",
+      "used": "Digunakan",
+      "free": "Bebas",
+      "available": "Tersedia",
+      "status": "Status",
+      "up": "HIDUP",
+      "down": "MATI"
+    },
+    "cpu": {
+      "title": "Informasi Prosesor",
+      "model": "Model",
+      "cores": "Inti",
+      "threads": "Thread",
+      "usage": "Penggunaan",
+      "frequency": "Frekuensi",
+      "load": "Beban",
+      "load_1min": "1 menit",
+      "load_5min": "5 menit", 
+      "load_15min": "15 menit",
+      "load_average": "Beban rata-rata"
+    },
+    "memory": {
+      "title": "Informasi Memori",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Memori fisik",
+      "virtual": "Memori virtual"
+    },
+    "disk": {
+      "title": "Informasi Disk",
+      "filesystem": "Sistem file",
+      "size": "Ukuran",
+      "mounted": "Titik mount",
+      "usage": "Penggunaan",
+      "storage": "Penyimpanan"
+    },
+    "network": {
+      "title": "Informasi Jaringan",
+      "interface": "Antarmuka",
+      "received": "Diterima",
+      "sent": "Dikirim",
+      "bytes": "byte",
+      "packets": "paket",
+      "errors": "Kesalahan",
+      "network_interfaces": "Antarmuka jaringan"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Vertikal",
+      "horizontal": "Horizontal",
+      "loading": "Memuat...",
+      "no_data": "Tidak ada data",
+      "percent": "persen"
+    },
+    "commands": {
+      "help": "Bantuan",
+      "version": "Versi",
+      "all": "Semua informasi",
+      "disk_only": "Hanya disk",
+      "cpu_only": "Hanya prosesor",
+      "memory_only": "Hanya memori",
+      "network_only": "Hanya jaringan",
+      "refresh_rate": "Interval pembaruan",
+      "language": "Bahasa",
+      "remote": "Mode jarak jauh",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Perintah tidak ditemukan: %s",
+      "invalid_port": "Port tidak valid: %d",
+      "invalid_refresh": "Interval pembaruan tidak valid: %d",
+      "config_load_failed": "Gagal memuat konfigurasi",
+      "module_failed": "Kesalahan modul %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Pemantauan dimulai",
+      "updating_every": "Memperbarui setiap %d detik",
+      "press_ctrl_c": "Tekan Ctrl+C untuk keluar",
+      "remote_mode": "Mode jarak jauh di port %d"
+    }
+  }
+}

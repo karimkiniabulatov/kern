@@ -1,0 +1,92 @@
+{
+  "language": "Eesti",
+  "language_code": "et",
+  "translations": {
+    "common": {
+      "title": "kern - Süsteemiseire",
+      "refresh": "Värskenda",
+      "seconds": "sek",
+      "error": "Viga",
+      "unknown": "Tundmatu",
+      "total": "Kokku",
+      "used": "Kasutatud",
+      "free": "Vaba",
+      "available": "Saadaval",
+      "status": "Olek",
+      "up": "SEES",
+      "down": "VÄLJAS"
+    },
+    "cpu": {
+      "title": "Protsessori teave",
+      "model": "Mudel",
+      "cores": "Tuumad",
+      "threads": "Lõimed",
+      "usage": "Kasutus",
+      "frequency": "Sagedus",
+      "load": "Koormus",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Keskmine koormus"
+    },
+    "memory": {
+      "title": "Mälu teave",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Füüsiline mälu",
+      "virtual": "Virtuaalmälu"
+    },
+    "disk": {
+      "title": "Ketta teave",
+      "filesystem": "Failisüsteem",
+      "size": "Suurus",
+      "mounted": "Haakepunkt",
+      "usage": "Kasutus",
+      "storage": "Salvestus"
+    },
+    "network": {
+      "title": "Võrgu teave",
+      "interface": "Liides",
+      "received": "Vastu võetud",
+      "sent": "Saadetud",
+      "bytes": "baiti",
+      "packets": "paketti",
+      "errors": "Vead",
+      "network_interfaces": "Võrguliidesed"
+    },
+    "ui": {
+      "histogram": "Histogramm",
+      "vertical": "Vertikaalne",
+      "horizontal": "Horisontaalne",
+      "loading": "Laadimine...",
+      "no_data": "Andmeid pole",
+      "percent": "protsenti"
+    },
+    "commands": {
+      "help": "Abi",
+      "version": "Versioon",
+      "all": "Kogu teave",
+      "disk_only": "Ainult ketas",
+      "cpu_only": "Ainult protsessor",
+      "memory_only": "Ainult mälu",
+      "network_only": "Ainult võrk",
+      "refresh_rate": "Värskendussagedus",
+      "language": "Keel",
+      "remote": "Kaugrežiim",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Käsku ei leitud: %s",
+      "invalid_port": "Vigane port: %d",
+      "invalid_refresh": "Vigane värskendussagedus: %d",
+      "config_load_failed": "Seadistuse laadimine ebaõnnestus",
+      "module_failed": "Mooduli %s viga: %v"
+    },
+    "status": {
+      "monitoring_started": "Seire alustatud",
+      "updating_every": "Uuendamine iga %d sekundi järel",
+      "press_ctrl_c": "Väljumiseks vajutage Ctrl+C",
+      "remote_mode": "Kaugrežiim pordil %d"
+    }
+  }
+}

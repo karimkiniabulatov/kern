@@ -1,0 +1,92 @@
+{
+  "language": "Српски",
+  "language_code": "sr",
+  "translations": {
+    "common": {
+      "title": "kern - Мониторинг система",
+      "refresh": "Освежи",
+      "seconds": "сек",
+      "error": "Грешка",
+      "unknown": "Непознато",
+      "total": "Укупно",
+      "used": "Искоришћено",
+      "free": "Слободно",
+      "available": "Доступно",
+      "status": "Статус",
+      "up": "УКЉ",
+      "down": "ИСКЉ"
+    },
+    "cpu": {
+      "title": "Информације о процесору",
+      "model": "Модел",
+      "cores": "Језгра",
+      "threads": "Нити",
+      "usage": "Искоришћење",
+      "frequency": "Фреквенција",
+      "load": "Оптерећење",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин", 
+      "load_15min": "15 мин",
+      "load_average": "Просечно оптерећење"
+    },
+    "memory": {
+      "title": "Информације о меморији",
+      "ram": "РАМ",
+      "swap": "Своп",
+      "physical": "Физичка меморија",
+      "virtual": "Виртуелна меморија"
+    },
+    "disk": {
+      "title": "Информације о диску",
+      "filesystem": "Фајл систем",
+      "size": "Величина",
+      "mounted": "Тачка монтирања",
+      "usage": "Искоришћење",
+      "storage": "Складиште"
+    },
+    "network": {
+      "title": "Мрежне информације",
+      "interface": "Интерфејс",
+      "received": "Примљено",
+      "sent": "Послато",
+      "bytes": "бајтова",
+      "packets": "пакета",
+      "errors": "Грешке",
+      "network_interfaces": "Мрежни интерфејси"
+    },
+    "ui": {
+      "histogram": "Хистограм",
+      "vertical": "Вертикално",
+      "horizontal": "Хоризонтално",
+      "loading": "Учитавање...",
+      "no_data": "Нема података",
+      "percent": "процената"
+    },
+    "commands": {
+      "help": "Помоћ",
+      "version": "Верзија",
+      "all": "Све информације",
+      "disk_only": "Само диск",
+      "cpu_only": "Само процесор",
+      "memory_only": "Само меморија",
+      "network_only": "Само мрежа",
+      "refresh_rate": "Интервал освежавања",
+      "language": "Језик",
+      "remote": "Удаљени режим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команда није пронађена: %s",
+      "invalid_port": "Неисправан порт: %d",
+      "invalid_refresh": "Неисправан интервал освежавања: %d",
+      "config_load_failed": "Није успело учитавање конфигурације",
+      "module_failed": "Грешка модула %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Мониторинг покренут",
+      "updating_every": "Ажурирање сваких %d секунди",
+      "press_ctrl_c": "Притисните Ctrl+C за излаз",
+      "remote_mode": "Удаљени режим на порту %d"
+    }
+  }
+}

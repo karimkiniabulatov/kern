@@ -1,0 +1,92 @@
+{
+  "language": "Nederlands",
+  "language_code": "nl",
+  "translations": {
+    "common": {
+      "title": "kern - Systeembewaking",
+      "refresh": "Vernieuwen",
+      "seconds": "sec",
+      "error": "Fout",
+      "unknown": "Onbekend",
+      "total": "Totaal",
+      "used": "Gebruikt",
+      "free": "Vrij",
+      "available": "Beschikbaar",
+      "status": "Status",
+      "up": "AAN",
+      "down": "UIT"
+    },
+    "cpu": {
+      "title": "Processorinformatie",
+      "model": "Model",
+      "cores": "Kernen",
+      "threads": "Threads",
+      "usage": "Gebruik",
+      "frequency": "Frequentie",
+      "load": "Belasting",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Gemiddelde belasting"
+    },
+    "memory": {
+      "title": "Geheugeninformatie",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fysiek geheugen",
+      "virtual": "Virtueel geheugen"
+    },
+    "disk": {
+      "title": "Schijfinformatie",
+      "filesystem": "Bestandssysteem",
+      "size": "Grootte",
+      "mounted": "Mountpunt",
+      "usage": "Gebruik",
+      "storage": "Opslag"
+    },
+    "network": {
+      "title": "Netwerkinformatie",
+      "interface": "Interface",
+      "received": "Ontvangen",
+      "sent": "Verzonden",
+      "bytes": "bytes",
+      "packets": "pakketten",
+      "errors": "Fouten",
+      "network_interfaces": "Netwerkinterfaces"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Verticaal",
+      "horizontal": "Horizontaal",
+      "loading": "Laden...",
+      "no_data": "Geen gegevens",
+      "percent": "procent"
+    },
+    "commands": {
+      "help": "Help",
+      "version": "Versie",
+      "all": "Alle informatie",
+      "disk_only": "Alleen schijf",
+      "cpu_only": "Alleen processor",
+      "memory_only": "Alleen geheugen",
+      "network_only": "Alleen netwerk",
+      "refresh_rate": "Vernieuwingsinterval",
+      "language": "Taal",
+      "remote": "Externe modus",
+      "port": "Poort"
+    },
+    "errors": {
+      "command_not_found": "Commando niet gevonden: %s",
+      "invalid_port": "Ongeldige poort: %d",
+      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d",
+      "config_load_failed": "Kon configuratie niet laden",
+      "module_failed": "Module %s fout: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitoring gestart",
+      "updating_every": "Bijwerken elke %d seconden",
+      "press_ctrl_c": "Druk op Ctrl+C om af te sluiten",
+      "remote_mode": "Externe modus op poort %d"
+    }
+  }
+}

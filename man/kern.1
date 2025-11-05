@@ -1,5 +1,3 @@
-### man/kern.1
-```man
 .TH KERN 1 "2025-01-01" "kern" "System Monitoring Tool"
 .SH NAME
 kern \- real-time system monitoring tool
@@ -10,7 +8,8 @@ kern \- real-time system monitoring tool
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
 about disk usage, CPU performance, memory utilization, and network statistics.
-It features a colorful terminal interface with auto-refresh capabilities.
+It features a colorful terminal interface with auto-refresh capabilities
+and support for multiple languages.
 .SH OPTIONS
 .TP
 .B \-a, \-\-all
@@ -38,10 +37,14 @@ Show version information.
 Set refresh interval in seconds (default: 2).
 .TP
 .B \-l \fILANG\fR
-Set interface language (e.g., 'ru' for Russian).
+Set interface language. Supported languages: en, ru, zh, es, fr, de, ja, ko, it, pt, ar, hi, id, vi, th, tr, pl, nl, sv, da, no, fi, cs, hu, ro, bg, hr, sk, sl, et, lv, lt, uk, sr, bs, mk, sq, el, he, fa, ur, bn, ta, te, ml, kn, gu, mr, pa, ne, la, bo, ba, kk, mo, ka, hy, be, mn.
 .TP
 .B \-r \fIPORT\fR
 Start remote API server on specified port.
+.SH INTERACTIVE COMMANDS
+.TP
+.B q
+Quit the application.
 .SH EXAMPLES
 .TP
 .B kern

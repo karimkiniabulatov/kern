@@ -1,0 +1,92 @@
+{
+  "language": "Українська",
+  "language_code": "uk",
+  "translations": {
+    "common": {
+      "title": "kern - Моніторинг системи",
+      "refresh": "Оновити",
+      "seconds": "сек",
+      "error": "Помилка",
+      "unknown": "Невідомо",
+      "total": "Всього",
+      "used": "Використано",
+      "free": "Вільно",
+      "available": "Доступно",
+      "status": "Статус",
+      "up": "УВІМК",
+      "down": "ВИМК"
+    },
+    "cpu": {
+      "title": "Інформація про процесор",
+      "model": "Модель",
+      "cores": "Ядер",
+      "threads": "Потоків",
+      "usage": "Використання",
+      "frequency": "Частота",
+      "load": "Навантаження",
+      "load_1min": "1 хв",
+      "load_5min": "5 хв", 
+      "load_15min": "15 хв",
+      "load_average": "Середнє навантаження"
+    },
+    "memory": {
+      "title": "Інформація про пам'ять",
+      "ram": "ОЗП",
+      "swap": "Своп",
+      "physical": "Фізична пам'ять",
+      "virtual": "Віртуальна пам'ять"
+    },
+    "disk": {
+      "title": "Інформація про диск",
+      "filesystem": "Файлова система",
+      "size": "Розмір",
+      "mounted": "Точка монтування",
+      "usage": "Використання",
+      "storage": "Сховище"
+    },
+    "network": {
+      "title": "Мережева інформація",
+      "interface": "Інтерфейс",
+      "received": "Отримано",
+      "sent": "Відправлено",
+      "bytes": "байтів",
+      "packets": "пакетів",
+      "errors": "Помилки",
+      "network_interfaces": "Мережеві інтерфейси"
+    },
+    "ui": {
+      "histogram": "Гістограма",
+      "vertical": "Вертикальна",
+      "horizontal": "Горизонтальна",
+      "loading": "Завантаження...",
+      "no_data": "Немає даних",
+      "percent": "відсотків"
+    },
+    "commands": {
+      "help": "Допомога",
+      "version": "Версія",
+      "all": "Вся інформація",
+      "disk_only": "Лише диск",
+      "cpu_only": "Лише процесор",
+      "memory_only": "Лише пам'ять",
+      "network_only": "Лише мережа",
+      "refresh_rate": "Інтервал оновлення",
+      "language": "Мова",
+      "remote": "Віддалений режим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команду не знайдено: %s",
+      "invalid_port": "Неправильний порт: %d",
+      "invalid_refresh": "Неправильний інтервал оновлення: %d",
+      "config_load_failed": "Не вдалося завантажити конфігурацію",
+      "module_failed": "Помилка модуля %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Моніторинг запущено",
+      "updating_every": "Оновлення кожні %d секунд",
+      "press_ctrl_c": "Натисніть Ctrl+C для виходу",
+      "remote_mode": "Віддалений режим на порті %d"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "اردو",
+  "language_code": "ur",
+  "translations": {
+    "common": {
+      "title": "kern - سسٹم مانیٹرنگ",
+      "refresh": "ریفریش",
+      "seconds": "سیکنڈ",
+      "error": "خرابی",
+      "unknown": "نامعلوم",
+      "total": "کل",
+      "used": "استعمال شدہ",
+      "free": "خالی",
+      "available": "دستیاب",
+      "status": "حالت",
+      "up": "چالو",
+      "down": "بند"
+    },
+    "cpu": {
+      "title": "پروسیسر کی معلومات",
+      "model": "ماڈل",
+      "cores": "کور",
+      "threads": "تھریڈز",
+      "usage": "استعمال",
+      "frequency": "فریکوئنسی",
+      "load": "لوڈ",
+      "load_1min": "1 منٹ",
+      "load_5min": "5 منٹ", 
+      "load_15min": "15 منٹ",
+      "load_average": "اوسط لوڈ"
+    },
+    "memory": {
+      "title": "میموری کی معلومات",
+      "ram": "RAM",
+      "swap": "سویپ",
+      "physical": "فزیکل میموری",
+      "virtual": "ورچوئل میموری"
+    },
+    "disk": {
+      "title": "ڈسک کی معلومات",
+      "filesystem": "فائل سسٹم",
+      "size": "سائز",
+      "mounted": "ماؤنٹ پوائنٹ",
+      "usage": "استعمال",
+      "storage": "اسٹوریج"
+    },
+    "network": {
+      "title": "نیٹ ورک کی معلومات",
+      "interface": "انٹرفیس",
+      "received": "موصول",
+      "sent": "ارسال شدہ",
+      "bytes": "بائٹس",
+      "packets": "پیکٹس",
+      "errors": "خرابیاں",
+      "network_interfaces": "نیٹ ورک انٹرفیس"
+    },
+    "ui": {
+      "histogram": "ہسٹوگرام",
+      "vertical": "عمودی",
+      "horizontal": "افقی",
+      "loading": "لوڈ ہو رہا ہے...",
+      "no_data": "کوئی ڈیٹا نہیں",
+      "percent": "فیصد"
+    },
+    "commands": {
+      "help": "مدد",
+      "version": "ورژن",
+      "all": "تمام معلومات",
+      "disk_only": "صرف ڈسک",
+      "cpu_only": "صرف پروسیسر",
+      "memory_only": "صرف میموری",
+      "network_only": "صرف نیٹ ورک",
+      "refresh_rate": "ریفریش وقفہ",
+      "language": "زبان",
+      "remote": "ریموٹ موڈ",
+      "port": "پورٹ"
+    },
+    "errors": {
+      "command_not_found": "کمانڈ نہیں ملی: %s",
+      "invalid_port": "غلط پورٹ: %d",
+      "invalid_refresh": "غلط ریفریش وقفہ: %d",
+      "config_load_failed": "کنفیگریشن لوڈ نہیں ہو سکی",
+      "module_failed": "ماڈیول %s خرابی: %v"
+    },
+    "status": {
+      "monitoring_started": "مانیٹرنگ شروع ہو گئی",
+      "updating_every": "ہر %d سیکنڈ میں اپڈیٹ ہو رہا ہے",
+      "press_ctrl_c": "باہر نکلنے کے لیے Ctrl+C دبائیں",
+      "remote_mode": "پورٹ %d پر ریموٹ موڈ"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "한국어",
+  "language_code": "ko",
+  "translations": {
+    "common": {
+      "title": "kern - 시스템 모니터링",
+      "refresh": "새로고침",
+      "seconds": "초",
+      "error": "오류",
+      "unknown": "알 수 없음",
+      "total": "전체",
+      "used": "사용됨",
+      "free": "여유",
+      "available": "사용 가능",
+      "status": "상태",
+      "up": "켬",
+      "down": "끔"
+    },
+    "cpu": {
+      "title": "프로세서 정보",
+      "model": "모델",
+      "cores": "코어 수",
+      "threads": "스레드 수",
+      "usage": "사용률",
+      "frequency": "주파수",
+      "load": "로드",
+      "load_1min": "1분",
+      "load_5min": "5분", 
+      "load_15min": "15분",
+      "load_average": "평균 로드"
+    },
+    "memory": {
+      "title": "메모리 정보",
+      "ram": "RAM",
+      "swap": "스왑",
+      "physical": "물리적 메모리",
+      "virtual": "가상 메모리"
+    },
+    "disk": {
+      "title": "디스크 정보",
+      "filesystem": "파일 시스템",
+      "size": "크기",
+      "mounted": "마운트 지점",
+      "usage": "사용률",
+      "storage": "저장소"
+    },
+    "network": {
+      "title": "네트워크 정보",
+      "interface": "인터페이스",
+      "received": "수신",
+      "sent": "송신",
+      "bytes": "바이트",
+      "packets": "패킷",
+      "errors": "오류",
+      "network_interfaces": "네트워크 인터페이스"
+    },
+    "ui": {
+      "histogram": "히스토그램",
+      "vertical": "수직",
+      "horizontal": "수평",
+      "loading": "로딩 중...",
+      "no_data": "데이터 없음",
+      "percent": "퍼센트"
+    },
+    "commands": {
+      "help": "도움말",
+      "version": "버전",
+      "all": "모든 정보",
+      "disk_only": "디스크만",
+      "cpu_only": "프로세서만",
+      "memory_only": "메모리만",
+      "network_only": "네트워크만",
+      "refresh_rate": "새로고침 간격",
+      "language": "언어",
+      "remote": "원격 모드",
+      "port": "포트"
+    },
+    "errors": {
+      "command_not_found": "명령을 찾을 수 없습니다: %s",
+      "invalid_port": "잘못된 포트: %d",
+      "invalid_refresh": "잘못된 새로고침 간격: %d",
+      "config_load_failed": "구성을 불러오지 못했습니다",
+      "module_failed": "모듈 %s 오류: %v"
+    },
+    "status": {
+      "monitoring_started": "모니터링이 시작되었습니다",
+      "updating_every": "%d초마다 업데이트",
+      "press_ctrl_c": "종료하려면 Ctrl+C를 누르세요",
+      "remote_mode": "포트 %d에서 원격 모드"
+    }
+  }
+}

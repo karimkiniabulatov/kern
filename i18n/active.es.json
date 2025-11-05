@@ -1,0 +1,92 @@
+{
+  "language": "Español",
+  "language_code": "es",
+  "translations": {
+    "common": {
+      "title": "kern - Monitoreo del Sistema",
+      "refresh": "Actualizar",
+      "seconds": "seg",
+      "error": "Error",
+      "unknown": "Desconocido",
+      "total": "Total",
+      "used": "Usado",
+      "free": "Libre",
+      "available": "Disponible",
+      "status": "Estado",
+      "up": "ACTIVO",
+      "down": "INACTIVO"
+    },
+    "cpu": {
+      "title": "Información del Procesador",
+      "model": "Modelo",
+      "cores": "Núcleos",
+      "threads": "Hilos",
+      "usage": "Uso",
+      "frequency": "Frecuencia",
+      "load": "Carga",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Carga promedio"
+    },
+    "memory": {
+      "title": "Información de Memoria",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Memoria física",
+      "virtual": "Memoria virtual"
+    },
+    "disk": {
+      "title": "Información del Disco",
+      "filesystem": "Sistema de archivos",
+      "size": "Tamaño",
+      "mounted": "Punto de montaje",
+      "usage": "Uso",
+      "storage": "Almacenamiento"
+    },
+    "network": {
+      "title": "Información de Red",
+      "interface": "Interfaz",
+      "received": "Recibido",
+      "sent": "Enviado",
+      "bytes": "bytes",
+      "packets": "paquetes",
+      "errors": "Errores",
+      "network_interfaces": "Interfaces de red"
+    },
+    "ui": {
+      "histogram": "Histograma",
+      "vertical": "Vertical",
+      "horizontal": "Horizontal",
+      "loading": "Cargando...",
+      "no_data": "Sin datos",
+      "percent": "porcentaje"
+    },
+    "commands": {
+      "help": "Ayuda",
+      "version": "Versión",
+      "all": "Toda la información",
+      "disk_only": "Solo disco",
+      "cpu_only": "Solo procesador",
+      "memory_only": "Solo memoria",
+      "network_only": "Solo red",
+      "refresh_rate": "Intervalo de actualización",
+      "language": "Idioma",
+      "remote": "Modo remoto",
+      "port": "Puerto"
+    },
+    "errors": {
+      "command_not_found": "Comando no encontrado: %s",
+      "invalid_port": "Puerto inválido: %d",
+      "invalid_refresh": "Intervalo de actualización inválido: %d",
+      "config_load_failed": "No se pudo cargar la configuración",
+      "module_failed": "Error del módulo %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitoreo iniciado",
+      "updating_every": "Actualizando cada %d segundos",
+      "press_ctrl_c": "Presione Ctrl+C para salir",
+      "remote_mode": "Modo remoto en puerto %d"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "ქართული",
+  "language_code": "ka",
+  "translations": {
+    "common": {
+      "title": "kern - სისტემის მონიტორინგი",
+      "refresh": "განახლება",
+      "seconds": "წმ",
+      "error": "შეცდომა",
+      "unknown": "უცნობი",
+      "total": "სულ",
+      "used": "გამოყენებული",
+      "free": "თავისუფალი",
+      "available": "ხელმისაწვდომი",
+      "status": "სტატუსი",
+      "up": "ჩართული",
+      "down": "გამორთული"
+    },
+    "cpu": {
+      "title": "პროცესორის ინფორმაცია",
+      "model": "მოდელი",
+      "cores": "ბირთვები",
+      "threads": "ნაკადები",
+      "usage": "გამოყენება",
+      "frequency": "სიხშირე",
+      "load": "დატვირთვა",
+      "load_1min": "1 წთ",
+      "load_5min": "5 წთ", 
+      "load_15min": "15 წთ",
+      "load_average": "საშუალო დატვირთვა"
+    },
+    "memory": {
+      "title": "მეხსიერების ინფორმაცია",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "ფიზიკური მეხსიერება",
+      "virtual": "ვირტუალური მეხსიერება"
+    },
+    "disk": {
+      "title": "დისკის ინფორმაცია",
+      "filesystem": "ფაილური სისტემა",
+      "size": "ზომა",
+      "mounted": "მონტაჟის წერტილი",
+      "usage": "გამოყენება",
+      "storage": "შენახვა"
+    },
+    "network": {
+      "title": "ქსელის ინფორმაცია",
+      "interface": "ინტერფეისი",
+      "received": "მიღებული",
+      "sent": "გაგზავნილი",
+      "bytes": "ბაიტი",
+      "packets": "პაკეტი",
+      "errors": "შეცდომები",
+      "network_interfaces": "ქსელის ინტერფეისები"
+    },
+    "ui": {
+      "histogram": "ჰისტოგრამა",
+      "vertical": "ვერტიკალური",
+      "horizontal": "ჰორიზონტალური",
+      "loading": "იტვირთება...",
+      "no_data": "მონაცემები არ არის",
+      "percent": "პროცენტი"
+    },
+    "commands": {
+      "help": "დახმარება",
+      "version": "ვერსია",
+      "all": "ყველა ინფორმაცია",
+      "disk_only": "მხოლოდ დისკი",
+      "cpu_only": "მხოლოდ პროცესორი",
+      "memory_only": "მხოლოდ მეხსიერება",
+      "network_only": "მხოლოდ ქსელი",
+      "refresh_rate": "განახლების ინტერვალი",
+      "language": "ენა",
+      "remote": "დისტანციური რეჟიმი",
+      "port": "პორტი"
+    },
+    "errors": {
+      "command_not_found": "ბრძანება არ მოიძებნა: %s",
+      "invalid_port": "არასწორი პორტი: %d",
+      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d",
+      "config_load_failed": "კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
+      "module_failed": "მოდულის %s შეცდომა: %v"
+    },
+    "status": {
+      "monitoring_started": "მონიტორინგი დაიწყო",
+      "updating_every": "განახლება ყოველ %d წამში",
+      "press_ctrl_c": "გასასვლელად დააჭირეთ Ctrl+C",
+      "remote_mode": "დისტანციური რეჟიმი პორტზე %d"
+    }
+  }
+}

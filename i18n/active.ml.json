@@ -1,0 +1,92 @@
+{
+  "language": "മലയാളം",
+  "language_code": "ml",
+  "translations": {
+    "common": {
+      "title": "kern - സിസ്റ്റം മോണിറ്ററിംഗ്",
+      "refresh": "റിഫ്രഷ്",
+      "seconds": "സെക്കൻഡ്",
+      "error": "പിശക്",
+      "unknown": "അജ്ഞാതം",
+      "total": "ആകെ",
+      "used": "ഉപയോഗിച്ചു",
+      "free": "സ്വതന്ത്രം",
+      "available": "ലഭ്യമാണ്",
+      "status": "സ്റ്റാറ്റസ്",
+      "up": "ഓൺ",
+      "down": "ഓഫ്"
+    },
+    "cpu": {
+      "title": "പ്രോസസർ വിവരം",
+      "model": "മോഡൽ",
+      "cores": "കോറുകൾ",
+      "threads": "ത്രെഡുകൾ",
+      "usage": "ഉപയോഗം",
+      "frequency": "ഫ്രീക്വൻസി",
+      "load": "ലോഡ്",
+      "load_1min": "1 മിനിറ്റ്",
+      "load_5min": "5 മിനിറ്റ്", 
+      "load_15min": "15 മിനിറ്റ്",
+      "load_average": "ശരാശരി ലോഡ്"
+    },
+    "memory": {
+      "title": "മെമ്മറി വിവരം",
+      "ram": "RAM",
+      "swap": "സ്വാപ്പ്",
+      "physical": "ഫിസിക്കൽ മെമ്മറി",
+      "virtual": "വെർച്വൽ മെമ്മറി"
+    },
+    "disk": {
+      "title": "ഡിസ്ക് വിവരം",
+      "filesystem": "ഫയൽ സിസ്റ്റം",
+      "size": "സൈസ്",
+      "mounted": "മൗണ്ട് പോയിന്റ്",
+      "usage": "ഉപയോഗം",
+      "storage": "സ്റ്റോറേജ്"
+    },
+    "network": {
+      "title": "നെറ്റ്വർക്ക് വിവരം",
+      "interface": "ഇന്റർഫേസ്",
+      "received": "ലഭിച്ചത്",
+      "sent": "അയച്ചത്",
+      "bytes": "ബൈറ്റുകൾ",
+      "packets": "പാക്കറ്റുകൾ",
+      "errors": "പിശകുകൾ",
+      "network_interfaces": "നെറ്റ്വർക്ക് ഇന്റർഫേസുകൾ"
+    },
+    "ui": {
+      "histogram": "ഹിസ്റ്റോഗ്രാം",
+      "vertical": "ലംബമായ",
+      "horizontal": "തിരശ്ചീനമായ",
+      "loading": "ലോഡ് ചെയ്യുന്നു...",
+      "no_data": "ഡാറ്റ ഇല്ല",
+      "percent": "ശതമാനം"
+    },
+    "commands": {
+      "help": "സഹായം",
+      "version": "വേർഷൻ",
+      "all": "എല്ലാ വിവരങ്ങളും",
+      "disk_only": "ഡിസ്ക് മാത്രം",
+      "cpu_only": "പ്രോസസർ മാത്രം",
+      "memory_only": "മെമ്മറി മാത്രം",
+      "network_only": "നെറ്റ്വർക്ക് മാത്രം",
+      "refresh_rate": "റിഫ്രഷ് റേറ്റ്",
+      "language": "ഭാഷ",
+      "remote": "റിമോട്ട് മോഡ്",
+      "port": "പോർട്ട്"
+    },
+    "errors": {
+      "command_not_found": "കമാൻഡ് കണ്ടെത്തിയില്ല: %s",
+      "invalid_port": "അസാധുവായ പോർട്ട്: %d",
+      "invalid_refresh": "അസാധുവായ റിഫ്രഷ് റേറ്റ്: %d",
+      "config_load_failed": "കോൺഫിഗറേഷൻ ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല",
+      "module_failed": "മൊഡ്യൂൾ %s പിശക്: %v"
+    },
+    "status": {
+      "monitoring_started": "മോണിറ്ററിംഗ് ആരംഭിച്ചു",
+      "updating_every": "ഓരോ %d സെക്കൻഡിലും അപ്ഡേറ്റ് ചെയ്യുന്നു",
+      "press_ctrl_c": "പുറത്ത് കടക്കാൻ Ctrl+C അമർത്തുക",
+      "remote_mode": "പോർട്ട് %d-ൽ റിമോട്ട് മോഡ്"
+    }
+  }
+}

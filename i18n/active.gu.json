@@ -1,0 +1,92 @@
+{
+  "language": "ગુજરાતી",
+  "language_code": "gu",
+  "translations": {
+    "common": {
+      "title": "kern - સિસ્ટમ મોનિટરિંગ",
+      "refresh": "રીફ્રેશ",
+      "seconds": "સેકંડ",
+      "error": "ભૂલ",
+      "unknown": "અજ્ઞાત",
+      "total": "કુલ",
+      "used": "વપરાયેલ",
+      "free": "મફત",
+      "available": "ઉપલબ્ધ",
+      "status": "સ્થિતિ",
+      "up": "ચાલુ",
+      "down": "બંધ"
+    },
+    "cpu": {
+      "title": "પ્રોસેસર માહિતી",
+      "model": "મોડેલ",
+      "cores": "કોર",
+      "threads": "થ્રેડ",
+      "usage": "વપરાશ",
+      "frequency": "ફ્રીક્વન્સી",
+      "load": "લોડ",
+      "load_1min": "1 મિનિટ",
+      "load_5min": "5 મિનિટ", 
+      "load_15min": "15 મિનિટ",
+      "load_average": "સરેરાશ લોડ"
+    },
+    "memory": {
+      "title": "મેમરી માહિતી",
+      "ram": "RAM",
+      "swap": "સ્વેપ",
+      "physical": "ફિઝિકલ મેમરી",
+      "virtual": "વર્ચ્યુઅલ મેमરી"
+    },
+    "disk": {
+      "title": "ડિસ્ક માહિતી",
+      "filesystem": "ફાઇલ સિસ્ટમ",
+      "size": "સાઇઝ",
+      "mounted": "માઉન્ટ પોઇન્ટ",
+      "usage": "વપરાશ",
+      "storage": "સ્ટોરેજ"
+    },
+    "network": {
+      "title": "નેટવર્ક માહિતી",
+      "interface": "ઇન્ટરફેસ",
+      "received": "મળેલ",
+      "sent": "મોકલેલ",
+      "bytes": "બાઇટ",
+      "packets": "પેકેટ",
+      "errors": "ભૂલો",
+      "network_interfaces": "નેટવર્ક ઇન્ટરફેસ"
+    },
+    "ui": {
+      "histogram": "હિસ્ટોગ્રામ",
+      "vertical": "ઊભી",
+      "horizontal": "આડી",
+      "loading": "લોડ થાય છે...",
+      "no_data": "કોઈ ડેટા નથી",
+      "percent": "ટકા"
+    },
+    "commands": {
+      "help": "મદદ",
+      "version": "વર્ઝન",
+      "all": "બધી માહિતી",
+      "disk_only": "માત્ર ડિસ્ક",
+      "cpu_only": "માત્ર પ્રોસેસર",
+      "memory_only": "માત્ર મેમરી",
+      "network_only": "માત્ર નેટવર્ક",
+      "refresh_rate": "રીફ્રેશ રેટ",
+      "language": "ભાષા",
+      "remote": "રિમોટ મોડ",
+      "port": "પોર્ટ"
+    },
+    "errors": {
+      "command_not_found": "કમાન્ડ મળ્યું નથી: %s",
+      "invalid_port": "અમાન્ય પોર્ટ: %d",
+      "invalid_refresh": "અમાન્ય રીફ્રેશ રેટ: %d",
+      "config_load_failed": "કોન્ફિગરેશન લોડ કરવામાં અસફળ",
+      "module_failed": "મોડ્યુલ %s ભૂલ: %v"
+    },
+    "status": {
+      "monitoring_started": "મોનિટરિંગ શરૂ થયું",
+      "updating_every": "દરેક %d સેકંડે અપડેટ થાય છે",
+      "press_ctrl_c": "બહાર નીકળવા માટે Ctrl+C દબાવો",
+      "remote_mode": "પોર્ટ %d પર રિમોટ મોડ"
+    }
+  }
+}

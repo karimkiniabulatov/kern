@@ -1,0 +1,92 @@
+{
+  "language": "ไทย",
+  "language_code": "th",
+  "translations": {
+    "common": {
+      "title": "kern - การตรวจสอบระบบ",
+      "refresh": "รีเฟรช",
+      "seconds": "วินาที",
+      "error": "ข้อผิดพลาด",
+      "unknown": "ไม่ทราบ",
+      "total": "ทั้งหมด",
+      "used": "ใช้แล้ว",
+      "free": "ว่าง",
+      "available": "ใช้งานได้",
+      "status": "สถานะ",
+      "up": "เปิด",
+      "down": "ปิด"
+    },
+    "cpu": {
+      "title": "ข้อมูลโปรเซสเซอร์",
+      "model": "รุ่น",
+      "cores": "คอร์",
+      "threads": "เธรด",
+      "usage": "การใช้งาน",
+      "frequency": "ความถี่",
+      "load": "โหลด",
+      "load_1min": "1 นาที",
+      "load_5min": "5 นาที", 
+      "load_15min": "15 นาที",
+      "load_average": "โหลดเฉลี่ย"
+    },
+    "memory": {
+      "title": "ข้อมูลหน่วยความจำ",
+      "ram": "RAM",
+      "swap": "สว็อป",
+      "physical": "หน่วยความจำทางกายภาพ",
+      "virtual": "หน่วยความจำเสมือน"
+    },
+    "disk": {
+      "title": "ข้อมูลดิสก์",
+      "filesystem": "ระบบไฟล์",
+      "size": "ขนาด",
+      "mounted": "จุดเมานต์",
+      "usage": "การใช้งาน",
+      "storage": "ที่เก็บข้อมูล"
+    },
+    "network": {
+      "title": "ข้อมูลเครือข่าย",
+      "interface": "อินเทอร์เฟซ",
+      "received": "รับ",
+      "sent": "ส่ง",
+      "bytes": "ไบต์",
+      "packets": "แพ็กเก็ต",
+      "errors": "ข้อผิดพลาด",
+      "network_interfaces": "อินเทอร์เฟซเครือข่าย"
+    },
+    "ui": {
+      "histogram": "ฮิสโตแกรม",
+      "vertical": "แนวตั้ง",
+      "horizontal": "แนวนอน",
+      "loading": "กำลังโหลด...",
+      "no_data": "ไม่มีข้อมูล",
+      "percent": "เปอร์เซ็นต์"
+    },
+    "commands": {
+      "help": "ช่วยเหลือ",
+      "version": "เวอร์ชัน",
+      "all": "ข้อมูลทั้งหมด",
+      "disk_only": "ดิสก์เท่านั้น",
+      "cpu_only": "โปรเซสเซอร์เท่านั้น",
+      "memory_only": "หน่วยความจำเท่านั้น",
+      "network_only": "เครือข่ายเท่านั้น",
+      "refresh_rate": "อัตราการรีเฟรช",
+      "language": "ภาษา",
+      "remote": "โหมดรีโมต",
+      "port": "พอร์ต"
+    },
+    "errors": {
+      "command_not_found": "ไม่พบคำสั่ง: %s",
+      "invalid_port": "พอร์ตไม่ถูกต้อง: %d",
+      "invalid_refresh": "อัตราการรีเฟรชไม่ถูกต้อง: %d",
+      "config_load_failed": "โหลดการกำหนดค่าไม่สำเร็จ",
+      "module_failed": "ข้อผิดพลาดโมดูล %s: %v"
+    },
+    "status": {
+      "monitoring_started": "เริ่มการตรวจสอบแล้ว",
+      "updating_every": "อัปเดตทุก %d วินาที",
+      "press_ctrl_c": "กด Ctrl+C เพื่อออก",
+      "remote_mode": "โหมดรีโมตบนพอร์ต %d"
+    }
+  }
+}

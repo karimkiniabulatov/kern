@@ -1,0 +1,92 @@
+{
+  "language": "हिन्दी",
+  "language_code": "hi",
+  "translations": {
+    "common": {
+      "title": "kern - सिस्टम मॉनिटरिंग",
+      "refresh": "ताज़ा करें",
+      "seconds": "सेकंड",
+      "error": "त्रुटि",
+      "unknown": "अज्ञात",
+      "total": "कुल",
+      "used": "उपयोग किया गया",
+      "free": "मुक्त",
+      "available": "उपलब्ध",
+      "status": "स्थिति",
+      "up": "चालू",
+      "down": "बंद"
+    },
+    "cpu": {
+      "title": "प्रोसेसर जानकारी",
+      "model": "मॉडल",
+      "cores": "कोर",
+      "threads": "थ्रेड",
+      "usage": "उपयोग",
+      "frequency": "आवृत्ति",
+      "load": "लोड",
+      "load_1min": "1 मिनट",
+      "load_5min": "5 मिनट", 
+      "load_15min": "15 मिनट",
+      "load_average": "औसत लोड"
+    },
+    "memory": {
+      "title": "मेमोरी जानकारी",
+      "ram": "रैम",
+      "swap": "स्वैप",
+      "physical": "भौतिक मेमोरी",
+      "virtual": "आभासी मेमोरी"
+    },
+    "disk": {
+      "title": "डिस्क जानकारी",
+      "filesystem": "फाइल सिस्टम",
+      "size": "आकार",
+      "mounted": "माउंट पॉइंट",
+      "usage": "उपयोग",
+      "storage": "संग्रहण"
+    },
+    "network": {
+      "title": "नेटवर्क जानकारी",
+      "interface": "इंटरफेस",
+      "received": "प्राप्त",
+      "sent": "भेजा गया",
+      "bytes": "बाइट",
+      "packets": "पैकेट",
+      "errors": "त्रुटियाँ",
+      "network_interfaces": "नेटवर्क इंटरफेस"
+    },
+    "ui": {
+      "histogram": "हिस्टोग्राम",
+      "vertical": "ऊर्ध्वाधर",
+      "horizontal": "क्षैतिज",
+      "loading": "लोड हो रहा है...",
+      "no_data": "कोई डेटा नहीं",
+      "percent": "प्रतिशत"
+    },
+    "commands": {
+      "help": "सहायता",
+      "version": "संस्करण",
+      "all": "सभी जानकारी",
+      "disk_only": "केवल डिस्क",
+      "cpu_only": "केवल प्रोसेसर",
+      "memory_only": "केवल मेमोरी",
+      "network_only": "केवल नेटवर्क",
+      "refresh_rate": "ताज़ा करने की दर",
+      "language": "भाषा",
+      "remote": "रिमोट मोड",
+      "port": "पोर्ट"
+    },
+    "errors": {
+      "command_not_found": "कमांड नहीं मिला: %s",
+      "invalid_port": "अमान्य पोर्ट: %d",
+      "invalid_refresh": "अमान्य ताज़ा करने की दर: %d",
+      "config_load_failed": "कॉन्फ़िगरेशन लोड करने में विफल",
+      "module_failed": "मॉड्यूल %s त्रुटि: %v"
+    },
+    "status": {
+      "monitoring_started": "मॉनिटरिंग शुरू हो गई",
+      "updating_every": "हर %d सेकंड में अपडेट हो रहा है",
+      "press_ctrl_c": "बाहर निकलने के लिए Ctrl+C दबाएं",
+      "remote_mode": "पोर्ट %d पर रिमोट मोड"
+    }
+  }
+}

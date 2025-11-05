@@ -1,0 +1,92 @@
+{
+  "language": "Қазақ",
+  "language_code": "kk",
+  "translations": {
+    "common": {
+      "title": "kern - Жүйе мониторингі",
+      "refresh": "Жаңарту",
+      "seconds": "сек",
+      "error": "Қате",
+      "unknown": "Белгісіз",
+      "total": "Барлығы",
+      "used": "Пайдаланылған",
+      "free": "Бос",
+      "available": "Қолжетімді",
+      "status": "Күй",
+      "up": "ҚОСУЛЫ",
+      "down": "ӨШІРУЛІ"
+    },
+    "cpu": {
+      "title": "Процессор туралы ақпарат",
+      "model": "Модель",
+      "cores": "Ядролар",
+      "threads": "Ағындар",
+      "usage": "Пайдалану",
+      "frequency": "Жиілік",
+      "load": "Жүктеме",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин", 
+      "load_15min": "15 мин",
+      "load_average": "Орташа жүктеме"
+    },
+    "memory": {
+      "title": "Жад туралы ақпарат",
+      "ram": "RAM",
+      "swap": "Своп",
+      "physical": "Физикалық жады",
+      "virtual": "Виртуалды жады"
+    },
+    "disk": {
+      "title": "Диск туралы ақпарат",
+      "filesystem": "Файл жүйесі",
+      "size": "Өлшем",
+      "mounted": "Тіркеу нүктесі",
+      "usage": "Пайдалану",
+      "storage": "Сақтау"
+    },
+    "network": {
+      "title": "Желі туралы ақпарат",
+      "interface": "Интерфейс",
+      "received": "Алынған",
+      "sent": "Жіберілген",
+      "bytes": "байт",
+      "packets": "пакет",
+      "errors": "Қателер",
+      "network_interfaces": "Желі интерфейстері"
+    },
+    "ui": {
+      "histogram": "Гистограмма",
+      "vertical": "Тік",
+      "horizontal": "Көлденең",
+      "loading": "Жүктелуде...",
+      "no_data": "Дерек жоқ",
+      "percent": "пайыз"
+    },
+    "commands": {
+      "help": "Көмек",
+      "version": "Нұсқа",
+      "all": "Барлық ақпарат",
+      "disk_only": "Тек диск",
+      "cpu_only": "Тек процессор",
+      "memory_only": "Тек жад",
+      "network_only": "Тек желі",
+      "refresh_rate": "Жаңарту жиілігі",
+      "language": "Тіл",
+      "remote": "Қашықтан режим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команда табылмады: %s",
+      "invalid_port": "Жарамсыз порт: %d",
+      "invalid_refresh": "Жарамсыз жаңарту жиілігі: %d",
+      "config_load_failed": "Конфигурацияны жүктеу сәтсіз",
+      "module_failed": "Модуль %s қатесі: %v"
+    },
+    "status": {
+      "monitoring_started": "Мониторинг басталды",
+      "updating_every": "Әр %d секунд сайын жаңартылады",
+      "press_ctrl_c": "Шығу үшін Ctrl+C басыңыз",
+      "remote_mode": "%d портында қашықтан режим"
+    }
+  }
+}

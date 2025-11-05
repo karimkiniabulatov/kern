@@ -1,0 +1,92 @@
+{
+  "language": "Norsk",
+  "language_code": "no",
+  "translations": {
+    "common": {
+      "title": "kern - Systemovervåkning",
+      "refresh": "Oppdater",
+      "seconds": "sek",
+      "error": "Feil",
+      "unknown": "Ukjent",
+      "total": "Total",
+      "used": "Brukt",
+      "free": "Ledig",
+      "available": "Tilgjengelig",
+      "status": "Status",
+      "up": "PÅ",
+      "down": "AV"
+    },
+    "cpu": {
+      "title": "Prosessorinformasjon",
+      "model": "Modell",
+      "cores": "Kjerner",
+      "threads": "Tråder",
+      "usage": "Bruk",
+      "frequency": "Frekvens",
+      "load": "Belastning",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Gjennomsnittlig belastning"
+    },
+    "memory": {
+      "title": "Minneinformasjon",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fysisk minne",
+      "virtual": "Virtuelt minne"
+    },
+    "disk": {
+      "title": "Diskinformasjon",
+      "filesystem": "Filsystem",
+      "size": "Størrelse",
+      "mounted": "Monteringspunkt",
+      "usage": "Bruk",
+      "storage": "Lagring"
+    },
+    "network": {
+      "title": "Nettverksinformasjon",
+      "interface": "Grensesnitt",
+      "received": "Mottatt",
+      "sent": "Sendt",
+      "bytes": "bytes",
+      "packets": "pakker",
+      "errors": "Feil",
+      "network_interfaces": "Nettverksgrensesnitt"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Vertikal",
+      "horizontal": "Horisontal",
+      "loading": "Laster...",
+      "no_data": "Ingen data",
+      "percent": "prosent"
+    },
+    "commands": {
+      "help": "Hjelp",
+      "version": "Versjon",
+      "all": "All informasjon",
+      "disk_only": "Kun disk",
+      "cpu_only": "Kun prosessor",
+      "memory_only": "Kun minne",
+      "network_only": "Kun nettverk",
+      "refresh_rate": "Oppdateringsintervall",
+      "language": "Språk",
+      "remote": "Fjernmodus",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Kommando ikke funnet: %s",
+      "invalid_port": "Ugyldig port: %d",
+      "invalid_refresh": "Ugyldig oppdateringsintervall: %d",
+      "config_load_failed": "Kunne ikke laste konfigurasjon",
+      "module_failed": "Modul %s feil: %v"
+    },
+    "status": {
+      "monitoring_started": "Overvåkning startet",
+      "updating_every": "Oppdaterer hvert %d. sekund",
+      "press_ctrl_c": "Trykk Ctrl+C for å avslutte",
+      "remote_mode": "Fjernmodus på port %d"
+    }
+  }
+}

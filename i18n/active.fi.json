@@ -1,0 +1,92 @@
+{
+  "language": "Suomi",
+  "language_code": "fi",
+  "translations": {
+    "common": {
+      "title": "kern - Järjestelmänvalvonta",
+      "refresh": "Päivitä",
+      "seconds": "sek",
+      "error": "Virhe",
+      "unknown": "Tuntematon",
+      "total": "Yhteensä",
+      "used": "Käytetty",
+      "free": "Vapaa",
+      "available": "Käytettävissä",
+      "status": "Tila",
+      "up": "PÄÄLLÄ",
+      "down": "POIS"
+    },
+    "cpu": {
+      "title": "Prosessorin tiedot",
+      "model": "Malli",
+      "cores": "Ytimet",
+      "threads": "Säikeet",
+      "usage": "Käyttö",
+      "frequency": "Taajuus",
+      "load": "Kuorma",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Keskimääräinen kuorma"
+    },
+    "memory": {
+      "title": "Muistin tiedot",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fyysinen muisti",
+      "virtual": "Virtuaalimuisti"
+    },
+    "disk": {
+      "title": "Levyn tiedot",
+      "filesystem": "Tiedostojärjestelmä",
+      "size": "Koko",
+      "mounted": "Liitospiste",
+      "usage": "Käyttö",
+      "storage": "Tallennus"
+    },
+    "network": {
+      "title": "Verkon tiedot",
+      "interface": "Rajapinta",
+      "received": "Vastaanotettu",
+      "sent": "Lähetetty",
+      "bytes": "tavua",
+      "packets": "pakettia",
+      "errors": "Virheet",
+      "network_interfaces": "Verkkorajapinnat"
+    },
+    "ui": {
+      "histogram": "Histogrammi",
+      "vertical": "Pysty",
+      "horizontal": "Vaaka",
+      "loading": "Ladataan...",
+      "no_data": "Ei tietoja",
+      "percent": "prosenttia"
+    },
+    "commands": {
+      "help": "Ohje",
+      "version": "Versio",
+      "all": "Kaikki tiedot",
+      "disk_only": "Vain levy",
+      "cpu_only": "Vain prosessori",
+      "memory_only": "Vain muisti",
+      "network_only": "Vain verkko",
+      "refresh_rate": "Päivitystiheys",
+      "language": "Kieli",
+      "remote": "Etätila",
+      "port": "Portti"
+    },
+    "errors": {
+      "command_not_found": "Komentoa ei löytynyt: %s",
+      "invalid_port": "Virheellinen portti: %d",
+      "invalid_refresh": "Virheellinen päivitystiheys: %d",
+      "config_load_failed": "Asetusten lataus epäonnistui",
+      "module_failed": "Moduulin %s virhe: %v"
+    },
+    "status": {
+      "monitoring_started": "Valvonta aloitettu",
+      "updating_every": "Päivitetään %d sekunnin välein",
+      "press_ctrl_c": "Paina Ctrl+C poistuaksesi",
+      "remote_mode": "Etätila portissa %d"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "தமிழ்",
+  "language_code": "ta",
+  "translations": {
+    "common": {
+      "title": "kern - கணினி கண்காணிப்பு",
+      "refresh": "புதுப்பிக்க",
+      "seconds": "விநாடிகள்",
+      "error": "பிழை",
+      "unknown": "அறியப்படாத",
+      "total": "மொத்தம்",
+      "used": "பயன்படுத்தப்பட்டது",
+      "free": "இலவசம்",
+      "available": "கிடைக்கும்",
+      "status": "நிலை",
+      "up": "இயக்கு",
+      "down": "நிறுத்து"
+    },
+    "cpu": {
+      "title": "செயலி தகவல்",
+      "model": "மாதிரி",
+      "cores": "கோர்கள்",
+      "threads": "நூல்கள்",
+      "usage": "பயன்பாடு",
+      "frequency": "அதிர்வெண்",
+      "load": "சுமை",
+      "load_1min": "1 நிமிடம்",
+      "load_5min": "5 நிமிடம்", 
+      "load_15min": "15 நிமிடம்",
+      "load_average": "சராசரி சுமை"
+    },
+    "memory": {
+      "title": "நினைவக தகவல்",
+      "ram": "RAM",
+      "swap": "இடமாற்றம்",
+      "physical": "இயற்பியல் நினைவகம்",
+      "virtual": "மெய்நிகர் நினைவகம்"
+    },
+    "disk": {
+      "title": "வட்டு தகவல்",
+      "filesystem": "கோப்பு முறைமை",
+      "size": "அளவு",
+      "mounted": "மவுண்ட் புள்ளி",
+      "usage": "பயன்பாடு",
+      "storage": "சேமிப்பு"
+    },
+    "network": {
+      "title": "பிணைய தகவல்",
+      "interface": "இடைமுகம்",
+      "received": "பெறப்பட்டது",
+      "sent": "அனுப்பப்பட்டது",
+      "bytes": "பைட்டுகள்",
+      "packets": "பாக்கெட்டுகள்",
+      "errors": "பிழைகள்",
+      "network_interfaces": "பிணைய இடைமுகங்கள்"
+    },
+    "ui": {
+      "histogram": "வரைவி",
+      "vertical": "செங்குத்து",
+      "horizontal": "கிடைமட்ட",
+      "loading": "ஏற்றுகிறது...",
+      "no_data": "தரவு இல்லை",
+      "percent": "சதவீதம்"
+    },
+    "commands": {
+      "help": "உதவி",
+      "version": "பதிப்பு",
+      "all": "அனைத்து தகவல்கள்",
+      "disk_only": "வட்டு மட்டும்",
+      "cpu_only": "செயலி மட்டும்",
+      "memory_only": "நினைவகம் மட்டும்",
+      "network_only": "பிணையம் மட்டும்",
+      "refresh_rate": "புதுப்பிப்பு விகிதம்",
+      "language": "மொழி",
+      "remote": "தொலை முறை",
+      "port": "போர்ட்"
+    },
+    "errors": {
+      "command_not_found": "கட்டளை கிடைக்கவில்லை: %s",
+      "invalid_port": "தவறான போர்ட்: %d",
+      "invalid_refresh": "தவறான புதுப்பிப்பு விகிதம்: %d",
+      "config_load_failed": "கட்டமைப்பை ஏற்ற முடியவில்லை",
+      "module_failed": "தொகுதி %s பிழை: %v"
+    },
+    "status": {
+      "monitoring_started": "கண்காணிப்பு தொடங்கப்பட்டது",
+      "updating_every": "ஒவ்வொரு %d விநாடிகளும் புதுப்பிக்கப்படுகிறது",
+      "press_ctrl_c": "வெளியேற Ctrl+C ஐ அழுத்தவும்",
+      "remote_mode": "போர்ட் %d இல் தொலை முறை"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "Монгол",
+  "language_code": "mn",
+  "translations": {
+    "common": {
+      "title": "kern - Системийн хяналт",
+      "refresh": "Шинэчлэх",
+      "seconds": "сек",
+      "error": "Алдаа",
+      "unknown": "Тодорхойгүй",
+      "total": "Нийт",
+      "used": "Ашиглагдсан",
+      "free": "Чөлөөт",
+      "available": "Боломжтой",
+      "status": "Төлөв",
+      "up": "АСААЛТТАЙ",
+      "down": "УНТААСАН"
+    },
+    "cpu": {
+      "title": "Процессорын мэдээлэл",
+      "model": "Загвар",
+      "cores": "Цөм",
+      "threads": "Утас",
+      "usage": "Хэрэглээ",
+      "frequency": "Давтамж",
+      "load": "Ачаалал",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин", 
+      "load_15min": "15 мин",
+      "load_average": "Дундаж ачаалал"
+    },
+    "memory": {
+      "title": "Санах ойн мэдээлэл",
+      "ram": "RAM",
+      "swap": "Своп",
+      "physical": "Физик санах ой",
+      "virtual": "Виртуал санах ой"
+    },
+    "disk": {
+      "title": "Дискийн мэдээлэл",
+      "filesystem": "Файлын систем",
+      "size": "Хэмжээ",
+      "mounted": "Холболтын цэг",
+      "usage": "Хэрэглээ",
+      "storage": "Хадгалалт"
+    },
+    "network": {
+      "title": "Сүлжээний мэдээлэл",
+      "interface": "Интерфейс",
+      "received": "Хүлээн авсан",
+      "sent": "Илгээсэн",
+      "bytes": "байт",
+      "packets": "багц",
+      "errors": "Алдаанууд",
+      "network_interfaces": "Сүлжээний интерфейсүүд"
+    },
+    "ui": {
+      "histogram": "Гистограм",
+      "vertical": "Босоо",
+      "horizontal": "Хэвтээ",
+      "loading": "Уншиж байна...",
+      "no_data": "Өгөгдөл байхгүй",
+      "percent": "хувь"
+    },
+    "commands": {
+      "help": "Тусламж",
+      "version": "Хувилбар",
+      "all": "Бүх мэдээлэл",
+      "disk_only": "Зөвхөн диск",
+      "cpu_only": "Зөвхөн процессор",
+      "memory_only": "Зөвхөн санах ой",
+      "network_only": "Зөвхөн сүлжээ",
+      "refresh_rate": "Шинэчлэх интервал",
+      "language": "Хэл",
+      "remote": "Алсын горим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команд олдсонгүй: %s",
+      "invalid_port": "Буруу порт: %d",
+      "invalid_refresh": "Буруу шинэчлэх интервал: %d",
+      "config_load_failed": "Тохиргоог уншиж чадсангүй",
+      "module_failed": "%s модулийн алдаа: %v"
+    },
+    "status": {
+      "monitoring_started": "Хяналт эхлэв",
+      "updating_every": "%d секунд тутам шинэчлэгдэнэ",
+      "press_ctrl_c": "Гарахын тулд Ctrl+C дарна уу",
+      "remote_mode": "%d порт дээрх алсын горим"
+    }
+  }
+}

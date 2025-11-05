@@ -1,0 +1,92 @@
+{
+  "language": "Bosanski",
+  "language_code": "bs",
+  "translations": {
+    "common": {
+      "title": "kern - Praćenje sistema",
+      "refresh": "Osuvježi",
+      "seconds": "sek",
+      "error": "Greška",
+      "unknown": "Nepoznato",
+      "total": "Ukupno",
+      "used": "Korišteno",
+      "free": "Slobodno",
+      "available": "Dostupno",
+      "status": "Status",
+      "up": "UKLJUČENO",
+      "down": "ISKLJUČENO"
+    },
+    "cpu": {
+      "title": "Informacije o procesoru",
+      "model": "Model",
+      "cores": "Jezgra",
+      "threads": "Niti",
+      "usage": "Korištenje",
+      "frequency": "Frekvencija",
+      "load": "Opterećenje",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Prosječno opterećenje"
+    },
+    "memory": {
+      "title": "Informacije o memoriji",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fizička memorija",
+      "virtual": "Virtualna memorija"
+    },
+    "disk": {
+      "title": "Informacije o disku",
+      "filesystem": "Fajl sistem",
+      "size": "Veličina",
+      "mounted": "Tačka montiranja",
+      "usage": "Korištenje",
+      "storage": "Skladištenje"
+    },
+    "network": {
+      "title": "Informacije o mreži",
+      "interface": "Interfejs",
+      "received": "Primljeno",
+      "sent": "Poslano",
+      "bytes": "bajtova",
+      "packets": "paketa",
+      "errors": "Greške",
+      "network_interfaces": "Mrežni interfejsi"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Okomito",
+      "horizontal": "Vodoravno",
+      "loading": "Učitavanje...",
+      "no_data": "Nema podataka",
+      "percent": "posto"
+    },
+    "commands": {
+      "help": "Pomoć",
+      "version": "Verzija",
+      "all": "Sve informacije",
+      "disk_only": "Samo disk",
+      "cpu_only": "Samo procesor",
+      "memory_only": "Samo memorija",
+      "network_only": "Samo mreža",
+      "refresh_rate": "Interval osvježavanja",
+      "language": "Jezik",
+      "remote": "Udaljeni mod",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Komanda nije pronađena: %s",
+      "invalid_port": "Nevažeći port: %d",
+      "invalid_refresh": "Nevažeći interval osvježavanja: %d",
+      "config_load_failed": "Učitavanje konfiguracije nije uspjelo",
+      "module_failed": "Greška modula %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Praćenje je pokrenuto",
+      "updating_every": "Ažuriranje svakih %d sekundi",
+      "press_ctrl_c": "Pritisnite Ctrl+C za izlaz",
+      "remote_mode": "Udaljeni mod na portu %d"
+    }
+  }
+}

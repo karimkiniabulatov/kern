@@ -1,0 +1,92 @@
+{
+  "language": "Ελληνικά",
+  "language_code": "el",
+  "translations": {
+    "common": {
+      "title": "kern - Παρακολούθηση Συστήματος",
+      "refresh": "Ανανέωση",
+      "seconds": "δευτ",
+      "error": "Σφάλμα",
+      "unknown": "Άγνωστο",
+      "total": "Σύνολο",
+      "used": "Χρησιμοποιημένο",
+      "free": "Ελεύθερο",
+      "available": "Διαθέσιμο",
+      "status": "Κατάσταση",
+      "up": "ΕΝΕΡΓΟ",
+      "down": "ΑΝΕΝΕΡΓΟ"
+    },
+    "cpu": {
+      "title": "Πληροφορίες Επεξεργαστή",
+      "model": "Μοντέλο",
+      "cores": "Πυρήνες",
+      "threads": "Νήματα",
+      "usage": "Χρήση",
+      "frequency": "Συχνότητα",
+      "load": "Φόρτωση",
+      "load_1min": "1 λεπ",
+      "load_5min": "5 λεπ", 
+      "load_15min": "15 λεπ",
+      "load_average": "Μέσος φόρτος"
+    },
+    "memory": {
+      "title": "Πληροφορίες Μνήμης",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Φυσική μνήμη",
+      "virtual": "Εικονική μνήμη"
+    },
+    "disk": {
+      "title": "Πληροφορίες Δίσκου",
+      "filesystem": "Σύστημα αρχείων",
+      "size": "Μέγεθος",
+      "mounted": "Σημείο προσάρτησης",
+      "usage": "Χρήση",
+      "storage": "Αποθήκευση"
+    },
+    "network": {
+      "title": "Πληροφορίες Δικτύου",
+      "interface": "Διασύνδεση",
+      "received": "Ληφθέντα",
+      "sent": "Απεσταλμένα",
+      "bytes": "byte",
+      "packets": "πακέτα",
+      "errors": "Σφάλματα",
+      "network_interfaces": "Διασυνδέσεις δικτύου"
+    },
+    "ui": {
+      "histogram": "Ιστόγραμμα",
+      "vertical": "Κατακόρυφα",
+      "horizontal": "Οριζόντια",
+      "loading": "Φόρτωση...",
+      "no_data": "Δεν υπάρχουν δεδομένα",
+      "percent": "τοις εκατό"
+    },
+    "commands": {
+      "help": "Βοήθεια",
+      "version": "Έκδοση",
+      "all": "Όλες οι πληροφορίες",
+      "disk_only": "Μόνο δίσκος",
+      "cpu_only": "Μόνο επεξεργαστής",
+      "memory_only": "Μόνο μνήμη",
+      "network_only": "Μόνο δίκτυο",
+      "refresh_rate": "Διάστημα ανανέωσης",
+      "language": "Γλώσσα",
+      "remote": "Απομακρυσμένη λειτουργία",
+      "port": "Θύρα"
+    },
+    "errors": {
+      "command_not_found": "Η εντολή δεν βρέθηκε: %s",
+      "invalid_port": "Μη έγκυρη θύρα: %d",
+      "invalid_refresh": "Μη έγκυρο διάστημα ανανέωσης: %d",
+      "config_load_failed": "Αποτυχία φόρτωσης διαμόρφωσης",
+      "module_failed": "Σφάλμα μονάδας %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Η παρακολούθηση ξεκίνησε",
+      "updating_every": "Ενημέρωση κάθε %d δευτερόλεπτα",
+      "press_ctrl_c": "Πατήστε Ctrl+C για έξοδο",
+      "remote_mode": "Απομακρυσμένη λειτουργία στη θύρα %d"
+    }
+  }
+}

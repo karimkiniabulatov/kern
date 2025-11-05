@@ -1,0 +1,92 @@
+{
+  "language": "বাংলা",
+  "language_code": "bn",
+  "translations": {
+    "common": {
+      "title": "kern - সিস্টেম মনিটরিং",
+      "refresh": "রিফ্রেশ",
+      "seconds": "সেকেন্ড",
+      "error": "ত্রুটি",
+      "unknown": "অজানা",
+      "total": "মোট",
+      "used": "ব্যবহৃত",
+      "free": "মুক্ত",
+      "available": "উপলব্ধ",
+      "status": "স্ট্যাটাস",
+      "up": "চালু",
+      "down": "বন্ধ"
+    },
+    "cpu": {
+      "title": "প্রসেসর তথ্য",
+      "model": "মডেল",
+      "cores": "কোর",
+      "threads": "থ্রেড",
+      "usage": "ব্যবহার",
+      "frequency": "ফ্রিকোয়েন্সি",
+      "load": "লোড",
+      "load_1min": "1 মিনিট",
+      "load_5min": "5 মিনিট", 
+      "load_15min": "15 মিনিট",
+      "load_average": "গড় লোড"
+    },
+    "memory": {
+      "title": "মেমোরি তথ্য",
+      "ram": "RAM",
+      "swap": "সোয়াপ",
+      "physical": "ফিজিক্যাল মেমোরি",
+      "virtual": "ভার্চুয়াল মেমোরি"
+    },
+    "disk": {
+      "title": "ডিস্ক তথ্য",
+      "filesystem": "ফাইল সিস্টেম",
+      "size": "সাইজ",
+      "mounted": "মাউন্ট পয়েন্ট",
+      "usage": "ব্যবহার",
+      "storage": "স্টোরেজ"
+    },
+    "network": {
+      "title": "নেটওয়ার্ক তথ্য",
+      "interface": "ইন্টারফেস",
+      "received": "প্রাপ্ত",
+      "sent": "প্রেরিত",
+      "bytes": "বাইট",
+      "packets": "প্যাকেট",
+      "errors": "ত্রুটি",
+      "network_interfaces": "নেটওয়ার্ক ইন্টারফেস"
+    },
+    "ui": {
+      "histogram": "হিস্টোগ্রাম",
+      "vertical": "উল্লম্ব",
+      "horizontal": "অনুভূমিক",
+      "loading": "লোড হচ্ছে...",
+      "no_data": "কোন ডেটা নেই",
+      "percent": "শতাংশ"
+    },
+    "commands": {
+      "help": "সাহায্য",
+      "version": "ভার্সন",
+      "all": "সমস্ত তথ্য",
+      "disk_only": "শুধুমাত্র ডিস্ক",
+      "cpu_only": "শুধুমাত্র প্রসেসর",
+      "memory_only": "শুধুমাত্র মেমোরি",
+      "network_only": "শুধুমাত্র নেটওয়ার্ক",
+      "refresh_rate": "রিফ্রেশ রেট",
+      "language": "ভাষা",
+      "remote": "রিমোট মোড",
+      "port": "পোর্ট"
+    },
+    "errors": {
+      "command_not_found": "কমান্ড পাওয়া যায়নি: %s",
+      "invalid_port": "অবৈধ পোর্ট: %d",
+      "invalid_refresh": "অবৈধ রিফ্রেশ রেট: %d",
+      "config_load_failed": "কনফিগারেশন লোড করতে ব্যর্থ",
+      "module_failed": "মডিউল %s ত্রুটি: %v"
+    },
+    "status": {
+      "monitoring_started": "মনিটরিং শুরু হয়েছে",
+      "updating_every": "প্রতি %d সেকেন্ডে আপডেট হচ্ছে",
+      "press_ctrl_c": "প্রস্থান করতে Ctrl+C চাপুন",
+      "remote_mode": "পোর্ট %d এ রিমোট মোড"
+    }
+  }
+}

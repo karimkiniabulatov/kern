@@ -1,0 +1,92 @@
+{
+  "language": "Polski",
+  "language_code": "pl",
+  "translations": {
+    "common": {
+      "title": "kern - Monitorowanie Systemu",
+      "refresh": "Odśwież",
+      "seconds": "sek",
+      "error": "Błąd",
+      "unknown": "Nieznany",
+      "total": "Razem",
+      "used": "Użyte",
+      "free": "Wolne",
+      "available": "Dostępne",
+      "status": "Status",
+      "up": "WŁĄCZONY",
+      "down": "WYŁĄCZONY"
+    },
+    "cpu": {
+      "title": "Informacje o Procesorze",
+      "model": "Model",
+      "cores": "Rdzenie",
+      "threads": "Wątki",
+      "usage": "Użycie",
+      "frequency": "Częstotliwość",
+      "load": "Obciążenie",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Średnie obciążenie"
+    },
+    "memory": {
+      "title": "Informacje o Pamięci",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Pamięć fizyczna",
+      "virtual": "Pamięć wirtualna"
+    },
+    "disk": {
+      "title": "Informacje o Dyskach",
+      "filesystem": "System plików",
+      "size": "Rozmiar",
+      "mounted": "Punkt montowania",
+      "usage": "Użycie",
+      "storage": "Przechowywanie"
+    },
+    "network": {
+      "title": "Informacje o Sieci",
+      "interface": "Interfejs",
+      "received": "Odebrane",
+      "sent": "Wysłane",
+      "bytes": "bajtów",
+      "packets": "pakietów",
+      "errors": "Błędy",
+      "network_interfaces": "Interfejsy sieciowe"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Pionowy",
+      "horizontal": "Poziomy",
+      "loading": "Ładowanie...",
+      "no_data": "Brak danych",
+      "percent": "procent"
+    },
+    "commands": {
+      "help": "Pomoc",
+      "version": "Wersja",
+      "all": "Wszystkie informacje",
+      "disk_only": "Tylko dysk",
+      "cpu_only": "Tylko procesor",
+      "memory_only": "Tylko pamięć",
+      "network_only": "Tylko sieć",
+      "refresh_rate": "Interwał odświeżania",
+      "language": "Język",
+      "remote": "Tryb zdalny",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Nie znaleziono polecenia: %s",
+      "invalid_port": "Nieprawidłowy port: %d",
+      "invalid_refresh": "Nieprawidłowy interwał odświeżania: %d",
+      "config_load_failed": "Nie udało się załadować konfiguracji",
+      "module_failed": "Błąd modułu %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitorowanie rozpoczęte",
+      "updating_every": "Aktualizacja co %d sekund",
+      "press_ctrl_c": "Naciśnij Ctrl+C aby wyjść",
+      "remote_mode": "Tryb zdalny na porcie %d"
+    }
+  }
+}

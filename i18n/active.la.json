@@ -1,0 +1,92 @@
+{
+  "language": "Latina",
+  "language_code": "la",
+  "translations": {
+    "common": {
+      "title": "kern - Systema Monitoring",
+      "refresh": "Renova",
+      "seconds": "sec",
+      "error": "Error",
+      "unknown": "Ignotum",
+      "total": "Summa",
+      "used": "Usus",
+      "free": "Liber",
+      "available": "Praesto",
+      "status": "Status",
+      "up": "ACTIVUS",
+      "down": "INACTIVUS"
+    },
+    "cpu": {
+      "title": "Informacio Processoris",
+      "model": "Exemplar",
+      "cores": "Nuclei",
+      "threads": "Fila",
+      "usage": "Usus",
+      "frequency": "Frequentia",
+      "load": "Onus",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Onus medium"
+    },
+    "memory": {
+      "title": "Informacio Memoriae",
+      "ram": "RAM",
+      "swap": "Permutatio",
+      "physical": "Memoria physica",
+      "virtual": "Memoria virtualis"
+    },
+    "disk": {
+      "title": "Informacio Disci",
+      "filesystem": "Systema file",
+      "size": "Magnitudo",
+      "mounted": "Punctum montis",
+      "usage": "Usus",
+      "storage": "Repositorium"
+    },
+    "network": {
+      "title": "Informacio Retis",
+      "interface": "Interface",
+      "received": "Acceptum",
+      "sent": "Missum",
+      "bytes": "bytes",
+      "packets": "packets",
+      "errors": "Errores",
+      "network_interfaces": "Interfaces retis"
+    },
+    "ui": {
+      "histogram": "Histogramma",
+      "vertical": "Verticalis",
+      "horizontal": "Horizontalis",
+      "loading": "Loading...",
+      "no_data": "Nulla data",
+      "percent": "percent"
+    },
+    "commands": {
+      "help": "Auxilium",
+      "version": "Versio",
+      "all": "Omnes informationes",
+      "disk_only": "Solum discus",
+      "cpu_only": "Solum processor",
+      "memory_only": "Solum memoria",
+      "network_only": "Solum rete",
+      "refresh_rate": "Intervallum renovationis",
+      "language": "Lingua",
+      "remote": "Modus remotus",
+      "port": "Portus"
+    },
+    "errors": {
+      "command_not_found": "Mandatum non inventum: %s",
+      "invalid_port": "Portus invalidus: %d",
+      "invalid_refresh": "Intervallum renovationis invalidum: %d",
+      "config_load_failed": "Configuratio onerare non potuit",
+      "module_failed": "Error moduli %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitoring inceptum est",
+      "updating_every": "Renovatur omnes %d secundis",
+      "press_ctrl_c": "Preme Ctrl+C ad exeundum",
+      "remote_mode": "Modus remotus in portu %d"
+    }
+  }
+}

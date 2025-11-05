@@ -1,0 +1,92 @@
+{
+  "language": "Shqip",
+  "language_code": "sq",
+  "translations": {
+    "common": {
+      "title": "kern - Monitorimi i Sistemit",
+      "refresh": "Rifresko",
+      "seconds": "sek",
+      "error": "Gabim",
+      "unknown": "I panjohur",
+      "total": "Total",
+      "used": "Përdorur",
+      "free": "Falas",
+      "available": "I disponueshëm",
+      "status": "Statusi",
+      "up": "NDEZUR",
+      "down": "FIÇUR"
+    },
+    "cpu": {
+      "title": "Informacione për Procesorin",
+      "model": "Modeli",
+      "cores": "Bërthama",
+      "threads": "Fijet",
+      "usage": "Përdorimi",
+      "frequency": "Frekuenca",
+      "load": "Ngarkesa",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Ngarkesa mesatare"
+    },
+    "memory": {
+      "title": "Informacione për Kujtesën",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Kujtesa fizike",
+      "virtual": "Kujtesa virtuale"
+    },
+    "disk": {
+      "title": "Informacione për Diskun",
+      "filesystem": "Sistemi i skedarëve",
+      "size": "Madhësia",
+      "mounted": "Pika e montimit",
+      "usage": "Përdorimi",
+      "storage": "Depozitimi"
+    },
+    "network": {
+      "title": "Informacione për Rrjetin",
+      "interface": "Ndërfaqja",
+      "received": "Marrë",
+      "sent": "Dërguar",
+      "bytes": "bajte",
+      "packets": "paketa",
+      "errors": "Gabimet",
+      "network_interfaces": "Ndërfaqet e rrjetit"
+    },
+    "ui": {
+      "histogram": "Histogrami",
+      "vertical": "Vertikale",
+      "horizontal": "Horizontale",
+      "loading": "Duke ngarkuar...",
+      "no_data": "Nuk ka të dhëna",
+      "percent": "përqind"
+    },
+    "commands": {
+      "help": "Ndihmë",
+      "version": "Versioni",
+      "all": "Të gjitha informatat",
+      "disk_only": "Vetëm disku",
+      "cpu_only": "Vetëm procesori",
+      "memory_only": "Vetëm kujtesa",
+      "network_only": "Vetëm rrjeti",
+      "refresh_rate": "Intervali i rifreskimit",
+      "language": "Gjuha",
+      "remote": "Modaliteti i largët",
+      "port": "Porti"
+    },
+    "errors": {
+      "command_not_found": "Komanda nuk u gjet: %s",
+      "invalid_port": "Port i pavlefshëm: %d",
+      "invalid_refresh": "Interval i pavlefshëm rifreskimi: %d",
+      "config_load_failed": "Dështoi ngarkimi i konfigurimit",
+      "module_failed": "Gabim i modulit %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Monitorimi filloi",
+      "updating_every": "Përditësohet çdo %d sekonda",
+      "press_ctrl_c": "Shtypni Ctrl+C për të dalë",
+      "remote_mode": "Modalitet i largët në portin %d"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "language": "Slovenščina",
+  "language_code": "sl",
+  "translations": {
+    "common": {
+      "title": "kern - Spremljanje sistema",
+      "refresh": "Osveži",
+      "seconds": "sek",
+      "error": "Napaka",
+      "unknown": "Neznano",
+      "total": "Skupaj",
+      "used": "Uporabljeno",
+      "free": "Prosto",
+      "available": "Razpoložljivo",
+      "status": "Stanje",
+      "up": "VKLOPLJENO",
+      "down": "IZKLOPLJENO"
+    },
+    "cpu": {
+      "title": "Informacije o procesorju",
+      "model": "Model",
+      "cores": "Jedra",
+      "threads": "Niti",
+      "usage": "Uporaba",
+      "frequency": "Frekvenca",
+      "load": "Obremenitev",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Povprečna obremenitev"
+    },
+    "memory": {
+      "title": "Informacije o pomnilniku",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fizični pomnilnik",
+      "virtual": "Navidezni pomnilnik"
+    },
+    "disk": {
+      "title": "Informacije o disku",
+      "filesystem": "Datotečni sistem",
+      "size": "Velikost",
+      "mounted": "Priporna točka",
+      "usage": "Uporaba",
+      "storage": "Shramba"
+    },
+    "network": {
+      "title": "Informacije o omrežju",
+      "interface": "Vmesnik",
+      "received": "Prejeto",
+      "sent": "Poslano",
+      "bytes": "bajtov",
+      "packets": "paketov",
+      "errors": "Napake",
+      "network_interfaces": "Omrežni vmesniki"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Navpično",
+      "horizontal": "Vodoravno",
+      "loading": "Nalaganje...",
+      "no_data": "Ni podatkov",
+      "percent": "odstotkov"
+    },
+    "commands": {
+      "help": "Pomoč",
+      "version": "Različica",
+      "all": "Vse informacije",
+      "disk_only": "Samo disk",
+      "cpu_only": "Samo procesor",
+      "memory_only": "Samo pomnilnik",
+      "network_only": "Samo omrežje",
+      "refresh_rate": "Interval osveževanja",
+      "language": "Jezik",
+      "remote": "Daljinski način",
+      "port": "Vrata"
+    },
+    "errors": {
+      "command_not_found": "Ukaz ni najden: %s",
+      "invalid_port": "Neveljavna vrata: %d",
+      "invalid_refresh": "Neveljaven interval osveževanja: %d",
+      "config_load_failed": "Nalaganje konfiguracije ni uspelo",
+      "module_failed": "Napaka modula %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Spremljanje je začeto",
+      "updating_every": "Posodabljanje vsakih %d sekund",
+      "press_ctrl_c": "Pritisnite Ctrl+C za izhod",
+      "remote_mode": "Daljinski način na vratih %d"
+    }
+  }
+}

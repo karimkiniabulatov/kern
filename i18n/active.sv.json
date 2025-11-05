@@ -1,0 +1,92 @@
+{
+  "language": "Svenska",
+  "language_code": "sv",
+  "translations": {
+    "common": {
+      "title": "kern - Systemövervakning",
+      "refresh": "Uppdatera",
+      "seconds": "sek",
+      "error": "Fel",
+      "unknown": "Okänt",
+      "total": "Totalt",
+      "used": "Använt",
+      "free": "Ledigt",
+      "available": "Tillgängligt",
+      "status": "Status",
+      "up": "PÅ",
+      "down": "AV"
+    },
+    "cpu": {
+      "title": "Processorinformation",
+      "model": "Modell",
+      "cores": "Kärnor",
+      "threads": "Trådar",
+      "usage": "Användning",
+      "frequency": "Frekvens",
+      "load": "Belastning",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Genomsnittlig belastning"
+    },
+    "memory": {
+      "title": "Minnesinformation",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fysiskt minne",
+      "virtual": "Virtuellt minne"
+    },
+    "disk": {
+      "title": "Diskinformation",
+      "filesystem": "Filsystem",
+      "size": "Storlek",
+      "mounted": "Monteringspunkt",
+      "usage": "Användning",
+      "storage": "Lagring"
+    },
+    "network": {
+      "title": "Nätverksinformation",
+      "interface": "Gränssnitt",
+      "received": "Mottaget",
+      "sent": "Skickat",
+      "bytes": "byte",
+      "packets": "paket",
+      "errors": "Fel",
+      "network_interfaces": "Nätverksgränssnitt"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Vertikal",
+      "horizontal": "Horisontell",
+      "loading": "Laddar...",
+      "no_data": "Ingen data",
+      "percent": "procent"
+    },
+    "commands": {
+      "help": "Hjälp",
+      "version": "Version",
+      "all": "All information",
+      "disk_only": "Endast disk",
+      "cpu_only": "Endast processor",
+      "memory_only": "Endast minne",
+      "network_only": "Endast nätverk",
+      "refresh_rate": "Uppdateringsintervall",
+      "language": "Språk",
+      "remote": "Fjärrläge",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Kommandot hittades inte: %s",
+      "invalid_port": "Ogiltig port: %d",
+      "invalid_refresh": "Ogiltigt uppdateringsintervall: %d",
+      "config_load_failed": "Kunde inte ladda konfiguration",
+      "module_failed": "Modul %s fel: %v"
+    },
+    "status": {
+      "monitoring_started": "Övervakning startad",
+      "updating_every": "Uppdaterar var %d:e sekund",
+      "press_ctrl_c": "Tryck på Ctrl+C för att avsluta",
+      "remote_mode": "Fjärrläge på port %d"
+    }
+  }
+}

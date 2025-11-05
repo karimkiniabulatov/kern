@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -15,6 +16,7 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
 	"github.com/karimkiniabulatov/kern/internal/ui"
+	"golang.org/x/term"
 )
 
 var (
@@ -39,44 +41,65 @@ func main() {
 		return
 	}
 
-	// Load configuration and localization
+	// Загружаем конфигурацию
 	cfg, err := config.Load(*flagLang)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// If no specific module is selected, show all
-	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet {
-		*flagAll = true
-	}
-
-	// If remote mode is enabled, start the remote server and exit
+	// Если указан порт для remote, запускаем сервер
 	if *flagRemote != 0 {
 		startRemoteServer(cfg, *flagRemote)
 		return
 	}
 
-	// Start the main monitoring loop
+	// Если не указаны конкретные модули, показываем все
+	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet {
+		*flagAll = true
+	}
+
+	// Запускаем мониторинг
 	runMonitor(cfg)
 }
 
 func runMonitor(cfg *config.Config) {
-	// Set up signal handling for graceful shutdown
+	// Настраиваем обработку сигналов
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Initialize UI
+	// Инициализируем UI
 	renderer := ui.NewRenderer(cfg)
+
+	// Настраиваем неблокирующее чтение ввода
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err == nil {
+		defer term.Restore(int(os.Stdin.Fd()), oldState)
+	}
+
+	// Канал для клавиш
+	keyChan := make(chan rune, 1)
+	go readKeys(keyChan)
 
 	ticker := time.NewTicker(time.Duration(*flagRefresh) * time.Second)
 	defer ticker.Stop()
 
+	// Первый рендер
+	results := collectData(cfg)
+	renderer.Render(results)
+
 	for {
 		select {
 		case <-ticker.C:
-			// Collect data from enabled modules concurrently
 			results := collectData(cfg)
 			renderer.Render(results)
+			
+		case key := <-keyChan:
+			if key == 'q' || key == 'Q' {
+				renderer.Cleanup()
+				fmt.Println("\nMonitoring stopped.")
+				return
+			}
+			
 		case <-sigChan:
 			renderer.Cleanup()
 			fmt.Println("\nMonitoring stopped.")
@@ -85,6 +108,18 @@ func runMonitor(cfg *config.Config) {
 	}
 }
 
+func readKeys(keyChan chan rune) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		r, _, err := reader.ReadRune()
+		if err == nil {
+			keyChan <- r
+		} else {
+			time.Sleep(10 * time.Millisecond)
+		}
+	}
+}
+///второе обновление от main до сюда
 func collectData(cfg *config.Config) map[string]interface{} {
 	type result struct {
 		module string

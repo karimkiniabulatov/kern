@@ -1,41 +1,92 @@
 {
-"disk_title": "Дисковая информация",
-"disk_filesystem": "Файловая система",
-"disk_size": "Размер",
-"disk_used": "Использовано",
-"disk_available": "Доступно",
-"disk_use_percent": "Использовано",
-"disk_mounted_on": "Точка монтирования",
-
-"cpu_title": "Информация о процессоре",
-"cpu_model": "Модель",
-"cpu_cores": "Ядер",
-"cpu_threads": "Потоков",
-"cpu_usage": "Использование",
-"cpu_frequency": "Частота",
-"cpu_load1": "Загрузка (1 мин)",
-"cpu_load5": "Загрузка (5 мин)",
-"cpu_load15": "Загрузка (15 мин)",
-
-"mem_title": "Информация о памяти",
-"mem_total": "Всего",
-"mem_used": "Использовано",
-"mem_free": "Свободно",
-"mem_available": "Доступно",
-"mem_swap_total": "Общий своп",
-"mem_swap_used": "Использовано свопа",
-"mem_swap_free": "Свободно свопа",
-
-"net_title": "Сетевая информация",
-"net_interface": "Интерфейс",
-"net_rx_bytes": "Принято",
-"net_tx_bytes": "Передано",
-"net_status": "Статус",
-"net_status_up": "Включен",
-"net_status_down": "Выключен",
-
-"common_refresh": "Обновление",
-"common_seconds": "сек.",
-"common_error": "Ошибка",
-"common_unknown": "Неизвестно"
+  "language": "Русский",
+  "language_code": "ru",
+  "translations": {
+    "common": {
+      "title": "kern - Мониторинг системы",
+      "refresh": "Обновление",
+      "seconds": "сек",
+      "error": "Ошибка",
+      "unknown": "Неизвестно",
+      "total": "Всего",
+      "used": "Использовано",
+      "free": "Свободно",
+      "available": "Доступно",
+      "status": "Статус",
+      "up": "ВКЛ",
+      "down": "ВЫКЛ"
+    },
+    "cpu": {
+      "title": "Информация о процессоре",
+      "model": "Модель",
+      "cores": "Ядер",
+      "threads": "Потоков",
+      "usage": "Использование",
+      "frequency": "Частота",
+      "load": "Нагрузка",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин", 
+      "load_15min": "15 мин",
+      "load_average": "Средняя нагрузка"
+    },
+    "memory": {
+      "title": "Информация о памяти",
+      "ram": "ОЗУ",
+      "swap": "Своп",
+      "physical": "Физическая память",
+      "virtual": "Виртуальная память"
+    },
+    "disk": {
+      "title": "Дисковая информация",
+      "filesystem": "Файловая система",
+      "size": "Размер",
+      "mounted": "Точка монтирования",
+      "usage": "Использование",
+      "storage": "Хранилище"
+    },
+    "network": {
+      "title": "Сетевая информация",
+      "interface": "Интерфейс",
+      "received": "Принято",
+      "sent": "Отправлено",
+      "bytes": "байт",
+      "packets": "пакетов",
+      "errors": "Ошибки",
+      "network_interfaces": "Сетевые интерфейсы"
+    },
+    "ui": {
+      "histogram": "Гистограмма",
+      "vertical": "Вертикальная",
+      "horizontal": "Горизонтальная",
+      "loading": "Загрузка...",
+      "no_data": "Нет данных",
+      "percent": "процентов"
+    },
+    "commands": {
+      "help": "Помощь",
+      "version": "Версия",
+      "all": "Вся информация",
+      "disk_only": "Только диск",
+      "cpu_only": "Только процессор",
+      "memory_only": "Только память",
+      "network_only": "Только сеть",
+      "refresh_rate": "Интервал обновления",
+      "language": "Язык",
+      "remote": "Удаленный режим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команда не найдена: %s",
+      "invalid_port": "Неверный порт: %d",
+      "invalid_refresh": "Неверный интервал обновления: %d",
+      "config_load_failed": "Не удалось загрузить конфигурацию",
+      "module_failed": "Ошибка модуля %s: %v"
+    },
+    "status": {
+      "monitoring_started": "Мониторинг запущен",
+      "updating_every": "Обновление каждые %d секунд",
+      "press_ctrl_c": "Нажмите Ctrl+C для выхода",
+      "remote_mode": "Удаленный режим на порту %d"
+    }
+  }
 }

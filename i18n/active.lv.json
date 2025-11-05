@@ -1,0 +1,92 @@
+{
+  "language": "Latviešu",
+  "language_code": "lv",
+  "translations": {
+    "common": {
+      "title": "kern - Sistēmas uzraudzība",
+      "refresh": "Atjaunot",
+      "seconds": "sek",
+      "error": "Kļūda",
+      "unknown": "Nezināms",
+      "total": "Kopā",
+      "used": "Izlietots",
+      "free": "Brīvs",
+      "available": "Pieejams",
+      "status": "Statuss",
+      "up": "IESLĒGTS",
+      "down": "IZSLĒGTS"
+    },
+    "cpu": {
+      "title": "Procesora informācija",
+      "model": "Modelis",
+      "cores": "Kodoli",
+      "threads": "Pavedieni",
+      "usage": "Izmantojums",
+      "frequency": "Frekvence",
+      "load": "Slodze",
+      "load_1min": "1 min",
+      "load_5min": "5 min", 
+      "load_15min": "15 min",
+      "load_average": "Vidējā slodze"
+    },
+    "memory": {
+      "title": "Atmiņas informācija",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fiziskā atmiņa",
+      "virtual": "Virtuālā atmiņa"
+    },
+    "disk": {
+      "title": "Diska informācija",
+      "filesystem": "Failu sistēma",
+      "size": "Izmērs",
+      "mounted": "Piestiprināšanas punkts",
+      "usage": "Izmantojums",
+      "storage": "Krātuve"
+    },
+    "network": {
+      "title": "Tīkla informācija",
+      "interface": "Saskarne",
+      "received": "Saņemts",
+      "sent": "Nosūtīts",
+      "bytes": "baiti",
+      "packets": "paketes",
+      "errors": "Kļūdas",
+      "network_interfaces": "Tīkla saskarnes"
+    },
+    "ui": {
+      "histogram": "Histogramma",
+      "vertical": "Vertikāli",
+      "horizontal": "Horizontāli",
+      "loading": "Ielādē...",
+      "no_data": "Nav datu",
+      "percent": "procenti"
+    },
+    "commands": {
+      "help": "Palīdzība",
+      "version": "Versija",
+      "all": "Visa informācija",
+      "disk_only": "Tikai disks",
+      "cpu_only": "Tikai processors",
+      "memory_only": "Tikai atmiņa",
+      "network_only": "Tikai tīkls",
+      "refresh_rate": "Atjaunināšanas intervāls",
+      "language": "Valoda",
+      "remote": "Attālinātais režīms",
+      "port": "Ports"
+    },
+    "errors": {
+      "command_not_found": "Komanda nav atrasta: %s",
+      "invalid_port": "Nederīgs ports: %d",
+      "invalid_refresh": "Nederīgs atjaunināšanas intervāls: %d",
+      "config_load_failed": "Neizdevās ielādēt konfigurāciju",
+      "module_failed": "Moduļa %s kļūda: %v"
+    },
+    "status": {
+      "monitoring_started": "Uzraudzība sākta",
+      "updating_every": "Atjaunina ik pēc %d sekundēm",
+      "press_ctrl_c": "Nospiediet Ctrl+C, lai izietu",
+      "remote_mode": "Attālinātais režīms portā %d"
+    }
+  }
+}

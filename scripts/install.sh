@@ -52,20 +52,22 @@ go build -o kern ./cmd/kern
 echo "Installing globally..."
 go install ./cmd/kern
 
-# Check if GOPATH/bin is in PATH
-GOPATH_BIN="$(go env GOPATH)/bin"
-if [[ ":$PATH:" != *":$GOPATH_BIN:"* ]]; then
-    echo "Adding GOPATH/bin to PATH..."
-    echo "export PATH=\$PATH:$GOPATH_BIN" >> ~/.bashrc
-    echo "Please run: source ~/.bashrc"
-    echo "Or use full path: $GOPATH_BIN/kern"
-    export PATH=$PATH:$GOPATH_BIN
+# Проверяем есть ли путь в PATH
+    if [[ ":$PATH:" != *":$(go env GOPATH)/bin:"* ]]; then
+        echo "Adding GOPATH/bin to PATH..."
+        echo "export PATH=\$PATH:$(go env GOPATH)/bin" >> ~/.bashrc
+        echo "Please run: source ~/.bashrc"
+        echo "Or use: $(go env GOPATH)/bin/kern"
+    else
+        echo "You can now run: kern"
+    fi
+else
+    echo "Installation failed. You can run locally with: ./kern"
 fi
 
-echo "kern installed successfully!"
-echo "Available commands:"
-echo "  ./kern                    # Run local binary"
-echo "  kern                      # Run global installation"  
-echo "  $GOPATH_BIN/kern         # Run with full path"
 echo ""
-echo "Run 'kern --help' for options"
+echo "Usage examples:"
+echo "  ./kern                    # Run local binary"
+echo "  kern                      # Run global installation (if in PATH)"
+echo "  kern --cpu --mem          # Show only CPU and memory"
+echo "  kern --refresh=5 -l ru    # 5 sec refresh with Russian interface"
