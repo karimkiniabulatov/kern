@@ -53,45 +53,24 @@ func (r *Renderer) Render(data map[string]interface{}) {
 	r.renderFooter()
 }
 
-func (r *Renderer) renderTopBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 60))
-}
-
-func (r *Renderer) renderBottomBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 60))
-}
-
-func (r *Renderer) renderSeparator() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 30))
-}
-
 func (r *Renderer) renderCPU(data interface{}) {
 	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("cpu.title"))
-	r.renderTopBorder()
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.model"), cpuInfo.Model)
-
-		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %d %s, %d %s\n", 
 			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads"))
 
-		r.renderSeparator()
 		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
 		fmt.Printf("  \033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m\n",
 			r.config.T("cpu.usage"), graph, cpuInfo.Usage)
 
-		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.frequency"), cpuInfo.Frequency)
-
-		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %.2f, %.2f, %.2f\n",
 			r.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15)
 
 		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-			r.renderSeparator()
 			fmt.Printf("  \033[36m%s:\033[0m\n", r.config.T("cpu.core_usage"))
 			for i, usage := range cpuInfo.CoreUsage {
 				coreGraph := r.createSimpleGraph(usage, 15)
@@ -100,44 +79,35 @@ func (r *Renderer) renderCPU(data interface{}) {
 			}
 		}
 	}
-	r.renderBottomBorder()
 	fmt.Println()
 }
 
 func (r *Renderer) renderMemory(data interface{}) {
 	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("memory.title"))
-	r.renderTopBorder()
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		r.renderSeparator()
 		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
 		fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m\n",
 			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent)
 
-		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("common.available"), memInfo.Available)
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
-			r.renderSeparator()
 			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
 			fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m\n",
 				r.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent)
 		}
 	}
-	r.renderBottomBorder()
 	fmt.Println()
 }
 
 func (r *Renderer) renderDisk(data interface{}) {
 	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("disk.title"))
-	r.renderTopBorder()
 
 	if disks, ok := data.([]disk.DiskInfo); ok {
 		count := 0
 		for _, d := range disks {
 			if strings.HasPrefix(d.Filesystem, "/dev/") && count < 3 {
-				r.renderSeparator()
-				
 				devType := r.getDeviceType(d.Filesystem, d.MountedOn)
 				mountPoint := d.MountedOn
 				if mountPoint == "/" {
@@ -146,55 +116,42 @@ func (r *Renderer) renderDisk(data interface{}) {
 				
 				fmt.Printf("  \033[36m%s:\033[0m %s (%s)\n", 
 					r.config.T("disk.filesystem"), d.Filesystem, devType)
-				
-				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("disk.mounted"), mountPoint)
 				
-				r.renderSeparator()
 				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
 				fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m\n",
 					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent)
 				
 				count++
+				fmt.Println()
 			}
 		}
 	}
-	r.renderBottomBorder()
-	fmt.Println()
 }
 
 func (r *Renderer) renderNetwork(data interface{}) {
 	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("network.title"))
-	r.renderTopBorder()
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		count := 0
 		for _, net := range networks {
 			if net.Status == "UP" && net.Interface != "lo" && count < 2 {
-				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("network.interface"), net.Interface)
-				
-				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s\n", "IP Address", net.IPAddress)
-				
-				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s\n", "MAC Address", net.MACAddress)
 				
-				r.renderSeparator()
 				activityGraph := r.createSimpleGraph(net.ActivityPercent, 25)
 				fmt.Printf("  \033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m\n",
 					"Activity", activityGraph, net.ActivityPercent)
 				
-				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s↓ / %s↑\n",
 					"Speed", net.RXSpeed, net.TXSpeed)
 				
 				count++
+				fmt.Println()
 			}
 		}
 	}
-	r.renderBottomBorder()
-	fmt.Println()
 }
 
 func (r *Renderer) renderFooter() {

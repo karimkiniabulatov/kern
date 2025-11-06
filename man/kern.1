@@ -1,18 +1,18 @@
-.TH KERN 1 "2025-11-03" "kern" "System Monitoring Tool"
+```man
+.TH KERN 1 "2025-01-01" "kern" "System Monitoring Tool"
 .SH NAME
-kern \- real-time system monitoring tool with REST API and remote monitoring
+kern \- real-time system monitoring tool with REST API
 .SH SYNOPSIS
 .B kern
 [\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
 .B kern
-[\-\-ssh \fIHOST\fR] [\-\-api \fIURL\fR] [\-\-download-lang \fICODE\fR] [\-\-list-languages]
+[\-\-download-lang \fICODE\fR] [\-\-list-languages]
 .SH DESCRIPTION
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
 about disk usage, CPU performance, memory utilization, and network statistics.
-It features a clean line-based interface with colored graphs, auto-refresh capabilities,
-support for multiple languages with automatic download, and remote monitoring via
-SSH and API.
+It features a clean interface with auto-refresh capabilities,
+support for multiple languages with automatic download, and remote monitoring via API.
 .SH OPTIONS
 .TP
 .B \-a, \-\-all
@@ -34,7 +34,7 @@ Show memory information only.
 Show network information only.
 .TP
 .B \-v, \-\-version
-Show version information.
+Show version information and logo.
 .TP
 .B \-\-refresh=\fISECONDS\fR
 Set refresh interval in seconds (default: 2).
@@ -43,54 +43,22 @@ Set refresh interval in seconds (default: 2).
 Set interface language. Use \-\-list-languages to see all supported codes.
 .TP
 .B \-r \fIPORT\fR
-Start remote API server on specified port.
+Start remote API server on specified port (default: 28126).
 .TP
 .B \-\-detailed
 Show detailed CPU core information (individual core usage).
-.TP
-.B \-\-ssh \fIHOST\fR
-Monitor remote server via SSH (format: user@hostname).
-.TP
-.B \-\-api \fIURL\fR
-Monitor remote server via API (format: http://hostname:port).
 .TP
 .B \-\-download-lang \fICODE\fR
 Download language pack for specified language code.
 .TP
 .B \-\-list-languages
 List all supported language codes.
-.SH LANGUAGE SUPPORT
-.B kern
-supports over 50 languages. If a requested language is not available locally,
-it can be automatically downloaded from the official repository.
-.PP
-Supported language groups include:
-.IP \(bu 4
-European languages (en, ru, es, fr, de, it, pt, nl, pl, sv, da, no, fi)
-.IP \(bu 4
-Eastern European languages (cs, hu, ro, bg, hr, sk, sl, et, lv, lt, uk, sr, bs, mk, sq, el)
-.IP \(bu 4
-Asian languages (ja, ko, zh, ar, hi, id, vi, th, tr, he, fa, ur, bn, ta, te, ml, kn, gu, mr, pa, ne)
-.SH REMOTE MONITORING
-.B kern
-provides multiple methods for remote system monitoring:
-.TP
-.B API Monitoring
-Start kern as an API server on the remote machine with
-.B \-r
-and connect from a client machine with
-.B \-\-api.
-.TP
-.B SSH Monitoring
-Monitor remote systems via SSH connection using
-.B \-\-ssh
-(planned feature).
 .SH API
 When started with the
 .B \-r
 option,
 .B kern
-provides a REST API on the specified port:
+provides a REST API on the specified port (28126 by default):
 .TP
 .B GET /api/cpu
 Returns JSON with CPU information.
@@ -112,9 +80,9 @@ Returns health status.
 .PP
 Example usage:
 .IP
-kern -r 8080
+kern -r 28126
 .br
-curl http://localhost:8080/api/cpu
+curl http://localhost:28126/api/cpu
 .SH INTERACTIVE COMMANDS
 .TP
 .B q
@@ -133,14 +101,8 @@ Update every 5 seconds with Russian interface.
 .B kern \-\-detailed
 Show detailed CPU core information.
 .TP
-.B kern \-r 8080
-Start remote API server on port 8080.
-.TP
-.B kern \-\-ssh user@server
-Monitor remote server via SSH.
-.TP
-.B kern \-\-api http://server:8080
-Monitor remote server via API.
+.B kern \-r 28126
+Start remote API server on port 28126.
 .TP
 .B kern \-\-download-lang fr
 Download French language pack.

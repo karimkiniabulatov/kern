@@ -1,6 +1,6 @@
 # kern - System Monitoring Tool
 
-A comprehensive, real-time system monitoring tool written in Go with beautiful ANSI-colored interface and support for 50+ languages.
+A comprehensive, real-time system monitoring tool written in Go with beautiful interface and support for 50+ languages.
 
 ![kern demo](https://img.shields.io/badge/version-1.1.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
@@ -9,14 +9,13 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful A
 ## ✨ Features
 
 - **📊 Real-time Monitoring**: Live updates with configurable refresh intervals
-- **🎨 Beautiful Interface**: Clean line-based layout with colored graphs
+- **🎨 Clean Interface**: Simple, line-based output without visual clutter
 - **🌐 Multi-language**: Support for 50+ languages with auto-download capability
 - **💾 Disk Monitoring**: Filesystem usage with type detection (SSD/HDD/NVMe/RAID)
 - **⚡ CPU Monitoring**: Core/thread information with detailed core usage
 - **🧠 Memory Monitoring**: RAM and swap usage with visual graphs
 - **🌐 Network Monitoring**: Interface status, speeds, and activity indicators
-- **🔌 REST API**: HTTP API for remote monitoring and integration
-- **🚀 Remote Monitoring**: Support for SSH and API-based remote monitoring
+- **🔌 REST API**: HTTP API for remote monitoring on port 28126
 - **⌨️ Interactive**: Press 'q' to quit gracefully
 - **🔧 Cross-platform**: Works on Linux, Android (Termux), macOS
 
@@ -58,35 +57,28 @@ kern -l fr
 # List all supported languages
 kern --list-languages
 
-# Remote monitoring
-kern --ssh user@server     # Monitor via SSH (planned)
-kern --api http://srv:8080 # Monitor via API
+# Start API server on default port 28126
+kern -r 28126
 
-# Start API server
-kern -r 8080
-
-# Show version
+# Show version and logo
 kern -v
-
 ---------------------------------------------------------
-🎨 New Interface Design
-The new line-based interface provides a clean, stable display:
+🎨 Interface Design
+The clean line-based interface provides stable, flicker-free monitoring:
 ---------------------------------------------------------
-kern - System Monitor
-██████████
 CPU Information
-██████████
-     █████
   Model: AMD Ryzen 7 5800X
-     █████
   Cores: 8 Cores, 16 Threads
-     █████
   Usage: ███████████████████████ 95.5%
-     █████
   Frequency: 3800 MHz
-     █████
   Load Average: 1.25, 1.10, 0.95
-██████████
+
+Memory Information
+  RAM: 15.2G / 32.0G ███████████████████████ 47.5%
+  Available: 16.8G
+  Swap: 2.1G / 8.0G ███████████████████████ 26.2%
+
+Press 'q' to quit | Auto-refresh every 2 seconds
 ----------------------------------------------------------
 Color Scheme
 Headers: Bright yellow
@@ -235,7 +227,7 @@ Language Support:
   --download-lang code Download language pack
   --list-languages    List all supported languages
 ------------
-🧪 Testing
+🧪 Testing🔌
 ------------
 # Run test suite
 ./scripts/test.sh
@@ -252,17 +244,43 @@ kern -l es --refresh=1
 go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
 -------------------------------------------------------
 -------------------------------------------------------
-🔌 API Documentation
+🔌 API Usage
+kern provides a REST API for remote monitoring on port 28126:
+
+Start API Server
 -------------------
-Starting API Server
--------------------
-kern -r 8080
+kern -r 28126
 --------------------------------------------------------
+API Endpoints
+GET /api/cpu - CPU information
+
+GET /api/mem - Memory information
+
+GET /api/disk - Disk information
+
+GET /api/net - Network information
+
+GET /api/system - System information
+
+GET /health - Health check
+
+GET / - API information
 --------------------------------------------------------
+Example API Usage
+
+# Get CPU information
+curl http://localhost:28126/api/cpu
+
+# Get memory information
+curl http://localhost:28126/api/mem
+
+# Get all system information
+curl http://localhost:28126/api/system
+
 API Response Examples
 ---------------------
 # Get CPU information
-curl http://localhost:8080/api/cpu
+curl http://localhost:28126/api/cpu
 
 # Response example:
 {

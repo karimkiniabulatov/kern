@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e
 
+show_logo() {
+    echo -e "\033[1;36m"
+    cat << "EOF"
+╔═╗┌─┐┬─┐┌─┐
+║ ╦├┤ ├┬┘│ │
+╚═╝└─┘┴└─└─┘
+EOF
+    echo "kern v1.1.0 - System Monitoring Tool"
+    echo -e "\033[0m"
+}
+
+show_logo
+
 echo "Installing kern system monitor..."
 
 # Check if Go is installed
@@ -105,7 +118,7 @@ echo "  kern --disk               # Show only disk information"
 echo "  kern --net                # Show only network information"
 echo "  kern --refresh=5 -l ru    # 5 sec refresh with Russian interface"
 echo "  kern --detailed           # Show detailed CPU core information"
-echo "  kern -r 8080              # Start API server on port 8080"
+echo "  kern -r 28126             # Start API server on port 28126"
 echo "  kern --help               # Show help"
 echo ""
 echo "To view manual: man kern"

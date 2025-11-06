@@ -19,6 +19,7 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
 	"github.com/karimkiniabulatov/kern/internal/ui"
+	"golang.org/x/term"
 )
 
 var (
@@ -29,7 +30,7 @@ var (
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote    = flag.Int("r", 0, "Start remote API on specified port")
+	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 28126)")
 	flagVersion   = flag.Bool("v", false, "Show version")
 	flagHelp      = flag.Bool("h", false, "Show help")
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
@@ -59,7 +60,7 @@ func main() {
 		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
-		fmt.Println("  kern -r 8080               # Start API server on port 8080")
+		fmt.Println("  kern -r 28126              # Start API server on port 28126")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
 	}
 
@@ -71,7 +72,7 @@ func main() {
 	}
 
 	if *flagVersion {
-		fmt.Printf("kern v%s\n", version)
+		showLogo()
 		return
 	}
 
@@ -106,7 +107,11 @@ func main() {
 
 	// Если указан порт для remote, запускаем сервер
 	if *flagRemote != 0 {
-		startRemoteServer(cfg, *flagRemote)
+		port := *flagRemote
+		if port == 0 {
+			port = 28126 // порт по умолчанию
+		}
+		startRemoteServer(cfg, port)
 		return
 	}
 
@@ -126,8 +131,20 @@ func main() {
 		cfg.RefreshRate = *flagRefresh
 	}
 
+	// Показываем логотип при запуске
+	showLogo()
+
 	// Запускаем мониторинг
 	runMonitor(cfg)
+}
+
+func showLogo() {
+	logo := `
+╔═╗┌─┐┬─┐┌─┐
+║ ╦├┤ ├┬┘│ │
+╚═╝└─┘┴└─└─┘
+kern v` + version + " - System Monitoring Tool\n"
+	fmt.Print("\033[1;36m" + logo + "\033[0m")
 }
 
 func runMonitor(cfg *config.Config) {
@@ -138,16 +155,16 @@ func runMonitor(cfg *config.Config) {
 	// Initialize UI
 	renderer := ui.NewRenderer(cfg)
 
-	// Set up terminal for raw input
-	oldState, err := setTerminalRaw()
+	// Set up terminal for raw input to make 'q' work properly
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		log.Printf("Failed to set terminal raw mode: %v", err)
 	} else {
-		defer restoreTerminal(oldState)
+		defer term.Restore(int(os.Stdin.Fd()), oldState)
 	}
 
-	// Channel for keyboard input
-	keyChan := make(chan rune, 1)
+	// Channel for keyboard input with buffer
+	keyChan := make(chan rune, 10)
 	go readKeys(keyChan)
 
 	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
@@ -178,15 +195,6 @@ func runMonitor(cfg *config.Config) {
 	}
 }
 
-func setTerminalRaw() (interface{}, error) {
-	// В не-Windows системах используем term.MakeRaw
-	return nil, nil
-}
-
-func restoreTerminal(oldState interface{}) {
-	// В не-Windows системах восстанавливаем состояние
-}
-
 func readKeys(keyChan chan rune) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -197,7 +205,7 @@ func readKeys(keyChan chan rune) {
 		select {
 		case keyChan <- char:
 		default:
-			// Если канал полный, пропускаем ввод
+			// Если канал полный, пропускаем ввод (редкий случай)
 		}
 	}
 }
@@ -261,6 +269,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
+	if port == 0 {
+		port = 28126
+	}
+	
 	log.Printf("Starting remote API server on port %d...", port)
 
 	// CPU endpoint
