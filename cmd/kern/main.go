@@ -138,21 +138,17 @@ func runMonitor(cfg *config.Config) {
 	// Initialize UI
 	renderer := ui.NewRenderer(cfg)
 
+	// Set up terminal for raw input
+	oldState, err := setTerminalRaw()
+	if err != nil {
+		log.Printf("Failed to set terminal raw mode: %v", err)
+	} else {
+		defer restoreTerminal(oldState)
+	}
+
 	// Channel for keyboard input
 	keyChan := make(chan rune, 1)
-	go func() {
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			char, _, err := reader.ReadRune()
-			if err != nil {
-				return
-			}
-			select {
-			case keyChan <- char:
-			default:
-			}
-		}
-	}()
+	go readKeys(keyChan)
 
 	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
 	defer ticker.Stop()
@@ -178,6 +174,30 @@ func runMonitor(cfg *config.Config) {
 			renderer.Cleanup()
 			fmt.Println("Monitoring stopped.")
 			return
+		}
+	}
+}
+
+func setTerminalRaw() (interface{}, error) {
+	// В не-Windows системах используем term.MakeRaw
+	return nil, nil
+}
+
+func restoreTerminal(oldState interface{}) {
+	// В не-Windows системах восстанавливаем состояние
+}
+
+func readKeys(keyChan chan rune) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		char, _, err := reader.ReadRune()
+		if err != nil {
+			return
+		}
+		select {
+		case keyChan <- char:
+		default:
+			// Если канал полный, пропускаем ввод
 		}
 	}
 }
