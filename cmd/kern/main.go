@@ -160,15 +160,21 @@ func runMonitor(cfg *config.Config) {
 	// Initialize UI
 	renderer := ui.NewRenderer(cfg)
 
-	// Set up non-blocking input reading
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-	if err == nil {
-		defer term.Restore(int(os.Stdin.Fd()), oldState)
-	}
+	// Простой канал для выхода
+	done := make(chan bool, 1)
 
-	// Channel for keyboard input
-	keyChan := make(chan rune, 1)
-	go readKeys(keyChan)
+	// Обработка клавиши 'q' в отдельной горутине
+	go func() {
+		reader := bufio.NewReader(os.Stdin)
+		for {
+			r, _, err := reader.ReadRune()
+			if err == nil && (r == 'q' || r == 'Q') {
+				done <- true
+				return
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+	}()
 
 	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
 	defer ticker.Stop()
@@ -183,16 +189,14 @@ func runMonitor(cfg *config.Config) {
 			results := collectData(cfg)
 			renderer.Render(results)
 			
-		case key := <-keyChan:
-			if key == 'q' || key == 'Q' {
-				renderer.Cleanup()
-				fmt.Println("\nMonitoring stopped.")
-				return
-			}
+		case <-done:
+			renderer.Cleanup()
+			fmt.Println("Monitoring stopped.")
+			return
 			
 		case <-sigChan:
 			renderer.Cleanup()
-			fmt.Println("\nMonitoring stopped.")
+			fmt.Println("Monitoring stopped.")
 			return
 		}
 	}

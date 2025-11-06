@@ -12,64 +12,46 @@ import (
 )
 
 type Renderer struct {
-	config      *config.Config
-	lastData    map[string]interface{}
-	initialized bool
+	config *config.Config
 }
 
 func NewRenderer(cfg *config.Config) *Renderer {
 	return &Renderer{
-		config:   cfg,
-		lastData: make(map[string]interface{}),
+		config: cfg,
 	}
 }
 
 func (r *Renderer) Render(data map[string]interface{}) {
-	// Сохраняем последние данные
-	for module, moduleData := range data {
-		r.lastData[module] = moduleData
-	}
+	// Полная очистка экрана и курсор в начало
+	fmt.Print("\033[2J\033[H")
 
-	// Перемещаем курсор в начало
-	if !r.initialized {
-		fmt.Print("\033[2J") // Полная очистка только при первом запуске
-		r.initialized = true
-	}
-	fmt.Print("\033[H") // Курсор в начало
-
-	// Рендерим все модули в фиксированном порядке
+	// Рендерим все модули
 	r.renderHeader()
 
-	// Рендерим только включенные модули
 	if r.config.ShowDisk {
-		if diskData, exists := r.lastData["disk"]; exists {
+		if diskData, exists := data["disk"]; exists {
 			r.renderDisk(diskData)
-			fmt.Println()
 		}
 	}
 
 	if r.config.ShowMem {
-		if memData, exists := r.lastData["mem"]; exists {
+		if memData, exists := data["mem"]; exists {
 			r.renderMemory(memData)
-			fmt.Println()
 		}
 	}
 
 	if r.config.ShowNet {
-		if netData, exists := r.lastData["net"]; exists {
+		if netData, exists := data["net"]; exists {
 			r.renderNetwork(netData)
-			fmt.Println()
 		}
 	}
 
 	if r.config.ShowCPU {
-		if cpuData, exists := r.lastData["cpu"]; exists {
+		if cpuData, exists := data["cpu"]; exists {
 			r.renderCPU(cpuData)
-			fmt.Println()
 		}
 	}
 
-	// Подсказка для выхода
 	r.renderFooter()
 }
 
@@ -80,48 +62,42 @@ func (r *Renderer) renderHeader() {
 }
 
 func (r *Renderer) renderTopBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10)) // 10 синих пробелов
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10))
 }
 
 func (r *Renderer) renderBottomBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10)) // 10 синих пробелов
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10))
 }
 
 func (r *Renderer) renderSeparator() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 5)) // 5 синих пробелов
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 5))
 }
 
 func (r *Renderer) renderCPU(data interface{}) {
-	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("cpu.title")) // Ярко-желтый
+	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("cpu.title"))
 	r.renderTopBorder()
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		// Модель процессора
 		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.model"), cpuInfo.Model)
 
-		// Ядра и потоки
 		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %d %s, %d %s\n", 
 			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads"))
 
-		// Общее использование
 		r.renderSeparator()
 		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
 		fmt.Printf("  \033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m\n",
 			r.config.T("cpu.usage"), graph, cpuInfo.Usage)
 
-		// Частота
 		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.frequency"), cpuInfo.Frequency)
 
-		// Нагрузка
 		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %.2f, %.2f, %.2f\n",
 			r.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15)
 
-		// Детальная информация по ядрам
 		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 			r.renderSeparator()
 			fmt.Printf("  \033[36m%s:\033[0m\n", r.config.T("cpu.core_usage"))
@@ -133,6 +109,7 @@ func (r *Renderer) renderCPU(data interface{}) {
 		}
 	}
 	r.renderBottomBorder()
+	fmt.Println()
 }
 
 func (r *Renderer) renderMemory(data interface{}) {
@@ -140,17 +117,14 @@ func (r *Renderer) renderMemory(data interface{}) {
 	r.renderTopBorder()
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		// RAM
 		r.renderSeparator()
 		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
 		fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m\n",
 			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent)
 
-		// Available
 		r.renderSeparator()
 		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("common.available"), memInfo.Available)
 
-		// Swap
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
 			r.renderSeparator()
 			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
@@ -159,6 +133,7 @@ func (r *Renderer) renderMemory(data interface{}) {
 		}
 	}
 	r.renderBottomBorder()
+	fmt.Println()
 }
 
 func (r *Renderer) renderDisk(data interface{}) {
@@ -166,14 +141,12 @@ func (r *Renderer) renderDisk(data interface{}) {
 	r.renderTopBorder()
 
 	if disks, ok := data.([]disk.DiskInfo); ok {
-		for i, d := range disks {
-			if strings.HasPrefix(d.Filesystem, "/dev/") && i < 3 { // Показываем только первые 3 диска
+		count := 0
+		for _, d := range disks {
+			if strings.HasPrefix(d.Filesystem, "/dev/") && count < 3 {
 				r.renderSeparator()
 				
-				// Определяем тип устройства
 				devType := r.getDeviceType(d.Filesystem, d.MountedOn)
-				
-				// Основная информация
 				mountPoint := d.MountedOn
 				if mountPoint == "/" {
 					mountPoint = "ROOT"
@@ -189,10 +162,13 @@ func (r *Renderer) renderDisk(data interface{}) {
 				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
 				fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m\n",
 					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent)
+				
+				count++
 			}
 		}
 	}
 	r.renderBottomBorder()
+	fmt.Println()
 }
 
 func (r *Renderer) renderNetwork(data interface{}) {
@@ -223,6 +199,7 @@ func (r *Renderer) renderNetwork(data interface{}) {
 		}
 	}
 	r.renderBottomBorder()
+	fmt.Println()
 }
 
 func (r *Renderer) renderFooter() {
@@ -233,7 +210,6 @@ func (r *Renderer) renderFooter() {
 		r.config.T("ui.seconds"))
 }
 
-// Вспомогательные методы для создания графиков
 func (r *Renderer) createSimpleGraph(percent float64, width int) string {
 	if percent > 100 {
 		percent = 100
@@ -268,7 +244,5 @@ func (r *Renderer) getDeviceType(filesystem, mountPoint string) string {
 }
 
 func (r *Renderer) Cleanup() {
-	fmt.Print("\033[0m") // Сброс цветов
-	fmt.Print("\033[2J") // Очистка экрана
-	fmt.Print("\033[H")  // Курсор в начало
+	fmt.Print("\033[0m\033[2J\033[H")
 }
