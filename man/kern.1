@@ -1,6 +1,6 @@
 .TH KERN 1 "2025-01-01" "kern" "System Monitoring Tool"
 .SH NAME
-kern \- real-time system monitoring tool
+kern \- real-time system monitoring tool with REST API
 .SH SYNOPSIS
 .B kern
 [\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
@@ -8,8 +8,8 @@ kern \- real-time system monitoring tool
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
 about disk usage, CPU performance, memory utilization, and network statistics.
-It features a colorful terminal interface with auto-refresh capabilities
-and support for multiple languages.
+It features a colorful terminal interface with auto-refresh capabilities,
+support for multiple languages, and a REST API for remote monitoring.
 .SH OPTIONS
 .TP
 .B \-a, \-\-all
@@ -44,6 +44,33 @@ Start remote API server on specified port.
 .TP
 .B \-\-detailed
 Show detailed CPU core information (individual core usage).
+.SH API
+.B kern
+provides a REST API for remote monitoring when started with the
+.B \-r
+option.
+.TP
+.B GET /api/cpu
+Returns JSON with CPU information.
+.TP
+.B GET /api/mem
+Returns JSON with memory information.
+.TP
+.B GET /api/disk
+Returns JSON with disk information.
+.TP
+.B GET /api/net
+Returns JSON with network information.
+.TP
+.B GET /api/system
+Returns JSON with system information.
+.TP
+.B GET /health
+Returns health status.
+.PP
+Example usage:
+.IP
+kern -r 8080
 .SH INTERACTIVE COMMANDS
 .TP
 .B q
@@ -62,12 +89,15 @@ Update every 5 seconds with Russian interface.
 .B kern \-\-detailed
 Show detailed CPU core information.
 .TP
-.B kern \-r 26001
-Start remote API server on port 26001.
+.B kern \-r 8080
+Start remote API server on port 8080.
 .SH FILES
 .TP
 .I ~/.config/kern/kern.json
 Configuration file storing user preferences.
+.TP
+.I /usr/local/share/kern/i18n/
+Directory containing language translation files.
 .SH EXIT STATUS
 Returns 0 on success, 1 on error.
 .SH SEE ALSO
@@ -78,7 +108,7 @@ Returns 0 on success, 1 on error.
 .BR lscpu (1)
 .SH BUGS
 Report bugs at https://github.com/karimkiniabulatov/kern/issues
-.SH AUTHOR
-Karim Kinia Bulatov
+.SH AUTHORS
+Karim Kiniabulatov.
 .SH LICENSE
 GNU GPLv3

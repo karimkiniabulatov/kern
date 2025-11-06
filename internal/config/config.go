@@ -81,7 +81,6 @@ func getDefaultConfig(language string) *Config {
 	if language == "" {
 		language = "en" // Default to English
 	}
-
 	return &Config{
 		Language:    language,
 		RefreshRate: 2,

@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -55,6 +57,7 @@ func main() {
 		fmt.Println("  kern -d -l ru           # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5        # Update every 5 seconds")
 		fmt.Println("  kern --detailed         # Show detailed CPU core info")
+		fmt.Println("  kern -r 8080            # Start API server on port 8080")
 	}
 
 	flag.Parse()
@@ -75,6 +78,12 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	// Сохраняем язык в конфиг если указан
+	if *flagLang != "" {
+		cfg.Language = *flagLang
+		cfg.Save() // Сохраняем настройки языка
+	}
+
 	// Если указан порт для remote, запускаем сервер
 	if *flagRemote != 0 {
 		startRemoteServer(cfg, *flagRemote)
@@ -93,6 +102,7 @@ func main() {
 	cfg.ShowMem = showMem
 	cfg.ShowNet = showNet
 	cfg.DetailedCPU = *flagDetailed
+	cfg.RefreshRate = *flagRefresh
 
 	// Запускаем мониторинг
 	runMonitor(cfg)
@@ -215,8 +225,97 @@ func collectData(cfg *config.Config) map[string]interface{} {
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
-	// Remote server implementation would go here
-	log.Printf("Remote API server starting on port %d...", port)
-	// This would start the HTTP/gRPC server for remote monitoring
-	select {} // Block forever
+	log.Printf("Starting remote API server on port %d...", port)
+
+	// CPU endpoint
+	http.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		data, err := cpu.Summary()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
+	// Memory endpoint
+	http.HandleFunc("/api/mem", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		data, err := mem.Summary()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
+	// Disk endpoint
+	http.HandleFunc("/api/disk", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		data, err := disk.Summary()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
+	// Network endpoint
+	http.HandleFunc("/api/net", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		data, err := net.Summary()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
+	// System info endpoint
+	http.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		systemInfo := map[string]interface{}{
+			"version": version,
+			"time":    time.Now().Format(time.RFC3339),
+		}
+		json.NewEncoder(w).Encode(systemInfo)
+	})
+
+	// Health check endpoint
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	})
+
+	// Root endpoint with API info
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		apiInfo := map[string]interface{}{
+			"name":    "kern API",
+			"version": version,
+			"endpoints": []string{
+				"/api/cpu",
+				"/api/mem", 
+				"/api/disk",
+				"/api/net",
+				"/api/system",
+				"/health",
+			},
+		}
+		json.NewEncoder(w).Encode(apiInfo)
+	})
+
+	log.Printf("API server running on http://localhost:%d", port)
+	log.Printf("Available endpoints:")
+	log.Printf("  GET /api/cpu    - CPU information")
+	log.Printf("  GET /api/mem    - Memory information")
+	log.Printf("  GET /api/disk   - Disk information")
+	log.Printf("  GET /api/net    - Network information")
+	log.Printf("  GET /api/system - System information")
+	log.Printf("  GET /health     - Health check")
+	log.Printf("  GET /           - API information")
+
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+		log.Fatalf("Failed to start API server: %v", err)
+	}
 }

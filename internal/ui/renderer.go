@@ -19,6 +19,7 @@ type Renderer struct {
 	termHeight  int
 	lastData    map[string]interface{}
 	initialized bool
+	lineCount   int
 }
 
 func NewRenderer(cfg *config.Config) *Renderer {
@@ -27,7 +28,6 @@ func NewRenderer(cfg *config.Config) *Renderer {
 		width = 80
 		height = 24
 	}
-
 	return &Renderer{
 		config:     cfg,
 		termWidth:  width,
@@ -46,72 +46,100 @@ func (r *Renderer) Render(data map[string]interface{}) {
 	if !r.initialized {
 		fmt.Print("\033[2J") // Полная очистка только при первом запуске
 		r.initialized = true
+		r.lineCount = 0
 	}
+	
 	fmt.Print("\033[H") // Курсор в начало
+	
+	// Сбрасываем счетчик строк
+	currentLineCount := 0
 
 	// Рендерим все модули в фиксированном порядке
-	r.renderHeader()
+	currentLineCount += r.renderHeader()
 	
 	// Рендерим только включенные модули
 	if r.config.ShowDisk {
 		if diskData, exists := r.lastData["disk"]; exists {
-			r.renderDisk(diskData)
-			fmt.Println()
+			currentLineCount += r.renderDisk(diskData)
+			currentLineCount += r.renderEmptyLine()
 		}
 	}
 	
 	if r.config.ShowMem {
 		if memData, exists := r.lastData["mem"]; exists {
-			r.renderMemory(memData)
-			fmt.Println()
+			currentLineCount += r.renderMemory(memData)
+			currentLineCount += r.renderEmptyLine()
 		}
 	}
 	
 	if r.config.ShowNet {
 		if netData, exists := r.lastData["net"]; exists {
-			r.renderNetwork(netData)
-			fmt.Println()
+			currentLineCount += r.renderNetwork(netData)
+			currentLineCount += r.renderEmptyLine()
 		}
 	}
 	
 	if r.config.ShowCPU {
 		if cpuData, exists := r.lastData["cpu"]; exists {
-			r.renderCPU(cpuData)
-			fmt.Println()
+			currentLineCount += r.renderCPU(cpuData)
+			currentLineCount += r.renderEmptyLine()
 		}
 	}
 
 	// Подсказка для выхода
-	fmt.Printf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m\n", r.config.RefreshRate)
+	currentLineCount += r.renderFooter()
+
+	// Очищаем оставшиеся строки от предыдущего рендера
+	if currentLineCount < r.lineCount {
+		for i := currentLineCount; i < r.lineCount; i++ {
+			fmt.Print("\033[K\n") // Очищаем строку и переходим на следующую
+		}
+		fmt.Printf("\033[%dA", r.lineCount-currentLineCount) // Возвращаем курсор
+	}
+	
+	r.lineCount = currentLineCount
 }
 
-func (r *Renderer) renderHeader() {
-	title := "kern - System Monitor"
+func (r *Renderer) renderHeader() int {
+	title := r.config.T("title")
 	width := runewidth.StringWidth(title)
 	padding := (r.termWidth - width) / 2
+	if padding < 0 {
+		padding = 0
+	}
 	
 	fmt.Printf("\033[1;36m%s%s\033[0m\n", strings.Repeat(" ", padding), title)
-	r.renderSeparator()
+	return 1 + r.renderSeparator()
 }
 
-func (r *Renderer) renderSeparator() {
-	// Упрощенный разделитель - фиксированной длины
+func (r *Renderer) renderSeparator() int {
 	separator := strings.Repeat("─", 60)
 	fmt.Printf("\033[34m%s\033[0m\n", separator)
+	return 1
 }
 
-func (r *Renderer) renderCPU(data interface{}) {
-	fmt.Println("\033[1;34mCPU Information:\033[0m")
-	r.renderSeparator()
+func (r *Renderer) renderEmptyLine() int {
+	fmt.Println()
+	return 1
+}
+
+func (r *Renderer) renderCPU(data interface{}) int {
+	lines := 0
+	fmt.Println("\033[1;34m" + r.config.T("cpu.title") + "\033[0m")
+	lines++
+	lines += r.renderSeparator()
 	
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		// Основная информация о процессоре
 		model := truncateString(cpuInfo.Model, 20)
-		coresInfo := fmt.Sprintf("%d cores, %d threads", cpuInfo.Cores, cpuInfo.Threads)
+		coresInfo := fmt.Sprintf("%d %s, %d %s", 
+			cpuInfo.Cores, r.config.T("cpu.cores"), 
+			cpuInfo.Threads, r.config.T("cpu.threads"))
 		
 		fmt.Printf("  \033[36m%-20s\033[0m  %-18s  \033[38;5;215m%5.1f%%\033[0m     %-12s  %-12s\n", 
 			model, coresInfo, cpuInfo.Usage, cpuInfo.Vendor, cpuInfo.Architecture)
-
+		lines++
+		
 		if r.config.DetailedCPU {
 			// Детальный режим - показываем все ядра/потоки
 			if len(cpuInfo.CoreUsage) > 0 {
@@ -128,47 +156,58 @@ func (r *Renderer) renderCPU(data interface{}) {
 						graph := r.createCPUGraph(usage1, usage2)
 						
 						if i+1 < len(cpuInfo.CoreUsage) {
-							fmt.Printf("  Core %-2d              -                  %s   \033[38;5;215m%.1f%%/%.1f%%\033[0m\n", 
-								coreNum, graph, usage1, usage2)
+							fmt.Printf("  %s %-2d              -                  %s   \033[38;5;215m%.1f%%/%.1f%%\033[0m\n", 
+								r.config.T("cpu.core"), coreNum, graph, usage1, usage2)
 						} else {
-							fmt.Printf("  Core %-2d              -                  %s   \033[38;5;215m%.1f%%\033[0m\n", 
-								coreNum, graph, usage1)
+							fmt.Printf("  %s %-2d              -                  %s   \033[38;5;215m%.1f%%\033[0m\n", 
+								r.config.T("cpu.core"), coreNum, graph, usage1)
 						}
+						lines++
 					}
 				}
 			}
 		} else {
 			// Компактный режим - одна общая гистограмма
 			graph := r.createSimpleGraph(cpuInfo.Usage, 20)
-			fmt.Printf("  Overall Usage        -                  %s   \033[38;5;215m%5.1f%%\033[0m\n", graph, cpuInfo.Usage)
+			fmt.Printf("  %s        -                  %s   \033[38;5;215m%5.1f%%\033[0m\n", 
+				r.config.T("cpu.overall_usage"), graph, cpuInfo.Usage)
+			lines++
 		}
 	}
-	r.renderSeparator()
+	lines += r.renderSeparator()
+	return lines
 }
 
-func (r *Renderer) renderMemory(data interface{}) {
-	fmt.Println("\033[1;34mMemory Information:\033[0m")
-	r.renderSeparator()
+func (r *Renderer) renderMemory(data interface{}) int {
+	lines := 0
+	fmt.Println("\033[1;34m" + r.config.T("memory.title") + "\033[0m")
+	lines++
+	lines += r.renderSeparator()
 	
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		// RAM
 		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 20)
 		fmt.Printf("  %-17s  %-8s  %-8s  %-8s  %s   \033[38;5;154m%5.1f%%\033[0m\n",
-			"RAM", memInfo.Total, memInfo.Used, memInfo.Free, ramGraph, memInfo.UsagePercent)
-			
+			r.config.T("memory.ram"), memInfo.Total, memInfo.Used, memInfo.Free, ramGraph, memInfo.UsagePercent)
+		lines++
+		
 		// Swap
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
 			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 20)
 			fmt.Printf("  %-17s  %-8s  %-8s  %-8s  %s   \033[38;5;154m%5.1f%%\033[0m\n",
-				"Swap", memInfo.SwapTotal, memInfo.SwapUsed, memInfo.SwapFree, swapGraph, memInfo.SwapUsagePercent)
+				r.config.T("memory.swap"), memInfo.SwapTotal, memInfo.SwapUsed, memInfo.SwapFree, swapGraph, memInfo.SwapUsagePercent)
+			lines++
 		}
 	}
-	r.renderSeparator()
+	lines += r.renderSeparator()
+	return lines
 }
 
-func (r *Renderer) renderDisk(data interface{}) {
-	fmt.Println("\033[1;34mDisk Information:\033[0m")
-	r.renderSeparator()
+func (r *Renderer) renderDisk(data interface{}) int {
+	lines := 0
+	fmt.Println("\033[1;34m" + r.config.T("disk.title") + "\033[0m")
+	lines++
+	lines += r.renderSeparator()
 	
 	if disks, ok := data.([]disk.DiskInfo); ok {
 		for _, d := range disks {
@@ -189,15 +228,19 @@ func (r *Renderer) renderDisk(data interface{}) {
 				
 				fmt.Printf("  \033[36m%-14s\033[0m  %-18s  %-8s  %s   \033[38;5;216m%5.1f%%\033[0m     %-10s\n",
 					fs, mp, d.Size, graph, d.UsePercent, devType)
+				lines++
 			}
 		}
 	}
-	r.renderSeparator()
+	lines += r.renderSeparator()
+	return lines
 }
 
-func (r *Renderer) renderNetwork(data interface{}) {
-	fmt.Println("\033[1;34mNetwork Information:\033[0m")
-	r.renderSeparator()
+func (r *Renderer) renderNetwork(data interface{}) int {
+	lines := 0
+	fmt.Println("\033[1;34m" + r.config.T("network.title") + "\033[0m")
+	lines++
+	lines += r.renderSeparator()
 	
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		for _, net := range networks {
@@ -220,10 +263,21 @@ func (r *Renderer) renderNetwork(data interface{}) {
 				
 				fmt.Printf("  %-14s  %-18s  %-18s  %-18s  %s   \033[38;5;165m%5.1f%%\033[0m\n",
 					iface, ip, mac, speed, graph, activity)
+				lines++
 			}
 		}
 	}
-	r.renderSeparator()
+	lines += r.renderSeparator()
+	return lines
+}
+
+func (r *Renderer) renderFooter() int {
+	fmt.Printf("\033[90m%s | %s %d %s\033[0m\n", 
+		r.config.T("ui.press_quit"), 
+		r.config.T("ui.refresh_every"), 
+		r.config.RefreshRate, 
+		r.config.T("ui.seconds"))
+	return 1
 }
 
 // Вспомогательные методы для создания графиков

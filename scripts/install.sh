@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 echo "Installing kern system monitor..."
@@ -63,6 +62,22 @@ else
     sudo mandb >/dev/null 2>&1 && echo "Man page installed successfully" || echo "Man page installation failed - continuing..."
 fi
 
+# Install i18n files
+echo "Installing language files..."
+if [ -d "i18n" ]; then
+    # Copy to system directory
+    sudo mkdir -p /usr/local/share/kern/i18n
+    sudo cp i18n/active.*.json /usr/local/share/kern/i18n/ 2>/dev/null && \
+    echo "System language files installed successfully" || echo "System language files installation failed - continuing..."
+    
+    # Copy to user config directory
+    mkdir -p ~/.config/kern/i18n
+    cp i18n/active.*.json ~/.config/kern/i18n/ 2>/dev/null && \
+    echo "User language files installed successfully" || echo "User language files installation failed - continuing..."
+else
+    echo "No i18n directory found - skipping language files installation"
+fi
+
 # Check where kern was installed
 KERN_PATH="$(go env GOPATH)/bin/kern"
 if [ -f "$KERN_PATH" ]; then
@@ -90,6 +105,7 @@ echo "  kern --disk               # Show only disk information"
 echo "  kern --net                # Show only network information"
 echo "  kern --refresh=5 -l ru    # 5 sec refresh with Russian interface"
 echo "  kern --detailed           # Show detailed CPU core information"
+echo "  kern -r 8080              # Start API server on port 8080"
 echo "  kern --help               # Show help"
 echo ""
 echo "To view manual: man kern"
