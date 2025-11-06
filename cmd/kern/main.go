@@ -35,8 +35,6 @@ var (
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
 	flagDownload  = flag.String("download-lang", "", "Download language pack (e.g., 'fr' for French)")
 	flagListLangs = flag.Bool("list-languages", false, "List all supported languages")
-	flagSSH       = flag.String("ssh", "", "Monitor remote server via SSH (user@hostname)")
-	flagAPI       = flag.String("api", "", "Monitor remote server via API (http://hostname:port)")
 )
 
 const version = "1.1.0"
@@ -55,11 +53,6 @@ func main() {
 		fmt.Println("Usage: kern [OPTIONS]")
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
-		fmt.Println("\nRemote Monitoring:")
-		fmt.Println("  --ssh user@hostname        Monitor remote server via SSH")
-		fmt.Println("  --api http://host:port     Monitor remote server via API")
-		fmt.Println("  --download-lang CODE       Download language pack")
-		fmt.Println("  --list-languages           List all supported languages")
 		fmt.Println("\nExamples:")
 		fmt.Println("  kern                       # Show all information")
 		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
@@ -67,8 +60,6 @@ func main() {
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
 		fmt.Println("  kern -r 8080               # Start API server on port 8080")
-		fmt.Println("  kern --ssh user@server     # Monitor remote server via SSH")
-		fmt.Println("  kern --api http://srv:8080 # Monitor remote server via API")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
 	}
 
@@ -91,18 +82,6 @@ func main() {
 
 	if *flagDownload != "" {
 		downloadLanguagePack(*flagDownload)
-		return
-	}
-
-	// Remote monitoring via SSH
-	if *flagSSH != "" {
-		monitorViaSSH(*flagSSH)
-		return
-	}
-
-	// Remote monitoring via API
-	if *flagAPI != "" {
-		monitorViaAPI(*flagAPI)
 		return
 	}
 
@@ -159,19 +138,19 @@ func runMonitor(cfg *config.Config) {
 	// Initialize UI
 	renderer := ui.NewRenderer(cfg)
 
-	// Простой канал для выхода
-	done := make(chan bool, 1)
-
-	// Обработка клавиши 'q' в отдельной горутине
+	// Channel for keyboard input
+	keyChan := make(chan rune, 1)
 	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		for {
-			r, _, err := reader.ReadRune()
-			if err == nil && (r == 'q' || r == 'Q') {
-				done <- true
+			char, _, err := reader.ReadRune()
+			if err != nil {
 				return
 			}
-			time.Sleep(50 * time.Millisecond)
+			select {
+			case keyChan <- char:
+			default:
+			}
 		}
 	}()
 
@@ -188,27 +167,17 @@ func runMonitor(cfg *config.Config) {
 			results := collectData(cfg)
 			renderer.Render(results)
 			
-		case <-done:
-			renderer.Cleanup()
-			fmt.Println("Monitoring stopped.")
-			return
+		case key := <-keyChan:
+			if key == 'q' || key == 'Q' {
+				renderer.Cleanup()
+				fmt.Println("Monitoring stopped.")
+				return
+			}
 			
 		case <-sigChan:
 			renderer.Cleanup()
 			fmt.Println("Monitoring stopped.")
 			return
-		}
-	}
-}
-
-func readKeys(keyChan chan rune) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		r, _, err := reader.ReadRune()
-		if err == nil {
-			keyChan <- r
-		} else {
-			time.Sleep(10 * time.Millisecond)
 		}
 	}
 }
@@ -367,8 +336,6 @@ func startRemoteServer(cfg *config.Config, port int) {
 	}
 }
 
-// Новые функции для удаленного мониторинга
-
 func listSupportedLanguages() {
 	fmt.Println("Supported languages:")
 	languages := i18n.GetSupportedLanguages()
@@ -387,35 +354,5 @@ func downloadLanguagePack(lang string) {
 		fmt.Printf("Error: %v\n", err)
 	} else {
 		fmt.Printf("Language pack '%s' downloaded successfully!\n", lang)
-	}
-}
-
-func monitorViaSSH(sshTarget string) {
-	fmt.Printf("Monitoring remote server via SSH: %s\n", sshTarget)
-	fmt.Println("This feature is under development.")
-	fmt.Println("Planned implementation:")
-	fmt.Println("  - SSH connection with configurable credentials")
-	fmt.Println("  - Remote command execution for monitoring")
-	fmt.Println("  - Secure data transmission")
-	// Реализация будет использовать ssh команды для получения данных
-}
-
-func monitorViaAPI(apiURL string) {
-	fmt.Printf("Monitoring remote server via API: %s\n", apiURL)
-	fmt.Println("Checking API availability...")
-	
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Get(apiURL + "/health")
-	if err != nil {
-		fmt.Printf("API is not available: %v\n", err)
-		return
-	}
-	defer resp.Body.Close()
-	
-	if resp.StatusCode == http.StatusOK {
-		fmt.Println("API is available! Starting remote monitoring...")
-		// Здесь будет реализация периодического опроса API
-	} else {
-		fmt.Printf("API returned status: %d\n", resp.StatusCode)
 	}
 }

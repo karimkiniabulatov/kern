@@ -22,12 +22,10 @@ func NewRenderer(cfg *config.Config) *Renderer {
 }
 
 func (r *Renderer) Render(data map[string]interface{}) {
-	// Полная очистка экрана и курсор в начало
+	// Очистка экрана и курсор в начало
 	fmt.Print("\033[2J\033[H")
 
-	// Рендерим все модули
-	r.renderHeader()
-
+	// Рендерим только включенные модули
 	if r.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
 			r.renderDisk(diskData)
@@ -55,22 +53,16 @@ func (r *Renderer) Render(data map[string]interface{}) {
 	r.renderFooter()
 }
 
-func (r *Renderer) renderHeader() {
-	title := r.config.T("common.title")
-	fmt.Printf("\033[1;33m%s\033[0m\n", title) // Ярко-желтый
-	r.renderTopBorder()
-}
-
 func (r *Renderer) renderTopBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10))
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 60))
 }
 
 func (r *Renderer) renderBottomBorder() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10))
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 60))
 }
 
 func (r *Renderer) renderSeparator() {
-	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 5))
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat("─", 30))
 }
 
 func (r *Renderer) renderCPU(data interface{}) {
@@ -176,8 +168,9 @@ func (r *Renderer) renderNetwork(data interface{}) {
 	r.renderTopBorder()
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
+		count := 0
 		for _, net := range networks {
-			if net.Status == "UP" && net.Interface != "lo" {
+			if net.Status == "UP" && net.Interface != "lo" && count < 2 {
 				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("network.interface"), net.Interface)
 				
@@ -195,6 +188,8 @@ func (r *Renderer) renderNetwork(data interface{}) {
 				r.renderSeparator()
 				fmt.Printf("  \033[36m%s:\033[0m %s↓ / %s↑\n",
 					"Speed", net.RXSpeed, net.TXSpeed)
+				
+				count++
 			}
 		}
 	}
@@ -203,11 +198,8 @@ func (r *Renderer) renderNetwork(data interface{}) {
 }
 
 func (r *Renderer) renderFooter() {
-	fmt.Printf("\033[90m%s | %s %d %s\033[0m\n", 
-		r.config.T("ui.press_quit"), 
-		r.config.T("ui.refresh_every"), 
-		r.config.RefreshRate, 
-		r.config.T("ui.seconds"))
+	fmt.Printf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m\n", 
+		r.config.RefreshRate)
 }
 
 func (r *Renderer) createSimpleGraph(percent float64, width int) string {
