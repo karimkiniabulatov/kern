@@ -19,7 +19,6 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
 	"github.com/karimkiniabulatov/kern/internal/ui"
-	"golang.org/x/term"
 )
 
 var (
