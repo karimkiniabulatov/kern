@@ -2,14 +2,23 @@ package i18n
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 var (
 	translations = make(map[string]map[string]string)
 	mu           sync.RWMutex
+	supportedLanguages = []string{
+		"en", "ru", "es", "fr", "de", "it", "pt", "nl", "pl", "sv", "da", "no", "fi",
+		"cs", "hu", "ro", "bg", "hr", "sk", "sl", "et", "lv", "lt", "uk", "sr", "bs",
+		"mk", "sq", "el", "ja", "ko", "zh", "ar", "hi", "id", "vi", "th", "tr", "he",
+		"fa", "ur", "bn", "ta", "te", "ml", "kn", "gu", "mr", "pa", "ne",
+	}
 )
 
 func init() {
@@ -23,20 +32,26 @@ func loadTranslations() {
 	// Поиск файлов переводов в разных местах
 	possiblePaths := []string{
 		"i18n",
-		"/usr/local/share/kern/i18n",
+		"/usr/local/share/kern/i18n", 
 		"/usr/share/kern/i18n",
 		"./i18n",
-		"./internal/i18n",
+		"~/.config/kern/i18n",
 	}
 
 	// Добавляем путь относительно исполняемого файла
 	if exePath, err := os.Executable(); err == nil {
 		exeDir := filepath.Dir(exePath)
 		possiblePaths = append(possiblePaths, filepath.Join(exeDir, "i18n"))
-		possiblePaths = append(possiblePaths, filepath.Join(exeDir, "internal", "i18n"))
 	}
 
 	for _, basePath := range possiblePaths {
+		// Expand ~ в пути
+		if basePath[:2] == "~/" {
+			if home, err := os.UserHomeDir(); err == nil {
+				basePath = filepath.Join(home, basePath[2:])
+			}
+		}
+
 		files, err := filepath.Glob(filepath.Join(basePath, "active.*.json"))
 		if err != nil {
 			continue
@@ -80,6 +95,11 @@ func GetTranslation(lang, key string) string {
 	mu.RLock()
 	defer mu.RUnlock()
 
+	// Проверяем поддержку языка
+	if !IsLanguageSupported(lang) {
+		lang = "en"
+	}
+
 	// Пробуем запрошенный язык
 	if langTranslations, exists := translations[lang]; exists {
 		if translation, exists := langTranslations[key]; exists {
@@ -95,6 +115,80 @@ func GetTranslation(lang, key string) string {
 	}
 
 	return key
+}
+
+func IsLanguageSupported(lang string) bool {
+	for _, supported := range supportedLanguages {
+		if supported == lang {
+			return true
+		}
+	}
+	return false
+}
+
+func GetSupportedLanguages() []string {
+	return supportedLanguages
+}
+
+// DownloadLanguage загружает языковой пакет с GitHub
+func DownloadLanguage(lang string) error {
+	if !IsLanguageSupported(lang) {
+		return fmt.Errorf("language %s is not supported", lang)
+	}
+
+	url := fmt.Sprintf("https://raw.githubusercontent.com/karimkiniabulatov/kern/main/i18n/active.%s.json", lang)
+	
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download language pack: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("language pack not found for %s", lang)
+	}
+
+	var translationData struct {
+		Translations map[string]map[string]string `json:"translations"`
+	}
+	
+	if err := json.NewDecoder(resp.Body).Decode(&translationData); err != nil {
+		return fmt.Errorf("failed to parse language pack: %v", err)
+	}
+
+	// Сохраняем локально
+	configPath, err := getI18nConfigPath()
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(configPath, 0755); err != nil {
+		return err
+	}
+
+	filePath := filepath.Join(configPath, fmt.Sprintf("active.%s.json", lang))
+	data, err := json.MarshalIndent(translationData, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return err
+	}
+
+	// Перезагружаем переводы
+	loadTranslations()
+	
+	return nil
+}
+
+func getI18nConfigPath() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(homeDir, ".config", "kern", "i18n"), nil
 }
 
 func getDefaultEnglishTranslations() map[string]string {
@@ -125,6 +219,7 @@ func getDefaultEnglishTranslations() map[string]string {
 		"cpu.load_average":       "Load Average",
 		"cpu.core":               "Core",
 		"cpu.overall_usage":      "Overall Usage",
+		"cpu.core_usage":         "Core Usage",
 
 		"memory.title":           "Memory Information",
 		"memory.ram":             "RAM",

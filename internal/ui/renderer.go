@@ -9,30 +9,18 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/disk"
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
-	"github.com/mattn/go-runewidth"
-	"golang.org/x/term"
 )
 
 type Renderer struct {
 	config      *config.Config
-	termWidth   int
-	termHeight  int
 	lastData    map[string]interface{}
 	initialized bool
-	lineCount   int
 }
 
 func NewRenderer(cfg *config.Config) *Renderer {
-	width, height, err := term.GetSize(0)
-	if err != nil {
-		width = 80
-		height = 24
-	}
 	return &Renderer{
-		config:     cfg,
-		termWidth:  width,
-		termHeight: height,
-		lastData:   make(map[string]interface{}),
+		config:   cfg,
+		lastData: make(map[string]interface{}),
 	}
 }
 
@@ -46,279 +34,217 @@ func (r *Renderer) Render(data map[string]interface{}) {
 	if !r.initialized {
 		fmt.Print("\033[2J") // Полная очистка только при первом запуске
 		r.initialized = true
-		r.lineCount = 0
 	}
-	
 	fmt.Print("\033[H") // Курсор в начало
-	
-	// Сбрасываем счетчик строк
-	currentLineCount := 0
 
 	// Рендерим все модули в фиксированном порядке
-	currentLineCount += r.renderHeader()
-	
+	r.renderHeader()
+
 	// Рендерим только включенные модули
 	if r.config.ShowDisk {
 		if diskData, exists := r.lastData["disk"]; exists {
-			currentLineCount += r.renderDisk(diskData)
-			currentLineCount += r.renderEmptyLine()
+			r.renderDisk(diskData)
+			fmt.Println()
 		}
 	}
-	
+
 	if r.config.ShowMem {
 		if memData, exists := r.lastData["mem"]; exists {
-			currentLineCount += r.renderMemory(memData)
-			currentLineCount += r.renderEmptyLine()
+			r.renderMemory(memData)
+			fmt.Println()
 		}
 	}
-	
+
 	if r.config.ShowNet {
 		if netData, exists := r.lastData["net"]; exists {
-			currentLineCount += r.renderNetwork(netData)
-			currentLineCount += r.renderEmptyLine()
+			r.renderNetwork(netData)
+			fmt.Println()
 		}
 	}
-	
+
 	if r.config.ShowCPU {
 		if cpuData, exists := r.lastData["cpu"]; exists {
-			currentLineCount += r.renderCPU(cpuData)
-			currentLineCount += r.renderEmptyLine()
+			r.renderCPU(cpuData)
+			fmt.Println()
 		}
 	}
 
 	// Подсказка для выхода
-	currentLineCount += r.renderFooter()
-
-	// Очищаем оставшиеся строки от предыдущего рендера
-	if currentLineCount < r.lineCount {
-		for i := currentLineCount; i < r.lineCount; i++ {
-			fmt.Print("\033[K\n") // Очищаем строку и переходим на следующую
-		}
-		fmt.Printf("\033[%dA", r.lineCount-currentLineCount) // Возвращаем курсор
-	}
-	
-	r.lineCount = currentLineCount
+	r.renderFooter()
 }
 
-func (r *Renderer) renderHeader() int {
-	title := r.config.T("title")
-	width := runewidth.StringWidth(title)
-	padding := (r.termWidth - width) / 2
-	if padding < 0 {
-		padding = 0
-	}
-	
-	fmt.Printf("\033[1;36m%s%s\033[0m\n", strings.Repeat(" ", padding), title)
-	return 1 + r.renderSeparator()
+func (r *Renderer) renderHeader() {
+	title := r.config.T("common.title")
+	fmt.Printf("\033[1;33m%s\033[0m\n", title) // Ярко-желтый
+	r.renderTopBorder()
 }
 
-func (r *Renderer) renderSeparator() int {
-	separator := strings.Repeat("─", 60)
-	fmt.Printf("\033[34m%s\033[0m\n", separator)
-	return 1
+func (r *Renderer) renderTopBorder() {
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10)) // 10 синих пробелов
 }
 
-func (r *Renderer) renderEmptyLine() int {
-	fmt.Println()
-	return 1
+func (r *Renderer) renderBottomBorder() {
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 10)) // 10 синих пробелов
 }
 
-func (r *Renderer) renderCPU(data interface{}) int {
-	lines := 0
-	fmt.Println("\033[1;34m" + r.config.T("cpu.title") + "\033[0m")
-	lines++
-	lines += r.renderSeparator()
-	
+func (r *Renderer) renderSeparator() {
+	fmt.Printf("\033[34m%s\033[0m\n", strings.Repeat(" ", 5)) // 5 синих пробелов
+}
+
+func (r *Renderer) renderCPU(data interface{}) {
+	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("cpu.title")) // Ярко-желтый
+	r.renderTopBorder()
+
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		// Основная информация о процессоре
-		model := truncateString(cpuInfo.Model, 20)
-		coresInfo := fmt.Sprintf("%d %s, %d %s", 
-			cpuInfo.Cores, r.config.T("cpu.cores"), 
+		// Модель процессора
+		r.renderSeparator()
+		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.model"), cpuInfo.Model)
+
+		// Ядра и потоки
+		r.renderSeparator()
+		fmt.Printf("  \033[36m%s:\033[0m %d %s, %d %s\n", 
+			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads"))
-		
-		fmt.Printf("  \033[36m%-20s\033[0m  %-18s  \033[38;5;215m%5.1f%%\033[0m     %-12s  %-12s\n", 
-			model, coresInfo, cpuInfo.Usage, cpuInfo.Vendor, cpuInfo.Architecture)
-		lines++
-		
-		if r.config.DetailedCPU {
-			// Детальный режим - показываем все ядра/потоки
-			if len(cpuInfo.CoreUsage) > 0 {
-				for i, usage := range cpuInfo.CoreUsage {
-					if i%2 == 0 {
-						coreNum := i / 2
-						var usage1, usage2 float64
-						usage1 = usage
-						if i+1 < len(cpuInfo.CoreUsage) {
-							usage2 = cpuInfo.CoreUsage[i+1]
-						}
-						
-						// Гистограмма для пары потоков
-						graph := r.createCPUGraph(usage1, usage2)
-						
-						if i+1 < len(cpuInfo.CoreUsage) {
-							fmt.Printf("  %s %-2d              -                  %s   \033[38;5;215m%.1f%%/%.1f%%\033[0m\n", 
-								r.config.T("cpu.core"), coreNum, graph, usage1, usage2)
-						} else {
-							fmt.Printf("  %s %-2d              -                  %s   \033[38;5;215m%.1f%%\033[0m\n", 
-								r.config.T("cpu.core"), coreNum, graph, usage1)
-						}
-						lines++
-					}
-				}
+
+		// Общее использование
+		r.renderSeparator()
+		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
+		fmt.Printf("  \033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m\n",
+			r.config.T("cpu.usage"), graph, cpuInfo.Usage)
+
+		// Частота
+		r.renderSeparator()
+		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("cpu.frequency"), cpuInfo.Frequency)
+
+		// Нагрузка
+		r.renderSeparator()
+		fmt.Printf("  \033[36m%s:\033[0m %.2f, %.2f, %.2f\n",
+			r.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15)
+
+		// Детальная информация по ядрам
+		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
+			r.renderSeparator()
+			fmt.Printf("  \033[36m%s:\033[0m\n", r.config.T("cpu.core_usage"))
+			for i, usage := range cpuInfo.CoreUsage {
+				coreGraph := r.createSimpleGraph(usage, 15)
+				fmt.Printf("    %s %d: %s \033[38;5;215m%.1f%%\033[0m\n",
+					r.config.T("cpu.core"), i+1, coreGraph, usage)
 			}
-		} else {
-			// Компактный режим - одна общая гистограмма
-			graph := r.createSimpleGraph(cpuInfo.Usage, 20)
-			fmt.Printf("  %s        -                  %s   \033[38;5;215m%5.1f%%\033[0m\n", 
-				r.config.T("cpu.overall_usage"), graph, cpuInfo.Usage)
-			lines++
 		}
 	}
-	lines += r.renderSeparator()
-	return lines
+	r.renderBottomBorder()
 }
 
-func (r *Renderer) renderMemory(data interface{}) int {
-	lines := 0
-	fmt.Println("\033[1;34m" + r.config.T("memory.title") + "\033[0m")
-	lines++
-	lines += r.renderSeparator()
-	
+func (r *Renderer) renderMemory(data interface{}) {
+	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("memory.title"))
+	r.renderTopBorder()
+
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		// RAM
-		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 20)
-		fmt.Printf("  %-17s  %-8s  %-8s  %-8s  %s   \033[38;5;154m%5.1f%%\033[0m\n",
-			r.config.T("memory.ram"), memInfo.Total, memInfo.Used, memInfo.Free, ramGraph, memInfo.UsagePercent)
-		lines++
-		
+		r.renderSeparator()
+		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
+		fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m\n",
+			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent)
+
+		// Available
+		r.renderSeparator()
+		fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("common.available"), memInfo.Available)
+
 		// Swap
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
-			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 20)
-			fmt.Printf("  %-17s  %-8s  %-8s  %-8s  %s   \033[38;5;154m%5.1f%%\033[0m\n",
-				r.config.T("memory.swap"), memInfo.SwapTotal, memInfo.SwapUsed, memInfo.SwapFree, swapGraph, memInfo.SwapUsagePercent)
-			lines++
+			r.renderSeparator()
+			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
+			fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m\n",
+				r.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent)
 		}
 	}
-	lines += r.renderSeparator()
-	return lines
+	r.renderBottomBorder()
 }
 
-func (r *Renderer) renderDisk(data interface{}) int {
-	lines := 0
-	fmt.Println("\033[1;34m" + r.config.T("disk.title") + "\033[0m")
-	lines++
-	lines += r.renderSeparator()
-	
+func (r *Renderer) renderDisk(data interface{}) {
+	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("disk.title"))
+	r.renderTopBorder()
+
 	if disks, ok := data.([]disk.DiskInfo); ok {
-		for _, d := range disks {
-			if strings.HasPrefix(d.Filesystem, "/dev/") {
+		for i, d := range disks {
+			if strings.HasPrefix(d.Filesystem, "/dev/") && i < 3 { // Показываем только первые 3 диска
+				r.renderSeparator()
+				
 				// Определяем тип устройства
 				devType := r.getDeviceType(d.Filesystem, d.MountedOn)
 				
-				// Строим гистограмму
-				graph := r.createDiskGraph(d.UsePercent)
-				
+				// Основная информация
 				mountPoint := d.MountedOn
 				if mountPoint == "/" {
 					mountPoint = "ROOT"
 				}
 				
-				fs := truncateString(d.Filesystem, 14)
-				mp := truncateString(mountPoint, 18)
+				fmt.Printf("  \033[36m%s:\033[0m %s (%s)\n", 
+					r.config.T("disk.filesystem"), d.Filesystem, devType)
 				
-				fmt.Printf("  \033[36m%-14s\033[0m  %-18s  %-8s  %s   \033[38;5;216m%5.1f%%\033[0m     %-10s\n",
-					fs, mp, d.Size, graph, d.UsePercent, devType)
-				lines++
+				r.renderSeparator()
+				fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("disk.mounted"), mountPoint)
+				
+				r.renderSeparator()
+				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
+				fmt.Printf("  \033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m\n",
+					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent)
 			}
 		}
 	}
-	lines += r.renderSeparator()
-	return lines
+	r.renderBottomBorder()
 }
 
-func (r *Renderer) renderNetwork(data interface{}) int {
-	lines := 0
-	fmt.Println("\033[1;34m" + r.config.T("network.title") + "\033[0m")
-	lines++
-	lines += r.renderSeparator()
-	
+func (r *Renderer) renderNetwork(data interface{}) {
+	fmt.Printf("\033[1;33m%s\033[0m\n", r.config.T("network.title"))
+	r.renderTopBorder()
+
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		for _, net := range networks {
 			if net.Status == "UP" && net.Interface != "lo" {
-				// Определяем активность
-				activity := net.ActivityPercent
-				if activity > 100 {
-					activity = 100
-				}
+				r.renderSeparator()
+				fmt.Printf("  \033[36m%s:\033[0m %s\n", r.config.T("network.interface"), net.Interface)
 				
-				// Строим гистограмму
-				graph := r.createSimpleGraph(activity, 20)
+				r.renderSeparator()
+				fmt.Printf("  \033[36m%s:\033[0m %s\n", "IP Address", net.IPAddress)
 				
-				speedInfo := fmt.Sprintf("%s↓/%s↑", net.RXSpeed, net.TXSpeed)
+				r.renderSeparator()
+				fmt.Printf("  \033[36m%s:\033[0m %s\n", "MAC Address", net.MACAddress)
 				
-				iface := truncateString(net.Interface, 14)
-				ip := truncateString(net.IPAddress, 18)
-				mac := truncateString(net.MACAddress, 18)
-				speed := truncateString(speedInfo, 18)
+				r.renderSeparator()
+				activityGraph := r.createSimpleGraph(net.ActivityPercent, 25)
+				fmt.Printf("  \033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m\n",
+					"Activity", activityGraph, net.ActivityPercent)
 				
-				fmt.Printf("  %-14s  %-18s  %-18s  %-18s  %s   \033[38;5;165m%5.1f%%\033[0m\n",
-					iface, ip, mac, speed, graph, activity)
-				lines++
+				r.renderSeparator()
+				fmt.Printf("  \033[36m%s:\033[0m %s↓ / %s↑\n",
+					"Speed", net.RXSpeed, net.TXSpeed)
 			}
 		}
 	}
-	lines += r.renderSeparator()
-	return lines
+	r.renderBottomBorder()
 }
 
-func (r *Renderer) renderFooter() int {
+func (r *Renderer) renderFooter() {
 	fmt.Printf("\033[90m%s | %s %d %s\033[0m\n", 
 		r.config.T("ui.press_quit"), 
 		r.config.T("ui.refresh_every"), 
 		r.config.RefreshRate, 
 		r.config.T("ui.seconds"))
-	return 1
 }
 
 // Вспомогательные методы для создания графиков
 func (r *Renderer) createSimpleGraph(percent float64, width int) string {
+	if percent > 100 {
+		percent = 100
+	}
+	
 	graph := ""
 	usedSegments := int(percent / (100.0 / float64(width)))
 	
 	for i := 0; i < width; i++ {
 		if i < usedSegments {
 			graph += "█"
-		} else {
-			graph += "░"
-		}
-	}
-	return graph
-}
-
-func (r *Renderer) createDiskGraph(percent float64) string {
-	graph := ""
-	usedSegments := int(percent / 4) // 25 segments for 100%
-	
-	for i := 0; i < 25; i++ {
-		if i < usedSegments {
-			graph += "█"
-		} else {
-			graph += "░"
-		}
-	}
-	return graph
-}
-
-func (r *Renderer) createCPUGraph(usage1, usage2 float64) string {
-	graph := ""
-	for j := 0; j < 20; j++ {
-		pos := float64(j) * 5.0 // 5% per segment
-		if pos < usage1 && pos < usage2 {
-			graph += "█"
-		} else if pos < usage1 {
-			graph += "▀"
-		} else if pos < usage2 {
-			graph += "▄"
 		} else {
 			graph += "░"
 		}
@@ -345,24 +271,4 @@ func (r *Renderer) Cleanup() {
 	fmt.Print("\033[0m") // Сброс цветов
 	fmt.Print("\033[2J") // Очистка экрана
 	fmt.Print("\033[H")  // Курсор в начало
-}
-
-// Вспомогательная функция для обрезки строк
-func truncateString(s string, length int) string {
-	if runewidth.StringWidth(s) <= length {
-		return s
-	}
-	
-	// Обрезаем с учетом ширины символов
-	result := ""
-	width := 0
-	for _, r := range s {
-		charWidth := runewidth.RuneWidth(r)
-		if width+charWidth > length {
-			break
-		}
-		result += string(r)
-		width += charWidth
-	}
-	return result
 }

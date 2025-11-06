@@ -8,13 +8,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/karimkiniabulatov/kern/internal/config"
 	"github.com/karimkiniabulatov/kern/internal/cpu"
 	"github.com/karimkiniabulatov/kern/internal/disk"
+	"github.com/karimkiniabulatov/kern/internal/i18n"
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
 	"github.com/karimkiniabulatov/kern/internal/ui"
@@ -22,20 +26,24 @@ import (
 )
 
 var (
-	flagDisk     = flag.Bool("d", false, "Show disk information")
-	flagCPU      = flag.Bool("c", false, "Show CPU information")
-	flagMem      = flag.Bool("m", false, "Show memory information")
-	flagNet      = flag.Bool("n", false, "Show network information")
-	flagAll      = flag.Bool("a", false, "Show all information")
-	flagRefresh  = flag.Int("refresh", 2, "Refresh interval in seconds")
-	flagLang     = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote   = flag.Int("r", 0, "Start remote API on specified port")
-	flagVersion  = flag.Bool("v", false, "Show version")
-	flagHelp     = flag.Bool("h", false, "Show help")
-	flagDetailed = flag.Bool("detailed", false, "Show detailed CPU core information")
+	flagDisk      = flag.Bool("d", false, "Show disk information")
+	flagCPU       = flag.Bool("c", false, "Show CPU information")
+	flagMem       = flag.Bool("m", false, "Show memory information")
+	flagNet       = flag.Bool("n", false, "Show network information")
+	flagAll       = flag.Bool("a", false, "Show all information")
+	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
+	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
+	flagRemote    = flag.Int("r", 0, "Start remote API on specified port")
+	flagVersion   = flag.Bool("v", false, "Show version")
+	flagHelp      = flag.Bool("h", false, "Show help")
+	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
+	flagDownload  = flag.String("download-lang", "", "Download language pack (e.g., 'fr' for French)")
+	flagListLangs = flag.Bool("list-languages", false, "List all supported languages")
+	flagSSH       = flag.String("ssh", "", "Monitor remote server via SSH (user@hostname)")
+	flagAPI       = flag.String("api", "", "Monitor remote server via API (http://hostname:port)")
 )
 
-const version = "1.0.0"
+const version = "1.1.0"
 
 func main() {
 	// Добавляем альтернативные имена флагов
@@ -51,13 +59,21 @@ func main() {
 		fmt.Println("Usage: kern [OPTIONS]")
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
+		fmt.Println("\nRemote Monitoring:")
+		fmt.Println("  --ssh user@hostname        Monitor remote server via SSH")
+		fmt.Println("  --api http://host:port     Monitor remote server via API")
+		fmt.Println("  --download-lang CODE       Download language pack")
+		fmt.Println("  --list-languages           List all supported languages")
 		fmt.Println("\nExamples:")
-		fmt.Println("  kern                    # Show all information")
-		fmt.Println("  kern --cpu --mem        # Show only CPU and memory")
-		fmt.Println("  kern -d -l ru           # Disk info with Russian interface")
-		fmt.Println("  kern --refresh=5        # Update every 5 seconds")
-		fmt.Println("  kern --detailed         # Show detailed CPU core info")
-		fmt.Println("  kern -r 8080            # Start API server on port 8080")
+		fmt.Println("  kern                       # Show all information")
+		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
+		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
+		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
+		fmt.Println("  kern --detailed            # Show detailed CPU core info")
+		fmt.Println("  kern -r 8080               # Start API server on port 8080")
+		fmt.Println("  kern --ssh user@server     # Monitor remote server via SSH")
+		fmt.Println("  kern --api http://srv:8080 # Monitor remote server via API")
+		fmt.Println("  kern --download-lang fr    # Download French language pack")
 	}
 
 	flag.Parse()
@@ -72,16 +88,45 @@ func main() {
 		return
 	}
 
+	if *flagListLangs {
+		listSupportedLanguages()
+		return
+	}
+
+	if *flagDownload != "" {
+		downloadLanguagePack(*flagDownload)
+		return
+	}
+
+	// Remote monitoring via SSH
+	if *flagSSH != "" {
+		monitorViaSSH(*flagSSH)
+		return
+	}
+
+	// Remote monitoring via API
+	if *flagAPI != "" {
+		monitorViaAPI(*flagAPI)
+		return
+	}
+
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	// Проверяем поддержку языка
+	if *flagLang != "" && !i18n.IsLanguageSupported(*flagLang) {
+		fmt.Printf("Language '%s' is not supported. Using English.\n", *flagLang)
+		fmt.Printf("Use 'kern --download-lang %s' to download language pack.\n", *flagLang)
+		*flagLang = "en"
+	}
+
 	// Сохраняем язык в конфиг если указан
 	if *flagLang != "" {
 		cfg.Language = *flagLang
-		cfg.Save() // Сохраняем настройки языка
+		cfg.Save()
 	}
 
 	// Если указан порт для remote, запускаем сервер
@@ -102,7 +147,9 @@ func main() {
 	cfg.ShowMem = showMem
 	cfg.ShowNet = showNet
 	cfg.DetailedCPU = *flagDetailed
-	cfg.RefreshRate = *flagRefresh
+	if *flagRefresh > 0 {
+		cfg.RefreshRate = *flagRefresh
+	}
 
 	// Запускаем мониторинг
 	runMonitor(cfg)
@@ -317,5 +364,58 @@ func startRemoteServer(cfg *config.Config, port int) {
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		log.Fatalf("Failed to start API server: %v", err)
+	}
+}
+
+// Новые функции для удаленного мониторинга
+
+func listSupportedLanguages() {
+	fmt.Println("Supported languages:")
+	languages := i18n.GetSupportedLanguages()
+	for i, lang := range languages {
+		fmt.Printf("  %s", lang)
+		if (i+1)%10 == 0 {
+			fmt.Println()
+		}
+	}
+	fmt.Println()
+}
+
+func downloadLanguagePack(lang string) {
+	fmt.Printf("Downloading language pack for '%s'...\n", lang)
+	if err := i18n.DownloadLanguage(lang); err != nil {
+		fmt.Printf("Error: %v\n", err)
+	} else {
+		fmt.Printf("Language pack '%s' downloaded successfully!\n", lang)
+	}
+}
+
+func monitorViaSSH(sshTarget string) {
+	fmt.Printf("Monitoring remote server via SSH: %s\n", sshTarget)
+	fmt.Println("This feature is under development.")
+	fmt.Println("Planned implementation:")
+	fmt.Println("  - SSH connection with configurable credentials")
+	fmt.Println("  - Remote command execution for monitoring")
+	fmt.Println("  - Secure data transmission")
+	// Реализация будет использовать ssh команды для получения данных
+}
+
+func monitorViaAPI(apiURL string) {
+	fmt.Printf("Monitoring remote server via API: %s\n", apiURL)
+	fmt.Println("Checking API availability...")
+	
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(apiURL + "/health")
+	if err != nil {
+		fmt.Printf("API is not available: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode == http.StatusOK {
+		fmt.Println("API is available! Starting remote monitoring...")
+		// Здесь будет реализация периодического опроса API
+	} else {
+		fmt.Printf("API returned status: %d\n", resp.StatusCode)
 	}
 }

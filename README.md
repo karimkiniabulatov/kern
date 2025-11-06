@@ -2,20 +2,21 @@
 
 A comprehensive, real-time system monitoring tool written in Go with beautiful ANSI-colored interface and support for 50+ languages.
 
-![kern demo](https://img.shields.io/badge/version-1.0.0-blue)
+![kern demo](https://img.shields.io/badge/version-1.1.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/license-GPLv3-green)
 
 ## ✨ Features
 
 - **📊 Real-time Monitoring**: Live updates with configurable refresh intervals
-- **🎨 Beautiful Interface**: ANSI-colored histograms and stable layout
-- **🌐 Multi-language**: Support for 50+ languages with auto-detection
+- **🎨 Beautiful Interface**: Clean line-based layout with colored graphs
+- **🌐 Multi-language**: Support for 50+ languages with auto-download capability
 - **💾 Disk Monitoring**: Filesystem usage with type detection (SSD/HDD/NVMe/RAID)
-- **⚡ CPU Monitoring**: Core/thread information with grouped visualization
+- **⚡ CPU Monitoring**: Core/thread information with detailed core usage
 - **🧠 Memory Monitoring**: RAM and swap usage with visual graphs
 - **🌐 Network Monitoring**: Interface status, speeds, and activity indicators
 - **🔌 REST API**: HTTP API for remote monitoring and integration
+- **🚀 Remote Monitoring**: Support for SSH and API-based remote monitoring
 - **⌨️ Interactive**: Press 'q' to quit gracefully
 - **🔧 Cross-platform**: Works on Linux, Android (Termux), macOS
 
@@ -32,9 +33,9 @@ git clone https://github.com/karimkiniabulatov/kern
 cd kern
 chmod +x ./scripts/install.sh
 ./scripts/install.sh
-
+-----------
 Basic Usage
-
+-----------
 kern                    # Full system monitoring (default)
 kern --cpu              # CPU information only
 kern --disk             # Disk information only  
@@ -47,27 +48,94 @@ kern --refresh=3
 # Monitor specific components
 kern --cpu --mem --disk
 
-# Russian interface with fast updates
-kern -l ru --refresh=1
+# Russian interface
+kern -l ru
 
-# Custom language (50+ supported)
-kern -l es              # Spanish
-kern -l ja              # Japanese
-kern -l zh              # Chinese
+# Download and use French language
+kern --download-lang fr
+kern -l fr
 
-# Remote API
-kern -r 8080            # Start API server on port 8080
+# List all supported languages
+kern --list-languages
+
+# Remote monitoring
+kern --ssh user@server     # Monitor via SSH (planned)
+kern --api http://srv:8080 # Monitor via API
+
+# Start API server
+kern -r 8080
 
 # Show version
 kern -v
 
-🌐 API Usage
-kern provides a REST API for remote monitoring when started with the -r option:
+---------------------------------------------------------
+🎨 New Interface Design
+The new line-based interface provides a clean, stable display:
+---------------------------------------------------------
+kern - System Monitor
+██████████
+CPU Information
+██████████
+     █████
+  Model: AMD Ryzen 7 5800X
+     █████
+  Cores: 8 Cores, 16 Threads
+     █████
+  Usage: ███████████████████████ 95.5%
+     █████
+  Frequency: 3800 MHz
+     █████
+  Load Average: 1.25, 1.10, 0.95
+██████████
+----------------------------------------------------------
+Color Scheme
+Headers: Bright yellow
 
-Start API Server
+Borders: Blue spaces for clean separation
 
+Parameters: Cyan labels
+
+Graphs: Color-coded by module (orange for CPU, green for memory, etc.)
+
+Values: Appropriate colors for different metrics
+
+🌍 Language Support
+kern supports 50+ languages with automatic download capability:
+
+Major Language Groups
+European: English, Russian, Spanish, French, German, Italian, Portuguese, Dutch, Polish, Swedish, Danish, Norwegian, Finnish
+
+Eastern European: Czech, Hungarian, Romanian, Bulgarian, Croatian, Slovak, Slovenian, Estonian, Latvian, Lithuanian, Ukrainian, Serbian, Bosnian, Macedonian, Albanian, Greek
+
+Asian: Japanese, Korean, Chinese, Arabic, Hindi, Indonesian, Vietnamese, Thai, Turkish
+
+Other: Hebrew, Persian, Urdu, Bengali, Tamil, Telugu, and more
+-------------------
+Language Management
+-------------------
+# List all supported languages
+kern --list-languages
+
+# Download a language pack
+kern --download-lang fr
+
+# Use downloaded language
+kern -l fr
+-------------------
+Language packs are automatically downloaded from GitHub when requested.
+
+🚀 Remote Monitoring
+kern supports multiple remote monitoring methods:
+--------------------
+--------------------
+API-Based Monitoring
+--------------------
+# Start API server on remote machine
 kern -r 8080
 
+# Monitor from client machine
+kern --api http://remote-server:8080
+--------------------
 API Endpoints
 GET /api/cpu - CPU information
 
@@ -80,121 +148,9 @@ GET /api/net - Network information
 GET /api/system - System information
 
 GET /health - Health check
-
-GET / - API information
-
-Example API Usage
-
-# Get CPU information
-curl http://localhost:8080/api/cpu
-
-# Get memory information
-curl http://localhost:8080/api/mem
-
-# Get all system information
-curl http://localhost:8080/api/system
-
-API Response Example
-
-{
-  "model": "AMD Ryzen 7 5800X",
-  "vendor": "AuthenticAMD", 
-  "architecture": "x86_64",
-  "cores": 8,
-  "threads": 16,
-  "usage": 23.5,
-  "frequency": "3800 MHz",
-  "load1": 1.2,
-  "load5": 1.5,
-  "load15": 1.3
-}
-
-🎨 Interface Features
-Stable Layout
-Fixed positioning: Blocks remain in consistent order (Disk → Memory → Network → CPU)
-
-No screen jumping: Data updates in-place without scrolling or layout shifts
-
-Consistent viewing: Focus on changing metrics without visual disruptions
-
-Color Scheme
-Disk: 🟠 Orange (used) / ⬜ Gray (free)
-
-CPU: 🟠 Orange (active) / 🔵 Light blue (inactive)
-
-Memory: 🟢 Green (used) / ⬜ Gray (free)
-
-Network: 🟣 Purple (active) / ⬜ Gray (inactive)
-
-Smart Grouping
-CPU threads: Logical processors grouped under physical cores
-
-Device types: Automatic detection (SSD/HDD/NVMe/RAID/Virtual)
-
-Network interfaces: Active interfaces with speed calculations
-
-🌍 Supported Languages
-kern supports over 50 languages including:
-
-Major Languages: English, Russian, Chinese, Spanish, French, German, Japanese, Korean, Italian, Portuguese, Arabic, Hindi
-
-European: Polish, Dutch, Swedish, Danish, Norwegian, Finnish, Czech, Hungarian, Romanian, Bulgarian, Croatian, Slovak, Slovenian, Estonian, Latvian, Lithuanian, Ukrainian, Serbian, Bosnian, Macedonian, Albanian, Greek
-
-Asian: Indonesian, Vietnamese, Thai, Turkish, Bengali, Tamil, Telugu, Malayalam, Kannada, Gujarati, Marathi, Punjabi, Nepali
-
-Other: Hebrew, Persian, Urdu, Latin, Tibetan, Bashkir, Kazakh, Moldovan, Georgian, Armenian, Belarusian, Mongolian
-
-🛠 Installation Details
-Dependencies
-Go 1.21+ (automatically installed if missing)
-
-System tools: df, lscpu, free, ip (installed automatically)
-
-Manual Installation
-
-# One-line install
-curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
-
-# Or run manually
-./scripts/install.sh
-
-# Build from source
-git clone https://github.com/karimkiniabulatov/kern
-cd kern
-go build -o kern ./cmd/kern
-./kern
-
-📋 Usage Tips
-Interactive Controls
-Press 'q': Quit the application
-
-Stable output: No terminal flickering or layout changes
-
-Command Line Options
-text
-  -a, --all           Show all system information (default)
-  -c, --cpu           Show CPU information only
-  -d, --disk          Show disk information only
-  -m, --mem           Show memory information only
-  -n, --net           Show network information only
-  -v, --version       Show version information
-      --refresh=2     Set refresh interval in seconds
-  -l, --lang string   Set interface language
-  -r, --remote int    Start remote API server on port
-      --detailed      Show detailed CPU core information
-🧪 Testing
-bash
-# Run test suite
-./scripts/test.sh
-
-# Test API functionality  
-./scripts/test_api.sh
-
-# Quick verification
-go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
-
+--------------------------------------------
+--------------------------------------------
 📁 Project Structure
-
 kern/
 ├── cmd/
 │   └── kern/
@@ -229,28 +185,99 @@ kern/
 ├── go.mod
 ├── go.sum
 └── README.md
+----------------------------------------------------------------
+🛠 Installation Details
+Dependencies
+Go 1.21+ (automatically installed if missing)
 
+System tools: df, lscpu, free, ip (installed automatically)
+-------------------
+Manual Installation
+-------------------
+# One-line install
+curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
+
+# Or run manually
+./scripts/install.sh
+
+# Build from source
+git clone https://github.com/karimkiniabulatov/kern
+cd kern
+go build -o kern ./cmd/kern
+./kern
+-------------------
+📋 Usage Tips
+Interactive Controls
+Press 'q': Quit the application
+
+Stable output: Line-based design prevents screen flickering
+--------------------
+--------------------
+Command Line Options
+--------------------
+Basic Monitoring:
+  -a, --all           Show all system information (default)
+  -c, --cpu           Show CPU information only
+  -d, --disk          Show disk information only
+  -m, --mem           Show memory information only
+  -n, --net           Show network information only
+  -v, --version       Show version information
+      --refresh=2     Set refresh interval in seconds
+  -l, --lang string   Set interface language
+      --detailed      Show detailed CPU core information
+
+Remote Features:
+  -r, --remote int    Start remote API server on port
+  --ssh host          Monitor remote server via SSH
+  --api url           Monitor remote server via API
+
+Language Support:
+  --download-lang code Download language pack
+  --list-languages    List all supported languages
+------------
+🧪 Testing
+------------
+# Run test suite
+./scripts/test.sh
+
+# Test API functionality  
+./scripts/test_api.sh
+
+# Test language support
+kern --list-languages
+kern --download-lang es
+kern -l es --refresh=1
+
+# Quick verification
+go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
+-------------------------------------------------------
+-------------------------------------------------------
 🔌 API Documentation
-CPU Endpoint
-GET /api/cpu
-Returns detailed CPU information including model, usage, load averages, and core statistics.
+-------------------
+Starting API Server
+-------------------
+kern -r 8080
+--------------------------------------------------------
+--------------------------------------------------------
+API Response Examples
+---------------------
+# Get CPU information
+curl http://localhost:8080/api/cpu
 
-Memory Endpoint
-GET /api/mem
-Returns memory usage information for both RAM and swap space.
-
-Disk Endpoint
-GET /api/disk
-Returns filesystem usage information for all mounted disks.
-
-Network Endpoint
-GET /api/net
-Returns network interface statistics including traffic and speeds.
-
-System Endpoint
-GET /api/system
-Returns general system information and kern version.
-
+# Response example:
+{
+  "model": "AMD Ryzen 7 5800X",
+  "vendor": "AuthenticAMD", 
+  "architecture": "x86_64",
+  "cores": 8,
+  "threads": 16,
+  "usage": 23.5,
+  "frequency": "3800 MHz",
+  "load1": 1.2,
+  "load5": 1.5,
+  "load15": 1.3
+}
+-------------------------
 🤝 Contributing
 Fork the repository
 
@@ -265,7 +292,7 @@ Open a Pull Request
 Adding New Languages
 Add translation file to i18n/ directory
 
-Update language list in man/kern.1 and README
+Update supported languages list in internal/i18n/translations.go
 
 Test with: kern -l your_language_code
 
