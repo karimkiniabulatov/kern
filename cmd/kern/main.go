@@ -36,6 +36,7 @@ var (
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
 	flagDownload  = flag.String("download-lang", "", "Download language pack (e.g., 'fr' for French)")
 	flagListLangs = flag.Bool("list-languages", false, "List all supported languages")
+	flagLogo      = flag.Bool("logo", false, "Show logo during monitoring")
 )
 
 const version = "1.1.0"
@@ -48,20 +49,23 @@ func main() {
 	flag.BoolVar(flagNet, "net", false, "Show network information")
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
+	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
 
 	flag.Usage = func() {
+		showLogo()
 		fmt.Printf("kern v%s - System Monitoring Tool\n\n", version)
 		fmt.Println("Usage: kern [OPTIONS]")
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
 		fmt.Println("\nExamples:")
-		fmt.Println("  kern                       # Show all information")
+		fmt.Println("  kern                       # Show memory and network (default)")
 		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
 		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
 		fmt.Println("  kern -r 28126              # Start API server on port 28126")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
+		fmt.Println("  kern --logo                # Show logo during monitoring")
 	}
 
 	flag.Parse()
@@ -116,10 +120,17 @@ func main() {
 	}
 
 	// Определяем какие модули показывать
-	showDisk := *flagDisk || *flagAll || (!*flagCPU && !*flagMem && !*flagNet && !*flagDisk && !*flagNet)
-	showCPU := *flagCPU || *flagAll || (!*flagDisk && !*flagMem && !*flagNet && !*flagCPU && !*flagNet)
-	showMem := *flagMem || *flagAll || (!*flagDisk && !*flagCPU && !*flagNet && !*flagMem && !*flagNet)
-	showNet := *flagNet || *flagAll || (!*flagDisk && !*flagCPU && !*flagMem && !*flagNet && !*flagDisk)
+	// По умолчанию показываем только память и сеть
+	showDisk := *flagDisk || *flagAll
+	showCPU := *flagCPU || *flagAll
+	showMem := *flagMem || *flagAll
+	showNet := *flagNet || *flagAll
+
+	// Если не указано никаких модулей, показываем память и сеть по умолчанию
+	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && !*flagAll {
+		showMem = true
+		showNet = true
+	}
 
 	// Передаем флаги в конфиг
 	cfg.ShowDisk = showDisk
@@ -131,29 +142,29 @@ func main() {
 		cfg.RefreshRate = *flagRefresh
 	}
 
-	// Показываем логотип при запуске
-	showLogo()
-
 	// Запускаем мониторинг
-	runMonitor(cfg)
+	runMonitor(cfg, *flagLogo)
 }
 
 func showLogo() {
 	logo := `
-╔═╗┌─┐┬─┐┌─┐
-║ ╦├┤ ├┬┘│ │
-╚═╝└─┘┴└─└─┘
-kern v` + version + " - System Monitoring Tool\n"
+ ██╗  ██╗███████╗██████╗ ███╗   ██╗
+ ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
+ █████╔╝ █████╗  ██████╔╝██╔██╗ ██║
+ ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║
+ ██║  ██╗███████╗██║  ██║██║ ╚████║
+ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
+ kern v` + version + " - System Monitoring Tool\n"
 	fmt.Print("\033[1;36m" + logo + "\033[0m")
 }
 
-func runMonitor(cfg *config.Config) {
+func runMonitor(cfg *config.Config, showLogo bool) {
 	// Set up signal handling for graceful shutdown
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 	// Initialize UI
-	renderer := ui.NewRenderer(cfg)
+	renderer := ui.NewRenderer(cfg, showLogo)
 
 	// Set up terminal for raw input to make 'q' work properly
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -273,6 +284,7 @@ func startRemoteServer(cfg *config.Config, port int) {
 		port = 28126
 	}
 	
+	showLogo()
 	log.Printf("Starting remote API server on port %d...", port)
 
 	// CPU endpoint

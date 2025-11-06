@@ -35,17 +35,17 @@ chmod +x ./scripts/install.sh
 -----------
 Basic Usage
 -----------
-kern                    # Full system monitoring (default)
+kern                    # Memory and network information (default)
 kern --cpu              # CPU information only
 kern --disk             # Disk information only  
 kern --mem              # Memory information only
 kern --net              # Network information only
 
-# Monitor everything with custom refresh
-kern --refresh=3
+# Monitor everything
+kern --all
 
-# Monitor specific components
-kern --cpu --mem --disk
+# Custom refresh rate
+kern --refresh=3
 
 # Russian interface
 kern -l ru
@@ -60,23 +60,26 @@ kern --list-languages
 # Start API server on default port 28126
 kern -r 28126
 
+# Show logo during monitoring
+kern --logo
+
 # Show version and logo
 kern -v
 ---------------------------------------------------------
 🎨 Interface Design
-The clean line-based interface provides stable, flicker-free monitoring:
+The clean line-based interface provides stable, flicker-free monitoring with perfect left alignment:
 ---------------------------------------------------------
-CPU Information
-  Model: AMD Ryzen 7 5800X
-  Cores: 8 Cores, 16 Threads
-  Usage: ███████████████████████ 95.5%
-  Frequency: 3800 MHz
-  Load Average: 1.25, 1.10, 0.95
-
 Memory Information
-  RAM: 15.2G / 32.0G ███████████████████████ 47.5%
-  Available: 16.8G
-  Swap: 2.1G / 8.0G ███████████████████████ 26.2%
+RAM: 15.2G / 32.0G ███████████████████████ 47.5%
+Available: 16.8G
+Swap: 2.1G / 8.0G ███████████████████████ 26.2%
+
+Network Information
+Interface: eth0
+IP Address: 192.168.1.100
+MAC Address: aa:bb:cc:dd:ee:ff
+Activity: ███████████████████████ 15.5%
+Speed: 125.3KB/s↓ / 45.2KB/s↑
 
 Press 'q' to quit | Auto-refresh every 2 seconds
 ----------------------------------------------------------
@@ -227,7 +230,7 @@ Language Support:
   --download-lang code Download language pack
   --list-languages    List all supported languages
 ------------
-🧪 Testing🔌
+🧪 Testing
 ------------
 # Run test suite
 ./scripts/test.sh
