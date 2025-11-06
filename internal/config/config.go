@@ -87,9 +87,9 @@ func getDefaultConfig(language string) *Config {
 		Colors:      true,
 		Theme:       "default",
 		DetailedCPU: false,
-		ShowDisk:    true,
-		ShowCPU:     true,
-		ShowMem:     true,
-		ShowNet:     true,
+		ShowDisk:    false,  // По умолчанию не показываем диск
+		ShowCPU:     false,  // По умолчанию не показываем CPU
+		ShowMem:     true,   // По умолчанию показываем память
+		ShowNet:     true,   // По умолчанию показываем сеть
 	}
 }
