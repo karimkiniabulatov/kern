@@ -137,7 +137,7 @@ API-Based Monitoring
 kern -r 8080
 
 # Monitor from client machine
-kern --api http://remote-server:8080
+kern --api http://remote-server:28126
 
 API Endpoints
 GET /api/cpu - CPU information

@@ -26,7 +26,7 @@ var (
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 26001)")
+	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 28126)")
 	flagVersion   = flag.Bool("v", false, "Show version")
 	flagHelp      = flag.Bool("h", false, "Show help")
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
@@ -59,7 +59,7 @@ func main() {
 		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
-		fmt.Println("  kern -r 26001              # Start API server on port 26001")
+		fmt.Println("  kern -r 28126              # Start API server on port 28126")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
 		fmt.Println("  kern --logo                # Show logo during monitoring")
 	}
@@ -109,7 +109,7 @@ func main() {
 	if *flagRemote != 0 {
 		port := *flagRemote
 		if port == 0 {
-			port = 26001 // порт по умолчанию
+			port = 28126 // порт по умолчанию для API
 		}
 		startRemoteServer(cfg, port)
 		return
@@ -257,7 +257,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 
 func startRemoteServer(cfg *config.Config, port int) {
 	if port == 0 {
-		port = 26001
+		port = 28126 // порт по умолчанию для API
 	}
 	
 	showLogo()

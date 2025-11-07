@@ -12,8 +12,8 @@ import (
 )
 
 type Renderer struct {
-	config   *config.Config
-	showLogo bool
+	config       *config.Config
+	showLogo     bool
 	screenBuffer []string
 }
 
@@ -166,18 +166,18 @@ func (r *Renderer) renderNetworkToBuffer(data interface{}) {
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		count := 0
-		for _, net := range networks {
-			if net.Status == "UP" && net.Interface != "lo" && count < 2 {
-				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("network.interface"), net.Interface))
-				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", net.IPAddress))
-				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", net.MACAddress))
+		for _, netInfo := range networks {
+			if netInfo.Status == "UP" && netInfo.Interface != "lo" && count < 2 {
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("network.interface"), netInfo.Interface))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", netInfo.IPAddress))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", netInfo.MACAddress))
 				
-				activityGraph := r.createSimpleGraph(net.ActivityPercent, 25)
+				activityGraph := r.createSimpleGraph(netInfo.ActivityPercent, 25)
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
-					"Activity", activityGraph, net.ActivityPercent))
+					"Activity", activityGraph, netInfo.ActivityPercent))
 				
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s↓ / %s↑",
-					"Speed", net.RXSpeed, net.TXSpeed))
+					"Speed", netInfo.RXSpeed, netInfo.TXSpeed))
 				
 				count++
 				if count < 2 {

@@ -116,7 +116,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 			for i, usage := range cpuInfo.CoreUsage {
 				coreGraph := t.createSimpleGraph(usage, 15)
 				row = t.printLine(row, 2, fmt.Sprintf("%s %d: %s %.1f%%",
-					r.config.T("cpu.core"), i+1, coreGraph, usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+					t.config.T("cpu.core"), i+1, coreGraph, usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
 		}
 	}

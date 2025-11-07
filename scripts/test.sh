@@ -34,14 +34,14 @@ echo "✓ Refresh rate test passed"
 
 # Test API functionality
 echo "Testing API server..."
-./kern-test -r 26001 > /dev/null &
+./kern-test -r 28126 > /dev/null &
 API_PID=$!
 sleep 2
 
 # Test API endpoints
-curl -s http://localhost:26001/api/cpu > /dev/null && echo "✓ CPU API test passed"
-curl -s http://localhost:26001/api/mem > /dev/null && echo "✓ Memory API test passed"
-curl -s http://localhost:26001/health > /dev/null && echo "✓ Health API test passed"
+curl -s http://localhost:28126/api/cpu > /dev/null && echo "✓ CPU API test passed"
+curl -s http://localhost:28126/api/mem > /dev/null && echo "✓ Memory API test passed"
+curl -s http://localhost:28126/health > /dev/null && echo "✓ Health API test passed"
 
 kill $API_PID
 
