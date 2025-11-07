@@ -301,3 +301,8 @@ func (t *TUI) PollEvent() tcell.Event {
 func (t *TUI) Fini() {
 	t.screen.Fini()
 }
+
+//  метод для очистки экрана
+func (t *TUI) Clear() {
+    t.screen.Clear()
+}

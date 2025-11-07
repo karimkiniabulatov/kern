@@ -162,19 +162,36 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	}
 	defer tui.Fini()
 
-	for {
-		// Collect and render data
-		results := collectData(cfg)
-		tui.Render(results)
+	// Канал для обновления данных
+	updateChan := make(chan map[string]interface{})
+	
+	// Запускаем горутину для периодического сбора данных
+	go func() {
+		ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
+		defer ticker.Stop()
+		
+		// Первое обновление сразу
+		updateChan <- collectData(cfg)
+		
+		for {
+			select {
+			case <-ticker.C:
+				updateChan <- collectData(cfg)
+			}
+		}
+	}()
 
-		// Wait for refresh interval or key press
-		start := time.Now()
-		for time.Since(start) < time.Duration(cfg.RefreshRate)*time.Second {
-			// Check for exit key with small delay
-			time.Sleep(100 * time.Millisecond)
+	// Основной цикл обработки событий
+	for {
+		select {
+		case results := <-updateChan:
+			// Обновляем данные на экране
+			tui.Render(results)
 			
-			// Non-blocking event check
-			if event := tui.PollEvent(); event != nil {
+		default:
+			// Неблокирующая проверка событий
+			event := tui.PollEvent()
+			if event != nil {
 				switch ev := event.(type) {
 				case *tcell.EventKey:
 					if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || 
@@ -182,12 +199,14 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 						return
 					}
 				case *tcell.EventResize:
-					// Redraw on resize
+					// При изменении размера экрана перерисовываем с текущими данными
 					results := collectData(cfg)
 					tui.Render(results)
-					start = time.Now() // Reset timer after resize
 				}
 			}
+			
+			// Небольшая задержка для снижения нагрузки на CPU
+			time.Sleep(50 * time.Millisecond)
 		}
 	}
 }
