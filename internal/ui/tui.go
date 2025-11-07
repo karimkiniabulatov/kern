@@ -16,8 +16,6 @@ type TUI struct {
 	screen    tcell.Screen
 	config    *config.Config
 	showLogo  bool
-	width     int
-	height    int
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -30,57 +28,54 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 		return nil, err
 	}
 
-	width, height := screen.Size()
-
 	return &TUI{
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
-		width:    width,
-		height:   height,
 	}, nil
 }
 
 func (t *TUI) Render(data map[string]interface{}) {
 	t.screen.Clear()
+	width, height := t.screen.Size()
 
 	row := 0
 
 	// Show logo if needed
 	if t.showLogo {
-		row = t.renderLogo(row)
+		row = t.renderLogo(row, width)
 	}
 
 	// Render only enabled modules
 	if t.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
-			row = t.renderDisk(row, diskData)
+			row = t.renderDisk(row, width, diskData)
 		}
 	}
 
 	if t.config.ShowMem {
 		if memData, exists := data["mem"]; exists {
-			row = t.renderMemory(row, memData)
+			row = t.renderMemory(row, width, memData)
 		}
 	}
 
 	if t.config.ShowNet {
 		if netData, exists := data["net"]; exists {
-			row = t.renderNetwork(row, netData)
+			row = t.renderNetwork(row, width, netData)
 		}
 	}
 
 	if t.config.ShowCPU {
 		if cpuData, exists := data["cpu"]; exists {
-			row = t.renderCPU(row, cpuData)
+			row = t.renderCPU(row, width, cpuData)
 		}
 	}
 
-	t.renderFooter(row)
+	t.renderFooter(row, width, height)
 	t.screen.Show()
 }
 
-func (t *TUI) renderLogo(startRow int) int {
+func (t *TUI) renderLogo(startRow int, width int) int {
 	logo := []string{
 		" ██╗  ██╗███████╗██████╗ ███╗   ██╗",
 		" ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║",
@@ -93,62 +88,62 @@ func (t *TUI) renderLogo(startRow int) int {
 
 	cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
 	for i, line := range logo {
-		t.printCentered(startRow+i, line, cyan)
+		t.printCentered(startRow+i, line, cyan, width)
 	}
 
 	return startRow + len(logo) + 1
 }
 
-func (t *TUI) renderCPU(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("cpu.title"))
+func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("cpu.title"), width)
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		row = t.printLine(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		row = t.printLine(row, fmt.Sprintf("%s: %d %s, %d %s", 
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s", 
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"), 
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createSimpleGraph(cpuInfo.Usage, 25)
-		row = t.printLine(row, fmt.Sprintf("%s: %s %.1f%%",
-			t.config.T("cpu.usage"), graph, cpuInfo.Usage), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
+			t.config.T("cpu.usage"), graph, cpuInfo.Usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 
-		row = t.printLine(row, fmt.Sprintf("%s: %s", t.config.T("cpu.frequency"), cpuInfo.Frequency), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		row = t.printLine(row, fmt.Sprintf("%s: %.2f, %.2f, %.2f",
-			t.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.frequency"), cpuInfo.Frequency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %.2f, %.2f, %.2f",
+			t.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-			row = t.printLine(row, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for i, usage := range cpuInfo.CoreUsage {
 				coreGraph := t.createSimpleGraph(usage, 15)
-				row = t.printLine(row, fmt.Sprintf("  %s %d: %s %.1f%%",
-					t.config.T("cpu.core"), i+1, coreGraph, usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				row = t.printLine(row, 2, fmt.Sprintf("%s %d: %s %.1f%%",
+					r.config.T("cpu.core"), i+1, coreGraph, usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
 		}
 	}
 	return row + 1
 }
 
-func (t *TUI) renderMemory(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("memory.title"))
+func (t *TUI) renderMemory(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("memory.title"), width)
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		ramGraph := t.createSimpleGraph(memInfo.UsagePercent, 25)
-		row = t.printLine(row, fmt.Sprintf("%s: %s / %s %s %.1f%%",
-			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
+			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 
-		row = t.printLine(row, fmt.Sprintf("%s: %s", t.config.T("common.available"), memInfo.Available), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("common.available"), memInfo.Available), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
 			swapGraph := t.createSimpleGraph(memInfo.SwapUsagePercent, 25)
-			row = t.printLine(row, fmt.Sprintf("%s: %s / %s %s %.1f%%",
-				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
+				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 		}
 	}
 	return row + 1
 }
 
-func (t *TUI) renderDisk(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("disk.title"))
+func (t *TUI) renderDisk(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("disk.title"), width)
 
 	if disks, ok := data.([]disk.DiskInfo); ok {
 		count := 0
@@ -160,13 +155,13 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 					mountPoint = "ROOT"
 				}
 				
-				row = t.printLine(row, fmt.Sprintf("%s: %s (%s)", 
-					t.config.T("disk.filesystem"), d.Filesystem, devType), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printLine(row, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s (%s)", 
+					t.config.T("disk.filesystem"), d.Filesystem, devType), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				
 				diskGraph := t.createSimpleGraph(d.UsePercent, 25)
-				row = t.printLine(row, fmt.Sprintf("%s: %s / %s %s %.1f%%",
-					t.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
+					t.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 				
 				count++
 				if count < 3 {
@@ -178,23 +173,23 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 	return row + 1
 }
 
-func (t *TUI) renderNetwork(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("network.title"))
+func (t *TUI) renderNetwork(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("network.title"), width)
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		count := 0
 		for _, netInfo := range networks {
 			if netInfo.Status == "UP" && netInfo.Interface != "lo" && count < 2 {
-				row = t.printLine(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printLine(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printLine(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				
 				activityGraph := t.createSimpleGraph(netInfo.ActivityPercent, 25)
-				row = t.printLine(row, fmt.Sprintf("%s: %s %.1f%%",
-					"Activity", activityGraph, netInfo.ActivityPercent), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
+					"Activity", activityGraph, netInfo.ActivityPercent), tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
 				
-				row = t.printLine(row, fmt.Sprintf("%s: %s↓ / %s↑",
-					"Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s↓ / %s↑",
+					"Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				
 				count++
 				if count < 2 {
@@ -206,27 +201,39 @@ func (t *TUI) renderNetwork(startRow int, data interface{}) int {
 	return row + 1
 }
 
-func (t *TUI) renderFooter(row int) {
-	if row >= t.height-1 {
-		row = t.height - 1
+func (t *TUI) renderFooter(row int, width int, height int) {
+	if row >= height-1 {
+		row = height - 1
 	}
 	footer := fmt.Sprintf("Press 'q' to quit | Auto-refresh every %d seconds", t.config.RefreshRate)
-	t.printCentered(row, footer, tcell.StyleDefault.Foreground(tcell.ColorGray))
+	t.printCentered(row, footer, tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 }
 
-func (t *TUI) renderHeader(row int, text string) int {
+func (t *TUI) renderHeader(row int, text string, width int) int {
 	style := tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true)
-	t.printLine(row, text, style)
+	t.printLine(row, 0, text, style, width)
 	return row + 1
 }
 
-func (t *TUI) printLine(row int, text string, style tcell.Style) int {
-	if row >= t.height {
+func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
+	if row >= t.screen.Size().Height {
 		return row
 	}
 
-	for col, ch := range text {
-		if col >= t.width {
+	// Apply indentation
+	indentSpaces := ""
+	for i := 0; i < indent; i++ {
+		indentSpaces += " "
+	}
+	fullText := indentSpaces + text
+
+	// Truncate if too long for screen
+	if len(fullText) > width {
+		fullText = fullText[:width]
+	}
+
+	for col, ch := range fullText {
+		if col >= width {
 			break
 		}
 		t.screen.SetContent(col, row, ch, nil, style)
@@ -234,18 +241,18 @@ func (t *TUI) printLine(row int, text string, style tcell.Style) int {
 	return row + 1
 }
 
-func (t *TUI) printCentered(row int, text string, style tcell.Style) {
-	if row >= t.height {
+func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
+	if row >= t.screen.Size().Height {
 		return
 	}
 
-	col := (t.width - len(text)) / 2
+	col := (width - len(text)) / 2
 	if col < 0 {
 		col = 0
 	}
 
 	for i, ch := range text {
-		if col+i >= t.width {
+		if col+i >= width {
 			break
 		}
 		t.screen.SetContent(col+i, row, ch, nil, style)
@@ -291,8 +298,4 @@ func (t *TUI) PollEvent() tcell.Event {
 
 func (t *TUI) Fini() {
 	t.screen.Fini()
-}
-
-func (t *TUI) Size() (int, int) {
-	return t.screen.Size()
 }

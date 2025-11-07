@@ -1,17 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
 	"github.com/karimkiniabulatov/kern/internal/cpu"
 	"github.com/karimkiniabulatov/kern/internal/disk"
@@ -19,7 +16,6 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mem"
 	"github.com/karimkiniabulatov/kern/internal/net"
 	"github.com/karimkiniabulatov/kern/internal/ui"
-	"golang.org/x/term"
 )
 
 var (
@@ -30,7 +26,7 @@ var (
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 28126)")
+	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 26001)")
 	flagVersion   = flag.Bool("v", false, "Show version")
 	flagHelp      = flag.Bool("h", false, "Show help")
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
@@ -63,7 +59,7 @@ func main() {
 		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
-		fmt.Println("  kern -r 28126              # Start API server on port 28126")
+		fmt.Println("  kern -r 26001              # Start API server on port 26001")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
 		fmt.Println("  kern --logo                # Show logo during monitoring")
 	}
@@ -113,7 +109,7 @@ func main() {
 	if *flagRemote != 0 {
 		port := *flagRemote
 		if port == 0 {
-			port = 28126 // порт по умолчанию
+			port = 26001 // порт по умолчанию
 		}
 		startRemoteServer(cfg, port)
 		return
@@ -159,67 +155,44 @@ func showLogo() {
 }
 
 func runMonitor(cfg *config.Config, showLogo bool) {
-	// Set up signal handling for graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-
-	// Initialize UI
-	renderer := ui.NewRenderer(cfg, showLogo)
-
-	// Set up terminal for raw input to make 'q' work properly
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	// Initialize TUI
+	tui, err := ui.NewTUI(cfg, showLogo)
 	if err != nil {
-		log.Printf("Failed to set terminal raw mode: %v", err)
-	} else {
-		defer term.Restore(int(os.Stdin.Fd()), oldState)
+		log.Fatalf("Failed to initialize TUI: %v", err)
 	}
-
-	// Channel for keyboard input with buffer
-	keyChan := make(chan rune, 10)
-	go readKeys(keyChan)
-
-	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
-	defer ticker.Stop()
-
-	// Clear screen initially
-	fmt.Print("\033[2J\033[H")
+	defer tui.Fini()
 
 	// Initial render
 	results := collectData(cfg)
-	renderer.Render(results)
+	tui.Render(results)
 
+	// Set up refresh timer
+	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
+	defer ticker.Stop()
+
+	// Event loop
 	for {
 		select {
 		case <-ticker.C:
 			results := collectData(cfg)
-			renderer.Render(results)
+			tui.Render(results)
 			
-		case key := <-keyChan:
-			if key == 'q' || key == 'Q' {
-				renderer.Cleanup()
-				fmt.Println("Monitoring stopped.")
-				return
-			}
-			
-		case <-sigChan:
-			renderer.Cleanup()
-			fmt.Println("Monitoring stopped.")
-			return
-		}
-	}
-}
-
-func readKeys(keyChan chan rune) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		char, _, err := reader.ReadRune()
-		if err != nil {
-			return
-		}
-		select {
-		case keyChan <- char:
 		default:
-			// Если канал полный, пропускаем ввод (редкий случай)
+			// Handle keyboard events
+			event := tui.PollEvent()
+			switch ev := event.(type) {
+			case *tcell.EventKey:
+				switch ev.Key() {
+				case tcell.KeyEscape, tcell.KeyCtrlC:
+					return
+				case tcell.KeyRune:
+					if ev.Rune() == 'q' || ev.Rune() == 'Q' {
+						return
+					}
+				}
+			case *tcell.EventResize:
+				tui.Render(collectData(cfg))
+			}
 		}
 	}
 }
@@ -284,7 +257,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 
 func startRemoteServer(cfg *config.Config, port int) {
 	if port == 0 {
-		port = 28126
+		port = 26001
 	}
 	
 	showLogo()
