@@ -3,7 +3,7 @@ package net
 import (
 	"fmt"
 	"os/exec"
-	"regexp"
+	//"regexp"
 	"strconv"
 	"strings"
 	"time"
