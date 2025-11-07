@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
@@ -86,6 +87,29 @@ func (t *TUI) ForceRedraw() {
 		t.Render(t.lastData)
 	}
 }
+
+// PollEventWithTimeout - неблокирующий опрос событий с таймаутом
+func (t *TUI) PollEventWithTimeout(timeout time.Duration) tcell.Event {
+	// Используем канал для получения события с таймаутом
+	eventChan := make(chan tcell.Event, 1)
+	
+	go func() {
+		eventChan <- t.screen.PollEvent()
+	}()
+	
+	select {
+	case ev := <-eventChan:
+		return ev
+	case <-time.After(timeout):
+		return nil
+	}
+}
+
+// PollEvent - оригинальный блокирующий метод (для обратной совместимости)
+func (t *TUI) PollEvent() tcell.Event {
+	return t.screen.PollEvent()
+}
+
 
 func (t *TUI) renderLogo(startRow int, width int) int {
 	logo := []string{
@@ -304,10 +328,6 @@ func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
 		return "Virtual"
 	}
 	return "Disk"
-}
-
-func (t *TUI) PollEvent() tcell.Event {
-	return t.screen.PollEvent()
 }
 
 func (t *TUI) Fini() {

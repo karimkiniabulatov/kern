@@ -164,8 +164,9 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	}
 	defer tui.Fini()
 
-	// Канал для обновления данных
+	// Каналы для управления
 	updateChan := make(chan map[string]interface{})
+	quitChan := make(chan bool)
 	
 	// Запускаем горутину для периодического сбора данных
 	go func() {
@@ -179,36 +180,44 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 			select {
 			case <-ticker.C:
 				updateChan <- collectData(cfg)
+			case <-quitChan:
+				return
 			}
 		}
 	}()
 
-	// Основной цикл обработки событий
+	// Запускаем горутину для обработки событий
+	go func() {
+		for {
+			ev := tui.PollEvent()
+			if ev == nil {
+				continue
+			}
+			
+			switch e := ev.(type) {
+			case *tcell.EventKey:
+				if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC || 
+				   (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
+					quitChan <- true
+					return
+				}
+				// При нажатии любых клавиш (включая стрелки) обновляем данные
+				updateChan <- collectData(cfg)
+			case *tcell.EventResize:
+				// При изменении размера экрана перерисовываем с текущими данными
+				tui.ForceRedraw()
+			}
+		}
+	}()
+
+	// Основной цикл рендеринга
 	for {
 		select {
 		case results := <-updateChan:
 			// Обновляем данные на экране
 			tui.Render(results)
-			
-		default:
-			// Обработка событий с таймаутом
-			ev := tui.PollEvent()
-			if ev != nil {
-				switch e := ev.(type) {
-				case *tcell.EventKey:
-					if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC || 
-					   (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
-						return
-					}
-				case *tcell.EventResize:
-					// При изменении размера экрана перерисовываем с текущими данными
-					results := collectData(cfg)
-					tui.Render(results)
-				}
-			}
-			
-			// Небольшая задержка для снижения нагрузки на CPU
-			time.Sleep(50 * time.Millisecond)
+		case <-quitChan:
+			return
 		}
 	}
 }
