@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
@@ -16,6 +17,7 @@ type TUI struct {
 	screen    tcell.Screen
 	config    *config.Config
 	showLogo  bool
+	quit      chan struct{}
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -32,6 +34,7 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
+		quit:     make(chan struct{}),
 	}, nil
 }
 
@@ -100,10 +103,10 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s", 
-			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"), 
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			t.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
+			cpuInfo.Threads, r.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
-		graph := t.createSimpleGraph(cpuInfo.Usage, 25)
+		graph := t.createCompactGraph(cpuInfo.Usage, 15)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
 			t.config.T("cpu.usage"), graph, cpuInfo.Usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 
@@ -114,7 +117,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 		if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for i, usage := range cpuInfo.CoreUsage {
-				coreGraph := t.createSimpleGraph(usage, 15)
+				coreGraph := t.createCompactGraph(usage, 10)
 				row = t.printLine(row, 2, fmt.Sprintf("%s %d: %s %.1f%%",
 					t.config.T("cpu.core"), i+1, coreGraph, usage), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
@@ -127,14 +130,14 @@ func (t *TUI) renderMemory(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("memory.title"), width)
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		ramGraph := t.createSimpleGraph(memInfo.UsagePercent, 25)
+		ramGraph := t.createCompactGraph(memInfo.UsagePercent, 15)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
 			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("common.available"), memInfo.Available), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
-			swapGraph := t.createSimpleGraph(memInfo.SwapUsagePercent, 25)
+			swapGraph := t.createCompactGraph(memInfo.SwapUsagePercent, 15)
 			row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
 				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 		}
@@ -159,7 +162,7 @@ func (t *TUI) renderDisk(startRow int, width int, data interface{}) int {
 					t.config.T("disk.filesystem"), d.Filesystem, devType), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				
-				diskGraph := t.createSimpleGraph(d.UsePercent, 25)
+				diskGraph := t.createCompactGraph(d.UsePercent, 15)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
 					t.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 				
@@ -184,7 +187,7 @@ func (t *TUI) renderNetwork(startRow int, width int, data interface{}) int {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				
-				activityGraph := t.createSimpleGraph(netInfo.ActivityPercent, 25)
+				activityGraph := t.createCompactGraph(netInfo.ActivityPercent, 15)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
 					"Activity", activityGraph, netInfo.ActivityPercent), tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
 				
@@ -261,7 +264,7 @@ func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) 
 	}
 }
 
-func (t *TUI) createSimpleGraph(percent float64, width int) string {
+func (t *TUI) createCompactGraph(percent float64, width int) string {
 	if percent > 100 {
 		percent = 100
 	}
@@ -292,6 +295,44 @@ func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
 		return "Virtual"
 	}
 	return "Disk"
+}
+
+func (t *TUI) StartEventLoop(updateFunc func()) {
+	ticker := time.NewTicker(time.Duration(t.config.RefreshRate) * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			updateFunc()
+		case <-t.quit:
+			return
+		default:
+			// Non-blocking event check
+			if event := t.screen.PollEvent(); event != nil {
+				switch ev := event.(type) {
+				case *tcell.EventKey:
+					switch ev.Key() {
+					case tcell.KeyEscape, tcell.KeyCtrlC:
+						return
+					case tcell.KeyRune:
+						if ev.Rune() == 'q' || ev.Rune() == 'Q' {
+							return
+						}
+					}
+				case *tcell.EventResize:
+					updateFunc()
+				}
+			} else {
+				// Small delay to prevent CPU spinning
+				time.Sleep(50 * time.Millisecond)
+			}
+		}
+	}
+}
+
+func (t *TUI) Stop() {
+	close(t.quit)
 }
 
 func (t *TUI) PollEvent() tcell.Event {
