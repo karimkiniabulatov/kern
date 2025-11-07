@@ -103,8 +103,8 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s", 
-			t.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
-			cpuInfo.Threads, r.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"), 
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 15)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
