@@ -14,8 +14,8 @@ type NetworkInfo struct {
 	IPAddress      string
 	MACAddress     string
 	Status         string
-	RXBytes        string
-	TXBytes        string
+	RXBytes        uint64
+	TXBytes        uint64
 	RXSpeed        string
 	TXSpeed        string
 	ActivityPercent float64
@@ -95,7 +95,7 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
 			}
 
 			// Получаем статистику и скорость
-			if rx, tx, err := getNetworkStats(iface.Interface); err == nil {
+			if rx, tx, err := getNetworkStatsRaw(iface.Interface); err == nil {
 				iface.RXBytes = rx
 				iface.TXBytes = tx
 				iface.RXSpeed, iface.TXSpeed, iface.ActivityPercent = calculateNetworkSpeed(iface.Interface, rx, tx)
@@ -137,47 +137,30 @@ func getMACAndStatus(iface string) (string, string, error) {
 	return mac, status, nil
 }
 
-func getNetworkStats(iface string) (string, string, error) {
-	// Получаем статистику в человекочитаемом формате
-	cmd := exec.Command("ip", "-s", "-h", "link", "show", iface)
-	output, err := cmd.Output()
+func getNetworkStatsRaw(iface string) (uint64, uint64, error) {
+	// Получаем сырые данные из /sys/class/net/
+	rxPath := fmt.Sprintf("/sys/class/net/%s/statistics/rx_bytes", iface)
+	txPath := fmt.Sprintf("/sys/class/net/%s/statistics/tx_bytes", iface)
+
+	rxData, err := exec.Command("cat", rxPath).Output()
 	if err != nil {
-		return "0", "0", err
+		return 0, 0, err
 	}
 
-	var rxBytes, txBytes string
-	lines := strings.Split(string(output), "\n")
-
-	for i, line := range lines {
-		if strings.Contains(line, "RX:") && i+1 < len(lines) {
-			rxLine := strings.TrimSpace(lines[i+1])
-			rxBytes = extractBytes(rxLine)
-		}
-		if strings.Contains(line, "TX:") && i+1 < len(lines) {
-			txLine := strings.TrimSpace(lines[i+1])
-			txBytes = extractBytes(txLine)
-		}
+	txData, err := exec.Command("cat", txPath).Output()
+	if err != nil {
+		return 0, 0, err
 	}
+
+	rxBytes, _ := strconv.ParseUint(strings.TrimSpace(string(rxData)), 10, 64)
+	txBytes, _ := strconv.ParseUint(strings.TrimSpace(string(txData)), 10, 64)
 
 	return rxBytes, txBytes, nil
 }
 
-func extractBytes(line string) string {
-	re := regexp.MustCompile(`(\d+\.?\d*)([KMGT]?)(i?)B`)
-	matches := re.FindStringSubmatch(line)
-	if len(matches) >= 3 {
-		return matches[1] + matches[2] + matches[3] + "B"
-	}
-	return "0B"
-}
-
-func calculateNetworkSpeed(iface, rxBytes, txBytes string) (string, string, float64) {
+func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, string, float64) {
 	now := time.Now()
 	
-	// Конвертируем в байты для расчета
-	currentRX := convertToBytes(rxBytes)
-	currentTX := convertToBytes(txBytes)
-
 	// Проверяем есть ли предыдущие статистики
 	if last, exists := lastNetworkStats[iface]; exists {
 		timeDiff := now.Sub(last.Time).Seconds()
@@ -185,7 +168,7 @@ func calculateNetworkSpeed(iface, rxBytes, txBytes string) (string, string, floa
 			rxSpeed := float64(currentRX-last.RXBytes) / timeDiff
 			txSpeed := float64(currentTX-last.TXBytes) / timeDiff
 			
-			// Конвертируем обратно в человекочитаемый формат
+			// Конвертируем в человекочитаемый формат
 			rxSpeedStr := formatSpeed(rxSpeed)
 			txSpeedStr := formatSpeed(txSpeed)
 			
@@ -217,30 +200,6 @@ func calculateNetworkSpeed(iface, rxBytes, txBytes string) (string, string, floa
 	return "0B/s", "0B/s", 0
 }
 
-func convertToBytes(size string) uint64 {
-	re := regexp.MustCompile(`(\d+\.?\d*)([KMGT]?)(i?)B`)
-	matches := re.FindStringSubmatch(size)
-	if len(matches) < 3 {
-		return 0
-	}
-
-	value, _ := strconv.ParseFloat(matches[1], 64)
-	unit := matches[2]
-
-	switch unit {
-	case "K":
-		return uint64(value * 1024)
-	case "M":
-		return uint64(value * 1024 * 1024)
-	case "G":
-		return uint64(value * 1024 * 1024 * 1024)
-	case "T":
-		return uint64(value * 1024 * 1024 * 1024 * 1024)
-	default:
-		return uint64(value)
-	}
-}
-
 func formatSpeed(bytesPerSec float64) string {
 	units := []string{"B/s", "KB/s", "MB/s", "GB/s"}
 	value := bytesPerSec
@@ -251,5 +210,8 @@ func formatSpeed(bytesPerSec float64) string {
 		unitIndex++
 	}
 
+	if unitIndex == 0 {
+		return fmt.Sprintf("%.0f%s", value, units[unitIndex])
+	}
 	return fmt.Sprintf("%.1f%s", value, units[unitIndex])
 }

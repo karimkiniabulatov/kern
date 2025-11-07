@@ -201,8 +201,7 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 					quitChan <- true
 					return
 				}
-				// При нажатии любых клавиш (включая стрелки) обновляем данные
-				updateChan <- collectData(cfg)
+				// Убрали обновление при нажатии других клавиш
 			case *tcell.EventResize:
 				// При изменении размера экрана перерисовываем с текущими данными
 				tui.ForceRedraw()

@@ -47,6 +47,11 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 				continue
 			}
 
+			// Пропускаем временные файловые системы и специальные точки монтирования
+			if shouldSkipFilesystem(fields[0], fields[5]) {
+				continue
+			}
+
 			disk := DiskInfo{
 				Filesystem: fields[0],
 				Size:       fields[1],
@@ -60,4 +65,32 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 	}
 
 	return disks, nil
+}
+
+func shouldSkipFilesystem(filesystem, mountPoint string) bool {
+	// Пропускаем временные файловые системы
+	if strings.HasPrefix(filesystem, "tmpfs") ||
+		strings.HasPrefix(filesystem, "devtmpfs") ||
+		strings.HasPrefix(filesystem, "overlay") ||
+		strings.HasPrefix(filesystem, "shm") ||
+		strings.HasPrefix(filesystem, "udev") {
+		return true
+	}
+
+	// Пропускаем специальные точки монтирования
+	if mountPoint == "/dev" ||
+		mountPoint == "/sys" ||
+		mountPoint == "/proc" ||
+		mountPoint == "/sys/fs/cgroup" ||
+		strings.HasPrefix(mountPoint, "/var/lib/docker") ||
+		strings.HasPrefix(mountPoint, "/snap") {
+		return true
+	}
+
+	// Пропускаем loop устройства
+	if strings.HasPrefix(filesystem, "/dev/loop") {
+		return true
+	}
+
+	return false
 }
