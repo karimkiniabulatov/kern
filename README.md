@@ -1,6 +1,6 @@
 # kern - System Monitoring Tool
 
-A comprehensive, real-time system monitoring tool written in Go with beautiful interface and support for 50+ languages.
+A comprehensive, real-time system monitoring tool written in Go with beautiful TUI interface and support for 50+ languages.
 
 ![kern demo](https://img.shields.io/badge/version-1.1.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
@@ -9,15 +9,16 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful i
 ## ✨ Features
 
 - **📊 Real-time Monitoring**: Live updates with configurable refresh intervals
-- **🎨 Clean Interface**: Simple, line-based output without visual clutter
+- **🎨 Professional TUI**: Terminal User Interface with double buffering (no flickering)
 - **🌐 Multi-language**: Support for 50+ languages with auto-download capability
 - **💾 Disk Monitoring**: Filesystem usage with type detection (SSD/HDD/NVMe/RAID)
 - **⚡ CPU Monitoring**: Core/thread information with detailed core usage
 - **🧠 Memory Monitoring**: RAM and swap usage with visual graphs
 - **🌐 Network Monitoring**: Interface status, speeds, and activity indicators
 - **🔌 REST API**: HTTP API for remote monitoring on port 28126
-- **⌨️ Interactive**: Press 'q' to quit gracefully
-- **🔧 Cross-platform**: Works on Linux, Android (Termux), macOS
+- **⌨️ Interactive**: Press 'q' or ESC to quit gracefully
+- **🔧 Cross-platform**: Works on Linux, macOS, Windows
+- **📱 Resize Support**: Automatic redraw on terminal resize
 
 ## 🚀 Quick Start
 
@@ -32,9 +33,10 @@ git clone https://github.com/karimkiniabulatov/kern
 cd kern
 chmod +x ./scripts/install.sh
 ./scripts/install.sh
------------
+
+---------------------------------------------------------------------------------
 Basic Usage
------------
+
 kern                    # Memory and network information (default)
 kern --cpu              # CPU information only
 kern --disk             # Disk information only  
@@ -65,10 +67,24 @@ kern --logo
 
 # Show version and logo
 kern -v
----------------------------------------------------------
-🎨 Interface Design
-The clean line-based interface provides stable, flicker-free monitoring with perfect left alignment:
----------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
+🎨 TUI Interface
+The new Terminal User Interface provides:
+
+Flicker-free display with double buffering
+
+Professional color scheme with semantic coloring
+
+Responsive design that adapts to terminal size
+
+Smooth updates without screen artifacts
+
+Keyboard controls with intuitive navigation
+
+Example output:
+
 Memory Information
 RAM: 15.2G / 32.0G ███████████████████████ 47.5%
 Available: 16.8G
@@ -82,17 +98,8 @@ Activity: ███████████████████████ 
 Speed: 125.3KB/s↓ / 45.2KB/s↑
 
 Press 'q' to quit | Auto-refresh every 2 seconds
-----------------------------------------------------------
-Color Scheme
-Headers: Bright yellow
 
-Borders: Blue spaces for clean separation
-
-Parameters: Cyan labels
-
-Graphs: Color-coded by module (orange for CPU, green for memory, etc.)
-
-Values: Appropriate colors for different metrics
+---------------------------------------------------------------------------------
 
 🌍 Language Support
 kern supports 50+ languages with automatic download capability:
@@ -105,9 +112,9 @@ Eastern European: Czech, Hungarian, Romanian, Bulgarian, Croatian, Slovak, Slove
 Asian: Japanese, Korean, Chinese, Arabic, Hindi, Indonesian, Vietnamese, Thai, Turkish
 
 Other: Hebrew, Persian, Urdu, Bengali, Tamil, Telugu, and more
--------------------
+
 Language Management
--------------------
+
 # List all supported languages
 kern --list-languages
 
@@ -116,21 +123,22 @@ kern --download-lang fr
 
 # Use downloaded language
 kern -l fr
--------------------
+
 Language packs are automatically downloaded from GitHub when requested.
+
+---------------------------------------------------------------------------------
 
 🚀 Remote Monitoring
 kern supports multiple remote monitoring methods:
---------------------
---------------------
+
 API-Based Monitoring
---------------------
+
 # Start API server on remote machine
 kern -r 8080
 
 # Monitor from client machine
 kern --api http://remote-server:8080
---------------------
+
 API Endpoints
 GET /api/cpu - CPU information
 
@@ -143,13 +151,15 @@ GET /api/net - Network information
 GET /api/system - System information
 
 GET /health - Health check
---------------------------------------------
---------------------------------------------
+
+---------------------------------------------------------------------------------
+
 📁 Project Structure
+
 kern/
 ├── cmd/
 │   └── kern/
-│       └── main.go                 # CLI entry point
+│       └── main.go                 # CLI entry point with TUI
 ├── internal/
 │   ├── config/
 │   │   └── config.go               # Configuration handling
@@ -162,7 +172,8 @@ kern/
 │   ├── net/
 │   │   └── net.go                  # Network monitoring
 │   ├── ui/
-│   │   └── renderer.go             # Terminal rendering
+│   │   ├── tui.go                  # Terminal User Interface (TUI)
+│   │   └── renderer.go             # Legacy renderer (deprecated)
 │   └── i18n/
 │       └── translations.go         # Translation system
 ├── i18n/                           # Language files (50+)
@@ -180,15 +191,17 @@ kern/
 ├── go.mod
 ├── go.sum
 └── README.md
-----------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
 🛠 Installation Details
 Dependencies
 Go 1.21+ (automatically installed if missing)
 
 System tools: df, lscpu, free, ip (installed automatically)
--------------------
+
 Manual Installation
--------------------
+
 # One-line install
 curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
 
@@ -200,38 +213,56 @@ git clone https://github.com/karimkiniabulatov/kern
 cd kern
 go build -o kern ./cmd/kern
 ./kern
--------------------
+
+---------------------------------------------------------------------------------
+
 📋 Usage Tips
 Interactive Controls
-Press 'q': Quit the application
+Press 'q' or ESC: Quit the application
 
-Stable output: Line-based design prevents screen flickering
---------------------
---------------------
+Terminal Resize: Automatic redraw
+
+Flicker-free: Double buffering for smooth updates
+
 Command Line Options
---------------------
 Basic Monitoring:
-  -a, --all           Show all system information (default)
-  -c, --cpu           Show CPU information only
-  -d, --disk          Show disk information only
-  -m, --mem           Show memory information only
-  -n, --net           Show network information only
-  -v, --version       Show version information
-      --refresh=2     Set refresh interval in seconds
-  -l, --lang string   Set interface language
-      --detailed      Show detailed CPU core information
+
+-a, --all - Show all system information (default)
+
+-c, --cpu - Show CPU information only
+
+-d, --disk - Show disk information only
+
+-m, --mem - Show memory information only
+
+-n, --net - Show network information only
+
+-v, --version - Show version information
+
+--refresh=2 - Set refresh interval in seconds
+
+-l, --lang string - Set interface language
+
+--detailed - Show detailed CPU core information
 
 Remote Features:
-  -r, --remote int    Start remote API server on port
-  --ssh host          Monitor remote server via SSH
-  --api url           Monitor remote server via API
+
+-r, --remote int - Start remote API server on port
+
+--ssh host - Monitor remote server via SSH
+
+--api url - Monitor remote server via API
 
 Language Support:
-  --download-lang code Download language pack
-  --list-languages    List all supported languages
-------------
+
+--download-lang code - Download language pack
+
+--list-languages - List all supported languages
+
+---------------------------------------------------------------------------------
+
 🧪 Testing
-------------
+
 # Run test suite
 ./scripts/test.sh
 
@@ -245,15 +276,16 @@ kern -l es --refresh=1
 
 # Quick verification
 go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
--------------------------------------------------------
--------------------------------------------------------
+
+---------------------------------------------------------------------------------
+
 🔌 API Usage
 kern provides a REST API for remote monitoring on port 28126:
 
 Start API Server
--------------------
+
 kern -r 28126
---------------------------------------------------------
+
 API Endpoints
 GET /api/cpu - CPU information
 
@@ -268,7 +300,7 @@ GET /api/system - System information
 GET /health - Health check
 
 GET / - API information
---------------------------------------------------------
+
 Example API Usage
 
 # Get CPU information
@@ -281,7 +313,7 @@ curl http://localhost:28126/api/mem
 curl http://localhost:28126/api/system
 
 API Response Examples
----------------------
+
 # Get CPU information
 curl http://localhost:28126/api/cpu
 
@@ -298,7 +330,9 @@ curl http://localhost:28126/api/cpu
   "load5": 1.5,
   "load15": 1.3
 }
--------------------------
+
+---------------------------------------------------------------------------------
+
 🤝 Contributing
 Fork the repository
 
@@ -317,8 +351,12 @@ Update supported languages list in internal/i18n/translations.go
 
 Test with: kern -l your_language_code
 
+---------------------------------------------------------------------------------
+
 📄 License
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
+
+---------------------------------------------------------------------------------
 
 🆘 Support
 Documentation: man kern
@@ -328,5 +366,24 @@ API Documentation: See above section
 Issues: GitHub Issues
 
 Questions: Check existing issues or create new one
+
+---------------------------------------------------------------------------------
+
+🎯 Technical Highlights
+New TUI Architecture
+Double Buffering: Eliminates screen flickering completely
+
+Event-Driven: Responsive to keyboard and resize events
+
+Color Management: Professional color scheme with semantic meaning
+
+Cross-Platform: Consistent experience across Linux, macOS, Windows
+
+Performance Optimizations
+Concurrent Data Collection: All system metrics gathered in parallel
+
+Efficient Rendering: Only changed content is updated
+
+Memory Efficient: Minimal allocations during updates
 
 Enjoy monitoring your system with kern! 🎯

@@ -32,6 +32,19 @@ sleep 3
 kill $PID
 echo "✓ Refresh rate test passed"
 
+# Test API functionality
+echo "Testing API server..."
+./kern-test -r 8080 > /dev/null &
+API_PID=$!
+sleep 2
+
+# Test API endpoints
+curl -s http://localhost:8080/api/cpu > /dev/null && echo "✓ CPU API test passed"
+curl -s http://localhost:8080/api/mem > /dev/null && echo "✓ Memory API test passed"
+curl -s http://localhost:8080/health > /dev/null && echo "✓ Health API test passed"
+
+kill $API_PID
+
 # Cleanup
 rm -f kern-test
 

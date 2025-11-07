@@ -1,7 +1,6 @@
-```man
 .TH KERN 1 "2025-11-03" "kern" "System Monitoring Tool"
 .SH NAME
-kern \- real-time system monitoring tool with REST API
+kern \- real-time system monitoring tool with TUI and REST API
 .SH SYNOPSIS
 .B kern
 [\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
@@ -11,8 +10,9 @@ kern \- real-time system monitoring tool with REST API
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
 about disk usage, CPU performance, memory utilization, and network statistics.
-It features a clean interface with auto-refresh capabilities,
-support for multiple languages with automatic download, and remote monitoring via API.
+It features a professional Terminal User Interface (TUI) with double buffering
+to eliminate screen flickering, support for multiple languages with automatic
+download, and remote monitoring via REST API.
 .SH OPTIONS
 .TP
 .B \-a, \-\-all
@@ -53,6 +53,20 @@ Download language pack for specified language code.
 .TP
 .B \-\-list-languages
 List all supported language codes.
+.TP
+.B \-\-logo
+Show application logo during monitoring.
+.SH TUI CONTROLS
+When running in interactive mode, the following controls are available:
+.TP
+.B q, Q, ESC
+Quit the application
+.TP
+.B Ctrl+C
+Quit the application
+.TP
+.B Terminal Resize
+Interface automatically adapts to terminal size changes
 .SH API
 When started with the
 .B \-r
@@ -85,7 +99,7 @@ kern -r 28126
 curl http://localhost:28126/api/cpu
 .SH INTERACTIVE COMMANDS
 .TP
-.B q
+.B q, Q, ESC
 Quit the application.
 .SH EXAMPLES
 .TP
@@ -109,6 +123,9 @@ Download French language pack.
 .TP
 .B kern \-\-list-languages
 List all supported languages.
+.TP
+.B kern \-\-logo
+Show application logo during monitoring.
 .SH FILES
 .TP
 .I ~/.config/kern/kern.json
