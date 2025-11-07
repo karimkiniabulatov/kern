@@ -80,13 +80,14 @@ func (t *TUI) Render(data map[string]interface{}) {
 	t.screen.Show()
 }
 
-// Добавляем метод для принудительной перерисовки при изменении размера
+// ForceRedraw перерисовывает экран с последними данными
 func (t *TUI) ForceRedraw() {
 	if len(t.lastData) > 0 {
 		t.Render(t.lastData)
 	}
 }
 
+// Остальные методы остаются без изменений...
 func (t *TUI) renderLogo(startRow int, width int) int {
 	logo := []string{
 		" ██╗  ██╗███████╗██████╗ ███╗   ██╗",
@@ -112,7 +113,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s", 
-			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"), 
+			t.config.T("cpu.cores"), cpuInfo.Cores, tconfig.T("cpu.cores"), 
 			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 15)

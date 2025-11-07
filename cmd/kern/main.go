@@ -116,14 +116,16 @@ func main() {
 	}
 
 	// Определяем какие модули показывать
-	// По умолчанию показываем только память и сеть
+	// По умолчанию показываем все модули для произвольного выбора
 	showDisk := *flagDisk || *flagAll
 	showCPU := *flagCPU || *flagAll
 	showMem := *flagMem || *flagAll
 	showNet := *flagNet || *flagAll
 
-	// Если не указано никаких модулей, показываем память и сеть по умолчанию
+	// Если не указано никаких модулей, показываем все по умолчанию
 	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && !*flagAll {
+		showDisk = true
+		showCPU = true
 		showMem = true
 		showNet = true
 	}
@@ -190,9 +192,6 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 			
 		default:
 			// Обработка событий с таймаутом
-			tui.Screen().PollEvent()
-			
-			// Проверяем события без блокировки
 			ev := tui.PollEvent()
 			if ev != nil {
 				switch e := ev.(type) {
@@ -202,8 +201,9 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 						return
 					}
 				case *tcell.EventResize:
-					// При изменении размера экрана перерисовываем с последними данными
-					tui.ForceRedraw()
+					// При изменении размера экрана перерисовываем с текущими данными
+					results := collectData(cfg)
+					tui.Render(results)
 				}
 			}
 			
