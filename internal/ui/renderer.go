@@ -12,29 +12,27 @@ import (
 )
 
 type Renderer struct {
-	config  *config.Config
+	config   *config.Config
 	showLogo bool
-	lineWidth int // Максимальная ширина строки для очистки
 }
 
 func NewRenderer(cfg *config.Config, showLogo bool) *Renderer {
 	return &Renderer{
-		config:    cfg,
-		showLogo:  showLogo,
-		lineWidth: 80, // Стандартная ширина терминала
+		config:   cfg,
+		showLogo: showLogo,
 	}
 }
 
 func (r *Renderer) Render(data map[string]interface{}) {
-	// Очистка экрана и курсор в начало
-	fmt.Print("\033[2J\033[H")
+	// Move cursor to top and clear screen
+	fmt.Print("\033[H\033[2J")
 
-	// Показываем логотип если нужно
+	// Show logo if needed
 	if r.showLogo {
 		r.renderLogo()
 	}
 
-	// Рендерим только включенные модули
+	// Render only enabled modules
 	if r.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
 			r.renderDisk(diskData)
@@ -72,33 +70,31 @@ func (r *Renderer) renderLogo() {
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
  kern v1.1.0 - System Monitoring Tool
 `
-	fmt.Print("\033[1;36m" + logo + "\033[0m")
-	r.clearLine() // Очищаем оставшуюся часть строки
-	fmt.Print("\n")
+	fmt.Print("\033[1;36m" + logo + "\033[0m\n\n")
 }
 
 func (r *Renderer) renderCPU(data interface{}) {
 	r.printHeader(r.config.T("cpu.title"))
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", r.config.T("cpu.model"), cpuInfo.Model))
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %d %s, %d %s", 
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.model"), cpuInfo.Model))
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %d %s, %d %s", 
 			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads")))
 
 		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m",
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m",
 			r.config.T("cpu.usage"), graph, cpuInfo.Usage))
 
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", r.config.T("cpu.frequency"), cpuInfo.Frequency))
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %.2f, %.2f, %.2f",
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.frequency"), cpuInfo.Frequency))
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %.2f, %.2f, %.2f",
 			r.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15))
 
 		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-			r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m", r.config.T("cpu.core_usage")))
+			r.printLine(fmt.Sprintf("\033[36m%s:\033[0m", r.config.T("cpu.core_usage")))
 			for i, usage := range cpuInfo.CoreUsage {
 				coreGraph := r.createSimpleGraph(usage, 15)
-				r.printLine(fmt.Sprintf("\033[0m  %s %d: %s \033[38;5;215m%.1f%%\033[0m",
+				r.printLine(fmt.Sprintf("  %s %d: %s \033[38;5;215m%.1f%%\033[0m",
 					r.config.T("cpu.core"), i+1, coreGraph, usage))
 			}
 		}
@@ -111,14 +107,14 @@ func (r *Renderer) renderMemory(data interface{}) {
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent))
 
-		r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", r.config.T("common.available"), memInfo.Available))
+		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("common.available"), memInfo.Available))
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
 			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
-			r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
+			r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 				r.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent))
 		}
 	}
@@ -138,12 +134,12 @@ func (r *Renderer) renderDisk(data interface{}) {
 					mountPoint = "ROOT"
 				}
 				
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s (%s)", 
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s (%s)", 
 					r.config.T("disk.filesystem"), d.Filesystem, devType))
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", r.config.T("disk.mounted"), mountPoint))
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("disk.mounted"), mountPoint))
 				
 				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m",
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m",
 					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent))
 				
 				count++
@@ -162,15 +158,15 @@ func (r *Renderer) renderNetwork(data interface{}) {
 		count := 0
 		for _, net := range networks {
 			if net.Status == "UP" && net.Interface != "lo" && count < 2 {
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", r.config.T("network.interface"), net.Interface))
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", "IP Address", net.IPAddress))
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s", "MAC Address", net.MACAddress))
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("network.interface"), net.Interface))
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", net.IPAddress))
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", net.MACAddress))
 				
 				activityGraph := r.createSimpleGraph(net.ActivityPercent, 25)
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
 					"Activity", activityGraph, net.ActivityPercent))
 				
-				r.printLine(fmt.Sprintf("\033[0m\033[36m%s:\033[0m %s↓ / %s↑",
+				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s↓ / %s↑",
 					"Speed", net.RXSpeed, net.TXSpeed))
 				
 				count++
@@ -183,32 +179,20 @@ func (r *Renderer) renderNetwork(data interface{}) {
 }
 
 func (r *Renderer) renderFooter() {
-	r.printLine(fmt.Sprintf("\033[0m\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m", 
+	r.printLine(fmt.Sprintf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m", 
 		r.config.RefreshRate))
 }
 
-// Новые вспомогательные методы для стабильного вывода
-
 func (r *Renderer) printHeader(text string) {
-	fmt.Printf("\033[1;33m%s\033[0m", text)
-	r.clearLine()
-	fmt.Print("\n")
+	fmt.Printf("\033[1;33m%s\033[0m\n", text)
 }
 
 func (r *Renderer) printLine(text string) {
-	fmt.Print(text)
-	r.clearLine()
-	fmt.Print("\n")
+	fmt.Println(text)
 }
 
 func (r *Renderer) printEmptyLine() {
-	r.clearLine()
-	fmt.Print("\n")
-}
-
-func (r *Renderer) clearLine() {
-	// Очищаем оставшуюся часть строки
-	fmt.Print("\033[K")
+	fmt.Println()
 }
 
 func (r *Renderer) createSimpleGraph(percent float64, width int) string {

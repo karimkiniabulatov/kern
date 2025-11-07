@@ -40,7 +40,22 @@ func Summary() ([]NetworkInfo, error) {
 		}
 	}
 
-	return networks, nil
+	// Remove duplicates - keep only unique interfaces
+	return removeDuplicateInterfaces(networks), nil
+}
+
+func removeDuplicateInterfaces(networks []NetworkInfo) []NetworkInfo {
+	seen := make(map[string]bool)
+	var result []NetworkInfo
+	
+	for _, net := range networks {
+		if !seen[net.Interface] {
+			seen[net.Interface] = true
+			result = append(result, net)
+		}
+	}
+	
+	return result
 }
 
 func getNetworkInterfaces() ([]NetworkInfo, error) {
@@ -68,7 +83,9 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
 
 			// Получаем IP адрес
 			if len(fields) >= 6 && fields[2] == "inet" {
-				iface.IPAddress = fields[3]
+				// Extract only the IP address without subnet mask
+				ipParts := strings.Split(fields[3], "/")
+				iface.IPAddress = ipParts[0]
 			}
 
 			// Получаем MAC адрес и статус
