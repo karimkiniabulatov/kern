@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
 	"github.com/karimkiniabulatov/kern/internal/cpu"
 	"github.com/karimkiniabulatov/kern/internal/disk"
@@ -343,7 +344,6 @@ func startRemoteServer(cfg *config.Config, port int) {
 	log.Printf("  GET /api/net    - Network information")
 	log.Printf("  GET /api/system - System information")
 	log.Printf("  GET /health     - Health check")
-	log.Printf("  GET /           - API information")
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		log.Fatalf("Failed to start API server: %v", err)
