@@ -189,19 +189,21 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 			tui.Render(results)
 			
 		default:
-			// Неблокирующая проверка событий
-			event := tui.PollEvent()
-			if event != nil {
-				switch ev := event.(type) {
+			// Обработка событий с таймаутом
+			tui.Screen().PollEvent()
+			
+			// Проверяем события без блокировки
+			ev := tui.PollEvent()
+			if ev != nil {
+				switch e := ev.(type) {
 				case *tcell.EventKey:
-					if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || 
-					   (ev.Key() == tcell.KeyRune && (ev.Rune() == 'q' || ev.Rune() == 'Q')) {
+					if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC || 
+					   (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
 						return
 					}
 				case *tcell.EventResize:
-					// При изменении размера экрана перерисовываем с текущими данными
-					results := collectData(cfg)
-					tui.Render(results)
+					// При изменении размера экрана перерисовываем с последними данными
+					tui.ForceRedraw()
 				}
 			}
 			

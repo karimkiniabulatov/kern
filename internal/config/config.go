@@ -81,15 +81,17 @@ func getDefaultConfig(language string) *Config {
 	if language == "" {
 		language = "en" // Default to English
 	}
+	
+	// Устанавливаем все модули в true по умолчанию для произвольного выбора
 	return &Config{
 		Language:    language,
 		RefreshRate: 2,
 		Colors:      true,
 		Theme:       "default",
 		DetailedCPU: false,
-		ShowDisk:    false,  // По умолчанию не показываем диск
-		ShowCPU:     false,  // По умолчанию не показываем CPU
-		ShowMem:     true,   // По умолчанию показываем память
-		ShowNet:     true,   // По умолчанию показываем сеть
+		ShowDisk:    true,  // Все модули включены по умолчанию
+		ShowCPU:     true,  
+		ShowMem:     true,   
+		ShowNet:     true,   
 	}
 }

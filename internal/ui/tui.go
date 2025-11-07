@@ -16,6 +16,7 @@ type TUI struct {
 	screen    tcell.Screen
 	config    *config.Config
 	showLogo  bool
+	lastData  map[string]interface{}
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -32,12 +33,16 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
+		lastData: make(map[string]interface{}),
 	}, nil
 }
 
 func (t *TUI) Render(data map[string]interface{}) {
 	t.screen.Clear()
 	width, height := t.screen.Size()
+
+	// Сохраняем данные для перерисовки при resize
+	t.lastData = data
 
 	row := 0
 
@@ -73,6 +78,13 @@ func (t *TUI) Render(data map[string]interface{}) {
 
 	t.renderFooter(row, width, height)
 	t.screen.Show()
+}
+
+// Добавляем метод для принудительной перерисовки при изменении размера
+func (t *TUI) ForceRedraw() {
+	if len(t.lastData) > 0 {
+		t.Render(t.lastData)
+	}
 }
 
 func (t *TUI) renderLogo(startRow int, width int) int {
@@ -302,7 +314,6 @@ func (t *TUI) Fini() {
 	t.screen.Fini()
 }
 
-//  метод для очистки экрана
 func (t *TUI) Clear() {
     t.screen.Clear()
 }
