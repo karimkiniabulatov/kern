@@ -14,6 +14,7 @@ import (
 type Renderer struct {
 	config   *config.Config
 	showLogo bool
+	screenBuffer []string
 }
 
 func NewRenderer(cfg *config.Config, showLogo bool) *Renderer {
@@ -24,43 +25,51 @@ func NewRenderer(cfg *config.Config, showLogo bool) *Renderer {
 }
 
 func (r *Renderer) Render(data map[string]interface{}) {
-	// Move cursor to top and clear screen
-	fmt.Print("\033[H\033[2J")
+	// Clear screen buffer
+	r.screenBuffer = []string{}
 
-	// Show logo if needed
+	// Build screen content in buffer
 	if r.showLogo {
-		r.renderLogo()
+		r.renderLogoToBuffer()
 	}
 
 	// Render only enabled modules
 	if r.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
-			r.renderDisk(diskData)
+			r.renderDiskToBuffer(diskData)
 		}
 	}
 
 	if r.config.ShowMem {
 		if memData, exists := data["mem"]; exists {
-			r.renderMemory(memData)
+			r.renderMemoryToBuffer(memData)
 		}
 	}
 
 	if r.config.ShowNet {
 		if netData, exists := data["net"]; exists {
-			r.renderNetwork(netData)
+			r.renderNetworkToBuffer(netData)
 		}
 	}
 
 	if r.config.ShowCPU {
 		if cpuData, exists := data["cpu"]; exists {
-			r.renderCPU(cpuData)
+			r.renderCPUToBuffer(cpuData)
 		}
 	}
 
-	r.renderFooter()
+	r.renderFooterToBuffer()
+
+	// Clear screen and move cursor to top
+	fmt.Print("\033[2J\033[H")
+	
+	// Print entire buffer at once
+	for _, line := range r.screenBuffer {
+		fmt.Println(line)
+	}
 }
 
-func (r *Renderer) renderLogo() {
+func (r *Renderer) renderLogoToBuffer() {
 	logo := `
  ██╗  ██╗███████╗██████╗ ███╗   ██╗
  ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
@@ -70,59 +79,60 @@ func (r *Renderer) renderLogo() {
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
  kern v1.1.0 - System Monitoring Tool
 `
-	fmt.Print("\033[1;36m" + logo + "\033[0m\n\n")
+	r.screenBuffer = append(r.screenBuffer, "\033[1;36m"+strings.TrimSpace(logo)+"\033[0m")
+	r.screenBuffer = append(r.screenBuffer, "")
 }
 
-func (r *Renderer) renderCPU(data interface{}) {
-	r.printHeader(r.config.T("cpu.title"))
+func (r *Renderer) renderCPUToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("cpu.title"))
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.model"), cpuInfo.Model))
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %d %s, %d %s", 
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.model"), cpuInfo.Model))
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %d %s, %d %s", 
 			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads")))
 
 		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m",
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m",
 			r.config.T("cpu.usage"), graph, cpuInfo.Usage))
 
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.frequency"), cpuInfo.Frequency))
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %.2f, %.2f, %.2f",
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("cpu.frequency"), cpuInfo.Frequency))
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %.2f, %.2f, %.2f",
 			r.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15))
 
 		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-			r.printLine(fmt.Sprintf("\033[36m%s:\033[0m", r.config.T("cpu.core_usage")))
+			r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m", r.config.T("cpu.core_usage")))
 			for i, usage := range cpuInfo.CoreUsage {
 				coreGraph := r.createSimpleGraph(usage, 15)
-				r.printLine(fmt.Sprintf("  %s %d: %s \033[38;5;215m%.1f%%\033[0m",
+				r.addLineToBuffer(fmt.Sprintf("  %s %d: %s \033[38;5;215m%.1f%%\033[0m",
 					r.config.T("cpu.core"), i+1, coreGraph, usage))
 			}
 		}
 	}
-	r.printEmptyLine()
+	r.addEmptyLineToBuffer()
 }
 
-func (r *Renderer) renderMemory(data interface{}) {
-	r.printHeader(r.config.T("memory.title"))
+func (r *Renderer) renderMemoryToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("memory.title"))
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
 		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent))
 
-		r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("common.available"), memInfo.Available))
+		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("common.available"), memInfo.Available))
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
 			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
-			r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
+			r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 				r.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent))
 		}
 	}
-	r.printEmptyLine()
+	r.addEmptyLineToBuffer()
 }
 
-func (r *Renderer) renderDisk(data interface{}) {
-	r.printHeader(r.config.T("disk.title"))
+func (r *Renderer) renderDiskToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("disk.title"))
 
 	if disks, ok := data.([]disk.DiskInfo); ok {
 		count := 0
@@ -134,65 +144,65 @@ func (r *Renderer) renderDisk(data interface{}) {
 					mountPoint = "ROOT"
 				}
 				
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s (%s)", 
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s (%s)", 
 					r.config.T("disk.filesystem"), d.Filesystem, devType))
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("disk.mounted"), mountPoint))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("disk.mounted"), mountPoint))
 				
 				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m",
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m",
 					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent))
 				
 				count++
 				if count < 3 {
-					r.printEmptyLine()
+					r.addEmptyLineToBuffer()
 				}
 			}
 		}
 	}
 }
 
-func (r *Renderer) renderNetwork(data interface{}) {
-	r.printHeader(r.config.T("network.title"))
+func (r *Renderer) renderNetworkToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("network.title"))
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
 		count := 0
 		for _, net := range networks {
 			if net.Status == "UP" && net.Interface != "lo" && count < 2 {
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("network.interface"), net.Interface))
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", net.IPAddress))
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", net.MACAddress))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("network.interface"), net.Interface))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", net.IPAddress))
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", net.MACAddress))
 				
 				activityGraph := r.createSimpleGraph(net.ActivityPercent, 25)
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
 					"Activity", activityGraph, net.ActivityPercent))
 				
-				r.printLine(fmt.Sprintf("\033[36m%s:\033[0m %s↓ / %s↑",
+				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s↓ / %s↑",
 					"Speed", net.RXSpeed, net.TXSpeed))
 				
 				count++
 				if count < 2 {
-					r.printEmptyLine()
+					r.addEmptyLineToBuffer()
 				}
 			}
 		}
 	}
 }
 
-func (r *Renderer) renderFooter() {
-	r.printLine(fmt.Sprintf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m", 
+func (r *Renderer) renderFooterToBuffer() {
+	r.addLineToBuffer(fmt.Sprintf("\033[90mPress 'q' to quit | Auto-refresh every %d seconds\033[0m", 
 		r.config.RefreshRate))
 }
 
-func (r *Renderer) printHeader(text string) {
-	fmt.Printf("\033[1;33m%s\033[0m\n", text)
+func (r *Renderer) addHeaderToBuffer(text string) {
+	r.screenBuffer = append(r.screenBuffer, fmt.Sprintf("\033[1;33m%s\033[0m", text))
 }
 
-func (r *Renderer) printLine(text string) {
-	fmt.Println(text)
+func (r *Renderer) addLineToBuffer(text string) {
+	r.screenBuffer = append(r.screenBuffer, text)
 }
 
-func (r *Renderer) printEmptyLine() {
-	fmt.Println()
+func (r *Renderer) addEmptyLineToBuffer() {
+	r.screenBuffer = append(r.screenBuffer, "")
 }
 
 func (r *Renderer) createSimpleGraph(percent float64, width int) string {

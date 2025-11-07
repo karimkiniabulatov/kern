@@ -181,6 +181,9 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
 	defer ticker.Stop()
 
+	// Clear screen initially
+	fmt.Print("\033[2J\033[H")
+
 	// Initial render
 	results := collectData(cfg)
 	renderer.Render(results)
