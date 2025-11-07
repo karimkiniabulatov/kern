@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
@@ -17,7 +16,6 @@ type TUI struct {
 	screen    tcell.Screen
 	config    *config.Config
 	showLogo  bool
-	quit      chan struct{}
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -34,7 +32,6 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
-		quit:     make(chan struct{}),
 	}, nil
 }
 
@@ -295,44 +292,6 @@ func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
 		return "Virtual"
 	}
 	return "Disk"
-}
-
-func (t *TUI) StartEventLoop(updateFunc func()) {
-	ticker := time.NewTicker(time.Duration(t.config.RefreshRate) * time.Second)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			updateFunc()
-		case <-t.quit:
-			return
-		default:
-			// Non-blocking event check
-			if event := t.screen.PollEvent(); event != nil {
-				switch ev := event.(type) {
-				case *tcell.EventKey:
-					switch ev.Key() {
-					case tcell.KeyEscape, tcell.KeyCtrlC:
-						return
-					case tcell.KeyRune:
-						if ev.Rune() == 'q' || ev.Rune() == 'Q' {
-							return
-						}
-					}
-				case *tcell.EventResize:
-					updateFunc()
-				}
-			} else {
-				// Small delay to prevent CPU spinning
-				time.Sleep(50 * time.Millisecond)
-			}
-		}
-	}
-}
-
-func (t *TUI) Stop() {
-	close(t.quit)
 }
 
 func (t *TUI) PollEvent() tcell.Event {

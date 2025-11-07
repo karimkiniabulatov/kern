@@ -161,17 +161,34 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	}
 	defer tui.Fini()
 
-	// Update function
-	update := func() {
+	for {
+		// Collect and render data
 		results := collectData(cfg)
 		tui.Render(results)
+
+		// Wait for refresh interval or key press
+		start := time.Now()
+		for time.Since(start) < time.Duration(cfg.RefreshRate)*time.Second {
+			// Check for exit key with small delay
+			time.Sleep(100 * time.Millisecond)
+			
+			// Non-blocking event check
+			if event := tui.PollEvent(); event != nil {
+				switch ev := event.(type) {
+				case *tcell.EventKey:
+					if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || 
+					   (ev.Key() == tcell.KeyRune && (ev.Rune() == 'q' || ev.Rune() == 'Q')) {
+						return
+					}
+				case *tcell.EventResize:
+					// Redraw on resize
+					results := collectData(cfg)
+					tui.Render(results)
+					start = time.Now() // Reset timer after resize
+				}
+			}
+		}
 	}
-
-	// Initial render
-	update()
-
-	// Start event loop with updates
-	tui.StartEventLoop(update)
 }
 
 func collectData(cfg *config.Config) map[string]interface{} {
