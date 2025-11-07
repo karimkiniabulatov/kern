@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -164,64 +167,59 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	}
 	defer tui.Fini()
 
-	// Каналы для управления
-	updateChan := make(chan map[string]interface{})
-	quitChan := make(chan bool, 1) // буферизованный канал
-	
-	// Запускаем горутину для периодического сбора данных
+	// Обработка сигналов для гарантированного выхода
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	// Канал для выхода
+	quitChan := make(chan bool, 1)
+
+	// Запускаем сбор данных в отдельной горутине
 	go func() {
 		ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
 		defer ticker.Stop()
-		
+
 		// Первое обновление сразу
-		updateChan <- collectData(cfg)
-		
+		data := collectData(cfg)
+		tui.Render(data)
+
 		for {
 			select {
 			case <-ticker.C:
-				select {
-				case updateChan <- collectData(cfg):
-					// данные отправлены
-				default:
-					// пропускаем обновление если канал занят
-				}
+				data := collectData(cfg)
+				tui.Render(data)
 			case <-quitChan:
 				return
 			}
 		}
 	}()
 
-	// Основной цикл с неблокирующей обработкой событий
-	running := true
-	for running {
-		// Обработка событий с таймаутом
-		ev := tui.PollEventWithTimeout(100 * time.Millisecond)
-		if ev != nil {
-			switch e := ev.(type) {
-			case *tcell.EventKey:
-				if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC || 
-				   (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
-					running = false
-					break
-				}
-			case *tcell.EventResize:
-				tui.ForceRedraw()
+	// Основной цикл обработки событий
+	for {
+		ev := tui.PollEvent()
+		if ev == nil {
+			continue
+		}
+
+		switch e := ev.(type) {
+		case *tcell.EventKey:
+			if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC ||
+				(e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
+				quitChan <- true
+				return
 			}
+		case *tcell.EventResize:
+			tui.ForceRedraw()
 		}
 
-		// Неблокирующее чтение из канала обновлений
+		// Проверяем сигналы без блокировки
 		select {
-		case results := <-updateChan:
-			tui.Render(results)
+		case <-sigChan:
+			quitChan <- true
+			return
 		default:
-			// нет новых данных - продолжаем
+			// продолжаем
 		}
-	}
-
-	// Сигнализируем горутине о завершении
-	select {
-	case quitChan <- true:
-	default:
 	}
 }
 
@@ -266,10 +264,18 @@ func collectData(cfg *config.Config) map[string]interface{} {
 	// Collect results
 	results := make(map[string]interface{})
 	moduleCount := 0
-	if cfg.ShowDisk { moduleCount++ }
-	if cfg.ShowCPU { moduleCount++ }
-	if cfg.ShowMem { moduleCount++ }
-	if cfg.ShowNet { moduleCount++ }
+	if cfg.ShowDisk {
+		moduleCount++
+	}
+	if cfg.ShowCPU {
+		moduleCount++
+	}
+	if cfg.ShowMem {
+		moduleCount++
+	}
+	if cfg.ShowNet {
+		moduleCount++
+	}
 
 	for i := 0; i < moduleCount; i++ {
 		res := <-resultChan
@@ -287,7 +293,7 @@ func startRemoteServer(cfg *config.Config, port int) {
 	if port == 0 {
 		port = 28126 // порт по умолчанию для API
 	}
-	
+
 	showLogo()
 	log.Printf("Starting remote API server on port %d...", port)
 
@@ -359,7 +365,7 @@ func startRemoteServer(cfg *config.Config, port int) {
 			"version": version,
 			"endpoints": []string{
 				"/api/cpu",
-				"/api/mem", 
+				"/api/mem",
 				"/api/disk",
 				"/api/net",
 				"/api/system",

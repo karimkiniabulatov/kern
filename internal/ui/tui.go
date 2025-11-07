@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
@@ -14,10 +13,9 @@ import (
 )
 
 type TUI struct {
-	screen    tcell.Screen
-	config    *config.Config
-	showLogo  bool
-	lastData  map[string]interface{}
+	screen   tcell.Screen
+	config   *config.Config
+	showLogo bool
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -30,20 +28,18 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 		return nil, err
 	}
 
+	screen.Clear()
+
 	return &TUI{
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
-		lastData: make(map[string]interface{}),
 	}, nil
 }
 
 func (t *TUI) Render(data map[string]interface{}) {
 	t.screen.Clear()
 	width, height := t.screen.Size()
-
-	// Сохраняем данные для перерисовки при resize
-	t.lastData = data
 
 	row := 0
 
@@ -83,34 +79,16 @@ func (t *TUI) Render(data map[string]interface{}) {
 
 // ForceRedraw перерисовывает экран с последними данными
 func (t *TUI) ForceRedraw() {
-	if len(t.lastData) > 0 {
-		t.Render(t.lastData)
-	}
+	t.screen.Sync()
 }
 
-// PollEventWithTimeout - неблокирующий опрос событий с таймаутом
-func (t *TUI) PollEventWithTimeout(timeout time.Duration) tcell.Event {
-	// Используем канал для получения события с таймаутом
-	eventChan := make(chan tcell.Event, 1)
-	
-	go func() {
-		eventChan <- t.screen.PollEvent()
-	}()
-	
-	select {
-	case ev := <-eventChan:
-		return ev
-	case <-time.After(timeout):
-		return nil
-	}
-}
-
-// PollEvent - оригинальный блокирующий метод (для обратной совместимости)
 func (t *TUI) PollEvent() tcell.Event {
 	return t.screen.PollEvent()
 }
 
-// ... остальные методы без изменений ...
+func (t *TUI) Fini() {
+	t.screen.Fini()
+}
 
 func (t *TUI) renderLogo(startRow int, width int) int {
 	logo := []string{
@@ -136,8 +114,8 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 
 	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s", 
-			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"), 
+		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s",
+			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
 			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 15)
@@ -191,15 +169,15 @@ func (t *TUI) renderDisk(startRow int, width int, data interface{}) int {
 				if mountPoint == "/" {
 					mountPoint = "ROOT"
 				}
-				
-				row = t.printLine(row, 0, fmt.Sprintf("%s: %s (%s)", 
+
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s (%s)",
 					t.config.T("disk.filesystem"), d.Filesystem, devType), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-				
+
 				diskGraph := t.createCompactGraph(d.UsePercent, 15)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s %s %.1f%%",
 					t.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
-				
+
 				count++
 				if count < 3 {
 					row++
@@ -220,14 +198,14 @@ func (t *TUI) renderNetwork(startRow int, width int, data interface{}) int {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-				
+
 				activityGraph := t.createCompactGraph(netInfo.ActivityPercent, 15)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
 					"Activity", activityGraph, netInfo.ActivityPercent), tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
-				
+
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s↓ / %s↑",
 					"Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-				
+
 				count++
 				if count < 2 {
 					row++
@@ -302,10 +280,10 @@ func (t *TUI) createCompactGraph(percent float64, width int) string {
 	if percent > 100 {
 		percent = 100
 	}
-	
+
 	graph := ""
 	usedSegments := int(percent / (100.0 / float64(width)))
-	
+
 	for i := 0; i < width; i++ {
 		if i < usedSegments {
 			graph += "█"
@@ -329,12 +307,4 @@ func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
 		return "Virtual"
 	}
 	return "Disk"
-}
-
-func (t *TUI) Fini() {
-	t.screen.Fini()
-}
-
-func (t *TUI) Clear() {
-    t.screen.Clear()
 }
