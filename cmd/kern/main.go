@@ -166,7 +166,7 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 
 	// Каналы для управления
 	updateChan := make(chan map[string]interface{})
-	quitChan := make(chan bool)
+	quitChan := make(chan bool, 1) // буферизованный канал
 	
 	// Запускаем горутину для периодического сбора данных
 	go func() {
@@ -179,45 +179,49 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 		for {
 			select {
 			case <-ticker.C:
-				updateChan <- collectData(cfg)
+				select {
+				case updateChan <- collectData(cfg):
+					// данные отправлены
+				default:
+					// пропускаем обновление если канал занят
+				}
 			case <-quitChan:
 				return
 			}
 		}
 	}()
 
-	// Запускаем горутину для обработки событий
-	go func() {
-		for {
-			ev := tui.PollEvent()
-			if ev == nil {
-				continue
-			}
-			
+	// Основной цикл с неблокирующей обработкой событий
+	running := true
+	for running {
+		// Обработка событий с таймаутом
+		ev := tui.PollEventWithTimeout(100 * time.Millisecond)
+		if ev != nil {
 			switch e := ev.(type) {
 			case *tcell.EventKey:
 				if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC || 
 				   (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
-					quitChan <- true
-					return
+					running = false
+					break
 				}
-				// Убрали обновление при нажатии других клавиш
 			case *tcell.EventResize:
-				// При изменении размера экрана перерисовываем с текущими данными
 				tui.ForceRedraw()
 			}
 		}
-	}()
 
-	// Основной цикл рендеринга
-	for {
+		// Неблокирующее чтение из канала обновлений
 		select {
 		case results := <-updateChan:
-			// Обновляем данные на экране
 			tui.Render(results)
-		case <-quitChan:
-			return
+		default:
+			// нет новых данных - продолжаем
 		}
+	}
+
+	// Сигнализируем горутине о завершении
+	select {
+	case quitChan <- true:
+	default:
 	}
 }
 

@@ -110,6 +110,7 @@ func (t *TUI) PollEvent() tcell.Event {
 	return t.screen.PollEvent()
 }
 
+// ... остальные методы без изменений ...
 
 func (t *TUI) renderLogo(startRow int, width int) int {
 	logo := []string{
