@@ -216,7 +216,7 @@ func (t *TUI) renderHeader(row int, text string, width int) int {
 }
 
 func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	screenWidth, screenHeight := t.screen.Size()
+	_, screenHeight := t.screen.Size()
 	if row >= screenHeight {
 		return row
 	}
@@ -243,7 +243,7 @@ func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, wid
 }
 
 func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	screenWidth, screenHeight := t.screen.Size()
+	_, screenHeight := t.screen.Size()
 	if row >= screenHeight {
 		return
 	}
