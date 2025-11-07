@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
 	"github.com/karimkiniabulatov/kern/internal/cpu"
 	"github.com/karimkiniabulatov/kern/internal/disk"
