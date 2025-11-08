@@ -11,7 +11,7 @@ show_logo() {
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
 EOF
-    echo "kern v1.1.0 - System Monitoring Tool"
+    echo "kern v1.2.0 - System Monitoring Tool"
     echo -e "\033[0m"
 }
 
@@ -53,6 +53,20 @@ for tool in df lscpu free ip; do
         fi
     fi
 done
+
+# Check for GPU monitoring tools
+echo "Checking GPU monitoring capabilities..."
+if command -v nvidia-smi &> /dev/null; then
+    echo "✓ NVIDIA GPU monitoring available"
+else
+    echo "⚠ nvidia-smi not found (NVIDIA GPU monitoring disabled)"
+fi
+
+if command -v rocm-smi &> /dev/null; then
+    echo "✓ AMD GPU monitoring available"
+else
+    echo "⚠ rocm-smi not found (AMD GPU monitoring disabled)"
+fi
 
 # Update Go dependencies and install
 echo "Building kern..."
@@ -97,7 +111,7 @@ fi
 # Check where kern was installed
 KERN_PATH="$(go env GOPATH)/bin/kern"
 if [ -f "$KERN_PATH" ]; then
-    echo "kern installed successfully at: $KERN_PATH"
+    echo "kern v1.2.0 installed successfully at: $KERN_PATH"
     
     # Check if the path is in PATH
     if [[ ":$PATH:" != *":$(go env GOPATH)/bin:"* ]]; then
@@ -114,13 +128,14 @@ fi
 
 echo ""
 echo "Usage examples:"
-echo "  kern                       # Show memory and network (default)"
+echo "  kern                       # Show all system information"
 echo "  kern --cpu --mem           # Show only CPU and memory"
-echo "  kern --disk               # Show only disk information"
-echo "  kern --net                # Show only network information"
+echo "  kern --gpu --ai           # Show GPU and AI training info"
+echo "  kern --mining             # Show mining information"
 echo "  kern --refresh=5 -l ru    # 5 sec refresh with Russian interface"
 echo "  kern --detailed           # Show detailed CPU core information"
-echo "  kern -r 28126             # Start API server on port 28126"
+echo "  kern -r                    # Start API server on port 28126"
+echo "  kern -r 26001             # Start API server on custom port"
 echo "  kern --logo               # Show logo during monitoring"
 echo "  kern --help               # Show help"
 echo ""

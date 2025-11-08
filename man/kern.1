@@ -5,7 +5,7 @@ kern \- real-time system monitoring tool with TUI and REST API
 .B kern
 [\-acdhmnvg] [\-\-ai] [\-\-mining] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
 .B kern
-[\-\-download-lang \fICODE\fR] [\-\-list-languages]
+[\-\-api \fIURL\fR] [\-\-ssh \fIHOST\fR] [\-\-download-lang \fICODE\fR] [\-\-list-languages]
 .SH DESCRIPTION
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
@@ -13,7 +13,7 @@ about disk usage, CPU performance, memory utilization, network statistics,
 GPU monitoring, AI training processes, and cryptocurrency mining activity.
 It features a professional Terminal User Interface (TUI) with double buffering
 to eliminate screen flickering, support for multiple languages with automatic
-download, and remote monitoring via REST API.
+download, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
 .SH OPTIONS
 .TP
 .B \-a, \-\-all
@@ -58,6 +58,12 @@ Start remote API server on specified port (default: 28126).
 .B \-\-detailed
 Show detailed CPU core information (individual core usage).
 .TP
+.B \-\-api \fIURL\fR
+Monitor remote server via HTTP/HTTPS API.
+.TP
+.B \-\-ssh \fIHOST\fR
+Monitor remote server via SSH.
+.TP
 .B \-\-download-lang \fICODE\fR
 Download language pack for specified language code.
 .TP
@@ -77,6 +83,21 @@ Quit the application
 .TP
 .B Terminal Resize
 Interface automatically adapts to terminal size changes
+.SH REMOTE MONITORING
+.B kern
+supports multiple remote monitoring protocols:
+.TP
+.B HTTP/HTTPS API
+REST API accessible via HTTP or HTTPS (with TLS termination)
+.TP
+.B SSH
+Direct SSH execution or SSH tunneling
+.TP
+.B Local Network
+Access within local network segments
+.TP
+.B Global Internet
+Access via public IP with port forwarding
 .SH API
 When started with the
 .B \-r
@@ -116,6 +137,8 @@ Example usage:
 kern -r 28126
 .br
 curl http://localhost:28126/api/cpu
+.br
+kern --api http://192.168.1.100:28126
 .SH GPU MONITORING
 GPU monitoring requires:
 .IP \(bu 3
@@ -182,13 +205,19 @@ Start remote API server on default port 28126.
 .B kern \-r 26001
 Start remote API server on custom port 26001.
 .TP
-.B kern \-\-all \-r 26001
-Monitor all system resources with API on port 26001.
+.B kern \-\-api http://192.168.1.100:28126
+Monitor remote server via HTTP API.
 .TP
-.B kern \-\-download-lang fr
+.B kern \-\-api https://monitoring.example.com:28126
+Monitor remote server via HTTPS API.
+.TP
+.B kern \-\-ssh user@remote\-host
+Monitor remote server via SSH.
+.TP
+.B kern \-\-download\-lang fr
 Download French language pack.
 .TP
-.B kern \-\-list-languages
+.B kern \-\-list\-languages
 List all supported languages.
 .TP
 .B kern \-\-logo
