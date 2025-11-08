@@ -4,9 +4,18 @@ set -e
 
 echo "Testing kern system monitor..."
 
+# Check if scripts are executable
+if [ ! -x "./scripts/test.sh" ]; then
+    echo "Setting executable permissions..."
+    chmod +x scripts/*.sh
+fi
+
 # Build the project
 echo "Building kern..."
 go build -o kern-test ./cmd/kern
+
+# Set executable permission for test binary
+chmod +x kern-test
 
 # Test basic functionality
 echo "Testing disk information..."

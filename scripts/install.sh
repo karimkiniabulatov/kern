@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# Set executable permissions for all scripts
+echo "Setting executable permissions for scripts..."
+chmod +x scripts/*.sh 2>/dev/null || echo "Warning: Could not set script permissions"
+
 show_logo() {
     echo -e "\033[1;36m"
     cat << "EOF"
@@ -107,6 +111,10 @@ if [ -d "i18n" ]; then
 else
     echo "No i18n directory found - skipping language files installation"
 fi
+
+# Ensure script permissions are set
+echo "Ensuring script permissions..."
+chmod +x scripts/*.sh
 
 # Check where kern was installed
 KERN_PATH="$(go env GOPATH)/bin/kern"

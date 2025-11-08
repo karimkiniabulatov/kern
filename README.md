@@ -38,6 +38,25 @@ cd kern
 chmod +x ./scripts/install.sh
 ./scripts/install.sh
 
+-----------------------------------------------------------------------------
+
+### Troubleshooting
+
+If you encounter permission issues:
+
+```bash
+# Make all scripts executable
+chmod +x scripts/*.sh
+
+# Or run the fix permissions script
+./scripts/fix-permissions.sh
+
+# If scripts still can't run, try:
+bash scripts/install.sh
+bash scripts/test.sh
+
+-----------------------------------------------------------------------------
+
 Basic Usage
 
 kern                    # Show all system information (default)

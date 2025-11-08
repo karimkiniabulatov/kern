@@ -3,9 +3,18 @@ set -e
 
 echo "Testing kern API..."
 
+# Check if scripts are executable
+if [ ! -x "./scripts/test_api.sh" ]; then
+    echo "Setting executable permissions..."
+    chmod +x scripts/*.sh
+fi
+
 # Build the project
 echo "Building kern..."
 go build -o kern-test ./cmd/kern
+
+# Set executable permission
+chmod +x kern-test
 
 # Start kern in API mode in the background
 echo "Starting API server on port 28126..."
@@ -35,15 +44,27 @@ echo "4. Testing /api/net..."
 curl -s http://localhost:28126/api/net | jq . && echo "✓ Network API test passed"
 
 echo ""
-echo "5. Testing /api/system..."
+echo "5. Testing /api/gpu..."
+curl -s http://localhost:28126/api/gpu | jq . && echo "✓ GPU API test passed"
+
+echo ""
+echo "6. Testing /api/ai..."
+curl -s http://localhost:28126/api/ai | jq . && echo "✓ AI API test passed"
+
+echo ""
+echo "7. Testing /api/mining..."
+curl -s http://localhost:28126/api/mining | jq . && echo "✓ Mining API test passed"
+
+echo ""
+echo "8. Testing /api/system..."
 curl -s http://localhost:28126/api/system | jq . && echo "✓ System API test passed"
 
 echo ""
-echo "6. Testing /health..."
+echo "9. Testing /health..."
 curl -s http://localhost:28126/health | jq . && echo "✓ Health check passed"
 
 echo ""
-echo "7. Testing root endpoint..."
+echo "10. Testing root endpoint..."
 curl -s http://localhost:28126/ | jq . && echo "✓ Root endpoint passed"
 
 # Stop kern
