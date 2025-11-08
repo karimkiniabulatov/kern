@@ -1,36 +1,36 @@
 {
-  "language": "മലയാളം",
+  "language": "Malayalam (മലയാളം)", 
   "language_code": "ml",
   "translations": {
     "common": {
-      "title": "kern - സിസ്റ്റം മോണിറ്ററിംഗ്",
+      "title": "kern - സിസ്റ്റം മോണിറ്റർ",
       "refresh": "റിഫ്രഷ്",
       "seconds": "സെക്കൻഡ്",
       "error": "പിശക്",
       "unknown": "അജ്ഞാതം",
       "total": "ആകെ",
-      "used": "ഉപയോഗിച്ചു",
+      "used": "ഉപയോഗിച്ച", 
       "free": "സ്വതന്ത്രം",
-      "available": "ലഭ്യമാണ്",
-      "status": "സ്റ്റാറ്റസ്",
-      "up": "ഓൺ",
-      "down": "ഓഫ്"
+      "available": "ലഭ്യമായ",
+      "status": "സ്ഥിതി",
+      "up": "ഓണാണ്",
+      "down": "ഓഫാണ്"
     },
     "cpu": {
-      "title": "പ്രോസസർ വിവരം",
+      "title": "CPU വിവരം",
       "model": "മോഡൽ",
       "cores": "കോറുകൾ",
       "threads": "ത്രെഡുകൾ",
       "usage": "ഉപയോഗം",
-      "frequency": "ഫ്രീക്വൻസി",
+      "frequency": "ആവൃത്തി", 
       "load": "ലോഡ്",
       "load_1min": "1 മിനിറ്റ്",
-      "load_5min": "5 മിനിറ്റ്", 
+      "load_5min": "5 മിനിറ്റ്",
       "load_15min": "15 മിനിറ്റ്",
       "load_average": "ശരാശരി ലോഡ്"
     },
     "memory": {
-      "title": "മെമ്മറി വിവരം",
+      "title": "മെമ്മറി വിവരം", 
       "ram": "RAM",
       "swap": "സ്വാപ്പ്",
       "physical": "ഫിസിക്കൽ മെമ്മറി",
@@ -39,10 +39,10 @@
     "disk": {
       "title": "ഡിസ്ക് വിവരം",
       "filesystem": "ഫയൽ സിസ്റ്റം",
-      "size": "സൈസ്",
-      "mounted": "മൗണ്ട് പോയിന്റ്",
+      "size": "വലിപ്പം",
+      "mounted": "മൗണ്ട് ചെയ്തത്", 
       "usage": "ഉപയോഗം",
-      "storage": "സ്റ്റോറേജ്"
+      "storage": "സംഭരണം"
     },
     "network": {
       "title": "നെറ്റ്വർക്ക് വിവരം",
@@ -54,22 +54,64 @@
       "errors": "പിശകുകൾ",
       "network_interfaces": "നെറ്റ്വർക്ക് ഇന്റർഫേസുകൾ"
     },
+    "gpu": {
+      "title": "GPU വിവരം",
+      "model": "മോഡൽ",
+      "driver": "ഡ്രൈവർ",
+      "temperature": "താപനില",
+      "memory": "മെമ്മറി",
+      "utilization": "ഉപയോഗം",
+      "power": "പവർ",
+      "clock_core": "കോർ ക്ലോക്ക്",
+      "clock_memory": "മെമ്മറി ക്ലോക്ക്",
+      "fan_speed": "ഫാൻ സ്പീഡ്"
+    },
+    "ai": {
+      "title": "AI പരിശീലനം",
+      "framework": "ഫ്രെയിംവർക്ക്",
+      "processes": "പ്രക്രിയകൾ",
+      "vram": "VRAM",
+      "model": "മോഡൽ",
+      "batch_size": "ബാച്ച് വലിപ്പം",
+      "throughput": "ത്രൂപുട്ട്",
+      "epoch": "യുഗം",
+      "loss": "നഷ്ടം",
+      "accuracy": "കൃത്യത",
+      "training_time": "പരിശീലന സമയം",
+      "no_training": "AI പരിശീലനം കണ്ടെത്തിയിട്ടില്ല"
+    },
+    "mining": {
+      "title": "മൈനിംഗ് വിവരം",
+      "algorithm": "അൽഗോരിതം",
+      "hashrate": "ഹാഷ് റേറ്റ്",
+      "shares": "ഷെയറുകൾ",
+      "temperature": "താപനില",
+      "power": "പവർ",
+      "efficiency": "കാര്യക്ഷമത",
+      "uptime": "അപ്പ്‌ടൈം",
+      "revenue_24h": "24മണിക്കൂർ വരുമാനം",
+      "pool": "പൂൾ",
+      "not_detected": "മൈനിംഗ് പ്രവർത്തനം കണ്ടെത്തിയിട്ടില്ല"
+    },
     "ui": {
       "histogram": "ഹിസ്റ്റോഗ്രാം",
-      "vertical": "ലംബമായ",
-      "horizontal": "തിരശ്ചീനമായ",
+      "vertical": "ലംബ", 
+      "horizontal": "തിരശ്ചീന",
       "loading": "ലോഡ് ചെയ്യുന്നു...",
       "no_data": "ഡാറ്റ ഇല്ല",
       "percent": "ശതമാനം"
     },
     "commands": {
       "help": "സഹായം",
-      "version": "വേർഷൻ",
+      "version": "പതിപ്പ്",
       "all": "എല്ലാ വിവരങ്ങളും",
       "disk_only": "ഡിസ്ക് മാത്രം",
-      "cpu_only": "പ്രോസസർ മാത്രം",
-      "memory_only": "മെമ്മറി മാത്രം",
+      "cpu_only": "CPU മാത്രം",
+      "memory_only": "മെമ്മറി മാത്രം", 
       "network_only": "നെറ്റ്വർക്ക് മാത്രം",
+      "gpu_only": "GPU മാത്രം",
+      "ai_only": "AI പരിശീലനം മാത്രം",
+      "mining_only": "മൈനിംഗ് മാത്രം",
       "refresh_rate": "റിഫ്രഷ് റേറ്റ്",
       "language": "ഭാഷ",
       "remote": "റിമോട്ട് മോഡ്",
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "കമാൻഡ് കണ്ടെത്തിയില്ല: %s",
       "invalid_port": "അസാധുവായ പോർട്ട്: %d",
-      "invalid_refresh": "അസാധുവായ റിഫ്രഷ് റേറ്റ്: %d",
-      "config_load_failed": "കോൺഫിഗറേഷൻ ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല",
-      "module_failed": "മൊഡ്യൂൾ %s പിശക്: %v"
+      "invalid_refresh": "അസാധുവായ റിഫ്രഷ് ഇടവേള: %d", 
+      "config_load_failed": "കോൺഫിഗറേഷൻ ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു",
+      "module_failed": "മൊഡ്യൂൾ %s പരാജയപ്പെട്ടു: %v",
+      "nvidia_smi_not_found": "nvidia-smi കണ്ടെത്തിയില്ല. GPU മോണിറ്ററിംഗിന് NVIDIA ഡ്രൈവറുകൾ ആവശ്യമാണ്",
+      "rocm_smi_not_found": "rocm-smi കണ്ടെത്തിയില്ല. AMD GPU മോണിറ്ററിംഗിന് ROCm ആവശ്യമാണ്"
     },
     "status": {
       "monitoring_started": "മോണിറ്ററിംഗ് ആരംഭിച്ചു",
-      "updating_every": "ഓരോ %d സെക്കൻഡിലും അപ്ഡേറ്റ് ചെയ്യുന്നു",
+      "updating_every": "ഓരോ %d സെക്കൻഡിലും അപ്‌ഡേറ്റ് ചെയ്യുന്നു", 
       "press_ctrl_c": "പുറത്ത് കടക്കാൻ Ctrl+C അമർത്തുക",
-      "remote_mode": "പോർട്ട് %d-ൽ റിമോട്ട് മോഡ്"
+      "remote_mode": "പോർട്ട് %d-ൽ റിമോട്ട് മോഡ്",
+      "gpu_detected": "GPU കണ്ടെത്തി: %s",
+      "ai_training_detected": "AI പരിശീലന പ്രക്രിയകൾ കണ്ടെത്തി: %d",
+      "mining_detected": "മൈനിംഗ് പ്രവർത്തനം കണ്ടെത്തി: %s"
     }
   }
 }

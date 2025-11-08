@@ -1,36 +1,36 @@
 {
-  "language": "日本語",
+  "language": "Japanese (日本語)", 
   "language_code": "ja",
   "translations": {
     "common": {
-      "title": "kern - システム監視",
+      "title": "kern - システムモニター",
       "refresh": "更新",
       "seconds": "秒",
       "error": "エラー",
       "unknown": "不明",
       "total": "合計",
-      "used": "使用済み",
+      "used": "使用済み", 
       "free": "空き",
       "available": "利用可能",
-      "status": "ステータス",
-      "up": "オン",
-      "down": "オフ"
+      "status": "状態",
+      "up": "オンライン",
+      "down": "オフライン"
     },
     "cpu": {
-      "title": "プロセッサ情報",
+      "title": "CPU情報",
       "model": "モデル",
       "cores": "コア数",
       "threads": "スレッド数",
       "usage": "使用率",
-      "frequency": "周波数",
+      "frequency": "周波数", 
       "load": "負荷",
       "load_1min": "1分",
-      "load_5min": "5分", 
+      "load_5min": "5分",
       "load_15min": "15分",
       "load_average": "平均負荷"
     },
     "memory": {
-      "title": "メモリ情報",
+      "title": "メモリ情報", 
       "ram": "RAM",
       "swap": "スワップ",
       "physical": "物理メモリ",
@@ -40,7 +40,7 @@
       "title": "ディスク情報",
       "filesystem": "ファイルシステム",
       "size": "サイズ",
-      "mounted": "マウントポイント",
+      "mounted": "マウント先", 
       "usage": "使用率",
       "storage": "ストレージ"
     },
@@ -54,9 +54,48 @@
       "errors": "エラー",
       "network_interfaces": "ネットワークインターフェース"
     },
+    "gpu": {
+      "title": "GPU情報",
+      "model": "モデル",
+      "driver": "ドライバー",
+      "temperature": "温度",
+      "memory": "メモリ",
+      "utilization": "使用率",
+      "power": "電力",
+      "clock_core": "コアクロック",
+      "clock_memory": "メモリクロック",
+      "fan_speed": "ファン速度"
+    },
+    "ai": {
+      "title": "AIトレーニング",
+      "framework": "フレームワーク",
+      "processes": "プロセス",
+      "vram": "VRAM",
+      "model": "モデル",
+      "batch_size": "バッチサイズ",
+      "throughput": "スループット",
+      "epoch": "エポック",
+      "loss": "損失",
+      "accuracy": "精度",
+      "training_time": "トレーニング時間",
+      "no_training": "AIトレーニングが検出されません"
+    },
+    "mining": {
+      "title": "マイニング情報",
+      "algorithm": "アルゴリズム",
+      "hashrate": "ハッシュレート",
+      "shares": "シェア",
+      "temperature": "温度",
+      "power": "電力",
+      "efficiency": "効率",
+      "uptime": "稼働時間",
+      "revenue_24h": "24時間収益",
+      "pool": "プール",
+      "not_detected": "マイニング活動が検出されません"
+    },
     "ui": {
       "histogram": "ヒストグラム",
-      "vertical": "垂直",
+      "vertical": "垂直", 
       "horizontal": "水平",
       "loading": "読み込み中...",
       "no_data": "データなし",
@@ -65,28 +104,36 @@
     "commands": {
       "help": "ヘルプ",
       "version": "バージョン",
-      "all": "全情報",
+      "all": "全ての情報",
       "disk_only": "ディスクのみ",
-      "cpu_only": "プロセッサのみ",
-      "memory_only": "メモリのみ",
+      "cpu_only": "CPUのみ",
+      "memory_only": "メモリのみ", 
       "network_only": "ネットワークのみ",
-      "refresh_rate": "更新間隔",
+      "gpu_only": "GPUのみ",
+      "ai_only": "AIトレーニングのみ",
+      "mining_only": "マイニングのみ",
+      "refresh_rate": "更新レート",
       "language": "言語",
       "remote": "リモートモード",
       "port": "ポート"
     },
     "errors": {
-      "command_not_found": "コマンドが見つかりません：%s",
-      "invalid_port": "無効なポート：%d",
-      "invalid_refresh": "無効な更新間隔：%d",
+      "command_not_found": "コマンドが見つかりません: %s",
+      "invalid_port": "無効なポート: %d",
+      "invalid_refresh": "無効な更新間隔: %d", 
       "config_load_failed": "設定の読み込みに失敗しました",
-      "module_failed": "モジュール %s エラー：%v"
+      "module_failed": "モジュール %s が失敗しました: %v",
+      "nvidia_smi_not_found": "nvidia-smi が見つかりません。GPU監視にはNVIDIAドライバーが必要です",
+      "rocm_smi_not_found": "rocm-smi が見つかりません。AMD GPU監視にはROCmが必要です"
     },
     "status": {
       "monitoring_started": "監視を開始しました",
-      "updating_every": "%d 秒ごとに更新",
-      "press_ctrl_c": "Ctrl+Cで終了",
-      "remote_mode": "ポート %d でリモートモード"
+      "updating_every": "%d 秒ごとに更新", 
+      "press_ctrl_c": "Ctrl+Cを押して終了",
+      "remote_mode": "リモートモード、ポート %d",
+      "gpu_detected": "GPUを検出: %s",
+      "ai_training_detected": "AIトレーニングプロセスを検出: %d",
+      "mining_detected": "マイニング活動を検出: %s"
     }
   }
 }

@@ -1,15 +1,15 @@
 {
-  "language": "मराठी",
+  "language": "Marathi (मराठी)", 
   "language_code": "mr",
   "translations": {
     "common": {
-      "title": "kern - सिस्टम मॉनिटरिंग",
+      "title": "kern - सिस्टम मॉनिटर",
       "refresh": "रिफ्रेश",
       "seconds": "सेकंद",
       "error": "त्रुटी",
       "unknown": "अज्ञात",
       "total": "एकूण",
-      "used": "वापरले",
+      "used": "वापरले", 
       "free": "मोफत",
       "available": "उपलब्ध",
       "status": "स्थिती",
@@ -17,30 +17,30 @@
       "down": "बंद"
     },
     "cpu": {
-      "title": "प्रोसेसर माहिती",
+      "title": "CPU माहिती",
       "model": "मॉडेल",
       "cores": "कोर",
       "threads": "थ्रेड",
       "usage": "वापर",
-      "frequency": "फ्रिक्वेन्सी",
+      "frequency": "वारंवारता", 
       "load": "लोड",
       "load_1min": "1 मिनिट",
-      "load_5min": "5 मिनिट", 
+      "load_5min": "5 मिनिट",
       "load_15min": "15 मिनिट",
       "load_average": "सरासरी लोड"
     },
     "memory": {
-      "title": "मेमरी माहिती",
+      "title": "मेमरी माहिती", 
       "ram": "RAM",
       "swap": "स्वॅप",
-      "physical": "फिजिकल मेमरी",
+      "physical": "भौतिक मेमरी",
       "virtual": "व्हर्च्युअल मेमरी"
     },
     "disk": {
       "title": "डिस्क माहिती",
       "filesystem": "फाइल सिस्टम",
       "size": "आकार",
-      "mounted": "माउंट पॉइंट",
+      "mounted": "माउंटेड ऑन", 
       "usage": "वापर",
       "storage": "स्टोरेज"
     },
@@ -54,9 +54,48 @@
       "errors": "त्रुटी",
       "network_interfaces": "नेटवर्क इंटरफेस"
     },
+    "gpu": {
+      "title": "GPU माहिती",
+      "model": "मॉडेल",
+      "driver": "ड्रायव्हर",
+      "temperature": "तापमान",
+      "memory": "मेमरी",
+      "utilization": "वापर",
+      "power": "पॉवर",
+      "clock_core": "कोर क्लॉक",
+      "clock_memory": "मेमरी क्लॉक",
+      "fan_speed": "फॅन स्पीड"
+    },
+    "ai": {
+      "title": "AI ट्रेनिंग",
+      "framework": "फ्रेमवर्क",
+      "processes": "प्रक्रिया",
+      "vram": "VRAM",
+      "model": "मॉडेल",
+      "batch_size": "बॅच साइझ",
+      "throughput": "थ्रूपुट",
+      "epoch": "युग",
+      "loss": "लॉस",
+      "accuracy": "अचूकता",
+      "training_time": "ट्रेनिंग वेळ",
+      "no_training": "AI ट्रेनिंग आढळली नाही"
+    },
+    "mining": {
+      "title": "मायनिंग माहिती",
+      "algorithm": "अल्गोरिदम",
+      "hashrate": "हॅश रेट",
+      "shares": "शेअर",
+      "temperature": "तापमान",
+      "power": "पॉवर",
+      "efficiency": "कार्यक्षमता",
+      "uptime": "अपटाइम",
+      "revenue_24h": "24तास उत्पन्न",
+      "pool": "पूल",
+      "not_detected": "मायनिंग क्रियाकलाप आढळले नाही"
+    },
     "ui": {
       "histogram": "हिस्टोग्राम",
-      "vertical": "उभी",
+      "vertical": "उभी", 
       "horizontal": "आडवी",
       "loading": "लोड होत आहे...",
       "no_data": "डेटा नाही",
@@ -64,12 +103,15 @@
     },
     "commands": {
       "help": "मदत",
-      "version": "वर्जन",
+      "version": "आवृत्ती",
       "all": "सर्व माहिती",
       "disk_only": "फक्त डिस्क",
-      "cpu_only": "फक्त प्रोसेसर",
-      "memory_only": "फक्त मेमरी",
+      "cpu_only": "फक्त CPU",
+      "memory_only": "फक्त मेमरी", 
       "network_only": "फक्त नेटवर्क",
+      "gpu_only": "फक्त GPU",
+      "ai_only": "फक्त AI ट्रेनिंग",
+      "mining_only": "फक्त मायनिंग",
       "refresh_rate": "रिफ्रेश रेट",
       "language": "भाषा",
       "remote": "रिमोट मोड",
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "कमांड सापडली नाही: %s",
       "invalid_port": "अवैध पोर्ट: %d",
-      "invalid_refresh": "अवैध रिफ्रेश रेट: %d",
-      "config_load_failed": "कॉन्फिगरेशन लोड करण्यात अयशस्वी",
-      "module_failed": "मॉड्यूल %s त्रुटी: %v"
+      "invalid_refresh": "अवैध रिफ्रेश मध्यांतर: %d", 
+      "config_load_failed": "कॉन्फिग लोड होऊ शकली नाही",
+      "module_failed": "मॉड्यूल %s अयशस्वी: %v",
+      "nvidia_smi_not_found": "nvidia-smi सापडले नाही. GPU मॉनिटरिंगसाठी NVIDIA ड्रायव्हर आवश्यक",
+      "rocm_smi_not_found": "rocm-smi सापडले नाही. AMD GPU मॉनिटरिंगसाठी ROCm आवश्यक"
     },
     "status": {
       "monitoring_started": "मॉनिटरिंग सुरू झाले",
-      "updating_every": "दर %d सेकंदाने अपडेट होते",
+      "updating_every": "दर %d सेकंदांनी अपडेट होते", 
       "press_ctrl_c": "बाहेर पडण्यासाठी Ctrl+C दाबा",
-      "remote_mode": "पोर्ट %d वर रिमोट मोड"
+      "remote_mode": "पोर्ट %d वर रिमोट मोड",
+      "gpu_detected": "GPU आढळले: %s",
+      "ai_training_detected": "AI ट्रेनिंग प्रक्रिया आढळल्या: %d",
+      "mining_detected": "मायनिंग क्रियाकलाप आढळले: %s"
     }
   }
 }

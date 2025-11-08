@@ -1,36 +1,36 @@
 {
-  "language": "Moldovenească",
+  "language": "Moldovan (Moldovenească)", 
   "language_code": "mo",
   "translations": {
     "common": {
-      "title": "kern - Monitorizare Sistem",
+      "title": "kern - Monitor de Sistem",
       "refresh": "Reîmprospătați",
       "seconds": "sec",
       "error": "Eroare",
       "unknown": "Necunoscut",
       "total": "Total",
-      "used": "Utilizat",
+      "used": "Folosit", 
       "free": "Liber",
       "available": "Disponibil",
       "status": "Stare",
-      "up": "PORNIT",
-      "down": "OPRIT"
+      "up": "ACTIV",
+      "down": "INACTIV"
     },
     "cpu": {
-      "title": "Informații Procesor",
+      "title": "Informații CPU",
       "model": "Model",
       "cores": "Nuclee",
       "threads": "Fire",
       "usage": "Utilizare",
-      "frequency": "Frecvență",
+      "frequency": "Frecvență", 
       "load": "Încărcare",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Încărcare medie"
     },
     "memory": {
-      "title": "Informații Memorie",
+      "title": "Informații Memorie", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memorie fizică",
@@ -40,7 +40,7 @@
       "title": "Informații Disc",
       "filesystem": "Sistem de fișiere",
       "size": "Dimensiune",
-      "mounted": "Punct de montare",
+      "mounted": "Montat pe", 
       "usage": "Utilizare",
       "storage": "Stocare"
     },
@@ -54,9 +54,48 @@
       "errors": "Erori",
       "network_interfaces": "Interfețe de rețea"
     },
+    "gpu": {
+      "title": "Informații GPU",
+      "model": "Model",
+      "driver": "Driver",
+      "temperature": "Temperatură",
+      "memory": "Memorie",
+      "utilization": "Utilizare",
+      "power": "Putere",
+      "clock_core": "Frecvență nucleu",
+      "clock_memory": "Frecvență memorie",
+      "fan_speed": "Viteză ventilator"
+    },
+    "ai": {
+      "title": "Antrenament AI",
+      "framework": "Framework",
+      "processes": "Procese",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Dimensiune lot",
+      "throughput": "Debit",
+      "epoch": "Epocă",
+      "loss": "Pierdere",
+      "accuracy": "Acuratețe",
+      "training_time": "Timp antrenament",
+      "no_training": "Nu s-a detectat antrenament AI"
+    },
+    "mining": {
+      "title": "Informații Minare",
+      "algorithm": "Algoritm",
+      "hashrate": "Rată hash",
+      "shares": "Acțiuni",
+      "temperature": "Temperatură",
+      "power": "Putere",
+      "efficiency": "Eficiență",
+      "uptime": "Timp funcționare",
+      "revenue_24h": "Venit 24h",
+      "pool": "Pool",
+      "not_detected": "Nu s-a detectat activitate de minare"
+    },
     "ui": {
       "histogram": "Histogramă",
-      "vertical": "Vertical",
+      "vertical": "Vertical", 
       "horizontal": "Orizontal",
       "loading": "Se încarcă...",
       "no_data": "Nu există date",
@@ -67,26 +106,34 @@
       "version": "Versiune",
       "all": "Toate informațiile",
       "disk_only": "Doar disc",
-      "cpu_only": "Doar procesor",
-      "memory_only": "Doar memorie",
+      "cpu_only": "Doar CPU",
+      "memory_only": "Doar memorie", 
       "network_only": "Doar rețea",
-      "refresh_rate": "Interval de reîmprospătare",
+      "gpu_only": "Doar GPU",
+      "ai_only": "Doar antrenament AI",
+      "mining_only": "Doar minare",
+      "refresh_rate": "Rată reîmprospătare",
       "language": "Limbă",
-      "remote": "Mod la distanță",
+      "remote": "Mod remote",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Comandă negăsită: %s",
       "invalid_port": "Port invalid: %d",
-      "invalid_refresh": "Interval de reîmprospătare invalid: %d",
+      "invalid_refresh": "Interval reîmprospătare invalid: %d", 
       "config_load_failed": "Nu s-a putut încărca configurația",
-      "module_failed": "Eroare modul %s: %v"
+      "module_failed": "Modulul %s a eșuat: %v",
+      "nvidia_smi_not_found": "nvidia-smi negăsit. Monitorizarea GPU necesită drivere NVIDIA",
+      "rocm_smi_not_found": "rocm-smi negăsit. Monitorizarea AMD GPU necesită ROCm"
     },
     "status": {
       "monitoring_started": "Monitorizarea a început",
-      "updating_every": "Se actualizează la fiecare %d secunde",
+      "updating_every": "Se actualizează la fiecare %d secunde", 
       "press_ctrl_c": "Apăsați Ctrl+C pentru a ieși",
-      "remote_mode": "Mod la distanță pe portul %d"
+      "remote_mode": "Mod remote pe portul %d",
+      "gpu_detected": "GPU detectat: %s",
+      "ai_training_detected": "Procese de antrenament AI detectate: %d",
+      "mining_detected": "Activitate de minare detectată: %s"
     }
   }
 }

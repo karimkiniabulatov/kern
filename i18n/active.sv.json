@@ -1,38 +1,38 @@
 {
-  "language": "Svenska",
+  "language": "Swedish (Svenska)", 
   "language_code": "sv",
   "translations": {
     "common": {
-      "title": "kern - Systemövervakning",
+      "title": "kern - Systemövervakare",
       "refresh": "Uppdatera",
       "seconds": "sek",
       "error": "Fel",
       "unknown": "Okänt",
       "total": "Totalt",
-      "used": "Använt",
+      "used": "Använt", 
       "free": "Ledigt",
       "available": "Tillgängligt",
       "status": "Status",
-      "up": "PÅ",
-      "down": "AV"
+      "up": "UPP",
+      "down": "NER"
     },
     "cpu": {
-      "title": "Processorinformation",
+      "title": "CPU-information",
       "model": "Modell",
       "cores": "Kärnor",
       "threads": "Trådar",
       "usage": "Användning",
-      "frequency": "Frekvens",
+      "frequency": "Frekvens", 
       "load": "Belastning",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Genomsnittlig belastning"
     },
     "memory": {
-      "title": "Minnesinformation",
+      "title": "Minneinformation", 
       "ram": "RAM",
-      "swap": "Swap",
+      "swap": "Växlingsminne",
       "physical": "Fysiskt minne",
       "virtual": "Virtuellt minne"
     },
@@ -40,7 +40,7 @@
       "title": "Diskinformation",
       "filesystem": "Filsystem",
       "size": "Storlek",
-      "mounted": "Monteringspunkt",
+      "mounted": "Monterad på", 
       "usage": "Användning",
       "storage": "Lagring"
     },
@@ -54,9 +54,48 @@
       "errors": "Fel",
       "network_interfaces": "Nätverksgränssnitt"
     },
+    "gpu": {
+      "title": "GPU-information",
+      "model": "Modell",
+      "driver": "Drivrutin",
+      "temperature": "Temperatur",
+      "memory": "Minne",
+      "utilization": "Utnyttjande",
+      "power": "Effekt",
+      "clock_core": "Kärnklocka",
+      "clock_memory": "Minnesklocka",
+      "fan_speed": "Fläktfart"
+    },
+    "ai": {
+      "title": "AI-träning",
+      "framework": "Ramverk",
+      "processes": "Processer",
+      "vram": "VRAM",
+      "model": "Modell",
+      "batch_size": "Batchstorlek",
+      "throughput": "Genomströmning",
+      "epoch": "Epok",
+      "loss": "Förlust",
+      "accuracy": "Noggrannhet",
+      "training_time": "Träningstid",
+      "no_training": "Ingen AI-träning upptäckt"
+    },
+    "mining": {
+      "title": "Mineringsinformation",
+      "algorithm": "Algoritm",
+      "hashrate": "Hashhastighet",
+      "shares": "Andelar",
+      "temperature": "Temperatur",
+      "power": "Effekt",
+      "efficiency": "Effektivitet",
+      "uptime": "Upptid",
+      "revenue_24h": "24h intäkt",
+      "pool": "Pool",
+      "not_detected": "Ingen mineringsaktivitet upptäckt"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Vertikal",
+      "vertical": "Vertikal", 
       "horizontal": "Horisontell",
       "loading": "Laddar...",
       "no_data": "Ingen data",
@@ -67,26 +106,34 @@
       "version": "Version",
       "all": "All information",
       "disk_only": "Endast disk",
-      "cpu_only": "Endast processor",
-      "memory_only": "Endast minne",
+      "cpu_only": "Endast CPU",
+      "memory_only": "Endast minne", 
       "network_only": "Endast nätverk",
-      "refresh_rate": "Uppdateringsintervall",
+      "gpu_only": "Endast GPU",
+      "ai_only": "Endast AI-träning",
+      "mining_only": "Endast mining",
+      "refresh_rate": "Uppdateringsfrekvens",
       "language": "Språk",
       "remote": "Fjärrläge",
       "port": "Port"
     },
     "errors": {
-      "command_not_found": "Kommandot hittades inte: %s",
+      "command_not_found": "Kommando inte funnet: %s",
       "invalid_port": "Ogiltig port: %d",
-      "invalid_refresh": "Ogiltigt uppdateringsintervall: %d",
+      "invalid_refresh": "Ogiltigt uppdateringsintervall: %d", 
       "config_load_failed": "Kunde inte ladda konfiguration",
-      "module_failed": "Modul %s fel: %v"
+      "module_failed": "Modul %s misslyckades: %v",
+      "nvidia_smi_not_found": "nvidia-smi inte funnet. GPU-övervakning kräver NVIDIA-drivrutiner",
+      "rocm_smi_not_found": "rocm-smi inte funnet. AMD GPU-övervakning kräver ROCm"
     },
     "status": {
       "monitoring_started": "Övervakning startad",
-      "updating_every": "Uppdaterar var %d:e sekund",
+      "updating_every": "Uppdaterar var %d sekund", 
       "press_ctrl_c": "Tryck på Ctrl+C för att avsluta",
-      "remote_mode": "Fjärrläge på port %d"
+      "remote_mode": "Fjärrläge på port %d",
+      "gpu_detected": "GPU upptäckt: %s",
+      "ai_training_detected": "AI-träningsprocesser upptäckta: %d",
+      "mining_detected": "Mineringsaktivitet upptäckt: %s"
     }
   }
 }

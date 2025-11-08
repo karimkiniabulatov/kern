@@ -1,0 +1,139 @@
+{
+  "language": "Chuvash (Чӑвашла)", 
+  "language_code": "cv",
+  "translations": {
+    "common": {
+      "title": "kern - Системăна тĕрĕслесси",
+      "refresh": "Çĕнет",
+      "seconds": "сек",
+      "error": "Йăнăш",
+      "unknown": "Паллах мар",
+      "total": "Пĕтĕмпе",
+      "used": "Усă курнă", 
+      "free": "Ирĕк",
+      "available": "Лайăх",
+      "status": "Статус",
+      "up": "ĔÇЛЕКЕН",
+      "down": "ĔÇЛЕМЕКЕН"
+    },
+    "cpu": {
+      "title": "CPU çинчен хыпар",
+      "model": "Модель",
+      "cores": "Ядро",
+      "threads": "Çип",
+      "usage": "Усă курни",
+      "frequency": "Частота", 
+      "load": "Çӳкĕм",
+      "load_1min": "1 мин",
+      "load_5min": "5 мин",
+      "load_15min": "15 мин",
+      "load_average": "Вăтам çӳкĕм"
+    },
+    "memory": {
+      "title": "Асту çинчен хыпар", 
+      "ram": "RAM",
+      "swap": "Своп",
+      "physical": "Физика асти",
+      "virtual": "Виртуал асту"
+    },
+    "disk": {
+      "title": "Диск çинчен хыпар",
+      "filesystem": "Файл системи",
+      "size": "Кăшăл",
+      "mounted": "Лартнă", 
+      "usage": "Усă курни",
+      "storage": "Хранилище"
+    },
+    "network": {
+      "title": "Сеть çинчен хыпар",
+      "interface": "Интерфейс",
+      "received": "Илнĕ",
+      "sent": "Ярнă",
+      "bytes": "байт",
+      "packets": "пакет",
+      "errors": "Йăнăшсем",
+      "network_interfaces": "Сеть интерфейсĕсем"
+    },
+    "gpu": {
+      "title": "GPU çинчен хыпар",
+      "model": "Модель",
+      "driver": "Драйвер",
+      "temperature": "Температура",
+      "memory": "Асту",
+      "utilization": "Усă курни",
+      "power": "Вăй",
+      "clock_core": "Ядро такчĕ",
+      "clock_memory": "Асту такчĕ",
+      "fan_speed": "Вентилятор хăвăртлăхĕ"
+    },
+    "ai": {
+      "title": "AI вĕренӳ",
+      "framework": "Фреймворк",
+      "processes": "Процессем",
+      "vram": "VRAM",
+      "model": "Модель",
+      "batch_size": "Парти калăпĕ",
+      "throughput": "Пропуск способноççи",
+      "epoch": "Эпоха",
+      "loss": "Çухату",
+      "accuracy": "Тĕрĕслĕх",
+      "training_time": "Вĕренӳ вăхăчĕ",
+      "no_training": "AI вĕренӳ тупăнмарĕ"
+    },
+    "mining": {
+      "title": "Майнинг çинчен хыпар",
+      "algorithm": "Алгоритм",
+      "hashrate": "Хеш хăвăртлăхĕ",
+      "shares": "Паям",
+      "temperature": "Температура",
+      "power": "Вăй",
+      "efficiency": "Эффективлăх",
+      "uptime": "Ĕç вăхăчĕ",
+      "revenue_24h": "24ç тивĕç",
+      "pool": "Пул",
+      "not_detected": "Майнинг ĕçлевĕ тупăнмарĕ"
+    },
+    "ui": {
+      "histogram": "Гистограмм",
+      "vertical": "Тик", 
+      "horizontal": "Горизонталь",
+      "loading": "Çителĕклет...",
+      "no_data": "Даннăй çук",
+      "percent": "процент"
+    },
+    "commands": {
+      "help": "Пулăшу",
+      "version": "Верси",
+      "all": "Пĕтĕм хыпар",
+      "disk_only": "Диск çеç",
+      "cpu_only": "CPU çеç",
+      "memory_only": "Асту çеç", 
+      "network_only": "Сеть çеç",
+      "gpu_only": "GPU çеç",
+      "ai_only": "AI вĕренӳ çеç",
+      "mining_only": "Майнинг çеç",
+      "refresh_rate": "Çĕнет хăвăртлăхĕ",
+      "language": "Чĕлхе",
+      "remote": "Ылтăн режим",
+      "port": "Порт"
+    },
+    "errors": {
+      "command_not_found": "Команда тупăнмарĕ: %s",
+      "invalid_port": "Йăнăш порт: %d",
+      "invalid_refresh": "Йăнăш çĕнет интервалĕ: %d", 
+      "config_load_failed": "Конфигураци çителĕклемен",
+      "module_failed": "Модуль %s ĕçлемен: %v",
+      "nvidia_smi_not_found": "nvidia-smi тупăнмарĕ. GPU тĕрĕслессишĕн NVIDIA драйвер кирлĕ",
+      "rocm_smi_not_found": "rocm-smi тупăнмарĕ. AMD GPU тĕрĕслессишĕн ROCm кирлĕ"
+    },
+    "status": {
+      "monitoring_started": "Тĕрĕслесси пуçланă",
+      "updating_every": "%D секунд çине çĕнетет", 
+      "press_ctrl_c": "Тухмашкăн Ctrl+C пусăр",
+      "remote_mode": "%D порт çинче ылтăн режим",
+      "gpu_detected": "GPU тупăнчĕ: %s",
+      "ai_training_detected": "AI вĕренӳ процессĕсем тупăнчĕ: %d",
+      "mining_detected": "Майнинг ĕçлевĕ тупăнчĕ: %s"
+    }
+  }
+}

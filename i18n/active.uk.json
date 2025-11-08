@@ -1,36 +1,36 @@
 {
-  "language": "Українська",
+  "language": "Ukrainian (Українська)", 
   "language_code": "uk",
   "translations": {
     "common": {
-      "title": "kern - Моніторинг системи",
+      "title": "kern - Монітор системи",
       "refresh": "Оновити",
       "seconds": "сек",
       "error": "Помилка",
       "unknown": "Невідомо",
       "total": "Всього",
-      "used": "Використано",
+      "used": "Використано", 
       "free": "Вільно",
       "available": "Доступно",
       "status": "Статус",
-      "up": "УВІМК",
-      "down": "ВИМК"
+      "up": "ПРАЦЮЄ",
+      "down": "НЕ ПРАЦЮЄ"
     },
     "cpu": {
-      "title": "Інформація про процесор",
+      "title": "Інформація про CPU",
       "model": "Модель",
-      "cores": "Ядер",
-      "threads": "Потоків",
+      "cores": "Ядра",
+      "threads": "Потоки",
       "usage": "Використання",
-      "frequency": "Частота",
+      "frequency": "Частота", 
       "load": "Навантаження",
       "load_1min": "1 хв",
-      "load_5min": "5 хв", 
+      "load_5min": "5 хв",
       "load_15min": "15 хв",
       "load_average": "Середнє навантаження"
     },
     "memory": {
-      "title": "Інформація про пам'ять",
+      "title": "Інформація про пам'ять", 
       "ram": "ОЗП",
       "swap": "Своп",
       "physical": "Фізична пам'ять",
@@ -40,7 +40,7 @@
       "title": "Інформація про диск",
       "filesystem": "Файлова система",
       "size": "Розмір",
-      "mounted": "Точка монтування",
+      "mounted": "Змонтовано на", 
       "usage": "Використання",
       "storage": "Сховище"
     },
@@ -54,10 +54,49 @@
       "errors": "Помилки",
       "network_interfaces": "Мережеві інтерфейси"
     },
+    "gpu": {
+      "title": "Інформація про GPU",
+      "model": "Модель",
+      "driver": "Драйвер",
+      "temperature": "Температура",
+      "memory": "Пам'ять",
+      "utilization": "Використання",
+      "power": "Потужність",
+      "clock_core": "Тактова частота ядра",
+      "clock_memory": "Тактова частота пам'яті",
+      "fan_speed": "Швидкість вентилятора"
+    },
+    "ai": {
+      "title": "Навчання ШІ",
+      "framework": "Фреймворк",
+      "processes": "Процеси",
+      "vram": "VRAM",
+      "model": "Модель",
+      "batch_size": "Розмір партії",
+      "throughput": "Пропускна здатність",
+      "epoch": "Епоха",
+      "loss": "Втрати",
+      "accuracy": "Точність",
+      "training_time": "Час навчання",
+      "no_training": "Навчання ШІ не виявлено"
+    },
+    "mining": {
+      "title": "Інформація про майнінг",
+      "algorithm": "Алгоритм",
+      "hashrate": "Хешрейт",
+      "shares": "Шери",
+      "temperature": "Температура",
+      "power": "Потужність",
+      "efficiency": "Ефективність",
+      "uptime": "Час роботи",
+      "revenue_24h": "Дохід за 24 год",
+      "pool": "Пул",
+      "not_detected": "Активність майнінгу не виявлено"
+    },
     "ui": {
       "histogram": "Гістограма",
-      "vertical": "Вертикальна",
-      "horizontal": "Горизонтальна",
+      "vertical": "Вертикально", 
+      "horizontal": "Горизонтально",
       "loading": "Завантаження...",
       "no_data": "Немає даних",
       "percent": "відсотків"
@@ -66,27 +105,35 @@
       "help": "Допомога",
       "version": "Версія",
       "all": "Вся інформація",
-      "disk_only": "Лише диск",
-      "cpu_only": "Лише процесор",
-      "memory_only": "Лише пам'ять",
-      "network_only": "Лише мережа",
-      "refresh_rate": "Інтервал оновлення",
+      "disk_only": "Тільки диск",
+      "cpu_only": "Тільки CPU",
+      "memory_only": "Тільки пам'ять", 
+      "network_only": "Тільки мережа",
+      "gpu_only": "Тільки GPU",
+      "ai_only": "Тільки навчання ШІ",
+      "mining_only": "Тільки майнінг",
+      "refresh_rate": "Частота оновлення",
       "language": "Мова",
       "remote": "Віддалений режим",
       "port": "Порт"
     },
     "errors": {
       "command_not_found": "Команду не знайдено: %s",
-      "invalid_port": "Неправильний порт: %d",
-      "invalid_refresh": "Неправильний інтервал оновлення: %d",
+      "invalid_port": "Недійсний порт: %d",
+      "invalid_refresh": "Недійсний інтервал оновлення: %d", 
       "config_load_failed": "Не вдалося завантажити конфігурацію",
-      "module_failed": "Помилка модуля %s: %v"
+      "module_failed": "Модуль %s не вдався: %v",
+      "nvidia_smi_not_found": "nvidia-smi не знайдено. Для моніторингу GPU потрібні драйвери NVIDIA",
+      "rocm_smi_not_found": "rocm-smi не знайдено. Для моніторингу AMD GPU потрібен ROCm"
     },
     "status": {
-      "monitoring_started": "Моніторинг запущено",
-      "updating_every": "Оновлення кожні %d секунд",
+      "monitoring_started": "Моніторинг розпочато",
+      "updating_every": "Оновлення кожні %d секунд", 
       "press_ctrl_c": "Натисніть Ctrl+C для виходу",
-      "remote_mode": "Віддалений режим на порті %d"
+      "remote_mode": "Віддалений режим на порті %d",
+      "gpu_detected": "GPU виявлено: %s",
+      "ai_training_detected": "Процеси навчання ШІ виявлено: %d",
+      "mining_detected": "Активність майнінгу виявлено: %s"
     }
   }
 }

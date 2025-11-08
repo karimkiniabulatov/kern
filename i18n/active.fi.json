@@ -1,51 +1,51 @@
 {
-  "language": "Suomi",
+  "language": "Finnish (Suomi)", 
   "language_code": "fi",
   "translations": {
     "common": {
-      "title": "kern - Järjestelmänvalvonta",
+      "title": "kern - Järjestelmänvalvoja",
       "refresh": "Päivitä",
       "seconds": "sek",
       "error": "Virhe",
       "unknown": "Tuntematon",
       "total": "Yhteensä",
-      "used": "Käytetty",
+      "used": "Käytetty", 
       "free": "Vapaa",
       "available": "Käytettävissä",
       "status": "Tila",
-      "up": "PÄÄLLÄ",
-      "down": "POIS"
+      "up": "YLÖS",
+      "down": "ALAS"
     },
     "cpu": {
-      "title": "Prosessorin tiedot",
+      "title": "CPU-tiedot",
       "model": "Malli",
       "cores": "Ytimet",
       "threads": "Säikeet",
       "usage": "Käyttö",
-      "frequency": "Taajuus",
+      "frequency": "Taajuus", 
       "load": "Kuorma",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Keskimääräinen kuorma"
+      "load_average": "Keskiarvoinen kuorma"
     },
     "memory": {
-      "title": "Muistin tiedot",
+      "title": "Muistitiedot", 
       "ram": "RAM",
       "swap": "Swap",
-      "physical": "Fyysinen muisti",
+      "physical": "Fysikaalinen muisti",
       "virtual": "Virtuaalimuisti"
     },
     "disk": {
-      "title": "Levyn tiedot",
+      "title": "Levytiedot",
       "filesystem": "Tiedostojärjestelmä",
       "size": "Koko",
-      "mounted": "Liitospiste",
+      "mounted": "Liitetty kohteeseen", 
       "usage": "Käyttö",
       "storage": "Tallennus"
     },
     "network": {
-      "title": "Verkon tiedot",
+      "title": "Verkkotiedot",
       "interface": "Rajapinta",
       "received": "Vastaanotettu",
       "sent": "Lähetetty",
@@ -54,12 +54,51 @@
       "errors": "Virheet",
       "network_interfaces": "Verkkorajapinnat"
     },
+    "gpu": {
+      "title": "GPU-tiedot",
+      "model": "Malli",
+      "driver": "Ohjain",
+      "temperature": "Lämpötila",
+      "memory": "Muisti",
+      "utilization": "Käyttöaste",
+      "power": "Teho",
+      "clock_core": "Ydintaajuus",
+      "clock_memory": "Muistitaajuus",
+      "fan_speed": "Tuulettimen nopeus"
+    },
+    "ai": {
+      "title": "AI-koulutus",
+      "framework": "Kehys",
+      "processes": "Prosessit",
+      "vram": "VRAM",
+      "model": "Malli",
+      "batch_size": "Eräkoko",
+      "throughput": "Läpimeno",
+      "epoch": "Epookki",
+      "loss": "Häviö",
+      "accuracy": "Tarkkuus",
+      "training_time": "Koulutusaika",
+      "no_training": "AI-koulutusta ei havaittu"
+    },
+    "mining": {
+      "title": "Louhintatiedot",
+      "algorithm": "Algoritmi",
+      "hashrate": "Hash-nopeus",
+      "shares": "Osakkeet",
+      "temperature": "Lämpötila",
+      "power": "Teho",
+      "efficiency": "Tehokkuus",
+      "uptime": "Käyntiaika",
+      "revenue_24h": "24h tulot",
+      "pool": "Pooli",
+      "not_detected": "Louhinta-aktiviteettia ei havaittu"
+    },
     "ui": {
       "histogram": "Histogrammi",
-      "vertical": "Pysty",
-      "horizontal": "Vaaka",
+      "vertical": "Pystysuora", 
+      "horizontal": "Vaakasuora",
       "loading": "Ladataan...",
-      "no_data": "Ei tietoja",
+      "no_data": "Ei dataa",
       "percent": "prosenttia"
     },
     "commands": {
@@ -67,10 +106,13 @@
       "version": "Versio",
       "all": "Kaikki tiedot",
       "disk_only": "Vain levy",
-      "cpu_only": "Vain prosessori",
-      "memory_only": "Vain muisti",
+      "cpu_only": "Vain CPU",
+      "memory_only": "Vain muisti", 
       "network_only": "Vain verkko",
-      "refresh_rate": "Päivitystiheys",
+      "gpu_only": "Vain GPU",
+      "ai_only": "Vain AI-koulutus",
+      "mining_only": "Vain louhinta",
+      "refresh_rate": "Päivitystaajuus",
       "language": "Kieli",
       "remote": "Etätila",
       "port": "Portti"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Komentoa ei löytynyt: %s",
       "invalid_port": "Virheellinen portti: %d",
-      "invalid_refresh": "Virheellinen päivitystiheys: %d",
-      "config_load_failed": "Asetusten lataus epäonnistui",
-      "module_failed": "Moduulin %s virhe: %v"
+      "invalid_refresh": "Virheellinen päivitysväli: %d", 
+      "config_load_failed": "Konfiguraation lataus epäonnistui",
+      "module_failed": "Moduuli %s epäonnistui: %v",
+      "nvidia_smi_not_found": "nvidia-smi ei löytynyt. GPU-valvonta vaatii NVIDIA-ohjaimet",
+      "rocm_smi_not_found": "rocm-smi ei löytynyt. AMD GPU-valvonta vaatii ROCm"
     },
     "status": {
       "monitoring_started": "Valvonta aloitettu",
-      "updating_every": "Päivitetään %d sekunnin välein",
+      "updating_every": "Päivitetään %d sekunnin välein", 
       "press_ctrl_c": "Paina Ctrl+C poistuaksesi",
-      "remote_mode": "Etätila portissa %d"
+      "remote_mode": "Etätila portissa %d",
+      "gpu_detected": "GPU havaittu: %s",
+      "ai_training_detected": "AI-koulutusprosesseja havaittu: %d",
+      "mining_detected": "Louhinta-aktiviteetti havaittu: %s"
     }
   }
 }

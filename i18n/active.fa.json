@@ -1,20 +1,20 @@
 {
-  "language": "فارسی",
+  "language": "Persian (فارسی)", 
   "language_code": "fa",
   "translations": {
     "common": {
-      "title": "kern - مانیتورینگ سیستم",
-      "refresh": "بروزرسانی",
+      "title": "kern - مانیتور سیستم",
+      "refresh": "تازه‌سازی",
       "seconds": "ثانیه",
       "error": "خطا",
       "unknown": "ناشناخته",
       "total": "کل",
-      "used": "استفاده شده",
+      "used": "استفاده شده", 
       "free": "آزاد",
       "available": "در دسترس",
       "status": "وضعیت",
-      "up": "روشن",
-      "down": "خاموش"
+      "up": "فعال",
+      "down": "غیرفعال"
     },
     "cpu": {
       "title": "اطلاعات پردازنده",
@@ -22,17 +22,17 @@
       "cores": "هسته‌ها",
       "threads": "رشته‌ها",
       "usage": "مصرف",
-      "frequency": "فرکانس",
+      "frequency": "فرکانس", 
       "load": "بار",
       "load_1min": "1 دقیقه",
-      "load_5min": "5 دقیقه", 
+      "load_5min": "5 دقیقه",
       "load_15min": "15 دقیقه",
       "load_average": "میانگین بار"
     },
     "memory": {
-      "title": "اطلاعات حافظه",
-      "ram": "RAM",
-      "swap": "Swap",
+      "title": "اطلاعات حافظه", 
+      "ram": "رم",
+      "swap": "سواپ",
       "physical": "حافظه فیزیکی",
       "virtual": "حافظه مجازی"
     },
@@ -40,7 +40,7 @@
       "title": "اطلاعات دیسک",
       "filesystem": "سیستم فایل",
       "size": "اندازه",
-      "mounted": "نقطه مونت",
+      "mounted": "نصب شده روی", 
       "usage": "مصرف",
       "storage": "ذخیره‌سازی"
     },
@@ -48,15 +48,54 @@
       "title": "اطلاعات شبکه",
       "interface": "اینترفیس",
       "received": "دریافتی",
-      "sent": "ارسال شده",
+      "sent": "ارسالی",
       "bytes": "بایت",
       "packets": "بسته",
       "errors": "خطاها",
       "network_interfaces": "اینترفیس‌های شبکه"
     },
+    "gpu": {
+      "title": "اطلاعات کارت گرافیک",
+      "model": "مدل",
+      "driver": "درایور",
+      "temperature": "دما",
+      "memory": "حافظه",
+      "utilization": "مصرف",
+      "power": "توان",
+      "clock_core": "فرکانس هسته",
+      "clock_memory": "فرکانس حافظه",
+      "fan_speed": "سرعت فن"
+    },
+    "ai": {
+      "title": "آموزش هوش مصنوعی",
+      "framework": "فریمورک",
+      "processes": "پروسه‌ها",
+      "vram": "VRAM",
+      "model": "مدل",
+      "batch_size": "اندازه بچ",
+      "throughput": "توان عملیاتی",
+      "epoch": "دوره",
+      "loss": "اتلاف",
+      "accuracy": "دقت",
+      "training_time": "زمان آموزش",
+      "no_training": "آموزش هوش مصنوعی شناسایی نشد"
+    },
+    "mining": {
+      "title": "اطلاعات ماینینگ",
+      "algorithm": "الگوریتم",
+      "hashrate": "نرخ هش",
+      "shares": "سهم‌ها",
+      "temperature": "دما",
+      "power": "توان",
+      "efficiency": "بازدهی",
+      "uptime": "زمان فعالیت",
+      "revenue_24h": "درآمد 24 ساعته",
+      "pool": "استخر",
+      "not_detected": "فعالیت ماینینگ شناسایی نشد"
+    },
     "ui": {
       "histogram": "هیستوگرام",
-      "vertical": "عمودی",
+      "vertical": "عمودی", 
       "horizontal": "افقی",
       "loading": "در حال بارگذاری...",
       "no_data": "داده‌ای موجود نیست",
@@ -65,12 +104,15 @@
     "commands": {
       "help": "راهنما",
       "version": "نسخه",
-      "all": "همه اطلاعات",
+      "all": "تمام اطلاعات",
       "disk_only": "فقط دیسک",
       "cpu_only": "فقط پردازنده",
-      "memory_only": "فقط حافظه",
+      "memory_only": "فقط حافظه", 
       "network_only": "فقط شبکه",
-      "refresh_rate": "بازه بروزرسانی",
+      "gpu_only": "فقط کارت گرافیک",
+      "ai_only": "فقط آموزش هوش مصنوعی",
+      "mining_only": "فقط ماینینگ",
+      "refresh_rate": "نرخ تازه‌سازی",
       "language": "زبان",
       "remote": "حالت راه دور",
       "port": "پورت"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "دستور یافت نشد: %s",
       "invalid_port": "پورت نامعتبر: %d",
-      "invalid_refresh": "بازه بروزرسانی نامعتبر: %d",
+      "invalid_refresh": "بازه تازه‌سازی نامعتبر: %d", 
       "config_load_failed": "بارگذاری پیکربندی ناموفق بود",
-      "module_failed": "خطای ماژول %s: %v"
+      "module_failed": "ماژول %s ناموفق بود: %v",
+      "nvidia_smi_not_found": "nvidia-smi یافت نشد. مانیتورینگ کارت گرافیک نیاز به درایورهای NVIDIA دارد",
+      "rocm_smi_not_found": "rocm-smi یافت نشد. مانیتورینگ AMD GPU نیاز به ROCm دارد"
     },
     "status": {
       "monitoring_started": "مانیتورینگ آغاز شد",
-      "updating_every": "بروزرسانی هر %d ثانیه",
+      "updating_every": "به‌روزرسانی هر %d ثانیه", 
       "press_ctrl_c": "برای خروج Ctrl+C را فشار دهید",
-      "remote_mode": "حالت راه دور روی پورت %d"
+      "remote_mode": "حالت راه دور روی پورت %d",
+      "gpu_detected": "کارت گرافیک شناسایی شد: %s",
+      "ai_training_detected": "پروسه‌های آموزش هوش مصنوعی شناسایی شد: %d",
+      "mining_detected": "فعالیت ماینینگ شناسایی شد: %s"
     }
   }
 }

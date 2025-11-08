@@ -1,15 +1,15 @@
 {
-  "language": "Türkçe",
+  "language": "Turkish (Türkçe)", 
   "language_code": "tr",
   "translations": {
     "common": {
-      "title": "kern - Sistem İzleme",
+      "title": "kern - Sistem Monitörü",
       "refresh": "Yenile",
       "seconds": "sn",
       "error": "Hata",
       "unknown": "Bilinmeyen",
       "total": "Toplam",
-      "used": "Kullanılan",
+      "used": "Kullanılan", 
       "free": "Boş",
       "available": "Kullanılabilir",
       "status": "Durum",
@@ -17,30 +17,30 @@
       "down": "KAPALI"
     },
     "cpu": {
-      "title": "İşlemci Bilgisi",
+      "title": "CPU Bilgisi",
       "model": "Model",
       "cores": "Çekirdek",
       "threads": "İş Parçacığı",
       "usage": "Kullanım",
-      "frequency": "Frekans",
+      "frequency": "Frekans", 
       "load": "Yük",
       "load_1min": "1 dk",
-      "load_5min": "5 dk", 
+      "load_5min": "5 dk",
       "load_15min": "15 dk",
-      "load_average": "Ortalama yük"
+      "load_average": "Ortalama Yük"
     },
     "memory": {
-      "title": "Bellek Bilgisi",
+      "title": "Bellek Bilgisi", 
       "ram": "RAM",
       "swap": "Takas",
-      "physical": "Fiziksel bellek",
-      "virtual": "Sanal bellek"
+      "physical": "Fiziksel Bellek",
+      "virtual": "Sanal Bellek"
     },
     "disk": {
       "title": "Disk Bilgisi",
-      "filesystem": "Dosya sistemi",
+      "filesystem": "Dosya Sistemi",
       "size": "Boyut",
-      "mounted": "Bağlama noktası",
+      "mounted": "Bağlama Noktası", 
       "usage": "Kullanım",
       "storage": "Depolama"
     },
@@ -52,11 +52,50 @@
       "bytes": "bayt",
       "packets": "paket",
       "errors": "Hatalar",
-      "network_interfaces": "Ağ arayüzleri"
+      "network_interfaces": "Ağ Arayüzleri"
+    },
+    "gpu": {
+      "title": "GPU Bilgisi",
+      "model": "Model",
+      "driver": "Sürücü",
+      "temperature": "Sıcaklık",
+      "memory": "Bellek",
+      "utilization": "Kullanım",
+      "power": "Güç",
+      "clock_core": "Çekirdek Saati",
+      "clock_memory": "Bellek Saati",
+      "fan_speed": "Fan Hızı"
+    },
+    "ai": {
+      "title": "AI Eğitimi",
+      "framework": "Çerçeve",
+      "processes": "İşlemler",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Toplu İş Boyutu",
+      "throughput": "Verim",
+      "epoch": "Devir",
+      "loss": "Kayıp",
+      "accuracy": "Doğruluk",
+      "training_time": "Eğitim Süresi",
+      "no_training": "AI eğitimi tespit edilmedi"
+    },
+    "mining": {
+      "title": "Madencilik Bilgisi",
+      "algorithm": "Algoritma",
+      "hashrate": "Hash Oranı",
+      "shares": "Paylar",
+      "temperature": "Sıcaklık",
+      "power": "Güç",
+      "efficiency": "Verimlilik",
+      "uptime": "Çalışma Süresi",
+      "revenue_24h": "24s Gelir",
+      "pool": "Havuz",
+      "not_detected": "Madencilik aktivitesi tespit edilmedi"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Dikey",
+      "vertical": "Dikey", 
       "horizontal": "Yatay",
       "loading": "Yükleniyor...",
       "no_data": "Veri yok",
@@ -67,10 +106,13 @@
       "version": "Sürüm",
       "all": "Tüm bilgiler",
       "disk_only": "Sadece disk",
-      "cpu_only": "Sadece işlemci",
-      "memory_only": "Sadece bellek",
+      "cpu_only": "Sadece CPU",
+      "memory_only": "Sadece bellek", 
       "network_only": "Sadece ağ",
-      "refresh_rate": "Yenileme aralığı",
+      "gpu_only": "Sadece GPU",
+      "ai_only": "Sadece AI eğitimi",
+      "mining_only": "Sadece madencilik",
+      "refresh_rate": "Yenileme hızı",
       "language": "Dil",
       "remote": "Uzak mod",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Komut bulunamadı: %s",
       "invalid_port": "Geçersiz port: %d",
-      "invalid_refresh": "Geçersiz yenileme aralığı: %d",
+      "invalid_refresh": "Geçersiz yenileme aralığı: %d", 
       "config_load_failed": "Yapılandırma yüklenemedi",
-      "module_failed": "%s modül hatası: %v"
+      "module_failed": "Modül %s başarısız: %v",
+      "nvidia_smi_not_found": "nvidia-smi bulunamadı. GPU izleme için NVIDIA sürücüleri gerekli",
+      "rocm_smi_not_found": "rocm-smi bulunamadı. AMD GPU izleme için ROCm gerekli"
     },
     "status": {
       "monitoring_started": "İzleme başlatıldı",
-      "updating_every": "Her %d saniyede bir güncelleniyor",
+      "updating_every": "Her %d saniyede bir güncelleniyor", 
       "press_ctrl_c": "Çıkmak için Ctrl+C'ye basın",
-      "remote_mode": "%d portunda uzak mod"
+      "remote_mode": "%d portunda uzak mod",
+      "gpu_detected": "GPU tespit edildi: %s",
+      "ai_training_detected": "AI eğitim işlemleri tespit edildi: %d",
+      "mining_detected": "Madencilik aktivitesi tespit edildi: %s"
     }
   }
 }

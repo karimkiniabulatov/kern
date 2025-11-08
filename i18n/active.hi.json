@@ -1,15 +1,15 @@
 {
-  "language": "हिन्दी",
+  "language": "Hindi (हिन्दी)", 
   "language_code": "hi",
   "translations": {
     "common": {
-      "title": "kern - सिस्टम मॉनिटरिंग",
-      "refresh": "ताज़ा करें",
+      "title": "kern - सिस्टम मॉनिटर",
+      "refresh": "रिफ्रेश",
       "seconds": "सेकंड",
       "error": "त्रुटि",
       "unknown": "अज्ञात",
       "total": "कुल",
-      "used": "उपयोग किया गया",
+      "used": "उपयोग किया गया", 
       "free": "मुक्त",
       "available": "उपलब्ध",
       "status": "स्थिति",
@@ -17,20 +17,20 @@
       "down": "बंद"
     },
     "cpu": {
-      "title": "प्रोसेसर जानकारी",
+      "title": "सीपीयू जानकारी",
       "model": "मॉडल",
       "cores": "कोर",
       "threads": "थ्रेड",
       "usage": "उपयोग",
-      "frequency": "आवृत्ति",
+      "frequency": "आवृत्ति", 
       "load": "लोड",
       "load_1min": "1 मिनट",
-      "load_5min": "5 मिनट", 
+      "load_5min": "5 मिनट",
       "load_15min": "15 मिनट",
       "load_average": "औसत लोड"
     },
     "memory": {
-      "title": "मेमोरी जानकारी",
+      "title": "मेमोरी जानकारी", 
       "ram": "रैम",
       "swap": "स्वैप",
       "physical": "भौतिक मेमोरी",
@@ -40,7 +40,7 @@
       "title": "डिस्क जानकारी",
       "filesystem": "फाइल सिस्टम",
       "size": "आकार",
-      "mounted": "माउंट पॉइंट",
+      "mounted": "माउंटेड ऑन", 
       "usage": "उपयोग",
       "storage": "संग्रहण"
     },
@@ -49,14 +49,53 @@
       "interface": "इंटरफेस",
       "received": "प्राप्त",
       "sent": "भेजा गया",
-      "bytes": "बाइट",
+      "bytes": "बाइट्स",
       "packets": "पैकेट",
       "errors": "त्रुटियाँ",
       "network_interfaces": "नेटवर्क इंटरफेस"
     },
+    "gpu": {
+      "title": "जीपीयू जानकारी",
+      "model": "मॉडल",
+      "driver": "ड्राइवर",
+      "temperature": "तापमान",
+      "memory": "मेमोरी",
+      "utilization": "उपयोग",
+      "power": "पावर",
+      "clock_core": "कोर क्लॉक",
+      "clock_memory": "मेमोरी क्लॉक",
+      "fan_speed": "फैन स्पीड"
+    },
+    "ai": {
+      "title": "एआई ट्रेनिंग",
+      "framework": "फ्रेमवर्क",
+      "processes": "प्रक्रियाएं",
+      "vram": "वीरैम",
+      "model": "मॉडल",
+      "batch_size": "बैच साइज",
+      "throughput": "थ्रूपुट",
+      "epoch": "युग",
+      "loss": "लॉस",
+      "accuracy": "सटीकता",
+      "training_time": "प्रशिक्षण समय",
+      "no_training": "कोई एआई ट्रेनिंग नहीं मिली"
+    },
+    "mining": {
+      "title": "माइनिंग जानकारी",
+      "algorithm": "एल्गोरिदम",
+      "hashrate": "हैशरेट",
+      "shares": "शेयर्स",
+      "temperature": "तापमान",
+      "power": "पावर",
+      "efficiency": "दक्षता",
+      "uptime": "अपटाइम",
+      "revenue_24h": "24 घंटे की आय",
+      "pool": "पूल",
+      "not_detected": "कोई माइनिंग गतिविधि नहीं मिली"
+    },
     "ui": {
       "histogram": "हिस्टोग्राम",
-      "vertical": "ऊर्ध्वाधर",
+      "vertical": "ऊर्ध्वाधर", 
       "horizontal": "क्षैतिज",
       "loading": "लोड हो रहा है...",
       "no_data": "कोई डेटा नहीं",
@@ -67,10 +106,13 @@
       "version": "संस्करण",
       "all": "सभी जानकारी",
       "disk_only": "केवल डिस्क",
-      "cpu_only": "केवल प्रोसेसर",
-      "memory_only": "केवल मेमोरी",
+      "cpu_only": "केवल सीपीयू",
+      "memory_only": "केवल मेमोरी", 
       "network_only": "केवल नेटवर्क",
-      "refresh_rate": "ताज़ा करने की दर",
+      "gpu_only": "केवल जीपीयू",
+      "ai_only": "केवल एआई ट्रेनिंग",
+      "mining_only": "केवल माइनिंग",
+      "refresh_rate": "रिफ्रेश रेट",
       "language": "भाषा",
       "remote": "रिमोट मोड",
       "port": "पोर्ट"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "कमांड नहीं मिला: %s",
       "invalid_port": "अमान्य पोर्ट: %d",
-      "invalid_refresh": "अमान्य ताज़ा करने की दर: %d",
+      "invalid_refresh": "अमान्य रिफ्रेश अंतराल: %d", 
       "config_load_failed": "कॉन्फ़िगरेशन लोड करने में विफल",
-      "module_failed": "मॉड्यूल %s त्रुटि: %v"
+      "module_failed": "मॉड्यूल %s विफल: %v",
+      "nvidia_smi_not_found": "nvidia-smi नहीं मिला। जीपीयू मॉनिटरिंग के लिए NVIDIA ड्राइवरों की आवश्यकता है",
+      "rocm_smi_not_found": "rocm-smi नहीं मिला। AMD जीपीयू मॉनिटरिंग के लिए ROCm की आवश्यकता है"
     },
     "status": {
       "monitoring_started": "मॉनिटरिंग शुरू हो गई",
-      "updating_every": "हर %d सेकंड में अपडेट हो रहा है",
+      "updating_every": "हर %d सेकंड में अपडेट हो रहा है", 
       "press_ctrl_c": "बाहर निकलने के लिए Ctrl+C दबाएं",
-      "remote_mode": "पोर्ट %d पर रिमोट मोड"
+      "remote_mode": "पोर्ट %d पर रिमोट मोड",
+      "gpu_detected": "जीपीयू पाया गया: %s",
+      "ai_training_detected": "एआई ट्रेनिंग प्रक्रियाएं पाई गईं: %d",
+      "mining_detected": "माइनिंग गतिविधि पाई गई: %s"
     }
   }
 }

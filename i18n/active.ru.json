@@ -54,6 +54,45 @@
       "errors": "Ошибки",
       "network_interfaces": "Сетевые интерфейсы"
     },
+    "gpu": {
+      "title": "Информация о видеокарте",
+      "model": "Модель",
+      "driver": "Драйвер",
+      "temperature": "Температура",
+      "memory": "Память",
+      "utilization": "Загрузка",
+      "power": "Питание",
+      "clock_core": "Частота ядра",
+      "clock_memory": "Частота памяти",
+      "fan_speed": "Скорость вентилятора"
+    },
+    "ai": {
+      "title": "Обучение ИИ",
+      "framework": "Фреймворк",
+      "processes": "Процессы",
+      "vram": "Видеопамять",
+      "model": "Модель",
+      "batch_size": "Размер батча",
+      "throughput": "Пропускная способность",
+      "epoch": "Эпоха",
+      "loss": "Потери",
+      "accuracy": "Точность",
+      "training_time": "Время обучения",
+      "no_training": "Обучение ИИ не обнаружено"
+    },
+    "mining": {
+      "title": "Информация о майнинге",
+      "algorithm": "Алгоритм",
+      "hashrate": "Хэшрейт",
+      "shares": "Шары",
+      "temperature": "Температура",
+      "power": "Питание",
+      "efficiency": "Эффективность",
+      "uptime": "Время работы",
+      "revenue_24h": "Доход за 24ч",
+      "pool": "Пул",
+      "not_detected": "Активность майнинга не обнаружена"
+    },
     "ui": {
       "histogram": "Гистограмма",
       "vertical": "Вертикальная",
@@ -70,6 +109,9 @@
       "cpu_only": "Только процессор",
       "memory_only": "Только память",
       "network_only": "Только сеть",
+      "gpu_only": "Только видеокарта",
+      "ai_only": "Только обучение ИИ",
+      "mining_only": "Только майнинг",
       "refresh_rate": "Интервал обновления",
       "language": "Язык",
       "remote": "Удаленный режим",
@@ -80,13 +122,18 @@
       "invalid_port": "Неверный порт: %d",
       "invalid_refresh": "Неверный интервал обновления: %d",
       "config_load_failed": "Не удалось загрузить конфигурацию",
-      "module_failed": "Ошибка модуля %s: %v"
+      "module_failed": "Ошибка модуля %s: %v",
+      "nvidia_smi_not_found": "nvidia-smi не найден. Для мониторинга GPU требуются драйвера NVIDIA",
+      "rocm_smi_not_found": "rocm-smi не найден. Для мониторинга AMD GPU требуется ROCm"
     },
     "status": {
       "monitoring_started": "Мониторинг запущен",
       "updating_every": "Обновление каждые %d секунд",
       "press_ctrl_c": "Нажмите Ctrl+C для выхода",
-      "remote_mode": "Удаленный режим на порту %d"
+      "remote_mode": "Удаленный режим на порту %d",
+      "gpu_detected": "Видеокарта обнаружена: %s",
+      "ai_training_detected": "Процессы обучения ИИ обнаружены: %d",
+      "mining_detected": "Активность майнинга обнаружена: %s"
     }
   }
 }

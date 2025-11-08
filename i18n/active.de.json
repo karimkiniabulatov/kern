@@ -1,36 +1,36 @@
 {
-  "language": "Deutsch",
+  "language": "German (Deutsch)", 
   "language_code": "de",
   "translations": {
     "common": {
-      "title": "kern - Systemüberwachung",
+      "title": "kern - Systemmonitor",
       "refresh": "Aktualisieren",
       "seconds": "Sek",
       "error": "Fehler",
       "unknown": "Unbekannt",
       "total": "Gesamt",
-      "used": "Verwendet",
+      "used": "Verwendet", 
       "free": "Frei",
       "available": "Verfügbar",
       "status": "Status",
-      "up": "EIN",
-      "down": "AUS"
+      "up": "AKTIV",
+      "down": "INAKTIV"
     },
     "cpu": {
-      "title": "Prozessorinformationen",
+      "title": "CPU-Informationen",
       "model": "Modell",
       "cores": "Kerne",
       "threads": "Threads",
       "usage": "Nutzung",
-      "frequency": "Frequenz",
+      "frequency": "Frequenz", 
       "load": "Last",
       "load_1min": "1 Min",
-      "load_5min": "5 Min", 
+      "load_5min": "5 Min",
       "load_15min": "15 Min",
       "load_average": "Durchschnittslast"
     },
     "memory": {
-      "title": "Speicherinformationen",
+      "title": "Speicherinformationen", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Physischer Speicher",
@@ -40,7 +40,7 @@
       "title": "Festplatteninformationen",
       "filesystem": "Dateisystem",
       "size": "Größe",
-      "mounted": "Einhängepunkt",
+      "mounted": "Eingehängt auf", 
       "usage": "Nutzung",
       "storage": "Speicher"
     },
@@ -54,9 +54,48 @@
       "errors": "Fehler",
       "network_interfaces": "Netzwerkschnittstellen"
     },
+    "gpu": {
+      "title": "GPU-Informationen",
+      "model": "Modell",
+      "driver": "Treiber",
+      "temperature": "Temperatur",
+      "memory": "Speicher",
+      "utilization": "Auslastung",
+      "power": "Leistung",
+      "clock_core": "Takt Kern",
+      "clock_memory": "Takt Speicher",
+      "fan_speed": "Lüftergeschwindigkeit"
+    },
+    "ai": {
+      "title": "KI-Training",
+      "framework": "Framework",
+      "processes": "Prozesse",
+      "vram": "VRAM",
+      "model": "Modell",
+      "batch_size": "Batch-Größe",
+      "throughput": "Durchsatz",
+      "epoch": "Epoche",
+      "loss": "Verlust",
+      "accuracy": "Genauigkeit",
+      "training_time": "Trainingszeit",
+      "no_training": "Kein KI-Training erkannt"
+    },
+    "mining": {
+      "title": "Mining-Informationen",
+      "algorithm": "Algorithmus",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
+      "temperature": "Temperatura",
+      "power": "Leistung",
+      "efficiency": "Effizienz",
+      "uptime": "Betriebszeit",
+      "revenue_24h": "24h Ertrag",
+      "pool": "Pool",
+      "not_detected": "Keine Mining-Aktivität erkannt"
+    },
     "ui": {
       "histogram": "Histogramm",
-      "vertical": "Vertikal",
+      "vertical": "Vertikal", 
       "horizontal": "Horizontal",
       "loading": "Lädt...",
       "no_data": "Keine Daten",
@@ -67,10 +106,13 @@
       "version": "Version",
       "all": "Alle Informationen",
       "disk_only": "Nur Festplatte",
-      "cpu_only": "Nur Prozessor",
-      "memory_only": "Nur Speicher",
+      "cpu_only": "Nur CPU",
+      "memory_only": "Nur Speicher", 
       "network_only": "Nur Netzwerk",
-      "refresh_rate": "Aktualisierungsintervall",
+      "gpu_only": "Nur GPU",
+      "ai_only": "Nur KI-Training",
+      "mining_only": "Nur Mining",
+      "refresh_rate": "Aktualisierungsrate",
       "language": "Sprache",
       "remote": "Fernmodus",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Befehl nicht gefunden: %s",
       "invalid_port": "Ungültiger Port: %d",
-      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d",
+      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d", 
       "config_load_failed": "Konfiguration konnte nicht geladen werden",
-      "module_failed": "Modul %s Fehler: %v"
+      "module_failed": "Modul %s fehlgeschlagen: %v",
+      "nvidia_smi_not_found": "nvidia-smi nicht gefunden. GPU-Überwachung erfordert NVIDIA-Treiber",
+      "rocm_smi_not_found": "rocm-smi nicht gefunden. AMD GPU-Überwachung erfordert ROCm"
     },
     "status": {
       "monitoring_started": "Überwachung gestartet",
-      "updating_every": "Aktualisiere alle %d Sekunden",
-      "press_ctrl_c": "Drücken Sie Ctrl+C zum Beenden",
-      "remote_mode": "Fernmodus auf Port %d"
+      "updating_every": "Aktualisiere alle %d Sekunden", 
+      "press_ctrl_c": "Drücken Sie Strg+C zum Beenden",
+      "remote_mode": "Fernmodus auf Port %d",
+      "gpu_detected": "GPU erkannt: %s",
+      "ai_training_detected": "KI-Trainingsprozesse erkannt: %d",
+      "mining_detected": "Mining-Aktivität erkannt: %s"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Dansk",
+  "language": "Danish (Dansk)", 
   "language_code": "da",
   "translations": {
     "common": {
@@ -9,28 +9,28 @@
       "error": "Fejl",
       "unknown": "Ukendt",
       "total": "Total",
-      "used": "Brugt",
+      "used": "Brugt", 
       "free": "Ledig",
       "available": "Tilgængelig",
       "status": "Status",
-      "up": "TIL",
-      "down": "FRA"
+      "up": "OP",
+      "down": "NED"
     },
     "cpu": {
-      "title": "Processorinformation",
+      "title": "CPU-information",
       "model": "Model",
       "cores": "Kerner",
       "threads": "Tråde",
       "usage": "Brug",
-      "frequency": "Frekvens",
+      "frequency": "Frekvens", 
       "load": "Belastning",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Gennemsnitlig belastning"
     },
     "memory": {
-      "title": "Hukommelsesinformation",
+      "title": "Hukommelsesinformation", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysisk hukommelse",
@@ -40,9 +40,9 @@
       "title": "Diskinformation",
       "filesystem": "Filsystem",
       "size": "Størrelse",
-      "mounted": "Monteringspunkt",
+      "mounted": "Monteret på", 
       "usage": "Brug",
-      "storage": "Lager"
+      "storage": "Lagring"
     },
     "network": {
       "title": "Netværksinformation",
@@ -54,9 +54,48 @@
       "errors": "Fejl",
       "network_interfaces": "Netværksinterfaces"
     },
+    "gpu": {
+      "title": "GPU-information",
+      "model": "Model",
+      "driver": "Driver",
+      "temperature": "Temperatur",
+      "memory": "Hukommelse",
+      "utilization": "Udbnyttelse",
+      "power": "Effekt",
+      "clock_core": "Kernehastighed",
+      "clock_memory": "Hukommelseshastighed",
+      "fan_speed": "Ventilatorhastighed"
+    },
+    "ai": {
+      "title": "AI-træning",
+      "framework": "Framework",
+      "processes": "Processer",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Batchstørrelse",
+      "throughput": "Gennemstrømning",
+      "epoch": "Epoke",
+      "loss": "Tab",
+      "accuracy": "Nøjagtighed",
+      "training_time": "Træningstid",
+      "no_training": "Ingen AI-træning registreret"
+    },
+    "mining": {
+      "title": "Mining-information",
+      "algorithm": "Algoritme",
+      "hashrate": "Hashrate",
+      "shares": "Andele",
+      "temperature": "Temperatur",
+      "power": "Effekt",
+      "efficiency": "Effektivitet",
+      "uptime": "Oppetid",
+      "revenue_24h": "24h indtægt",
+      "pool": "Pool",
+      "not_detected": "Ingen mining-aktivitet registreret"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Lodret",
+      "vertical": "Lodret", 
       "horizontal": "Vandret",
       "loading": "Indlæser...",
       "no_data": "Ingen data",
@@ -67,10 +106,13 @@
       "version": "Version",
       "all": "Al information",
       "disk_only": "Kun disk",
-      "cpu_only": "Kun processor",
-      "memory_only": "Kun hukommelse",
+      "cpu_only": "Kun CPU",
+      "memory_only": "Kun hukommelse", 
       "network_only": "Kun netværk",
-      "refresh_rate": "Opdateringsinterval",
+      "gpu_only": "Kun GPU",
+      "ai_only": "Kun AI-træning",
+      "mining_only": "Kun mining",
+      "refresh_rate": "Opdateringsfrekvens",
       "language": "Sprog",
       "remote": "Fjernmodus",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Kommando ikke fundet: %s",
       "invalid_port": "Ugyldig port: %d",
-      "invalid_refresh": "Ugyldigt opdateringsinterval: %d",
+      "invalid_refresh": "Ugyldigt opdateringsinterval: %d", 
       "config_load_failed": "Kunne ikke indlæse konfiguration",
-      "module_failed": "Modul %s fejl: %v"
+      "module_failed": "Modul %s fejlede: %v",
+      "nvidia_smi_not_found": "nvidia-smi ikke fundet. GPU-overvågning kræver NVIDIA-drivere",
+      "rocm_smi_not_found": "rocm-smi ikke fundet. AMD GPU-overvågning kræver ROCm"
     },
     "status": {
       "monitoring_started": "Overvågning startet",
-      "updating_every": "Opdaterer hver %d. sekund",
-      "press_ctrl_c": "Tryk på Ctrl+C for at afslutte",
-      "remote_mode": "Fjernmodus på port %d"
+      "updating_every": "Opdaterer hver %d sekund", 
+      "press_ctrl_c": "Tryk Ctrl+C for at afslutte",
+      "remote_mode": "Fjernmodus på port %d",
+      "gpu_detected": "GPU registreret: %s",
+      "ai_training_detected": "AI-træningsprocesser registreret: %d",
+      "mining_detected": "Mining-aktivitet registreret: %s"
     }
   }
 }

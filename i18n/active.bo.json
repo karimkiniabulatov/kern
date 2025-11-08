@@ -1,92 +1,139 @@
 {
-  "language": "བོད་ཡིག",
+  "language": "Tibetan (བོད་སྐད་)", 
   "language_code": "bo",
   "translations": {
     "common": {
-      "title": "kern - མ་ལྕེ་འཛིན་སྤྱོད་ཐབས་བརྟག་དཔྱད།",
-      "refresh": "སེར་འདོན།",
+      "title": "kern - མ་ལག་གི་བརྟག་དཔྱད་ཆས།",
+      "refresh": "སེལ་འཐུ།",
       "seconds": "སྐར་མ།",
       "error": "ནོར་འཁྲུལ།",
       "unknown": "མི་ཤེས་པ།",
       "total": "སྤྱིར་བསྡོམས།",
-      "used": "བཀོལ་སྤྱོད་བྱས་པ།",
-      "free": "ཡོད་པ།",
-      "available": "ལག་ལེན་བྱེད་ཐུབ་པ།",
+      "used": "བཀོལ་སྤྱོད་བྱས་པ།", 
+      "free": "ཡིད་མངོན།",
+      "available": "ལྷག་པ།",
       "status": "གནས་སྟངས།",
-      "up": "བཀོལ་སྤྱོད།",
-      "down": "བཀོལ་སྤྱོད་མེད་པ།"
+      "up": "ཡོད།",
+      "down": "མེད།"
     },
     "cpu": {
-      "title": "གཏོང་སྒོའི་ཆ་འཕྲིན།",
-      "model": "དཔེ་བམ།",
-      "cores": "གཞི་མ།",
-      "threads": "ཚང་མ།",
+      "title": "CPU གནས་ཚུལ།",
+      "model": "དཔེ་བཟོ།",
+      "cores": "གཙོ་སྒྲོམ།",
+      "threads": "ཐེ་རེཌ།",
       "usage": "བཀོལ་སྤྱོད།",
-      "frequency": "གཟིགས་ཚད།",
+      "frequency": "ཁྲོད་རྒྱུན།", 
       "load": "འཁྱེར་བ།",
-      "load_1min": "སྐར་མ་༦༠",
-      "load_5min": "སྐར་མ་༣༠༠", 
-      "load_15min": "སྐར་མ་༩༠༠",
-      "load_average": "འཁྱེར་བའི་ཆ་སྙོམས།"
+      "load_1min": "1 སྐར་མ།",
+      "load_5min": "5 སྐར་མ།",
+      "load_15min": "15 སྐར་མ།",
+      "load_average": "འཁྱེར་བ་སྤྱིམ།"
     },
     "memory": {
-      "title": "དྲན་ཚད་ཆ་འཕྲིན།",
+      "title": "དྲན་གསོའི་གནས་ཚུལ།", 
       "ram": "RAM",
-      "swap": "བར་མར་བཏང་བ།",
-      "physical": "དངོས་གནས་དྲན་ཚད།",
-      "virtual": "འཇོག་སྤྱོད་དྲན་ཚད།"
+      "swap": "བརྗེ་སྒྱུར།",
+      "physical": "དངོས་པོའི་དྲན་གསོ།",
+      "virtual": "འཇུག་སྤྱོད་དྲན་གསོ།"
     },
     "disk": {
-      "title": "དིས་ཀའི་ཆ་འཕྲིན།",
+      "title": "དིསཀའི་གནས་ཚུལ།",
       "filesystem": "ཡིག་སྣོད་མ་ལག།",
       "size": "ཆེ་ཆུང་།",
-      "mounted": "བཙུགས་ས་།",
+      "mounted": "འཇོག་ས།", 
       "usage": "བཀོལ་སྤྱོད།",
-      "storage": "སྣོད་འཛིན།"
+      "storage": "གཞི་སྟོང་།"
     },
     "network": {
-      "title": "དྲ་རྒྱའི་ཆ་འཕྲིན།",
-      "interface": "མཐུད་སྒོ།",
-      "received": "ཐོབ་པ།",
-      "sent": "འཕྲིན་པ།",
-      "bytes": "བེད།",
-      "packets": "ཚིལ་གྲུཔ།",
+      "title": "དྲ་བའི་གནས་ཚུལ།",
+      "interface": "མཐོང་ཆས།",
+      "received": "ལེན་པ།",
+      "sent": "གཏོང་བ།",
+      "bytes": "བཡེཊ།",
+      "packets": "པེ་ཀེཊ།",
       "errors": "ནོར་འཁྲུལ།",
-      "network_interfaces": "དྲ་རྒྱའི་མཐུད་སྒོ།"
+      "network_interfaces": "དྲ་བའི་མཐོང་ཆས།"
+    },
+    "gpu": {
+      "title": "GPU གནས་ཚུལ།",
+      "model": "དཔེ་བཟོ།",
+      "driver": "སྣེ་ལེན་པ།",
+      "temperature": "དྲོད་ཚད།",
+      "memory": "དྲན་གསོ།",
+      "utilization": "བཀོལ་སྤྱོད།",
+      "power": "ནུས་པ།",
+      "clock_core": "གཙོ་སྒྲོམ་དུས་ཚོད།",
+      "clock_memory": "དྲན་གསོའི་དུས་ཚོད།",
+      "fan_speed": "རླུང་འཁོར་མགྱོགས་ཚད།"
+    },
+    "ai": {
+      "title": "AI སྦྱོང་བརྡར།",
+      "framework": "གཞི་རྩ།",
+      "processes": "ལས་རིམ།",
+      "vram": "VRAM",
+      "model": "དཔེ་བཟོ།",
+      "batch_size": "སྡེབ་ཚན་ཆེ་ཆུང་།",
+      "throughput": "བརྒྱུད་རིམ།",
+      "epoch": "དུས་རབས།",
+      "loss": "ཉོས་འཁྲུལ།",
+      "accuracy": "གཏན་ཚིགས།",
+      "training_time": "སྦྱོང་བརྡར་དུས་ཚོད།",
+      "no_training": "AI སྦྱོང་བརྡར་མ་རྙེད།"
+    },
+    "mining": {
+      "title": "འཚོང་རྫོང་གནས་ཚུལ།",
+      "algorithm": "རྩིས་ཐབས།",
+      "hashrate": "ཧཤ་མགྱོགས་ཚད།",
+      "shares": "ཚོང་ཁུངས།",
+      "temperature": "དྲོད་ཚད།",
+      "power": "ནུས་པ།",
+      "efficiency": "ནུས་པ།",
+      "uptime": "བྱེད་ནུས་དུས་ཚོད།",
+      "revenue_24h": "24ཆུ་ཚོད་འབྲས་བུ།",
+      "pool": "ཁང་པ།",
+      "not_detected": "འཚོང་རྫོང་བྱེད་ནུས་མ་རྙེད།"
     },
     "ui": {
-      "histogram": "ཚད་ལྡན་རིས་མོ།",
-      "vertical": "ཚད་ལྡན།",
-      "horizontal": "སྤྱི་ཁྱོན།",
+      "histogram": "གཏན་ཚིགས་རིས།",
+      "vertical": "ཡལ་ག།", 
+      "horizontal": "འཁྱོལ་བ།",
       "loading": "འཇུག་བཞིན་པ།...",
-      "no_data": "གཞི་གྲངས་མེད་པ།",
-      "percent": "ཆིག་བརྒྱ།"
+      "no_data": "གཞི་གྲངས་མེད།",
+      "percent": "ཚད་གཞི།"
     },
     "commands": {
       "help": "རོགས་རམ།",
       "version": "ཐོན་རིམ།",
-      "all": "ཆ་འཕྲིན་ཡོངས་རྫོགས།",
-      "disk_only": "དིས་ཀ་ཁོ་ན།",
-      "cpu_only": "གཏོང་སྒོ་ཁོ་ན།",
-      "memory_only": "དྲན་ཚད་ཁོ་ན།",
-      "network_only": "དྲ་རྒྱ་ཁོ་ན།",
-      "refresh_rate": "སེར་འདོན་ཚད།",
-      "language": "སྐད་ཡིག།",
-      "remote": "ཐག་པའི་ཐབས་ཤེས།",
-      "port": "འཛུལ་སྒོ།"
+      "all": "གནས་ཚུལ་ཡོངས།",
+      "disk_only": "དིསཀ་ཁོ་ན།",
+      "cpu_only": "CPU ཁོ་ན།",
+      "memory_only": "དྲན་གསོ་ཁོ་ན།", 
+      "network_only": "དྲ་བ་ཁོ་ན།",
+      "gpu_only": "GPU ཁོ་ན།",
+      "ai_only": "AI སྦྱོང་བརྡར་ཁོ་ན།",
+      "mining_only": "འཚོང་རྫོང་ཁོ་ན།",
+      "refresh_rate": "སེལ་འཐུའི་མགྱོགས་ཚད།",
+      "language": "སྐད་ཡིག",
+      "remote": "ཐག་རིང་ལས་ཁུངས།",
+      "port": "ཕོརཊ།"
     },
     "errors": {
-      "command_not_found": "བཀོལ་ཚིག་མ་རྙེད་པ།: %s",
-      "invalid_port": "འཛུལ་སྒོ་ནོར་འཁྲུལ།: %d",
-      "invalid_refresh": "སེར་འདོན་ཚད་ནོར་འཁྲུལ།: %d",
-      "config_load_failed": "དམ་བཅའ་འཇུག་མི་ཐུབ་པ།",
-      "module_failed": "ཆ་ཤས་ %s ནོར་འཁྲུལ།: %v"
+      "command_not_found": "བཀོལ་སྤྱོད་མ་རྙེད།: %s",
+      "invalid_port": "ནོར་འཁྲུལ་ཕོརཊ།: %d",
+      "invalid_refresh": "ནོར་འཁྲུལ་སེལ་འཐུའི་བར་སྟོང་།: %d", 
+      "config_load_failed": "སྒྲིག་བཀོད་འཇུག་མ་ཐུབ།",
+      "module_failed": "ཆ་ཤས་ %s ཕམ་ཉེས།: %v",
+      "nvidia_smi_not_found": "nvidia-smi མ་རྙེད། GPU བརྟག་དཔྱད་ལ་ NVIDIA སྣེ་ལེན་པ་དགོས།",
+      "rocm_smi_not_found": "rocm-smi མ་རྙེད། AMD GPU བརྟག་དཔྱད་ལ་ ROCm དགོས།"
     },
     "status": {
       "monitoring_started": "བརྟག་དཔྱད་འགོ་བཙུགས།",
-      "updating_every": "སྐར་མ་ %d རེ་ནང་གསར་བཅོས།",
-      "press_ctrl_c": "ཕྱིར་འབུད་པར་Ctrl+Cནོན།",
-      "remote_mode": "འཛུལ་སྒོ་ %d ལ་ཐག་པའི་ཐབས་ཤེས།"
+      "updating_every": "སྐར་མ་ %d རེ་ནས་གསར་བཅོས།", 
+      "press_ctrl_c": "ཕྱིར་འགྲོ་ལ་ Ctrl+C ནོན།",
+      "remote_mode": "ཕོརཊ་ %d ནང་ཐག་རིང་ལས་ཁུངས།",
+      "gpu_detected": "GPU རྙེད་ཐུབ།: %s",
+      "ai_training_detected": "AI སྦྱོང་བརྡར་ལས་རིམ་རྙེད་ཐུབ།: %d",
+      "mining_detected": "འཚོང་རྫོང་བྱེད་ནུས་རྙེད་ཐུབ།: %s"
     }
   }
 }

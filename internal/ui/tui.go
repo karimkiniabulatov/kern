@@ -38,43 +38,64 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 }
 
 func (t *TUI) Render(data map[string]interface{}) {
-	t.screen.Clear()
-	width, height := t.screen.Size()
+    t.screen.Clear()
+    width, height := t.screen.Size()
 
-	row := 0
+    row := 0
 
-	// Show logo if needed
-	if t.showLogo {
-		row = t.renderLogo(row, width)
-	}
+    // Show logo if needed
+    if t.showLogo {
+        row = t.renderLogo(row, width)
+    }
 
-	// Render only enabled modules
-	if t.config.ShowDisk {
-		if diskData, exists := data["disk"]; exists {
-			row = t.renderDisk(row, width, diskData)
-		}
-	}
+    // Render only enabled modules
+    if t.config.ShowDisk {
+        if diskData, exists := data["disk"]; exists {
+            row = t.renderDisk(row, width, diskData)
+        }
+    }
 
-	if t.config.ShowMem {
-		if memData, exists := data["mem"]; exists {
-			row = t.renderMemory(row, width, memData)
-		}
-	}
+    if t.config.ShowMem {
+        if memData, exists := data["mem"]; exists {
+            row = t.renderMemory(row, width, memData)
+        }
+    }
 
-	if t.config.ShowNet {
-		if netData, exists := data["net"]; exists {
-			row = t.renderNetwork(row, width, netData)
-		}
-	}
+    if t.config.ShowNet {
+        if netData, exists := data["net"]; exists {
+            row = t.renderNetwork(row, width, netData)
+        }
+    }
 
-	if t.config.ShowCPU {
-		if cpuData, exists := data["cpu"]; exists {
-			row = t.renderCPU(row, width, cpuData)
-		}
-	}
+    if t.config.ShowCPU {
+        if cpuData, exists := data["cpu"]; exists {
+            row = t.renderCPU(row, width, cpuData)
+        }
+    }
 
-	t.renderFooter(row, width, height)
-	t.screen.Show()
+    // NEW: GPU monitoring
+    if t.config.ShowGPU {
+        if gpuData, exists := data["gpu"]; exists {
+            row = t.renderGPU(row, width, gpuData)
+        }
+    }
+
+    // NEW: AI training monitoring  
+    if t.config.ShowAI {
+        if aiData, exists := data["ai"]; exists {
+            row = t.renderAI(row, width, aiData)
+        }
+    }
+
+    // NEW: Mining monitoring
+    if t.config.ShowMining {
+        if miningData, exists := data["mining"]; exists {
+            row = t.renderMining(row, width, miningData)
+        }
+    }
+
+    t.renderFooter(row, width, height)
+    t.screen.Show()
 }
 
 // ForceRedraw перерисовывает экран с последними данными
@@ -108,6 +129,106 @@ func (t *TUI) renderLogo(startRow int, width int) int {
 
 	return startRow + len(logo) + 1
 }
+
+func (t *TUI) renderGPU(startRow int, width int, data interface{}) int {
+    row := t.renderHeader(startRow, t.config.T("gpu.title"), width)
+
+    if gpuInfo, ok := data.(*gpu.GPUInfo); ok {
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        
+        tempGraph := t.createCompactGraph(gpuInfo.GPUTemp/100*100, 15) // Normalize to percentage
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f°C", 
+            t.config.T("gpu.temperature"), tempGraph, gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+
+        utilGraph := t.createCompactGraph(gpuInfo.Utilization, 15)
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%", 
+            t.config.T("gpu.utilization"), utilGraph, gpuInfo.Utilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s", 
+            t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s", 
+            t.config.T("gpu.power"), gpuInfo.PowerDraw, gpuInfo.PowerLimit), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+            
+        row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %s", 
+            t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
+            t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+    }
+    return row + 1
+}
+
+func (t *TUI) renderAI(startRow int, width int, data interface{}) int {
+    row := t.renderHeader(startRow, t.config.T("ai.title"), width)
+
+    if aiInfo, ok := data.(*ai.AIInfo); ok {
+        if aiInfo.ProcessCount > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("ai.framework"), aiInfo.Framework), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d", t.config.T("ai.processes"), aiInfo.ProcessCount), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+            
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s", 
+                t.config.T("ai.vram"), aiInfo.VRAMUsage, aiInfo.VRAMTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+
+            if aiInfo.ModelName != "" {
+                row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("ai.model"), aiInfo.ModelName), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            }
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d | %s: %.1f samples/sec", 
+                t.config.T("ai.batch_size"), aiInfo.BatchSize,
+                t.config.T("ai.throughput"), aiInfo.Throughput), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d | %s: %.3f | %s: %.1f%%", 
+                t.config.T("ai.epoch"), aiInfo.Epoch,
+                t.config.T("ai.loss"), aiInfo.Loss,
+                t.config.T("ai.accuracy"), aiInfo.Accuracy*100), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("ai.training_time"), aiInfo.TrainingTime), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        } else {
+            row = t.printLine(row, 0, t.config.T("ai.no_training"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+        }
+    }
+    return row + 1
+}
+
+func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
+    row := t.renderHeader(startRow, t.config.T("mining.title"), width)
+
+    if miningInfo, ok := data.(*mining.MiningInfo); ok {
+        if miningInfo.Algorithm != "" {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s (%s)", 
+                t.config.T("mining.algorithm"), miningInfo.Algorithm, miningInfo.Currency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+                t.config.T("mining.hashrate"), miningInfo.Hashrate), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d/%d (%.1f%%)", 
+                t.config.T("mining.shares"), miningInfo.SharesValid, 
+                miningInfo.SharesValid+miningInfo.SharesInvalid,
+                float64(miningInfo.SharesValid)/float64(miningInfo.SharesValid+miningInfo.SharesInvalid)*100),
+                tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+
+            tempGraph := t.createCompactGraph(miningInfo.Temperature, 15)
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f°C", 
+                t.config.T("mining.temperature"), tempGraph, miningInfo.Temperature), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %s", 
+                t.config.T("mining.power"), miningInfo.PowerConsumption,
+                t.config.T("mining.efficiency"), miningInfo.Efficiency), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %s", 
+                t.config.T("mining.uptime"), miningInfo.Uptime,
+                t.config.T("mining.revenue_24h"), miningInfo.Revenue24h), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+                t.config.T("mining.pool"), miningInfo.Pool), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        } else {
+            row = t.printLine(row, 0, t.config.T("mining.not_detected"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+        }
+    }
+    return row + 1
+}
+
+
 
 func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("cpu.title"), width)

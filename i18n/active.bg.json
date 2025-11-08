@@ -1,36 +1,36 @@
 {
-  "language": "Български",
+  "language": "Bulgarian (Български)", 
   "language_code": "bg",
   "translations": {
     "common": {
-      "title": "kern - Системен мониторинг",
-      "refresh": "Обнови",
+      "title": "kern - Системен монитор",
+      "refresh": "Опресняване",
       "seconds": "сек",
       "error": "Грешка",
       "unknown": "Неизвестно",
       "total": "Общо",
-      "used": "Използвано",
+      "used": "Използвано", 
       "free": "Свободно",
       "available": "Налично",
       "status": "Статус",
-      "up": "ВКЛ",
-      "down": "ИЗКЛ"
+      "up": "АКТИВНО",
+      "down": "НЕАКТИВНО"
     },
     "cpu": {
-      "title": "Информация за процесора",
+      "title": "CPU информация",
       "model": "Модел",
       "cores": "Ядра",
       "threads": "Нишки",
       "usage": "Използване",
-      "frequency": "Честота",
+      "frequency": "Честота", 
       "load": "Натоварване",
       "load_1min": "1 мин",
-      "load_5min": "5 мин", 
+      "load_5min": "5 мин",
       "load_15min": "15 мин",
       "load_average": "Средно натоварване"
     },
     "memory": {
-      "title": "Информация за паметта",
+      "title": "Информация за паметта", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Физическа памет",
@@ -40,53 +40,100 @@
       "title": "Информация за диска",
       "filesystem": "Файлова система",
       "size": "Размер",
-      "mounted": "Точка на монтиране",
+      "mounted": "Монтиран на", 
       "usage": "Използване",
       "storage": "Съхранение"
     },
     "network": {
-      "title": "Информация за мрежата",
+      "title": "Мрежова информация",
       "interface": "Интерфейс",
-      "received": "Получено",
-      "sent": "Изпратено",
+      "received": "Получени",
+      "sent": "Изпратени",
       "bytes": "байта",
-      "packets": "пакета",
+      "packets": "пакети",
       "errors": "Грешки",
       "network_interfaces": "Мрежови интерфейси"
     },
+    "gpu": {
+      "title": "GPU информация",
+      "model": "Модел",
+      "driver": "Драйвер",
+      "temperature": "Температура",
+      "memory": "Памет",
+      "utilization": "Използване",
+      "power": "Мощност",
+      "clock_core": "Честота на ядрото",
+      "clock_memory": "Честота на паметта",
+      "fan_speed": "Скорост на вентилатора"
+    },
+    "ai": {
+      "title": "AI обучение",
+      "framework": "Фреймуърк",
+      "processes": "Процеси",
+      "vram": "VRAM",
+      "model": "Модел",
+      "batch_size": "Размер на батча",
+      "throughput": "Пропускателна способност",
+      "epoch": "Епоха",
+      "loss": "Загуба",
+      "accuracy": "Точност",
+      "training_time": "Време за обучение",
+      "no_training": "Не е открито AI обучение"
+    },
+    "mining": {
+      "title": "Информация за мининг",
+      "algorithm": "Алгоритъм",
+      "hashrate": "Хешрейт",
+      "shares": "Дялове",
+      "temperature": "Температура",
+      "power": "Мощност",
+      "efficiency": "Ефективност",
+      "uptime": "Време на работа",
+      "revenue_24h": "24ч приход",
+      "pool": "Пул",
+      "not_detected": "Не е открита минърска активност"
+    },
     "ui": {
       "histogram": "Хистограма",
-      "vertical": "Вертикална",
-      "horizontal": "Хоризонтална",
+      "vertical": "Вертикално", 
+      "horizontal": "Хоризонтално",
       "loading": "Зареждане...",
       "no_data": "Няма данни",
-      "percent": "процента"
+      "percent": "процент"
     },
     "commands": {
       "help": "Помощ",
       "version": "Версия",
       "all": "Цялата информация",
       "disk_only": "Само диск",
-      "cpu_only": "Само процесор",
-      "memory_only": "Само памет",
+      "cpu_only": "Само CPU",
+      "memory_only": "Само памет", 
       "network_only": "Само мрежа",
-      "refresh_rate": "Интервал на обновяване",
+      "gpu_only": "Само GPU",
+      "ai_only": "Само AI обучение",
+      "mining_only": "Само мининг",
+      "refresh_rate": "Честота на опресняване",
       "language": "Език",
       "remote": "Отдалечен режим",
       "port": "Порт"
     },
     "errors": {
-      "command_not_found": "Командата не е открита: %s",
+      "command_not_found": "Командата не е намерена: %s",
       "invalid_port": "Невалиден порт: %d",
-      "invalid_refresh": "Невалиден интервал на обновяване: %d",
+      "invalid_refresh": "Невалиден интервал на опресняване: %d", 
       "config_load_failed": "Неуспешно зареждане на конфигурацията",
-      "module_failed": "Грешка в модул %s: %v"
+      "module_failed": "Модул %s неуспешен: %v",
+      "nvidia_smi_not_found": "nvidia-smi не е намерен. Мониторингът на GPU изисква NVIDIA драйвери",
+      "rocm_smi_not_found": "rocm-smi не е намерен. Мониторингът на AMD GPU изисква ROCm"
     },
     "status": {
       "monitoring_started": "Мониторингът започна",
-      "updating_every": "Обновяване на всеки %d секунди",
+      "updating_every": "Актуализира се на всеки %d секунди", 
       "press_ctrl_c": "Натиснете Ctrl+C за изход",
-      "remote_mode": "Отдалечен режим на порт %d"
+      "remote_mode": "Отдалечен режим на порт %d",
+      "gpu_detected": "GPU открит: %s",
+      "ai_training_detected": "Открити AI обучаващи процеси: %d",
+      "mining_detected": "Открита минърска активност: %s"
     }
   }
 }

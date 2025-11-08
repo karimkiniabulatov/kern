@@ -1,15 +1,15 @@
 {
-  "language": "Slovenčina",
+  "language": "Slovak (Slovenčina)", 
   "language_code": "sk",
   "translations": {
     "common": {
-      "title": "kern - Monitorovanie systému",
+      "title": "kern - Monitor systému",
       "refresh": "Obnoviť",
       "seconds": "sek",
       "error": "Chyba",
       "unknown": "Neznáme",
       "total": "Celkom",
-      "used": "Použité",
+      "used": "Použité", 
       "free": "Voľné",
       "available": "Dostupné",
       "status": "Stav",
@@ -17,20 +17,20 @@
       "down": "VYPNUTÉ"
     },
     "cpu": {
-      "title": "Informácie o procesore",
+      "title": "Informácie o CPU",
       "model": "Model",
       "cores": "Jadrá",
       "threads": "Vlákna",
       "usage": "Využitie",
-      "frequency": "Frekvencia",
+      "frequency": "Frekvencia", 
       "load": "Zaťaženie",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Priemerné zaťaženie"
     },
     "memory": {
-      "title": "Informácie o pamäti",
+      "title": "Informácie o pamäti", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fyzická pamäť",
@@ -40,12 +40,12 @@
       "title": "Informácie o disku",
       "filesystem": "Súborový systém",
       "size": "Veľkosť",
-      "mounted": "Prípojný bod",
+      "mounted": "Pripojené na", 
       "usage": "Využitie",
       "storage": "Úložisko"
     },
     "network": {
-      "title": "Informácie o sieti",
+      "title": "Sieťové informácie",
       "interface": "Rozhranie",
       "received": "Prijaté",
       "sent": "Odoslané",
@@ -54,10 +54,49 @@
       "errors": "Chyby",
       "network_interfaces": "Sieťové rozhrania"
     },
+    "gpu": {
+      "title": "Informácie o GPU",
+      "model": "Model",
+      "driver": "Ovládač",
+      "temperature": "Teplota",
+      "memory": "Pamäť",
+      "utilization": "Využitie",
+      "power": "Výkon",
+      "clock_core": "Takt jadra",
+      "clock_memory": "Takt pamäte",
+      "fan_speed": "Rýchlosť ventilátora"
+    },
+    "ai": {
+      "title": "AI tréning",
+      "framework": "Framework",
+      "processes": "Procesy",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Veľkosť dávky",
+      "throughput": "Prenosová rýchlosť",
+      "epoch": "Epocha",
+      "loss": "Strata",
+      "accuracy": "Presnosť",
+      "training_time": "Čas tréningu",
+      "no_training": "Nebol zistený AI tréning"
+    },
+    "mining": {
+      "title": "Informácie o ťažbe",
+      "algorithm": "Algoritmus",
+      "hashrate": "Hash rýchlosť",
+      "shares": "Podiely",
+      "temperature": "Teplota",
+      "power": "Výkon",
+      "efficiency": "Efektívnosť",
+      "uptime": "Doba prevádzky",
+      "revenue_24h": "24h výnos",
+      "pool": "Pool",
+      "not_detected": "Nebola zistená ťažobná aktivita"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Zvislý",
-      "horizontal": "Vodorovný",
+      "vertical": "Vertikálne", 
+      "horizontal": "Horizontálne",
       "loading": "Načítava sa...",
       "no_data": "Žiadne dáta",
       "percent": "percent"
@@ -67,10 +106,13 @@
       "version": "Verzia",
       "all": "Všetky informácie",
       "disk_only": "Iba disk",
-      "cpu_only": "Iba procesor",
-      "memory_only": "Iba pamäť",
+      "cpu_only": "Iba CPU",
+      "memory_only": "Iba pamäť", 
       "network_only": "Iba sieť",
-      "refresh_rate": "Interval obnovenia",
+      "gpu_only": "Iba GPU",
+      "ai_only": "Iba AI tréning",
+      "mining_only": "Iba ťažba",
+      "refresh_rate": "Frekvencia obnovovania",
       "language": "Jazyk",
       "remote": "Vzdialený režim",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Príkaz nebol nájdený: %s",
       "invalid_port": "Neplatný port: %d",
-      "invalid_refresh": "Neplatný interval obnovenia: %d",
+      "invalid_refresh": "Neplatný interval obnovovania: %d", 
       "config_load_failed": "Nepodarilo sa načítať konfiguráciu",
-      "module_failed": "Chyba modulu %s: %v"
+      "module_failed": "Modul %s zlyhal: %v",
+      "nvidia_smi_not_found": "nvidia-smi nebol nájdený. Sledovanie GPU vyžaduje ovládače NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nebol nájdený. Sledovanie AMD GPU vyžaduje ROCm"
     },
     "status": {
-      "monitoring_started": "Monitorovanie spustené",
-      "updating_every": "Aktualizácia každých %d sekúnd",
+      "monitoring_started": "Sledovanie bolo spustené",
+      "updating_every": "Aktualizácia každých %d sekúnd", 
       "press_ctrl_c": "Stlačte Ctrl+C pre ukončenie",
-      "remote_mode": "Vzdialený režim na porte %d"
+      "remote_mode": "Vzdialený režim na porte %d",
+      "gpu_detected": "GPU zistené: %s",
+      "ai_training_detected": "AI tréningové procesy zistené: %d",
+      "mining_detected": "Ťažobná aktivita zistená: %s"
     }
   }
 }

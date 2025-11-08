@@ -54,6 +54,45 @@
       "errors": "Errors",
       "network_interfaces": "Network Interfaces"
     },
+    "gpu": {
+      "title": "GPU Information",
+      "model": "Model",
+      "driver": "Driver",
+      "temperature": "Temperature",
+      "memory": "Memory",
+      "utilization": "Utilization",
+      "power": "Power",
+      "clock_core": "Core Clock",
+      "clock_memory": "Memory Clock",
+      "fan_speed": "Fan Speed"
+    },
+    "ai": {
+      "title": "AI Training",
+      "framework": "Framework",
+      "processes": "Processes",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Batch Size",
+      "throughput": "Throughput",
+      "epoch": "Epoch",
+      "loss": "Loss",
+      "accuracy": "Accuracy",
+      "training_time": "Training Time",
+      "no_training": "No AI training detected"
+    },
+    "mining": {
+      "title": "Mining Information",
+      "algorithm": "Algorithm",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
+      "temperature": "Temperature",
+      "power": "Power",
+      "efficiency": "Efficiency",
+      "uptime": "Uptime",
+      "revenue_24h": "24h Revenue",
+      "pool": "Pool",
+      "not_detected": "No mining activity detected"
+    },
     "ui": {
       "histogram": "Histogram",
       "vertical": "Vertical", 
@@ -70,6 +109,9 @@
       "cpu_only": "CPU only",
       "memory_only": "Memory only", 
       "network_only": "Network only",
+      "gpu_only": "GPU only",
+      "ai_only": "AI training only",
+      "mining_only": "Mining only",
       "refresh_rate": "Refresh rate",
       "language": "Language",
       "remote": "Remote mode",
@@ -80,13 +122,18 @@
       "invalid_port": "Invalid port: %d",
       "invalid_refresh": "Invalid refresh interval: %d", 
       "config_load_failed": "Failed to load configuration",
-      "module_failed": "Module %s failed: %v"
+      "module_failed": "Module %s failed: %v",
+      "nvidia_smi_not_found": "nvidia-smi not found. GPU monitoring requires NVIDIA drivers",
+      "rocm_smi_not_found": "rocm-smi not found. AMD GPU monitoring requires ROCm"
     },
     "status": {
       "monitoring_started": "Monitoring started",
       "updating_every": "Updating every %d seconds", 
       "press_ctrl_c": "Press Ctrl+C to exit",
-      "remote_mode": "Remote mode on port %d"
+      "remote_mode": "Remote mode on port %d",
+      "gpu_detected": "GPU detected: %s",
+      "ai_training_detected": "AI training processes detected: %d",
+      "mining_detected": "Mining activity detected: %s"
     }
   }
 }

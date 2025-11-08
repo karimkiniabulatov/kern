@@ -1,15 +1,15 @@
 {
-  "language": "Čeština",
+  "language": "Czech (Čeština)", 
   "language_code": "cs",
   "translations": {
     "common": {
-      "title": "kern - Monitorování systému",
+      "title": "kern - Monitor systému",
       "refresh": "Obnovit",
       "seconds": "sek",
       "error": "Chyba",
-      "unknown": "Neznámý",
+      "unknown": "Neznámé",
       "total": "Celkem",
-      "used": "Použito",
+      "used": "Použito", 
       "free": "Volné",
       "available": "Dostupné",
       "status": "Stav",
@@ -17,20 +17,20 @@
       "down": "VYPNUTO"
     },
     "cpu": {
-      "title": "Informace o procesoru",
+      "title": "Informace o CPU",
       "model": "Model",
-      "cores": "Jader",
+      "cores": "Jádra",
       "threads": "Vlákna",
       "usage": "Využití",
-      "frequency": "Frekvence",
+      "frequency": "Frekvence", 
       "load": "Zatížení",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Průměrné zatížení"
     },
     "memory": {
-      "title": "Informace o paměti",
+      "title": "Informace o paměti", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fyzická paměť",
@@ -40,7 +40,7 @@
       "title": "Informace o disku",
       "filesystem": "Souborový systém",
       "size": "Velikost",
-      "mounted": "Přípojný bod",
+      "mounted": "Připojeno na", 
       "usage": "Využití",
       "storage": "Úložiště"
     },
@@ -54,10 +54,49 @@
       "errors": "Chyby",
       "network_interfaces": "Síťová rozhraní"
     },
+    "gpu": {
+      "title": "Informace o GPU",
+      "model": "Model",
+      "driver": "Ovladač",
+      "temperature": "Teplota",
+      "memory": "Paměť",
+      "utilization": "Využití",
+      "power": "Výkon",
+      "clock_core": "Takt jádra",
+      "clock_memory": "Takt paměti",
+      "fan_speed": "Rychlost ventilátoru"
+    },
+    "ai": {
+      "title": "AI trénink",
+      "framework": "Framework",
+      "processes": "Procesy",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Velikost dávky",
+      "throughput": "Propustnost",
+      "epoch": "Epocha",
+      "loss": "Ztráta",
+      "accuracy": "Přesnost",
+      "training_time": "Doba tréninku",
+      "no_training": "Nebyl detekován AI trénink"
+    },
+    "mining": {
+      "title": "Informace o těžbě",
+      "algorithm": "Algoritmus",
+      "hashrate": "Hashrate",
+      "shares": "Podíly",
+      "temperature": "Teplota",
+      "power": "Výkon",
+      "efficiency": "Efektivita",
+      "uptime": "Doba provozu",
+      "revenue_24h": "24h výnos",
+      "pool": "Pool",
+      "not_detected": "Nebyla detekována těžební aktivita"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Svislý",
-      "horizontal": "Vodorovný",
+      "vertical": "Vertikální", 
+      "horizontal": "Horizontální",
       "loading": "Načítání...",
       "no_data": "Žádná data",
       "percent": "procent"
@@ -67,10 +106,13 @@
       "version": "Verze",
       "all": "Všechny informace",
       "disk_only": "Pouze disk",
-      "cpu_only": "Pouze procesor",
-      "memory_only": "Pouze paměť",
+      "cpu_only": "Pouze CPU",
+      "memory_only": "Pouze paměť", 
       "network_only": "Pouze síť",
-      "refresh_rate": "Interval obnovení",
+      "gpu_only": "Pouze GPU",
+      "ai_only": "Pouze AI trénink",
+      "mining_only": "Pouze těžba",
+      "refresh_rate": "Obnovovací frekvence",
       "language": "Jazyk",
       "remote": "Vzdálený režim",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Příkaz nebyl nalezen: %s",
       "invalid_port": "Neplatný port: %d",
-      "invalid_refresh": "Neplatný interval obnovení: %d",
+      "invalid_refresh": "Neplatný interval obnovení: %d", 
       "config_load_failed": "Nepodařilo se načíst konfiguraci",
-      "module_failed": "Chyba modulu %s: %v"
+      "module_failed": "Modul %s selhal: %v",
+      "nvidia_smi_not_found": "nvidia-smi nebyl nalezen. Sledování GPU vyžaduje ovladače NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nebyl nalezen. Sledování AMD GPU vyžaduje ROCm"
     },
     "status": {
-      "monitoring_started": "Monitorování spuštěno",
-      "updating_every": "Aktualizace každých %d sekund",
+      "monitoring_started": "Sledování zahájeno",
+      "updating_every": "Aktualizace každých %d sekund", 
       "press_ctrl_c": "Stiskněte Ctrl+C pro ukončení",
-      "remote_mode": "Vzdálený režim na portu %d"
+      "remote_mode": "Vzdálený režim na portu %d",
+      "gpu_detected": "GPU detekováno: %s",
+      "ai_training_detected": "Detekovány AI tréninkové procesy: %d",
+      "mining_detected": "Detekována těžební aktivita: %s"
     }
   }
 }

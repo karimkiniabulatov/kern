@@ -1,64 +1,103 @@
 {
-  "language": "తెలుగు",
+  "language": "Telugu (తెలుగు)", 
   "language_code": "te",
   "translations": {
     "common": {
-      "title": "kern - సిస్టమ్ మానిటరింగ్",
+      "title": "kern - సిస్టమ్ మానిటర్",
       "refresh": "రిఫ్రెష్",
-      "seconds": "సెకన్లు",
+      "seconds": "సెకను",
       "error": "లోపం",
       "unknown": "తెలియదు",
       "total": "మొత్తం",
-      "used": "వాడబడిన",
+      "used": "ఉపయోగించబడినది", 
       "free": "ఉచితం",
-      "available": "అందుబాటులో",
-      "status": "స్టేటస్",
-      "up": "చాలూను",
-      "down": "ఆఫ్"
+      "available": "అందుబాటులో ఉంది",
+      "status": "స్థితి",
+      "up": "చాలూని",
+      "down": "చాలూని"
     },
     "cpu": {
-      "title": "ప్రాసెసర్ సమాచారం",
+      "title": "CPU సమాచారం",
       "model": "మోడల్",
       "cores": "కోర్లు",
       "threads": "థ్రెడ్లు",
-      "usage": "వినియోగం",
-      "frequency": "ఫ్రీక్వెన్సీ",
+      "usage": "ఉపయోగం",
+      "frequency": "ఫ్రీక్వెన్సీ", 
       "load": "లోడ్",
       "load_1min": "1 నిమిషం",
-      "load_5min": "5 నిమిషాలు", 
+      "load_5min": "5 నిమిషాలు",
       "load_15min": "15 నిమిషాలు",
       "load_average": "సగటు లోడ్"
     },
     "memory": {
-      "title": "మెమరీ సమాచారం",
+      "title": "మెమరీ సమాచారం", 
       "ram": "RAM",
       "swap": "స్వాప్",
-      "physical": "ఫిజికల్ మెమరీ",
+      "physical": "భౌతిక మెమరీ",
       "virtual": "వర్చువల్ మెమరీ"
     },
     "disk": {
       "title": "డిస్క్ సమాచారం",
       "filesystem": "ఫైల్ సిస్టమ్",
-      "size": "సైజు",
-      "mounted": "మౌంట్ పాయింట్",
-      "usage": "వినియోగం",
+      "size": "పరిమాణం",
+      "mounted": "మౌంట్ చేయబడినది", 
+      "usage": "ఉపయోగం",
       "storage": "స్టోరేజ్"
     },
     "network": {
       "title": "నెట్వర్క్ సమాచారం",
       "interface": "ఇంటర్ఫేస్",
-      "received": "స్వీకరించబడిన",
-      "sent": "పంపబడిన",
+      "received": "స్వీకరించబడినది",
+      "sent": "పంపబడినది",
       "bytes": "బైట్లు",
       "packets": "ప్యాకెట్లు",
       "errors": "లోపాలు",
       "network_interfaces": "నెట్వర్క్ ఇంటర్ఫేస్లు"
     },
+    "gpu": {
+      "title": "GPU సమాచారం",
+      "model": "మోడల్",
+      "driver": "డ్రైవర్",
+      "temperature": "ఉష్ణోగ్రత",
+      "memory": "మెమరీ",
+      "utilization": "ఉపయోగం",
+      "power": "పవర్",
+      "clock_core": "కోర్ క్లాక్",
+      "clock_memory": "మెమరీ క్లాక్",
+      "fan_speed": "ఫ్యాన్ స్పీడ్"
+    },
+    "ai": {
+      "title": "AI శిక్షణ",
+      "framework": "ఫ్రేమ్వర్క్",
+      "processes": "ప్రాసెస్లు",
+      "vram": "VRAM",
+      "model": "మోడల్",
+      "batch_size": "బ్యాచ్ పరిమాణం",
+      "throughput": "థ్రూపుట్",
+      "epoch": "యుగం",
+      "loss": "లాస్",
+      "accuracy": "ఖచ్చితత్వం",
+      "training_time": "శిక్షణ సమయం",
+      "no_training": "AI శిక్షణ కనుగొనబడలేదు"
+    },
+    "mining": {
+      "title": "మైనింగ్ సమాచారం",
+      "algorithm": "అల్గోరిథం",
+      "hashrate": "హాష్ రేట్",
+      "shares": "షేర్లు",
+      "temperature": "ఉష్ణోగ్రత",
+      "power": "పవర్",
+      "efficiency": "సామర్థ్యం",
+      "uptime": "అప్టైమ్",
+      "revenue_24h": "24గంటల ఆదాయం",
+      "pool": "పూల్",
+      "not_detected": "మైనింగ్ కార్యకలాపాలు కనుగొనబడలేదు"
+    },
     "ui": {
       "histogram": "హిస్టోగ్రామ్",
-      "vertical": "నిలువు",
+      "vertical": "నిలువు", 
       "horizontal": "అడ్డం",
-      "loading": "లోడ్ అవుతుంది...",
+      "loading": "లోడ్ అవుతోంది...",
       "no_data": "డేటా లేదు",
       "percent": "శాతం"
     },
@@ -67,9 +106,12 @@
       "version": "వెర్షన్",
       "all": "అన్ని సమాచారం",
       "disk_only": "డిస్క్ మాత్రమే",
-      "cpu_only": "ప్రాసెసర్ మాత్రమే",
-      "memory_only": "మెమరీ మాత్రమే",
+      "cpu_only": "CPU మాత్రమే",
+      "memory_only": "మెమరీ మాత్రమే", 
       "network_only": "నెట్వర్క్ మాత్రమే",
+      "gpu_only": "GPU మాత్రమే",
+      "ai_only": "AI శిక్షణ మాత్రమే",
+      "mining_only": "మైనింగ్ మాత్రమే",
       "refresh_rate": "రిఫ్రెష్ రేట్",
       "language": "భాష",
       "remote": "రిమోట్ మోడ్",
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "కమాండ్ కనుగొనబడలేదు: %s",
       "invalid_port": "చెల్లని పోర్ట్: %d",
-      "invalid_refresh": "చెల్లని రిఫ్రెష్ రేట్: %d",
+      "invalid_refresh": "చెల్లని రిఫ్రెష్ ఇంటర్వెల్: %d", 
       "config_load_failed": "కాన్ఫిగరేషన్ లోడ్ చేయడం విఫలమైంది",
-      "module_failed": "మాడ్యూల్ %s లోపం: %v"
+      "module_failed": "మాడ్యూల్ %s విఫలమైంది: %v",
+      "nvidia_smi_not_found": "nvidia-smi కనుగొనబడలేదు. GPU మానిటరింగ్ కు NVIDIA డ్రైవర్లు అవసరం",
+      "rocm_smi_not_found": "rocm-smi కనుగొనబడలేదు. AMD GPU మానిటరింగ్ కు ROCm అవసరం"
     },
     "status": {
-      "monitoring_started": "మానిటరింగ్ ప్రారంభమైంది",
-      "updating_every": "ప్రతి %d సెకన్లకు నవీకరిస్తుంది",
+      "monitoring_started": "మానిటరింగ్ ప్రారంభించబడింది",
+      "updating_every": "ప్రతి %d సెకన్లకు నవీకరించబడుతోంది", 
       "press_ctrl_c": "నిష్క్రమించడానికి Ctrl+C నొక్కండి",
-      "remote_mode": "పోర్ట్ %d వద్ద రిమోట్ మోడ్"
+      "remote_mode": "పోర్ట్ %d లో రిమోట్ మోడ్",
+      "gpu_detected": "GPU కనుగొనబడింది: %s",
+      "ai_training_detected": "AI శిక్షణ ప్రాసెస్లు కనుగొనబడ్డాయి: %d",
+      "mining_detected": "మైనింగ్ కార్యకలాపాలు కనుగొనబడ్డాయి: %s"
     }
   }
 }

@@ -1,15 +1,15 @@
 {
-  "language": "ქართული",
+  "language": "Georgian (ქართული)", 
   "language_code": "ka",
   "translations": {
     "common": {
-      "title": "kern - სისტემის მონიტორინგი",
+      "title": "kern - სისტემის მონიტორი",
       "refresh": "განახლება",
       "seconds": "წმ",
       "error": "შეცდომა",
       "unknown": "უცნობი",
       "total": "სულ",
-      "used": "გამოყენებული",
+      "used": "გამოყენებული", 
       "free": "თავისუფალი",
       "available": "ხელმისაწვდომი",
       "status": "სტატუსი",
@@ -17,20 +17,20 @@
       "down": "გამორთული"
     },
     "cpu": {
-      "title": "პროცესორის ინფორმაცია",
+      "title": "CPU ინფორმაცია",
       "model": "მოდელი",
       "cores": "ბირთვები",
       "threads": "ნაკადები",
       "usage": "გამოყენება",
-      "frequency": "სიხშირე",
+      "frequency": "სიხშირე", 
       "load": "დატვირთვა",
       "load_1min": "1 წთ",
-      "load_5min": "5 წთ", 
+      "load_5min": "5 წთ",
       "load_15min": "15 წთ",
       "load_average": "საშუალო დატვირთვა"
     },
     "memory": {
-      "title": "მეხსიერების ინფორმაცია",
+      "title": "მეხსიერების ინფორმაცია", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "ფიზიკური მეხსიერება",
@@ -40,7 +40,7 @@
       "title": "დისკის ინფორმაცია",
       "filesystem": "ფაილური სისტემა",
       "size": "ზომა",
-      "mounted": "მონტაჟის წერტილი",
+      "mounted": "მონტაჟებულია", 
       "usage": "გამოყენება",
       "storage": "შენახვა"
     },
@@ -54,9 +54,48 @@
       "errors": "შეცდომები",
       "network_interfaces": "ქსელის ინტერფეისები"
     },
+    "gpu": {
+      "title": "GPU ინფორმაცია",
+      "model": "მოდელი",
+      "driver": "დრაივერი",
+      "temperature": "ტემპერატურა",
+      "memory": "მეხსიერება",
+      "utilization": "გამოყენება",
+      "power": "სიმძლავრე",
+      "clock_core": "ბირთვის სიხშირე",
+      "clock_memory": "მეხსიერების სიხშირე",
+      "fan_speed": "გულშემატკივრის სიჩქარე"
+    },
+    "ai": {
+      "title": "AI ტრენინგი",
+      "framework": "ფრეიმვორკი",
+      "processes": "პროცესები",
+      "vram": "VRAM",
+      "model": "მოდელი",
+      "batch_size": "ბაჩის ზომა",
+      "throughput": "გამტარუნარიანობა",
+      "epoch": "ეპოქა",
+      "loss": "დანაკარგი",
+      "accuracy": "სიზუსტე",
+      "training_time": "ტრენინგის დრო",
+      "no_training": "AI ტრენინგი არ აღმოჩენილა"
+    },
+    "mining": {
+      "title": "მაინინგის ინფორმაცია",
+      "algorithm": "ალგორითმი",
+      "hashrate": "ჰეშრეიტი",
+      "shares": "წილი",
+      "temperature": "ტემპერატურა",
+      "power": "სიმძლავრე",
+      "efficiency": "ეფექტურობა",
+      "uptime": "მუშაობის დრო",
+      "revenue_24h": "24ს შემოსავალი",
+      "pool": "პული",
+      "not_detected": "მაინინგის აქტივობა არ აღმოჩენილა"
+    },
     "ui": {
       "histogram": "ჰისტოგრამა",
-      "vertical": "ვერტიკალური",
+      "vertical": "ვერტიკალური", 
       "horizontal": "ჰორიზონტალური",
       "loading": "იტვირთება...",
       "no_data": "მონაცემები არ არის",
@@ -67,10 +106,13 @@
       "version": "ვერსია",
       "all": "ყველა ინფორმაცია",
       "disk_only": "მხოლოდ დისკი",
-      "cpu_only": "მხოლოდ პროცესორი",
-      "memory_only": "მხოლოდ მეხსიერება",
+      "cpu_only": "მხოლოდ CPU",
+      "memory_only": "მხოლოდ მეხსიერება", 
       "network_only": "მხოლოდ ქსელი",
-      "refresh_rate": "განახლების ინტერვალი",
+      "gpu_only": "მხოლოდ GPU",
+      "ai_only": "მხოლოდ AI ტრენინგი",
+      "mining_only": "მხოლოდ მაინინგი",
+      "refresh_rate": "განახლების სიხშირე",
       "language": "ენა",
       "remote": "დისტანციური რეჟიმი",
       "port": "პორტი"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "ბრძანება არ მოიძებნა: %s",
       "invalid_port": "არასწორი პორტი: %d",
-      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d",
+      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d", 
       "config_load_failed": "კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
-      "module_failed": "მოდულის %s შეცდომა: %v"
+      "module_failed": "მოდული %s ვერ მოხერხდა: %v",
+      "nvidia_smi_not_found": "nvidia-smi არ მოიძებნა. GPU მონიტორინგისთვის საჭიროა NVIDIA დრაივერები",
+      "rocm_smi_not_found": "rocm-smi არ მოიძებნა. AMD GPU მონიტორინგისთვის საჭიროა ROCm"
     },
     "status": {
       "monitoring_started": "მონიტორინგი დაიწყო",
-      "updating_every": "განახლება ყოველ %d წამში",
+      "updating_every": "განახლება ყოველ %d წამში", 
       "press_ctrl_c": "გასასვლელად დააჭირეთ Ctrl+C",
-      "remote_mode": "დისტანციური რეჟიმი პორტზე %d"
+      "remote_mode": "დისტანციური რეჟიმი პორტზე %d",
+      "gpu_detected": "GPU აღმოჩენილია: %s",
+      "ai_training_detected": "AI ტრენინგის პროცესები აღმოჩენილია: %d",
+      "mining_detected": "მაინინგის აქტივობა აღმოჩენილია: %s"
     }
   }
 }

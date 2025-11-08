@@ -1,36 +1,36 @@
 {
-  "language": "বাংলা",
+  "language": "Bengali (বাংলা)", 
   "language_code": "bn",
   "translations": {
     "common": {
-      "title": "kern - সিস্টেম মনিটরিং",
+      "title": "kern - সিস্টেম মনিটর",
       "refresh": "রিফ্রেশ",
       "seconds": "সেকেন্ড",
       "error": "ত্রুটি",
       "unknown": "অজানা",
       "total": "মোট",
-      "used": "ব্যবহৃত",
+      "used": "ব্যবহৃত", 
       "free": "মুক্ত",
       "available": "উপলব্ধ",
-      "status": "স্ট্যাটাস",
+      "status": "স্থিতি",
       "up": "চালু",
       "down": "বন্ধ"
     },
     "cpu": {
-      "title": "প্রসেসর তথ্য",
+      "title": "CPU তথ্য",
       "model": "মডেল",
       "cores": "কোর",
       "threads": "থ্রেড",
       "usage": "ব্যবহার",
-      "frequency": "ফ্রিকোয়েন্সি",
+      "frequency": "ফ্রিকোয়েন্সি", 
       "load": "লোড",
       "load_1min": "1 মিনিট",
-      "load_5min": "5 মিনিট", 
+      "load_5min": "5 মিনিট",
       "load_15min": "15 মিনিট",
       "load_average": "গড় লোড"
     },
     "memory": {
-      "title": "মেমোরি তথ্য",
+      "title": "মেমোরি তথ্য", 
       "ram": "RAM",
       "swap": "সোয়াপ",
       "physical": "ফিজিক্যাল মেমোরি",
@@ -39,8 +39,8 @@
     "disk": {
       "title": "ডিস্ক তথ্য",
       "filesystem": "ফাইল সিস্টেম",
-      "size": "সাইজ",
-      "mounted": "মাউন্ট পয়েন্ট",
+      "size": "আকার",
+      "mounted": "মাউন্ট করা হয়েছে", 
       "usage": "ব্যবহার",
       "storage": "স্টোরেজ"
     },
@@ -54,9 +54,48 @@
       "errors": "ত্রুটি",
       "network_interfaces": "নেটওয়ার্ক ইন্টারফেস"
     },
+    "gpu": {
+      "title": "GPU তথ্য",
+      "model": "মডেল",
+      "driver": "ড্রাইভার",
+      "temperature": "তাপমাত্রা",
+      "memory": "মেমোরি",
+      "utilization": "ব্যবহার",
+      "power": "পাওয়ার",
+      "clock_core": "কোর ক্লক",
+      "clock_memory": "মেমোরি ক্লক",
+      "fan_speed": "ফ্যান স্পিড"
+    },
+    "ai": {
+      "title": "AI ট্রেনিং",
+      "framework": "ফ্রেমওয়ার্ক",
+      "processes": "প্রসেস",
+      "vram": "VRAM",
+      "model": "মডেল",
+      "batch_size": "ব্যাচ সাইজ",
+      "throughput": "থ্রুপুট",
+      "epoch": "ইপক",
+      "loss": "লস",
+      "accuracy": "একুরেসি",
+      "training_time": "ট্রেনিং সময়",
+      "no_training": "AI ট্রেনিং শনাক্ত হয়নি"
+    },
+    "mining": {
+      "title": "মাইনিং তথ্য",
+      "algorithm": "অ্যালগরিদম",
+      "hashrate": "হ্যাশরেট",
+      "shares": "শেয়ার",
+      "temperature": "তাপমাত্রা",
+      "power": "পাওয়ার",
+      "efficiency": "দক্ষতা",
+      "uptime": "আপটাইম",
+      "revenue_24h": "24ঘণ্টা আয়",
+      "pool": "পুল",
+      "not_detected": "মাইনিং কার্যকলাপ শনাক্ত হয়নি"
+    },
     "ui": {
       "histogram": "হিস্টোগ্রাম",
-      "vertical": "উল্লম্ব",
+      "vertical": "উল্লম্ব", 
       "horizontal": "অনুভূমিক",
       "loading": "লোড হচ্ছে...",
       "no_data": "কোন ডেটা নেই",
@@ -64,12 +103,15 @@
     },
     "commands": {
       "help": "সাহায্য",
-      "version": "ভার্সন",
+      "version": "সংস্করণ",
       "all": "সমস্ত তথ্য",
       "disk_only": "শুধুমাত্র ডিস্ক",
-      "cpu_only": "শুধুমাত্র প্রসেসর",
-      "memory_only": "শুধুমাত্র মেমোরি",
+      "cpu_only": "শুধুমাত্র CPU",
+      "memory_only": "শুধুমাত্র মেমোরি", 
       "network_only": "শুধুমাত্র নেটওয়ার্ক",
+      "gpu_only": "শুধুমাত্র GPU",
+      "ai_only": "শুধুমাত্র AI ট্রেনিং",
+      "mining_only": "শুধুমাত্র মাইনিং",
       "refresh_rate": "রিফ্রেশ রেট",
       "language": "ভাষা",
       "remote": "রিমোট মোড",
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "কমান্ড পাওয়া যায়নি: %s",
       "invalid_port": "অবৈধ পোর্ট: %d",
-      "invalid_refresh": "অবৈধ রিফ্রেশ রেট: %d",
-      "config_load_failed": "কনফিগারেশন লোড করতে ব্যর্থ",
-      "module_failed": "মডিউল %s ত্রুটি: %v"
+      "invalid_refresh": "অবৈধ রিফ্রেশ ব্যবধান: %d", 
+      "config_load_failed": "কনফিগারেশন লোড ব্যর্থ",
+      "module_failed": "মডিউল %s ব্যর্থ: %v",
+      "nvidia_smi_not_found": "nvidia-smi পাওয়া যায়নি। GPU মনিটরিং এর জন্য NVIDIA ড্রাইভার প্রয়োজন",
+      "rocm_smi_not_found": "rocm-smi পাওয়া যায়নি। AMD GPU মনিটরিং এর জন্য ROCm প্রয়োজন"
     },
     "status": {
       "monitoring_started": "মনিটরিং শুরু হয়েছে",
-      "updating_every": "প্রতি %d সেকেন্ডে আপডেট হচ্ছে",
+      "updating_every": "প্রতি %d সেকেন্ডে আপডেট হচ্ছে", 
       "press_ctrl_c": "প্রস্থান করতে Ctrl+C চাপুন",
-      "remote_mode": "পোর্ট %d এ রিমোট মোড"
+      "remote_mode": "পোর্ট %d এ রিমোট মোড",
+      "gpu_detected": "GPU শনাক্ত হয়েছে: %s",
+      "ai_training_detected": "AI ট্রেনিং প্রসেস শনাক্ত হয়েছে: %d",
+      "mining_detected": "মাইনিং কার্যকলাপ শনাক্ত হয়েছে: %s"
     }
   }
 }

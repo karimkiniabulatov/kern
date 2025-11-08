@@ -3,13 +3,14 @@
 kern \- real-time system monitoring tool with TUI and REST API
 .SH SYNOPSIS
 .B kern
-[\-acdhmnv] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
+[\-acdhmnvg] [\-\-ai] [\-\-mining] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
 .B kern
 [\-\-download-lang \fICODE\fR] [\-\-list-languages]
 .SH DESCRIPTION
 .B kern
 is a comprehensive system monitoring tool that provides real-time information
-about disk usage, CPU performance, memory utilization, and network statistics.
+about disk usage, CPU performance, memory utilization, network statistics,
+GPU monitoring, AI training processes, and cryptocurrency mining activity.
 It features a professional Terminal User Interface (TUI) with double buffering
 to eliminate screen flickering, support for multiple languages with automatic
 download, and remote monitoring via REST API.
@@ -32,6 +33,15 @@ Show memory information only.
 .TP
 .B \-n, \-\-net
 Show network information only.
+.TP
+.B \-g, \-\-gpu
+Show GPU information only (requires NVIDIA or AMD drivers).
+.TP
+.B \-\-ai
+Show AI training information only.
+.TP
+.B \-\-mining
+Show cryptocurrency mining information only.
 .TP
 .B \-v, \-\-version
 Show version information and logo.
@@ -86,6 +96,15 @@ Returns JSON with disk information.
 .B GET /api/net
 Returns JSON with network information.
 .TP
+.B GET /api/gpu
+Returns JSON with GPU information.
+.TP
+.B GET /api/ai
+Returns JSON with AI training information.
+.TP
+.B GET /api/mining
+Returns JSON with mining information.
+.TP
 .B GET /api/system
 Returns JSON with system information.
 .TP
@@ -97,6 +116,42 @@ Example usage:
 kern -r 28126
 .br
 curl http://localhost:28126/api/cpu
+.SH GPU MONITORING
+GPU monitoring requires:
+.IP \(bu 3
+NVIDIA GPUs: nvidia-smi utility (included with NVIDIA drivers)
+.IP \(bu 3
+AMD GPUs: rocm-smi utility (included with ROCm)
+.PP
+GPU monitoring provides:
+.IP \(bu 3
+Temperature and utilization metrics
+.IP \(bu 3
+Memory usage (VRAM)
+.IP \(bu 3
+Power consumption and clock speeds
+.IP \(bu 3
+Fan speed and performance state
+.SH AI TRAINING MONITORING
+AI training detection monitors for:
+.IP \(bu 3
+TensorFlow, PyTorch, Keras, and HuggingFace processes
+.IP \(bu 3
+VRAM usage by AI frameworks
+.IP \(bu 3
+Training metrics (loss, accuracy, throughput)
+.IP \(bu 3
+Batch size and epoch information
+.SH MINING MONITORING
+Mining detection identifies:
+.IP \(bu 3
+Popular mining software (xmrig, ethminer, t-rex, etc.)
+.IP \(bu 3
+Mining algorithms (RandomX, Ethash, SHA-256)
+.IP \(bu 3
+Hashrate and share statistics
+.IP \(bu 3
+Power efficiency and profitability estimates
 .SH INTERACTIVE COMMANDS
 .TP
 .B q, Q, ESC
@@ -115,8 +170,20 @@ Update every 5 seconds with Russian interface.
 .B kern \-\-detailed
 Show detailed CPU core information.
 .TP
-.B kern \-r 28126
-Start remote API server on port 28126.
+.B kern \-g \-\-ai
+Monitor GPU and AI training processes.
+.TP
+.B kern \-\-mining
+Monitor cryptocurrency mining activity.
+.TP
+.B kern \-r
+Start remote API server on default port 28126.
+.TP
+.B kern \-r 26001
+Start remote API server on custom port 26001.
+.TP
+.B kern \-\-all \-r 26001
+Monitor all system resources with API on port 26001.
 .TP
 .B kern \-\-download-lang fr
 Download French language pack.
@@ -143,7 +210,9 @@ Returns 0 on success, 1 on error.
 .BR htop (1),
 .BR df (1),
 .BR free (1),
-.BR lscpu (1)
+.BR lscpu (1),
+.BR nvidia-smi (1),
+.BR rocm-smi (1)
 .SH BUGS
 Report bugs at https://github.com/karimkiniabulatov/kern/issues
 .SH AUTHORS

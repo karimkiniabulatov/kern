@@ -1,5 +1,5 @@
 {
-  "language": "Tiếng Việt",
+  "language": "Vietnamese (Tiếng Việt)", 
   "language_code": "vi",
   "translations": {
     "common": {
@@ -9,38 +9,38 @@
       "error": "Lỗi",
       "unknown": "Không xác định",
       "total": "Tổng",
-      "used": "Đã dùng",
+      "used": "Đã dùng", 
       "free": "Trống",
       "available": "Khả dụng",
       "status": "Trạng thái",
-      "up": "BẬT",
-      "down": "TẮT"
+      "up": "HOẠT ĐỘNG",
+      "down": "NGỪNG"
     },
     "cpu": {
-      "title": "Thông tin Bộ xử lý",
-      "model": "Mẫu",
-      "cores": "Lõi",
+      "title": "Thông tin CPU",
+      "model": "Model",
+      "cores": "Nhân",
       "threads": "Luồng",
       "usage": "Sử dụng",
-      "frequency": "Tần số",
+      "frequency": "Tần số", 
       "load": "Tải",
       "load_1min": "1 phút",
-      "load_5min": "5 phút", 
+      "load_5min": "5 phút",
       "load_15min": "15 phút",
       "load_average": "Tải trung bình"
     },
     "memory": {
-      "title": "Thông tin Bộ nhớ",
+      "title": "Thông tin Bộ nhớ", 
       "ram": "RAM",
       "swap": "Swap",
-      "physical": "Bộ nhớ vật lý",
-      "virtual": "Bộ nhớ ảo"
+      "physical": "Bộ nhớ Vật lý",
+      "virtual": "Bộ nhớ Ảo"
     },
     "disk": {
       "title": "Thông tin Đĩa",
-      "filesystem": "Hệ thống tệp",
+      "filesystem": "Hệ thống tập tin",
       "size": "Kích thước",
-      "mounted": "Điểm gắn kết",
+      "mounted": "Được gắn vào", 
       "usage": "Sử dụng",
       "storage": "Lưu trữ"
     },
@@ -52,11 +52,50 @@
       "bytes": "byte",
       "packets": "gói tin",
       "errors": "Lỗi",
-      "network_interfaces": "Giao diện mạng"
+      "network_interfaces": "Giao diện Mạng"
+    },
+    "gpu": {
+      "title": "Thông tin GPU",
+      "model": "Model",
+      "driver": "Trình điều khiển",
+      "temperature": "Nhiệt độ",
+      "memory": "Bộ nhớ",
+      "utilization": "Sử dụng",
+      "power": "Công suất",
+      "clock_core": "Xung nhân",
+      "clock_memory": "Xung bộ nhớ",
+      "fan_speed": "Tốc độ Quạt"
+    },
+    "ai": {
+      "title": "Huấn luyện AI",
+      "framework": "Framework",
+      "processes": "Quy trình",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Kích thước Batch",
+      "throughput": "Thông lượng",
+      "epoch": "Epoch",
+      "loss": "Mất mát",
+      "accuracy": "Độ chính xác",
+      "training_time": "Thời gian Huấn luyện",
+      "no_training": "Không phát hiện huấn luyện AI"
+    },
+    "mining": {
+      "title": "Thông tin Khai thác",
+      "algorithm": "Thuật toán",
+      "hashrate": "Hashrate",
+      "shares": "Cổ phần",
+      "temperature": "Nhiệt độ",
+      "power": "Công suất",
+      "efficiency": "Hiệu suất",
+      "uptime": "Thời gian hoạt động",
+      "revenue_24h": "Doanh thu 24h",
+      "pool": "Pool",
+      "not_detected": "Không phát hiện hoạt động khai thác"
     },
     "ui": {
       "histogram": "Biểu đồ",
-      "vertical": "Dọc",
+      "vertical": "Dọc", 
       "horizontal": "Ngang",
       "loading": "Đang tải...",
       "no_data": "Không có dữ liệu",
@@ -67,10 +106,13 @@
       "version": "Phiên bản",
       "all": "Tất cả thông tin",
       "disk_only": "Chỉ đĩa",
-      "cpu_only": "Chỉ bộ xử lý",
-      "memory_only": "Chỉ bộ nhớ",
+      "cpu_only": "Chỉ CPU",
+      "memory_only": "Chỉ bộ nhớ", 
       "network_only": "Chỉ mạng",
-      "refresh_rate": "Khoảng thời gian làm mới",
+      "gpu_only": "Chỉ GPU",
+      "ai_only": "Chỉ huấn luyện AI",
+      "mining_only": "Chỉ khai thác",
+      "refresh_rate": "Tốc độ làm mới",
       "language": "Ngôn ngữ",
       "remote": "Chế độ từ xa",
       "port": "Cổng"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Không tìm thấy lệnh: %s",
       "invalid_port": "Cổng không hợp lệ: %d",
-      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d",
+      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d", 
       "config_load_failed": "Không thể tải cấu hình",
-      "module_failed": "Lỗi mô-đun %s: %v"
+      "module_failed": "Mô-đun %s thất bại: %v",
+      "nvidia_smi_not_found": "Không tìm thấy nvidia-smi. Giám sát GPU yêu cầu trình điều khiển NVIDIA",
+      "rocm_smi_not_found": "Không tìm thấy rocm-smi. Giám sát AMD GPU yêu cầu ROCm"
     },
     "status": {
       "monitoring_started": "Đã bắt đầu giám sát",
-      "updating_every": "Cập nhật mỗi %d giây",
+      "updating_every": "Cập nhật mỗi %d giây", 
       "press_ctrl_c": "Nhấn Ctrl+C để thoát",
-      "remote_mode": "Chế độ từ xa trên cổng %d"
+      "remote_mode": "Chế độ từ xa trên cổng %d",
+      "gpu_detected": "Đã phát hiện GPU: %s",
+      "ai_training_detected": "Đã phát hiện quy trình huấn luyện AI: %d",
+      "mining_detected": "Đã phát hiện hoạt động khai thác: %s"
     }
   }
 }

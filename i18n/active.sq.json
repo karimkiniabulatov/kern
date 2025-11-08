@@ -1,64 +1,103 @@
 {
-  "language": "Shqip",
+  "language": "Albanian (Shqip)", 
   "language_code": "sq",
   "translations": {
     "common": {
-      "title": "kern - Monitorimi i Sistemit",
+      "title": "kern - Monitor i Sistemit",
       "refresh": "Rifresko",
       "seconds": "sek",
       "error": "Gabim",
       "unknown": "I panjohur",
-      "total": "Total",
-      "used": "Përdorur",
+      "total": "Gjithsej",
+      "used": "Përdorur", 
       "free": "Falas",
       "available": "I disponueshëm",
       "status": "Statusi",
-      "up": "NDEZUR",
-      "down": "FIÇUR"
+      "up": "I NDËZUR",
+      "down": "I FIKUR"
     },
     "cpu": {
-      "title": "Informacione për Procesorin",
+      "title": "Informacione CPU",
       "model": "Modeli",
       "cores": "Bërthama",
       "threads": "Fijet",
       "usage": "Përdorimi",
-      "frequency": "Frekuenca",
+      "frequency": "Frekuenca", 
       "load": "Ngarkesa",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Ngarkesa mesatare"
     },
     "memory": {
-      "title": "Informacione për Kujtesën",
+      "title": "Informacione memorie", 
       "ram": "RAM",
       "swap": "Swap",
-      "physical": "Kujtesa fizike",
-      "virtual": "Kujtesa virtuale"
+      "physical": "Memoria fizike",
+      "virtual": "Memoria virtuale"
     },
     "disk": {
-      "title": "Informacione për Diskun",
+      "title": "Informacione disk",
       "filesystem": "Sistemi i skedarëve",
       "size": "Madhësia",
-      "mounted": "Pika e montimit",
+      "mounted": "Montuar në", 
       "usage": "Përdorimi",
-      "storage": "Depozitimi"
+      "storage": "Ruajtja"
     },
     "network": {
-      "title": "Informacione për Rrjetin",
+      "title": "Informacione rrjeti",
       "interface": "Ndërfaqja",
       "received": "Marrë",
       "sent": "Dërguar",
-      "bytes": "bajte",
+      "bytes": "bajt",
       "packets": "paketa",
-      "errors": "Gabimet",
+      "errors": "Gabime",
       "network_interfaces": "Ndërfaqet e rrjetit"
+    },
+    "gpu": {
+      "title": "Informacione GPU",
+      "model": "Modeli",
+      "driver": "Driveri",
+      "temperature": "Temperatura",
+      "memory": "Memoria",
+      "utilization": "Përdorimi",
+      "power": "Fuqia",
+      "clock_core": "Frekuenca e bërthamës",
+      "clock_memory": "Frekuenca e memories",
+      "fan_speed": "Shpejtësia e ventilatorit"
+    },
+    "ai": {
+      "title": "Trajnimi AI",
+      "framework": "Korniza",
+      "processes": "Proceset",
+      "vram": "VRAM",
+      "model": "Modeli",
+      "batch_size": "Madhësia e grupit",
+      "throughput": "Xhiro",
+      "epoch": "Epoka",
+      "loss": "Humbje",
+      "accuracy": "Saktësi",
+      "training_time": "Koha e trajnimit",
+      "no_training": "Nuk u zbulua trajnim AI"
+    },
+    "mining": {
+      "title": "Informacione minierash",
+      "algorithm": "Algoritmi",
+      "hashrate": "Shkalla e hash",
+      "shares": "Aksione",
+      "temperature": "Temperatura",
+      "power": "Fuqia",
+      "efficiency": "Efikasiteti",
+      "uptime": "Koha e funksionimit",
+      "revenue_24h": "Të ardhura 24h",
+      "pool": "Pus",
+      "not_detected": "Nuk u zbulua aktivitet minierash"
     },
     "ui": {
       "histogram": "Histogrami",
-      "vertical": "Vertikale",
+      "vertical": "Vertikale", 
       "horizontal": "Horizontale",
-      "loading": "Duke ngarkuar...",
+      "loading": "Duke u ngarkuar...",
       "no_data": "Nuk ka të dhëna",
       "percent": "përqind"
     },
@@ -67,10 +106,13 @@
       "version": "Versioni",
       "all": "Të gjitha informatat",
       "disk_only": "Vetëm disku",
-      "cpu_only": "Vetëm procesori",
-      "memory_only": "Vetëm kujtesa",
+      "cpu_only": "Vetëm CPU",
+      "memory_only": "Vetëm memoria", 
       "network_only": "Vetëm rrjeti",
-      "refresh_rate": "Intervali i rifreskimit",
+      "gpu_only": "Vetëm GPU",
+      "ai_only": "Vetëm trajnimi AI",
+      "mining_only": "Vetëm miniera",
+      "refresh_rate": "Shkalla e rifreskimit",
       "language": "Gjuha",
       "remote": "Modaliteti i largët",
       "port": "Porti"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Komanda nuk u gjet: %s",
       "invalid_port": "Port i pavlefshëm: %d",
-      "invalid_refresh": "Interval i pavlefshëm rifreskimi: %d",
+      "invalid_refresh": "Interval i pavlefshëm rifreskimi: %d", 
       "config_load_failed": "Dështoi ngarkimi i konfigurimit",
-      "module_failed": "Gabim i modulit %s: %v"
+      "module_failed": "Moduli %s dështoi: %v",
+      "nvidia_smi_not_found": "nvidia-smi nuk u gjet. Monitorimi i GPU kërkon driverë NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nuk u gjet. Monitorimi i AMD GPU kërkon ROCm"
     },
     "status": {
       "monitoring_started": "Monitorimi filloi",
-      "updating_every": "Përditësohet çdo %d sekonda",
+      "updating_every": "Përditësim çdo %d sekonda", 
       "press_ctrl_c": "Shtypni Ctrl+C për të dalë",
-      "remote_mode": "Modalitet i largët në portin %d"
+      "remote_mode": "Modaliteti i largët në portin %d",
+      "gpu_detected": "GPU u zbulua: %s",
+      "ai_training_detected": "Proceset e trajnimit AI u zbuluan: %d",
+      "mining_detected": "Aktiviteti i minierave u zbulua: %s"
     }
   }
 }

@@ -1,46 +1,46 @@
 {
-  "language": "Latina",
+  "language": "Latin (Latina)", 
   "language_code": "la",
   "translations": {
     "common": {
-      "title": "kern - Systema Monitoring",
+      "title": "kern - Monitor Systematis",
       "refresh": "Renova",
       "seconds": "sec",
       "error": "Error",
-      "unknown": "Ignotum",
+      "unknown": "Ignotus",
       "total": "Summa",
-      "used": "Usus",
+      "used": "Usus", 
       "free": "Liber",
       "available": "Praesto",
       "status": "Status",
-      "up": "ACTIVUS",
-      "down": "INACTIVUS"
+      "up": "SURSUN",
+      "down": "DEORSUM"
     },
     "cpu": {
-      "title": "Informacio Processoris",
+      "title": "Informacio CPU",
       "model": "Exemplar",
       "cores": "Nuclei",
       "threads": "Fila",
       "usage": "Usus",
-      "frequency": "Frequentia",
+      "frequency": "Frequentia", 
       "load": "Onus",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Onus medium"
+      "load_average": "Onus Medium"
     },
     "memory": {
-      "title": "Informacio Memoriae",
+      "title": "Informacio Memoriae", 
       "ram": "RAM",
       "swap": "Permutatio",
-      "physical": "Memoria physica",
-      "virtual": "Memoria virtualis"
+      "physical": "Memoria Physica",
+      "virtual": "Memoria Virtualis"
     },
     "disk": {
       "title": "Informacio Disci",
-      "filesystem": "Systema file",
+      "filesystem": "Systema File",
       "size": "Magnitudo",
-      "mounted": "Punctum montis",
+      "mounted": "Impositus in", 
       "usage": "Usus",
       "storage": "Repositorium"
     },
@@ -52,41 +52,88 @@
       "bytes": "bytes",
       "packets": "packets",
       "errors": "Errores",
-      "network_interfaces": "Interfaces retis"
+      "network_interfaces": "Interfaces Retis"
+    },
+    "gpu": {
+      "title": "Informacio GPU",
+      "model": "Exemplar",
+      "driver": "Driver",
+      "temperature": "Temperatura",
+      "memory": "Memoria",
+      "utilization": "Usus",
+      "power": "Potentia",
+      "clock_core": "Horologium Nuclei",
+      "clock_memory": "Horologium Memoriae",
+      "fan_speed": "Celeritas Ventilatoris"
+    },
+    "ai": {
+      "title": "Exercitatio AI",
+      "framework": "Compages",
+      "processes": "Processus",
+      "vram": "VRAM",
+      "model": "Exemplar",
+      "batch_size": "Magnitudo Batch",
+      "throughput": "Perfusio",
+      "epoch": "Aevum",
+      "loss": "Damnum",
+      "accuracy": "Accuratio",
+      "training_time": "Tempus Exercitationis",
+      "no_training": "Exercitatio AI non detecta"
+    },
+    "mining": {
+      "title": "Informacio Fodinae",
+      "algorithm": "Algorithmus",
+      "hashrate": "Hash Rate",
+      "shares": "Partes",
+      "temperature": "Temperatura",
+      "power": "Potentia",
+      "efficiency": "Efficientia",
+      "uptime": "Tempus Operationis",
+      "revenue_24h": "Reditus 24h",
+      "pool": "Piscina",
+      "not_detected": "Actio Fodinae non detecta"
     },
     "ui": {
       "histogram": "Histogramma",
-      "vertical": "Verticalis",
+      "vertical": "Verticalis", 
       "horizontal": "Horizontalis",
       "loading": "Loading...",
-      "no_data": "Nulla data",
+      "no_data": "Nulla Data",
       "percent": "percent"
     },
     "commands": {
       "help": "Auxilium",
       "version": "Versio",
-      "all": "Omnes informationes",
-      "disk_only": "Solum discus",
-      "cpu_only": "Solum processor",
-      "memory_only": "Solum memoria",
-      "network_only": "Solum rete",
-      "refresh_rate": "Intervallum renovationis",
+      "all": "Omnis Informacio",
+      "disk_only": "Solum Discus",
+      "cpu_only": "Solum CPU",
+      "memory_only": "Solum Memoria", 
+      "network_only": "Solum Rete",
+      "gpu_only": "Solum GPU",
+      "ai_only": "Solum Exercitatio AI",
+      "mining_only": "Solum Fodina",
+      "refresh_rate": "Rate Renovationis",
       "language": "Lingua",
-      "remote": "Modus remotus",
+      "remote": "Modus Remotus",
       "port": "Portus"
     },
     "errors": {
       "command_not_found": "Mandatum non inventum: %s",
       "invalid_port": "Portus invalidus: %d",
-      "invalid_refresh": "Intervallum renovationis invalidum: %d",
-      "config_load_failed": "Configuratio onerare non potuit",
-      "module_failed": "Error moduli %s: %v"
+      "invalid_refresh": "Intervallum renovationis invalidum: %d", 
+      "config_load_failed": "Configuratio onerari non potuit",
+      "module_failed": "Modulus %s defecit: %v",
+      "nvidia_smi_not_found": "nvidia-smi non inventus. Monitoratio GPU requirit drivers NVIDIA",
+      "rocm_smi_not_found": "rocm-smi non inventus. Monitoratio AMD GPU requirit ROCm"
     },
     "status": {
-      "monitoring_started": "Monitoring inceptum est",
-      "updating_every": "Renovatur omnes %d secundis",
+      "monitoring_started": "Monitio incepta",
+      "updating_every": "Renovatur omnes %d secundis", 
       "press_ctrl_c": "Preme Ctrl+C ad exeundum",
-      "remote_mode": "Modus remotus in portu %d"
+      "remote_mode": "Modus remotus in portu %d",
+      "gpu_detected": "GPU detectus: %s",
+      "ai_training_detected": "Processus exercitationis AI detecti: %d",
+      "mining_detected": "Actio fodinae detecta: %s"
     }
   }
 }

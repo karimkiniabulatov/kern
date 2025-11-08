@@ -1,15 +1,15 @@
 {
-  "language": "ગુજરાતી",
+  "language": "Gujarati (ગુજરાતી)", 
   "language_code": "gu",
   "translations": {
     "common": {
-      "title": "kern - સિસ્ટમ મોનિટરિંગ",
+      "title": "kern - સિસ્ટમ મોનિટર",
       "refresh": "રીફ્રેશ",
       "seconds": "સેકંડ",
       "error": "ભૂલ",
       "unknown": "અજ્ઞાત",
       "total": "કુલ",
-      "used": "વપરાયેલ",
+      "used": "વપરાયેલ", 
       "free": "મફત",
       "available": "ઉપલબ્ધ",
       "status": "સ્થિતિ",
@@ -17,32 +17,32 @@
       "down": "બંધ"
     },
     "cpu": {
-      "title": "પ્રોસેસર માહિતી",
+      "title": "CPU માહિતી",
       "model": "મોડેલ",
       "cores": "કોર",
       "threads": "થ્રેડ",
       "usage": "વપરાશ",
-      "frequency": "ફ્રીક્વન્સી",
+      "frequency": "ફ્રીક્વન્સી", 
       "load": "લોડ",
       "load_1min": "1 મિનિટ",
-      "load_5min": "5 મિનિટ", 
+      "load_5min": "5 મિનિટ",
       "load_15min": "15 મિનિટ",
       "load_average": "સરેરાશ લોડ"
     },
     "memory": {
-      "title": "મેમરી માહિતી",
+      "title": "મેમરી માહિતી", 
       "ram": "RAM",
       "swap": "સ્વેપ",
       "physical": "ફિઝિકલ મેમરી",
-      "virtual": "વર્ચ્યુઅલ મેमરી"
+      "virtual": "વર્ચ્યુઅલ મેમરી"
     },
     "disk": {
       "title": "ડિસ્ક માહિતી",
       "filesystem": "ફાઇલ સિસ્ટમ",
-      "size": "સાઇઝ",
-      "mounted": "માઉન્ટ પોઇન્ટ",
+      "size": "કદ",
+      "mounted": "માઉન્ટેડ ઓન", 
       "usage": "વપરાશ",
-      "storage": "સ્ટોરેજ"
+      "storage": "સંગ્રહ"
     },
     "network": {
       "title": "નેટવર્ક માહિતી",
@@ -54,9 +54,48 @@
       "errors": "ભૂલો",
       "network_interfaces": "નેટવર્ક ઇન્ટરફેસ"
     },
+    "gpu": {
+      "title": "GPU માહિતી",
+      "model": "મોડેલ",
+      "driver": "ડ્રાઇવર",
+      "temperature": "તાપમાન",
+      "memory": "મેમરી",
+      "utilization": "ઉપયોગ",
+      "power": "પાવર",
+      "clock_core": "કોર ક્લોક",
+      "clock_memory": "મેમરી ક્લોક",
+      "fan_speed": "ફેન સ્પીડ"
+    },
+    "ai": {
+      "title": "AI ટ્રેનિંગ",
+      "framework": "ફ્રેમવર્ક",
+      "processes": "પ્રોસેસ",
+      "vram": "VRAM",
+      "model": "મોડેલ",
+      "batch_size": "બેચ સાઇઝ",
+      "throughput": "થ્રુપુટ",
+      "epoch": "યુગ",
+      "loss": "લોસ",
+      "accuracy": "ચોકસાઈ",
+      "training_time": "ટ્રેનિંગ સમય",
+      "no_training": "AI ટ્રેનિંગ મળી નથી"
+    },
+    "mining": {
+      "title": "માઇનિંગ માહિતી",
+      "algorithm": "એલ્ગોરિધમ",
+      "hashrate": "હેશ રેટ",
+      "shares": "શેર",
+      "temperature": "તાપમાન",
+      "power": "પાવર",
+      "efficiency": "કાર્યક્ષમતા",
+      "uptime": "અપટાઇમ",
+      "revenue_24h": "24ક કમાણી",
+      "pool": "પૂલ",
+      "not_detected": "માઇનિંગ એક્ટિવિટી મળી નથી"
+    },
     "ui": {
       "histogram": "હિસ્ટોગ્રામ",
-      "vertical": "ઊભી",
+      "vertical": "ઊભી", 
       "horizontal": "આડી",
       "loading": "લોડ થાય છે...",
       "no_data": "કોઈ ડેટા નથી",
@@ -66,27 +105,35 @@
       "help": "મદદ",
       "version": "વર્ઝન",
       "all": "બધી માહિતી",
-      "disk_only": "માત્ર ડિસ્ક",
-      "cpu_only": "માત્ર પ્રોસેસર",
-      "memory_only": "માત્ર મેમરી",
-      "network_only": "માત્ર નેટવર્ક",
+      "disk_only": "ફક્ત ડિસ્ક",
+      "cpu_only": "ફક્ત CPU",
+      "memory_only": "ફક્ત મેમરી", 
+      "network_only": "ફક્ત નેટવર્ક",
+      "gpu_only": "ફક્ત GPU",
+      "ai_only": "ફક્ત AI ટ્રેનિંગ",
+      "mining_only": "ફક્ત માઇનિંગ",
       "refresh_rate": "રીફ્રેશ રેટ",
       "language": "ભાષા",
       "remote": "રિમોટ મોડ",
       "port": "પોર્ટ"
     },
     "errors": {
-      "command_not_found": "કમાન્ડ મળ્યું નથી: %s",
+      "command_not_found": "કમાન્ડ મળી નથી: %s",
       "invalid_port": "અમાન્ય પોર્ટ: %d",
-      "invalid_refresh": "અમાન્ય રીફ્રેશ રેટ: %d",
-      "config_load_failed": "કોન્ફિગરેશન લોડ કરવામાં અસફળ",
-      "module_failed": "મોડ્યુલ %s ભૂલ: %v"
+      "invalid_refresh": "અમાન્ય રીફ્રેશ ઇન્ટરવલ: %d", 
+      "config_load_failed": "કોન્ફિગ લોડ ન થઈ શકી",
+      "module_failed": "મોડ્યુલ %s નિષ્ફળ: %v",
+      "nvidia_smi_not_found": "nvidia-smi મળ્યું નથી. GPU મોનિટરિંગ માટે NVIDIA ડ્રાઇવર જરૂરી",
+      "rocm_smi_not_found": "rocm-smi મળ્યું નથી. AMD GPU મોનિટરિંગ માટે ROCm જરૂરી"
     },
     "status": {
-      "monitoring_started": "મોનિટરિંગ શરૂ થયું",
-      "updating_every": "દરેક %d સેકંડે અપડેટ થાય છે",
-      "press_ctrl_c": "બહાર નીકળવા માટે Ctrl+C દબાવો",
-      "remote_mode": "પોર્ટ %d પર રિમોટ મોડ"
+      "monitoring_started": "મોનિટરિંગ શરૂ થઈ",
+      "updating_every": "દરેક %d સેકંડે અપડેટ થાય છે", 
+      "press_ctrl_c": "બહાર નીકળવા Ctrl+C દબાવો",
+      "remote_mode": "પોર્ટ %d પર રિમોટ મોડ",
+      "gpu_detected": "GPU મળ્યું: %s",
+      "ai_training_detected": "AI ટ્રેનિંગ પ્રોસેસ મળ્યા: %d",
+      "mining_detected": "માઇનિંગ એક્ટિવિટી મળી: %s"
     }
   }
 }

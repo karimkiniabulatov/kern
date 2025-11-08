@@ -1,15 +1,15 @@
 {
-  "language": "Latviešu",
+  "language": "Latvian (Latviešu)", 
   "language_code": "lv",
   "translations": {
     "common": {
-      "title": "kern - Sistēmas uzraudzība",
+      "title": "kern - Sistēmas monitors",
       "refresh": "Atjaunot",
       "seconds": "sek",
       "error": "Kļūda",
       "unknown": "Nezināms",
       "total": "Kopā",
-      "used": "Izlietots",
+      "used": "Izlietots", 
       "free": "Brīvs",
       "available": "Pieejams",
       "status": "Statuss",
@@ -17,22 +17,22 @@
       "down": "IZSLĒGTS"
     },
     "cpu": {
-      "title": "Procesora informācija",
+      "title": "CPU informācija",
       "model": "Modelis",
       "cores": "Kodoli",
       "threads": "Pavedieni",
       "usage": "Izmantojums",
-      "frequency": "Frekvence",
+      "frequency": "Frekvence", 
       "load": "Slodze",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Vidējā slodze"
     },
     "memory": {
-      "title": "Atmiņas informācija",
+      "title": "Atmiņas informācija", 
       "ram": "RAM",
-      "swap": "Swap",
+      "swap": "Mainīt",
       "physical": "Fiziskā atmiņa",
       "virtual": "Virtuālā atmiņa"
     },
@@ -40,7 +40,7 @@
       "title": "Diska informācija",
       "filesystem": "Failu sistēma",
       "size": "Izmērs",
-      "mounted": "Piestiprināšanas punkts",
+      "mounted": "Pievienots", 
       "usage": "Izmantojums",
       "storage": "Krātuve"
     },
@@ -54,23 +54,65 @@
       "errors": "Kļūdas",
       "network_interfaces": "Tīkla saskarnes"
     },
+    "gpu": {
+      "title": "GPU informācija",
+      "model": "Modelis",
+      "driver": "Draiveris",
+      "temperature": "Temperatūra",
+      "memory": "Atmiņa",
+      "utilization": "Izmantošana",
+      "power": "Jauda",
+      "clock_core": "Kodola frekvence",
+      "clock_memory": "Atmiņas frekvence",
+      "fan_speed": "Ventilatora ātrums"
+    },
+    "ai": {
+      "title": "AI apmācība",
+      "framework": "Ietvars",
+      "processes": "Procesi",
+      "vram": "VRAM",
+      "model": "Modelis",
+      "batch_size": "Partijas lielums",
+      "throughput": "Caurlaidspēja",
+      "epoch": "Epoha",
+      "loss": "Zaudējumi",
+      "accuracy": "Precizitāte",
+      "training_time": "Apmācības laiks",
+      "no_training": "Nav atklāta AI apmācība"
+    },
+    "mining": {
+      "title": "Maiņu informācija",
+      "algorithm": "Algoritms",
+      "hashrate": "Hash ātrums",
+      "shares": "Daļas",
+      "temperature": "Temperatūra",
+      "power": "Jauda",
+      "efficiency": "Efektivitāte",
+      "uptime": "Darbības laiks",
+      "revenue_24h": "24h ienākumi",
+      "pool": "Pūlis",
+      "not_detected": "Nav atklāta maiņu darbība"
+    },
     "ui": {
       "histogram": "Histogramma",
-      "vertical": "Vertikāli",
+      "vertical": "Vertikāli", 
       "horizontal": "Horizontāli",
       "loading": "Ielādē...",
       "no_data": "Nav datu",
-      "percent": "procenti"
+      "percent": "procentos"
     },
     "commands": {
       "help": "Palīdzība",
       "version": "Versija",
       "all": "Visa informācija",
       "disk_only": "Tikai disks",
-      "cpu_only": "Tikai processors",
-      "memory_only": "Tikai atmiņa",
+      "cpu_only": "Tikai CPU",
+      "memory_only": "Tikai atmiņa", 
       "network_only": "Tikai tīkls",
-      "refresh_rate": "Atjaunināšanas intervāls",
+      "gpu_only": "Tikai GPU",
+      "ai_only": "Tikai AI apmācība",
+      "mining_only": "Tikai maiņa",
+      "refresh_rate": "Atjaunināšanas biežums",
       "language": "Valoda",
       "remote": "Attālinātais režīms",
       "port": "Ports"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Komanda nav atrasta: %s",
       "invalid_port": "Nederīgs ports: %d",
-      "invalid_refresh": "Nederīgs atjaunināšanas intervāls: %d",
+      "invalid_refresh": "Nederīgs atjaunināšanas intervāls: %d", 
       "config_load_failed": "Neizdevās ielādēt konfigurāciju",
-      "module_failed": "Moduļa %s kļūda: %v"
+      "module_failed": "Modulis %s neizdevās: %v",
+      "nvidia_smi_not_found": "nvidia-smi nav atrasts. GPU uzraudzībai nepieciešami NVIDIA draiveri",
+      "rocm_smi_not_found": "rocm-smi nav atrasts. AMD GPU uzraudzībai nepieciešams ROCm"
     },
     "status": {
       "monitoring_started": "Uzraudzība sākta",
-      "updating_every": "Atjaunina ik pēc %d sekundēm",
+      "updating_every": "Atjaunina ik pēc %d sekundēm", 
       "press_ctrl_c": "Nospiediet Ctrl+C, lai izietu",
-      "remote_mode": "Attālinātais režīms portā %d"
+      "remote_mode": "Attālinātais režīms portā %d",
+      "gpu_detected": "GPU atklāts: %s",
+      "ai_training_detected": "AI apmācības procesi atklāti: %d",
+      "mining_detected": "Maiņu darbība atklāta: %s"
     }
   }
 }

@@ -1,37 +1,37 @@
 {
-  "language": "اردو",
+  "language": "Urdu (اردو)", 
   "language_code": "ur",
   "translations": {
     "common": {
-      "title": "kern - سسٹم مانیٹرنگ",
+      "title": "kern - سسٹم مانیٹر",
       "refresh": "ریفریش",
       "seconds": "سیکنڈ",
       "error": "خرابی",
       "unknown": "نامعلوم",
       "total": "کل",
-      "used": "استعمال شدہ",
-      "free": "خالی",
+      "used": "استعمال شدہ", 
+      "free": "فری",
       "available": "دستیاب",
       "status": "حالت",
       "up": "چالو",
-      "down": "بند"
+      "down": "غیر فعال"
     },
     "cpu": {
-      "title": "پروسیسر کی معلومات",
+      "title": "سی پی یو کی معلومات",
       "model": "ماڈل",
-      "cores": "کور",
+      "cores": "کورز",
       "threads": "تھریڈز",
       "usage": "استعمال",
-      "frequency": "فریکوئنسی",
+      "frequency": "فریکوئنسی", 
       "load": "لوڈ",
       "load_1min": "1 منٹ",
-      "load_5min": "5 منٹ", 
+      "load_5min": "5 منٹ",
       "load_15min": "15 منٹ",
       "load_average": "اوسط لوڈ"
     },
     "memory": {
-      "title": "میموری کی معلومات",
-      "ram": "RAM",
+      "title": "میموری کی معلومات", 
+      "ram": "ریم",
       "swap": "سویپ",
       "physical": "فزیکل میموری",
       "virtual": "ورچوئل میموری"
@@ -40,23 +40,62 @@
       "title": "ڈسک کی معلومات",
       "filesystem": "فائل سسٹم",
       "size": "سائز",
-      "mounted": "ماؤنٹ پوائنٹ",
+      "mounted": "ماؤنٹڈ آن", 
       "usage": "استعمال",
-      "storage": "اسٹوریج"
+      "storage": "سٹوریج"
     },
     "network": {
       "title": "نیٹ ورک کی معلومات",
       "interface": "انٹرفیس",
-      "received": "موصول",
+      "received": "موصولہ",
       "sent": "ارسال شدہ",
       "bytes": "بائٹس",
       "packets": "پیکٹس",
       "errors": "خرابیاں",
       "network_interfaces": "نیٹ ورک انٹرفیس"
     },
+    "gpu": {
+      "title": "جی پی یو کی معلومات",
+      "model": "ماڈل",
+      "driver": "ڈرائیور",
+      "temperature": "ٹمپریچر",
+      "memory": "میموری",
+      "utilization": "استعمال",
+      "power": "پاور",
+      "clock_core": "کور کلاک",
+      "clock_memory": "میموری کلاک",
+      "fan_speed": "فین اسپیڈ"
+    },
+    "ai": {
+      "title": "AI ٹریننگ",
+      "framework": "فریم ورک",
+      "processes": "پروسیسز",
+      "vram": "VRAM",
+      "model": "ماڈل",
+      "batch_size": "بیچ سائز",
+      "throughput": "تھرو پٹ",
+      "epoch": "ایپاک",
+      "loss": "لاگت",
+      "accuracy": "درستگی",
+      "training_time": "ٹریننگ کا وقت",
+      "no_training": "AI ٹریننگ کا پتہ نہیں چلا"
+    },
+    "mining": {
+      "title": "مائننگ کی معلومات",
+      "algorithm": "الگورتھم",
+      "hashrate": "ہیش ریٹ",
+      "shares": "شیئرز",
+      "temperature": "ٹمپریچر",
+      "power": "پاور",
+      "efficiency": "کارکردگی",
+      "uptime": "اپ ٹائم",
+      "revenue_24h": "24 گھنٹے کی آمدنی",
+      "pool": "پول",
+      "not_detected": "مائننگ سرگرمی کا پتہ نہیں چلا"
+    },
     "ui": {
       "histogram": "ہسٹوگرام",
-      "vertical": "عمودی",
+      "vertical": "عمودی", 
       "horizontal": "افقی",
       "loading": "لوڈ ہو رہا ہے...",
       "no_data": "کوئی ڈیٹا نہیں",
@@ -67,10 +106,13 @@
       "version": "ورژن",
       "all": "تمام معلومات",
       "disk_only": "صرف ڈسک",
-      "cpu_only": "صرف پروسیسر",
-      "memory_only": "صرف میموری",
+      "cpu_only": "صرف سی پی یو",
+      "memory_only": "صرف میموری", 
       "network_only": "صرف نیٹ ورک",
-      "refresh_rate": "ریفریش وقفہ",
+      "gpu_only": "صرف جی پی یو",
+      "ai_only": "صرف AI ٹریننگ",
+      "mining_only": "صرف مائننگ",
+      "refresh_rate": "ریفریش ریٹ",
       "language": "زبان",
       "remote": "ریموٹ موڈ",
       "port": "پورٹ"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "کمانڈ نہیں ملی: %s",
       "invalid_port": "غلط پورٹ: %d",
-      "invalid_refresh": "غلط ریفریش وقفہ: %d",
+      "invalid_refresh": "غلط ریفریش وقفہ: %d", 
       "config_load_failed": "کنفیگریشن لوڈ نہیں ہو سکی",
-      "module_failed": "ماڈیول %s خرابی: %v"
+      "module_failed": "ماڈیول %s ناکام: %v",
+      "nvidia_smi_not_found": "nvidia-smi نہیں ملا۔ جی پی یو مانیٹرنگ کے لیے NVIDIA ڈرائیورز درکار ہیں",
+      "rocm_smi_not_found": "rocm-smi نہیں ملا۔ AMD جی پی یو مانیٹرنگ کے لیے ROCm درکار ہے"
     },
     "status": {
       "monitoring_started": "مانیٹرنگ شروع ہو گئی",
-      "updating_every": "ہر %d سیکنڈ میں اپڈیٹ ہو رہا ہے",
+      "updating_every": "ہر %d سیکنڈ میں اپڈیٹ ہو رہا ہے", 
       "press_ctrl_c": "باہر نکلنے کے لیے Ctrl+C دبائیں",
-      "remote_mode": "پورٹ %d پر ریموٹ موڈ"
+      "remote_mode": "پورٹ %d پر ریموٹ موڈ",
+      "gpu_detected": "جی پی یو کا پتہ چلا: %s",
+      "ai_training_detected": "AI ٹریننگ پروسیسز کا پتہ چلا: %d",
+      "mining_detected": "مائننگ سرگرمی کا پتہ چلا: %s"
     }
   }
 }

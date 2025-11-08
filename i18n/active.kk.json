@@ -1,15 +1,15 @@
 {
-  "language": "Қазақ",
+  "language": "Kazakh (Қазақша)", 
   "language_code": "kk",
   "translations": {
     "common": {
-      "title": "kern - Жүйе мониторингі",
+      "title": "kern - Жүйе мониторы",
       "refresh": "Жаңарту",
       "seconds": "сек",
       "error": "Қате",
       "unknown": "Белгісіз",
       "total": "Барлығы",
-      "used": "Пайдаланылған",
+      "used": "Пайдаланылған", 
       "free": "Бос",
       "available": "Қолжетімді",
       "status": "Күй",
@@ -17,46 +17,85 @@
       "down": "ӨШІРУЛІ"
     },
     "cpu": {
-      "title": "Процессор туралы ақпарат",
+      "title": "CPU ақпараты",
       "model": "Модель",
       "cores": "Ядролар",
       "threads": "Ағындар",
       "usage": "Пайдалану",
-      "frequency": "Жиілік",
+      "frequency": "Жиілік", 
       "load": "Жүктеме",
       "load_1min": "1 мин",
-      "load_5min": "5 мин", 
+      "load_5min": "5 мин",
       "load_15min": "15 мин",
       "load_average": "Орташа жүктеме"
     },
     "memory": {
-      "title": "Жад туралы ақпарат",
+      "title": "Жад ақпараты", 
       "ram": "RAM",
       "swap": "Своп",
       "physical": "Физикалық жады",
       "virtual": "Виртуалды жады"
     },
     "disk": {
-      "title": "Диск туралы ақпарат",
+      "title": "Диск ақпараты",
       "filesystem": "Файл жүйесі",
       "size": "Өлшем",
-      "mounted": "Тіркеу нүктесі",
+      "mounted": "Орнатылған", 
       "usage": "Пайдалану",
       "storage": "Сақтау"
     },
     "network": {
-      "title": "Желі туралы ақпарат",
+      "title": "Желі ақпараты",
       "interface": "Интерфейс",
-      "received": "Алынған",
+      "received": "Қабылданған",
       "sent": "Жіберілген",
       "bytes": "байт",
       "packets": "пакет",
       "errors": "Қателер",
       "network_interfaces": "Желі интерфейстері"
     },
+    "gpu": {
+      "title": "GPU ақпараты",
+      "model": "Модель",
+      "driver": "Драйвер",
+      "temperature": "Температура",
+      "memory": "Жад",
+      "utilization": "Пайдалану",
+      "power": "Қуат",
+      "clock_core": "Ядро жиілігі",
+      "clock_memory": "Жад жиілігі",
+      "fan_speed": "Вентилятор жылдамдығы"
+    },
+    "ai": {
+      "title": "AI оқыту",
+      "framework": "Фреймворк",
+      "processes": "Процестер",
+      "vram": "VRAM",
+      "model": "Модель",
+      "batch_size": "Партия өлшемі",
+      "throughput": "Өткізу қабілеті",
+      "epoch": "Эпоха",
+      "loss": "Жоғалту",
+      "accuracy": "Дәлдік",
+      "training_time": "Оқыту уақыты",
+      "no_training": "AI оқыту табылмады"
+    },
+    "mining": {
+      "title": "Майнинг ақпараты",
+      "algorithm": "Алгоритм",
+      "hashrate": "Хеш мөлшері",
+      "shares": "Пайлар",
+      "temperature": "Температура",
+      "power": "Қуат",
+      "efficiency": "Тиімділік",
+      "uptime": "Жұмыс уақыты",
+      "revenue_24h": "24сағ табыс",
+      "pool": "Пул",
+      "not_detected": "Майнинг әрекеті табылмады"
+    },
     "ui": {
       "histogram": "Гистограмма",
-      "vertical": "Тік",
+      "vertical": "Тік", 
       "horizontal": "Көлденең",
       "loading": "Жүктелуде...",
       "no_data": "Дерек жоқ",
@@ -67,26 +106,34 @@
       "version": "Нұсқа",
       "all": "Барлық ақпарат",
       "disk_only": "Тек диск",
-      "cpu_only": "Тек процессор",
-      "memory_only": "Тек жад",
+      "cpu_only": "Тек CPU",
+      "memory_only": "Тек жады", 
       "network_only": "Тек желі",
+      "gpu_only": "Тек GPU",
+      "ai_only": "Тек AI оқыту",
+      "mining_only": "Тек майнинг",
       "refresh_rate": "Жаңарту жиілігі",
       "language": "Тіл",
-      "remote": "Қашықтан режим",
+      "remote": "Қашықтықтан режим",
       "port": "Порт"
     },
     "errors": {
       "command_not_found": "Команда табылмады: %s",
       "invalid_port": "Жарамсыз порт: %d",
-      "invalid_refresh": "Жарамсыз жаңарту жиілігі: %d",
+      "invalid_refresh": "Жарамсыз жаңарту аралығы: %d", 
       "config_load_failed": "Конфигурацияны жүктеу сәтсіз",
-      "module_failed": "Модуль %s қатесі: %v"
+      "module_failed": "Модуль %s сәтсіз: %v",
+      "nvidia_smi_not_found": "nvidia-smi табылмады. GPU мониторингі үшін NVIDIA драйверлері қажет",
+      "rocm_smi_not_found": "rocm-smi табылмады. AMD GPU мониторингі үшін ROCm қажет"
     },
     "status": {
       "monitoring_started": "Мониторинг басталды",
-      "updating_every": "Әр %d секунд сайын жаңартылады",
+      "updating_every": "Әр %d секунд сайын жаңартылады", 
       "press_ctrl_c": "Шығу үшін Ctrl+C басыңыз",
-      "remote_mode": "%d портында қашықтан режим"
+      "remote_mode": "%D портында қашықтықтан режим",
+      "gpu_detected": "GPU табылды: %s",
+      "ai_training_detected": "AI оқыту процестері табылды: %d",
+      "mining_detected": "Майнинг әрекеті табылды: %s"
     }
   }
 }

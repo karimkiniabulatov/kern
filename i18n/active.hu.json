@@ -1,36 +1,36 @@
 {
-  "language": "Magyar",
+  "language": "Hungarian (Magyar)", 
   "language_code": "hu",
   "translations": {
     "common": {
-      "title": "kern - Rendszerfigyelés",
+      "title": "kern - Rendszerfigyelő",
       "refresh": "Frissítés",
       "seconds": "mp",
       "error": "Hiba",
       "unknown": "Ismeretlen",
       "total": "Összesen",
-      "used": "Használt",
+      "used": "Használt", 
       "free": "Szabad",
       "available": "Elérhető",
       "status": "Állapot",
-      "up": "BE",
-      "down": "KI"
+      "up": "BEKAPCSOLVA",
+      "down": "KIKAPCSOLVA"
     },
     "cpu": {
-      "title": "Processzor információk",
+      "title": "CPU információk",
       "model": "Modell",
       "cores": "Magok",
       "threads": "Szálak",
-      "usage": "Kihasználtság",
-      "frequency": "Frekvencia",
+      "usage": "Használat",
+      "frequency": "Frekvencia", 
       "load": "Terhelés",
       "load_1min": "1 perc",
-      "load_5min": "5 perc", 
+      "load_5min": "5 perc",
       "load_15min": "15 perc",
       "load_average": "Átlagos terhelés"
     },
     "memory": {
-      "title": "Memória információk",
+      "title": "Memória információk", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fizikai memória",
@@ -40,8 +40,8 @@
       "title": "Lemez információk",
       "filesystem": "Fájlrendszer",
       "size": "Méret",
-      "mounted": "Csatolási pont",
-      "usage": "Kihasználtság",
+      "mounted": "Csatolva", 
+      "usage": "Használat",
       "storage": "Tároló"
     },
     "network": {
@@ -54,9 +54,48 @@
       "errors": "Hibák",
       "network_interfaces": "Hálózati interfészek"
     },
+    "gpu": {
+      "title": "GPU információk",
+      "model": "Modell",
+      "driver": "Meghajtó",
+      "temperature": "Hőmérséklet",
+      "memory": "Memória",
+      "utilization": "Kihasználtság",
+      "power": "Teljesítmény",
+      "clock_core": "Mag órajel",
+      "clock_memory": "Memória órajel",
+      "fan_speed": "Ventilátor sebesség"
+    },
+    "ai": {
+      "title": "AI képzés",
+      "framework": "Keretrendszer",
+      "processes": "Folyamatok",
+      "vram": "VRAM",
+      "model": "Modell",
+      "batch_size": "Batch méret",
+      "throughput": "Átviteli sebesség",
+      "epoch": "Epoha",
+      "loss": "Veszteség",
+      "accuracy": "Pontosság",
+      "training_time": "Képzési idő",
+      "no_training": "Nem észlelhető AI képzés"
+    },
+    "mining": {
+      "title": "Bányászat információk",
+      "algorithm": "Algoritmus",
+      "hashrate": "Hash sebesség",
+      "shares": "Részvények",
+      "temperature": "Hőmérséklet",
+      "power": "Teljesítmény",
+      "efficiency": "Hatékonyság",
+      "uptime": "Üzemidő",
+      "revenue_24h": "24h bevétel",
+      "pool": "Pool",
+      "not_detected": "Nem észlelhető bányászati tevékenység"
+    },
     "ui": {
       "histogram": "Hisztogram",
-      "vertical": "Függőleges",
+      "vertical": "Függőleges", 
       "horizontal": "Vízszintes",
       "loading": "Betöltés...",
       "no_data": "Nincs adat",
@@ -65,12 +104,15 @@
     "commands": {
       "help": "Súgó",
       "version": "Verzió",
-      "all": "Minden információ",
+      "all": "Összes információ",
       "disk_only": "Csak lemez",
-      "cpu_only": "Csak processzor",
-      "memory_only": "Csak memória",
+      "cpu_only": "Csak CPU",
+      "memory_only": "Csak memória", 
       "network_only": "Csak hálózat",
-      "refresh_rate": "Frissítési időköz",
+      "gpu_only": "Csak GPU",
+      "ai_only": "Csak AI képzés",
+      "mining_only": "Csak bányászat",
+      "refresh_rate": "Frissítési gyakoriság",
       "language": "Nyelv",
       "remote": "Távoli mód",
       "port": "Port"
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "Parancs nem található: %s",
       "invalid_port": "Érvénytelen port: %d",
-      "invalid_refresh": "Érvénytelen frissítési időköz: %d",
-      "config_load_failed": "A konfiguráció betöltése sikertelen",
-      "module_failed": "%s modul hibája: %v"
+      "invalid_refresh": "Érvénytelen frissítési időköz: %d", 
+      "config_load_failed": "Konfiguráció betöltése sikertelen",
+      "module_failed": "%s modul hibás: %v",
+      "nvidia_smi_not_found": "nvidia-smi nem található. GPU megfigyeléshez NVIDIA meghajtók szükségesek",
+      "rocm_smi_not_found": "rocm-smi nem található. AMD GPU megfigyeléshez ROCm szükséges"
     },
     "status": {
-      "monitoring_started": "Figyelés elindítva",
-      "updating_every": "Frissítés %d másodpercenként",
+      "monitoring_started": "Megfigyelés elindítva",
+      "updating_every": "Frissítés %d másodpercenként", 
       "press_ctrl_c": "Nyomja meg a Ctrl+C-t a kilépéshez",
-      "remote_mode": "Távoli mód a %d porton"
+      "remote_mode": "Távoli mód a %d porton",
+      "gpu_detected": "GPU észlelve: %s",
+      "ai_training_detected": "AI képzési folyamatok észlelve: %d",
+      "mining_detected": "Bányászati tevékenység észlelve: %s"
     }
   }
 }

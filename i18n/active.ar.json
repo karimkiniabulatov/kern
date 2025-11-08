@@ -1,46 +1,46 @@
 {
-  "language": "العربية",
+  "language": "Arabic (العربية)", 
   "language_code": "ar",
   "translations": {
     "common": {
-      "title": "kern - مراقبة النظام",
+      "title": "kern - مراقب النظام",
       "refresh": "تحديث",
       "seconds": "ثانية",
       "error": "خطأ",
       "unknown": "غير معروف",
       "total": "الإجمالي",
-      "used": "مستخدم",
+      "used": "مستخدم", 
       "free": "حر",
       "available": "متاح",
       "status": "الحالة",
-      "up": "تشغيل",
-      "down": "إيقاف"
+      "up": "يعمل",
+      "down": "متوقف"
     },
     "cpu": {
       "title": "معلومات المعالج",
       "model": "الموديل",
       "cores": "النوى",
-      "threads": "الخيوط",
+      "threads": "المهام",
       "usage": "الاستخدام",
-      "frequency": "التردد",
+      "frequency": "التردد", 
       "load": "الحمل",
       "load_1min": "1 دقيقة",
-      "load_5min": "5 دقائق", 
+      "load_5min": "5 دقائق",
       "load_15min": "15 دقيقة",
       "load_average": "متوسط الحمل"
     },
     "memory": {
-      "title": "معلومات الذاكرة",
+      "title": "معلومات الذاكرة", 
       "ram": "الذاكرة العشوائية",
-      "swap": "المبادلة",
-      "physical": "الذارة الفعلية",
+      "swap": "التبديل",
+      "physical": "الذاكرة الفعلية",
       "virtual": "الذاكرة الافتراضية"
     },
     "disk": {
       "title": "معلومات القرص",
       "filesystem": "نظام الملفات",
       "size": "الحجم",
-      "mounted": "نقطة التركيب",
+      "mounted": "مثبت على", 
       "usage": "الاستخدام",
       "storage": "التخزين"
     },
@@ -54,13 +54,52 @@
       "errors": "أخطاء",
       "network_interfaces": "واجهات الشبكة"
     },
+    "gpu": {
+      "title": "معلومات كارت الشاشة",
+      "model": "الموديل",
+      "driver": "برنامج التشغيل",
+      "temperature": "درجة الحرارة",
+      "memory": "الذاكرة",
+      "utilization": "الاستخدام",
+      "power": "الطاقة",
+      "clock_core": "سرعة النواة",
+      "clock_memory": "سرعة الذاكرة",
+      "fan_speed": "سرعة المروحة"
+    },
+    "ai": {
+      "title": "تدريب الذكاء الاصطناعي",
+      "framework": "الإطار",
+      "processes": "العمليات",
+      "vram": "الذاكرة الظاهرية",
+      "model": "النموذج",
+      "batch_size": "حجم الدفعة",
+      "throughput": "الإنتاجية",
+      "epoch": "الدورة",
+      "loss": "الفقد",
+      "accuracy": "الدقة",
+      "training_time": "وقت التدريب",
+      "no_training": "لم يتم اكتشاف تدريب للذكاء الاصطناعي"
+    },
+    "mining": {
+      "title": "معلومات التعدين",
+      "algorithm": "الخوارزمية",
+      "hashrate": "معدل الهاش",
+      "shares": "الحصص",
+      "temperature": "درجة الحرارة",
+      "power": "الطاقة",
+      "efficiency": "الكفاءة",
+      "uptime": "وقت التشغيل",
+      "revenue_24h": "الإيراد 24 ساعة",
+      "pool": "المجمع",
+      "not_detected": "لم يتم اكتشاف نشاط تعدين"
+    },
     "ui": {
-      "histogram": "مدرج تكراري",
-      "vertical": "عمودي",
+      "histogram": "الرسم البياني",
+      "vertical": "عمودي", 
       "horizontal": "أفقي",
       "loading": "جاري التحميل...",
       "no_data": "لا توجد بيانات",
-      "percent": "بالمائة"
+      "percent": "نسبة مئوية"
     },
     "commands": {
       "help": "مساعدة",
@@ -68,8 +107,11 @@
       "all": "جميع المعلومات",
       "disk_only": "القرص فقط",
       "cpu_only": "المعالج فقط",
-      "memory_only": "الذاكرة فقط",
+      "memory_only": "الذاكرة فقط", 
       "network_only": "الشبكة فقط",
+      "gpu_only": "كارت الشاشة فقط",
+      "ai_only": "تدريب الذكاء الاصطناعي فقط",
+      "mining_only": "التعدين فقط",
       "refresh_rate": "معدل التحديث",
       "language": "اللغة",
       "remote": "الوضع البعيد",
@@ -78,15 +120,20 @@
     "errors": {
       "command_not_found": "الأمر غير موجود: %s",
       "invalid_port": "منفذ غير صالح: %d",
-      "invalid_refresh": "معدل تحديث غير صالح: %d",
+      "invalid_refresh": "فاصل تحديث غير صالح: %d", 
       "config_load_failed": "فشل تحميل الإعدادات",
-      "module_failed": "خطأ في الوحدة %s: %v"
+      "module_failed": "فشل الوحدة %s: %v",
+      "nvidia_smi_not_found": "nvidia-smi غير موجود. مراقبة كارت الشاشة تتطلب برامج تشغيل NVIDIA",
+      "rocm_smi_not_found": "rocm-smi غير موجود. مراقبة AMD GPU تتطلب ROCm"
     },
     "status": {
       "monitoring_started": "بدأ المراقبة",
-      "updating_every": "التحديث كل %d ثانية",
-      "press_ctrl_c": "اضغط Ctrl+C للخروج",
-      "remote_mode": "الوضع البعيد على المنفذ %d"
+      "updating_every": "يتم التحديث كل %d ثانية", 
+      "press_ctrl_c": "اضغط على Ctrl+C للخروج",
+      "remote_mode": "الوضع البعيد على المنفذ %d",
+      "gpu_detected": "تم اكتشاف كارت الشاشة: %s",
+      "ai_training_detected": "تم اكتشاف عمليات تدريب الذكاء الاصطناعي: %d",
+      "mining_detected": "تم اكتشاف نشاط تعدين: %s"
     }
   }
 }

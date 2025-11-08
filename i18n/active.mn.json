@@ -1,38 +1,38 @@
 {
-  "language": "Монгол",
+  "language": "Mongolian (Монгол)", 
   "language_code": "mn",
   "translations": {
     "common": {
-      "title": "kern - Системийн хяналт",
+      "title": "kern - Системийн хянагч",
       "refresh": "Шинэчлэх",
       "seconds": "сек",
       "error": "Алдаа",
       "unknown": "Тодорхойгүй",
       "total": "Нийт",
-      "used": "Ашиглагдсан",
+      "used": "Ашиглагдсан", 
       "free": "Чөлөөт",
       "available": "Боломжтой",
       "status": "Төлөв",
       "up": "АСААЛТТАЙ",
-      "down": "УНТААСАН"
+      "down": "УНТАЛТТАЙ"
     },
     "cpu": {
-      "title": "Процессорын мэдээлэл",
+      "title": "CPU мэдээлэл",
       "model": "Загвар",
       "cores": "Цөм",
       "threads": "Утас",
       "usage": "Хэрэглээ",
-      "frequency": "Давтамж",
+      "frequency": "Давтамж", 
       "load": "Ачаалал",
       "load_1min": "1 мин",
-      "load_5min": "5 мин", 
+      "load_5min": "5 мин",
       "load_15min": "15 мин",
       "load_average": "Дундаж ачаалал"
     },
     "memory": {
-      "title": "Санах ойн мэдээлэл",
+      "title": "Санах ойн мэдээлэл", 
       "ram": "RAM",
-      "swap": "Своп",
+      "swap": "Солилцоо",
       "physical": "Физик санах ой",
       "virtual": "Виртуал санах ой"
     },
@@ -40,9 +40,9 @@
       "title": "Дискийн мэдээлэл",
       "filesystem": "Файлын систем",
       "size": "Хэмжээ",
-      "mounted": "Холболтын цэг",
+      "mounted": "Суулгасан", 
       "usage": "Хэрэглээ",
-      "storage": "Хадгалалт"
+      "storage": "Хадгалах"
     },
     "network": {
       "title": "Сүлжээний мэдээлэл",
@@ -50,13 +50,52 @@
       "received": "Хүлээн авсан",
       "sent": "Илгээсэн",
       "bytes": "байт",
-      "packets": "багц",
+      "packets": "пакет",
       "errors": "Алдаанууд",
       "network_interfaces": "Сүлжээний интерфейсүүд"
     },
+    "gpu": {
+      "title": "GPU мэдээлэл",
+      "model": "Загвар",
+      "driver": "Жолооч",
+      "temperature": "Температур",
+      "memory": "Санах ой",
+      "utilization": "Ашиглалт",
+      "power": "Хүч",
+      "clock_core": "Цөмийн хурд",
+      "clock_memory": "Санах ойн хурд",
+      "fan_speed": "Сэнсний хурд"
+    },
+    "ai": {
+      "title": "AI сургалт",
+      "framework": "Хүрээ",
+      "processes": "Процессууд",
+      "vram": "VRAM",
+      "model": "Загвар",
+      "batch_size": "Багцийн хэмжээ",
+      "throughput": "Пропуск чадвар",
+      "epoch": "Эпох",
+      "loss": "Алдагдал",
+      "accuracy": "Нарийвчлал",
+      "training_time": "Сургалтын хугацаа",
+      "no_training": "AI сургалт илрээгүй"
+    },
+    "mining": {
+      "title": "Олборлолтын мэдээлэл",
+      "algorithm": "Алгоритм",
+      "hashrate": "Хеш хурд",
+      "shares": "Хувьцаа",
+      "temperature": "Температур",
+      "power": "Хүч",
+      "efficiency": "Үр ашиг",
+      "uptime": "Ажиллах хугацаа",
+      "revenue_24h": "24ц орлого",
+      "pool": "Уусмал",
+      "not_detected": "Олборлолтын үйл ажиллагаа илрээгүй"
+    },
     "ui": {
       "histogram": "Гистограм",
-      "vertical": "Босоо",
+      "vertical": "Босоо", 
       "horizontal": "Хэвтээ",
       "loading": "Уншиж байна...",
       "no_data": "Өгөгдөл байхгүй",
@@ -67,26 +106,34 @@
       "version": "Хувилбар",
       "all": "Бүх мэдээлэл",
       "disk_only": "Зөвхөн диск",
-      "cpu_only": "Зөвхөн процессор",
-      "memory_only": "Зөвхөн санах ой",
+      "cpu_only": "Зөвхөн CPU",
+      "memory_only": "Зөвхөн санах ой", 
       "network_only": "Зөвхөн сүлжээ",
-      "refresh_rate": "Шинэчлэх интервал",
+      "gpu_only": "Зөвхөн GPU",
+      "ai_only": "Зөвхөн AI сургалт",
+      "mining_only": "Зөвхөн олборлолт",
+      "refresh_rate": "Шинэчлэх хурд",
       "language": "Хэл",
       "remote": "Алсын горим",
       "port": "Порт"
     },
     "errors": {
-      "command_not_found": "Команд олдсонгүй: %s",
+      "command_not_found": "Комманд олдсонгүй: %s",
       "invalid_port": "Буруу порт: %d",
-      "invalid_refresh": "Буруу шинэчлэх интервал: %d",
-      "config_load_failed": "Тохиргоог уншиж чадсангүй",
-      "module_failed": "%s модулийн алдаа: %v"
+      "invalid_refresh": "Буруу шинэчлэх интервал: %d", 
+      "config_load_failed": "Тохиргоог ачаалж чадсангүй",
+      "module_failed": "Модуль %s амжилтгүй: %v",
+      "nvidia_smi_not_found": "nvidia-smi олдсонгүй. GPU хянахын тулд NVIDIA жолооч шаардлагатай",
+      "rocm_smi_not_found": "rocm-smi олдсонгүй. AMD GPU хянахын тулд ROCm шаардлагатай"
     },
     "status": {
       "monitoring_started": "Хяналт эхлэв",
-      "updating_every": "%d секунд тутам шинэчлэгдэнэ",
+      "updating_every": "%d секунд тутам шинэчлэгдэнэ", 
       "press_ctrl_c": "Гарахын тулд Ctrl+C дарна уу",
-      "remote_mode": "%d порт дээрх алсын горим"
+      "remote_mode": "%d порт дээр алсын горим",
+      "gpu_detected": "GPU илрээ: %s",
+      "ai_training_detected": "AI сургалтын процессууд илрээ: %d",
+      "mining_detected": "Олборлолтын үйл ажиллагаа илрээ: %s"
     }
   }
 }

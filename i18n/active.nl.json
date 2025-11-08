@@ -1,36 +1,36 @@
 {
-  "language": "Nederlands",
+  "language": "Dutch (Nederlands)", 
   "language_code": "nl",
   "translations": {
     "common": {
-      "title": "kern - Systeembewaking",
+      "title": "kern - Systeemmonitor",
       "refresh": "Vernieuwen",
       "seconds": "sec",
       "error": "Fout",
       "unknown": "Onbekend",
       "total": "Totaal",
-      "used": "Gebruikt",
+      "used": "Gebruikt", 
       "free": "Vrij",
       "available": "Beschikbaar",
       "status": "Status",
-      "up": "AAN",
-      "down": "UIT"
+      "up": "ACTIEF",
+      "down": "INACTIEF"
     },
     "cpu": {
-      "title": "Processorinformatie",
+      "title": "CPU-informatie",
       "model": "Model",
       "cores": "Kernen",
       "threads": "Threads",
       "usage": "Gebruik",
-      "frequency": "Frequentie",
+      "frequency": "Frequentie", 
       "load": "Belasting",
       "load_1min": "1 min",
-      "load_5min": "5 min", 
+      "load_5min": "5 min",
       "load_15min": "15 min",
       "load_average": "Gemiddelde belasting"
     },
     "memory": {
-      "title": "Geheugeninformatie",
+      "title": "Geheugeninformatie", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysiek geheugen",
@@ -40,7 +40,7 @@
       "title": "Schijfinformatie",
       "filesystem": "Bestandssysteem",
       "size": "Grootte",
-      "mounted": "Mountpunt",
+      "mounted": "Gemonteerd op", 
       "usage": "Gebruik",
       "storage": "Opslag"
     },
@@ -54,9 +54,48 @@
       "errors": "Fouten",
       "network_interfaces": "Netwerkinterfaces"
     },
+    "gpu": {
+      "title": "GPU-informatie",
+      "model": "Model",
+      "driver": "Stuurprogramma",
+      "temperature": "Temperatuur",
+      "memory": "Geheugen",
+      "utilization": "Gebruik",
+      "power": "Vermogen",
+      "clock_core": "Kernklok",
+      "clock_memory": "Geheugenklok",
+      "fan_speed": "Ventilatorsnelheid"
+    },
+    "ai": {
+      "title": "AI-training",
+      "framework": "Framework",
+      "processes": "Processen",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Batchgrootte",
+      "throughput": "Doorvoer",
+      "epoch": "Epoch",
+      "loss": "Verlies",
+      "accuracy": "Nauwkeurigheid",
+      "training_time": "Trainingstijd",
+      "no_training": "Geen AI-training gedetecteerd"
+    },
+    "mining": {
+      "title": "Mining-informatie",
+      "algorithm": "Algoritme",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
+      "temperature": "Temperatuur",
+      "power": "Vermogen",
+      "efficiency": "Efficiëntie",
+      "uptime": "Uptime",
+      "revenue_24h": "24u opbrengst",
+      "pool": "Pool",
+      "not_detected": "Geen mining-activiteit gedetecteerd"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Verticaal",
+      "vertical": "Verticaal", 
       "horizontal": "Horizontaal",
       "loading": "Laden...",
       "no_data": "Geen gegevens",
@@ -67,26 +106,34 @@
       "version": "Versie",
       "all": "Alle informatie",
       "disk_only": "Alleen schijf",
-      "cpu_only": "Alleen processor",
-      "memory_only": "Alleen geheugen",
+      "cpu_only": "Alleen CPU",
+      "memory_only": "Alleen geheugen", 
       "network_only": "Alleen netwerk",
-      "refresh_rate": "Vernieuwingsinterval",
+      "gpu_only": "Alleen GPU",
+      "ai_only": "Alleen AI-training",
+      "mining_only": "Alleen mining",
+      "refresh_rate": "Vernieuwingssnelheid",
       "language": "Taal",
       "remote": "Externe modus",
       "port": "Poort"
     },
     "errors": {
-      "command_not_found": "Commando niet gevonden: %s",
+      "command_not_found": "Opdracht niet gevonden: %s",
       "invalid_port": "Ongeldige poort: %d",
-      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d",
-      "config_load_failed": "Kon configuratie niet laden",
-      "module_failed": "Module %s fout: %v"
+      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d", 
+      "config_load_failed": "Configuratie laden mislukt",
+      "module_failed": "Module %s mislukt: %v",
+      "nvidia_smi_not_found": "nvidia-smi niet gevonden. GPU-monitoring vereist NVIDIA-stuurprogramma's",
+      "rocm_smi_not_found": "rocm-smi niet gevonden. AMD GPU-monitoring vereist ROCm"
     },
     "status": {
       "monitoring_started": "Monitoring gestart",
-      "updating_every": "Bijwerken elke %d seconden",
+      "updating_every": "Bijwerken elke %d seconden", 
       "press_ctrl_c": "Druk op Ctrl+C om af te sluiten",
-      "remote_mode": "Externe modus op poort %d"
+      "remote_mode": "Externe modus op poort %d",
+      "gpu_detected": "GPU gedetecteerd: %s",
+      "ai_training_detected": "AI-trainingsprocessen gedetecteerd: %d",
+      "mining_detected": "Mining-activiteit gedetecteerd: %s"
     }
   }
 }
