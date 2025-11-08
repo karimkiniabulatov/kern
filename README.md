@@ -45,6 +45,7 @@ chmod +x ./scripts/install.sh
 If you encounter permission issues:
 
 ```bash
+```bash
 # Make all scripts executable
 chmod +x scripts/*.sh
 
