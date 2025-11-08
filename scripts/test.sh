@@ -10,6 +10,11 @@ if [ ! -x "./scripts/test.sh" ]; then
     chmod +x scripts/*.sh
 fi
 
+# Update dependencies first
+echo "Updating Go dependencies..."
+go mod download
+go mod tidy
+
 # Build the project
 echo "Building kern..."
 go build -o kern-test ./cmd/kern

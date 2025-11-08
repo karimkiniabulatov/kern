@@ -75,6 +75,20 @@ fi
 # Update Go dependencies and install
 echo "Building kern..."
 cd "$(dirname "$0")/.."
+
+# Clean up any previous builds
+rm -f kern kern-test
+
+# Download all dependencies
+echo "Downloading Go dependencies..."
+go mod download
+
+# Verify dependencies
+echo "Verifying dependencies..."
+go mod verify
+
+# Update go.sum
+echo "Updating go.sum..."
 go mod tidy
 
 # Build locally for testing

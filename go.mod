@@ -3,7 +3,7 @@ module github.com/karimkiniabulatov/kern
 go 1.21
 
 require (
-    github.com/gdamore/tcell/v2 v2.7.0
+    github.com/gdamore/tcell/v2 v2.7.1
     github.com/mattn/go-runewidth v0.0.15
     golang.org/x/term v0.18.0
 )
