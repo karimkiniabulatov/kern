@@ -5,7 +5,7 @@ import (
     "os/exec"
     "strconv"
     "strings"
-    "time"
+    //"time"
 )
 
 type AIInfo struct {

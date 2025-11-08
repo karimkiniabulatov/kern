@@ -37,7 +37,7 @@ func Summary() (*GPUInfo, error) {
     }
 
     // Fallback: check for GPU devices
-    info.Model = "Generic GPU"
+    info.Model = "Generic GPU (No drivers detected)"
     info.DriverVersion = "Unknown"
     
     return info, nil
