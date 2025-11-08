@@ -58,6 +58,27 @@ func (r *Renderer) Render(data map[string]interface{}) {
 		}
 	}
 
+	// NEW: GPU monitoring
+	if r.config.ShowGPU {
+		if gpuData, exists := data["gpu"]; exists {
+			r.renderGPUToBuffer(gpuData)
+		}
+	}
+
+	// NEW: AI training monitoring
+	if r.config.ShowAI {
+		if aiData, exists := data["ai"]; exists {
+			r.renderAIToBuffer(aiData)
+		}
+	}
+
+	// NEW: Mining monitoring
+	if r.config.ShowMining {
+		if miningData, exists := data["mining"]; exists {
+			r.renderMiningToBuffer(miningData)
+		}
+	}
+
 	r.renderFooterToBuffer()
 
 	// Clear screen and move cursor to top
@@ -77,7 +98,7 @@ func (r *Renderer) renderLogoToBuffer() {
  ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
- kern v1.1.0 - System Monitoring Tool
+ kern v1.2.0 - System Monitoring Tool
 `
 	r.screenBuffer = append(r.screenBuffer, "\033[1;36m"+strings.TrimSpace(logo)+"\033[0m")
 	r.screenBuffer = append(r.screenBuffer, "")
@@ -186,6 +207,48 @@ func (r *Renderer) renderNetworkToBuffer(data interface{}) {
 			}
 		}
 	}
+}
+
+func (r *Renderer) renderGPUToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("gpu.title"))
+
+	switch gpuData := data.(type) {
+	case map[string]interface{}:
+		if errorMsg, exists := gpuData["error"]; exists {
+			r.addLineToBuffer(fmt.Sprintf("Error: %v", errorMsg))
+		}
+	default:
+		r.addLineToBuffer("GPU monitoring not available")
+	}
+	r.addEmptyLineToBuffer()
+}
+
+func (r *Renderer) renderAIToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("ai.title"))
+
+	switch aiData := data.(type) {
+	case map[string]interface{}:
+		if errorMsg, exists := aiData["error"]; exists {
+			r.addLineToBuffer(fmt.Sprintf("Error: %v", errorMsg))
+		}
+	default:
+		r.addLineToBuffer(r.config.T("ai.no_training"))
+	}
+	r.addEmptyLineToBuffer()
+}
+
+func (r *Renderer) renderMiningToBuffer(data interface{}) {
+	r.addHeaderToBuffer(r.config.T("mining.title"))
+
+	switch miningData := data.(type) {
+	case map[string]interface{}:
+		if errorMsg, exists := miningData["error"]; exists {
+			r.addLineToBuffer(fmt.Sprintf("Error: %v", errorMsg))
+		}
+	default:
+		r.addLineToBuffer(r.config.T("mining.not_detected"))
+	}
+	r.addEmptyLineToBuffer()
 }
 
 func (r *Renderer) renderFooterToBuffer() {
