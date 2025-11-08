@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -58,7 +59,7 @@ func main() {
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
-	
+
 	flag.Usage = func() {
 		showLogo()
 		fmt.Printf("kern v%s - System Monitoring Tool\n\n", version)
@@ -267,7 +268,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		err    error
 	}
 
-	resultChan := make(chan result, 7)  // Increased buffer size for new modules
+	resultChan := make(chan result, 7) // Increased buffer size for new modules
 
 	// Launch goroutines only for enabled modules
 	if cfg.ShowDisk {
@@ -306,7 +307,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		}()
 	}
 
-	// NEW: AI training monitoring  
+	// NEW: AI training monitoring
 	if cfg.ShowAI {
 		go func() {
 			data, err := ai.Summary()
@@ -325,13 +326,27 @@ func collectData(cfg *config.Config) map[string]interface{} {
 	// Collect results
 	results := make(map[string]interface{})
 	moduleCount := 0
-	if cfg.ShowDisk { moduleCount++ }
-	if cfg.ShowCPU { moduleCount++ }
-	if cfg.ShowMem { moduleCount++ }
-	if cfg.ShowNet { moduleCount++ }
-	if cfg.ShowGPU { moduleCount++ }
-	if cfg.ShowAI { moduleCount++ }
-	if cfg.ShowMining { moduleCount++ }
+	if cfg.ShowDisk {
+		moduleCount++
+	}
+	if cfg.ShowCPU {
+		moduleCount++
+	}
+	if cfg.ShowMem {
+		moduleCount++
+	}
+	if cfg.ShowNet {
+		moduleCount++
+	}
+	if cfg.ShowGPU {
+		moduleCount++
+	}
+	if cfg.ShowAI {
+		moduleCount++
+	}
+	if cfg.ShowMining {
+		moduleCount++
+	}
 
 	for i := 0; i < moduleCount; i++ {
 		res := <-resultChan
@@ -554,7 +569,7 @@ func fetchRemoteData(baseURL string) (map[string]interface{}, error) {
 // NEW: Display remote data
 func displayRemoteData(data map[string]interface{}) {
 	fmt.Println("=== Remote System Monitoring ===")
-	
+
 	for module, moduleData := range data {
 		fmt.Printf("\n%s:\n", strings.ToUpper(module))
 		if errorData, isError := moduleData.(map[string]interface{}); isError {
@@ -604,4 +619,4 @@ func downloadLanguagePack(lang string) {
 	} else {
 		fmt.Printf("Language pack '%s' downloaded successfully!\n", lang)
 	}
-}	
+}

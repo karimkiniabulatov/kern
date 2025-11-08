@@ -91,9 +91,24 @@ go mod verify
 echo "Updating go.sum..."
 go mod tidy
 
+# Check for common code issues and fix them
+echo "Checking for common code issues..."
+if ! grep -q '"strings"' cmd/kern/main.go; then
+    echo "Fixing missing strings import in main.go..."
+    # Apply the strings import fix
+    sed -i '7a\\t"strings"' cmd/kern/main.go
+    echo "✓ Fixed strings import"
+fi
+
 # Build locally for testing
 echo "Building local binary..."
-go build -o kern ./cmd/kern
+if ! go build -o kern ./cmd/kern; then
+    echo "Build failed. Trying alternative build method..."
+    # Try building with more verbose output
+    go build -x -o kern ./cmd/kern 2>&1 | tail -20
+    echo "If build continues to fail, run: ./scripts/quick-fix.sh"
+    exit 1
+fi
 
 # Install globally
 echo "Installing globally..."
