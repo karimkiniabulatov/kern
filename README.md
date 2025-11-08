@@ -44,8 +44,7 @@ chmod +x ./scripts/install.sh
 
 If you encounter permission issues:
 
-```bash
-```bash
+
 # Make all scripts executable
 chmod +x scripts/*.sh
 
@@ -110,6 +109,8 @@ kern --cpu --gpu --ai --refresh=1
 
 # Remote monitoring with all modules on custom port
 kern --all -r 26001
+
+-----------------------------------------------------------------------------
 
 🌐 Remote Monitoring
 kern supports multiple remote monitoring protocols and access methods:
@@ -207,6 +208,8 @@ ssh user@remote-host 'kern --all --refresh=2'
 ssh -L 28126:localhost:28126 user@remote-host &
 kern --api http://localhost:28126
 
+-----------------------------------------------------------------------------
+
 🎨 TUI Interface
 The Terminal User Interface provides:
 
@@ -243,6 +246,8 @@ Power: 285 W / 320 W
 
 Press 'q' to quit | Auto-refresh every 2 seconds
 
+-----------------------------------------------------------------------------
+
 🎮 GPU Monitoring
 Supported GPUs
 NVIDIA: All cards with nvidia-smi support
@@ -263,6 +268,8 @@ Power consumption and limits
 Core and memory clock speeds
 
 Performance state
+
+-----------------------------------------------------------------------------
 
 🤖 AI Training Monitoring
 Detected Frameworks
@@ -289,6 +296,8 @@ Loss and accuracy metrics
 
 Epoch progress and training time
 
+-----------------------------------------------------------------------------
+
 ⛏️ Mining Monitoring
 Supported Algorithms
 RandomX: Monero (XMR)
@@ -313,6 +322,8 @@ Mining efficiency (hash/watt)
 Uptime and pool information
 
 24-hour revenue estimation
+
+-----------------------------------------------------------------------------
 
 🌍 Language Support
 kern supports 50+ languages with automatic download capability:
@@ -341,6 +352,8 @@ kern -l fr
 kern --download-lang es
 kern --download-lang de
 kern --download-lang ja
+
+-----------------------------------------------------------------------------
 
 📁 Project Structure
 
@@ -386,6 +399,8 @@ kern/
 ├── go.sum
 └── README.md
 
+-----------------------------------------------------------------------------
+
 🛠 Installation Details
 Dependencies
 Go 1.21+ (automatically installed if missing)
@@ -407,6 +422,8 @@ git clone https://github.com/karimkiniabulatov/kern
 cd kern
 go build -o kern ./cmd/kern
 ./kern
+
+-----------------------------------------------------------------------------
 
 📋 Usage Tips
 Interactive Controls
@@ -459,6 +476,8 @@ Language Support:
 
 --list-languages - List all supported languages
 
+-----------------------------------------------------------------------------
+
 🧪 Testing
 
 # Run test suite
@@ -478,6 +497,8 @@ go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
 # Test remote monitoring
 kern -r 28126 &
 curl http://localhost:28126/api/cpu
+
+-----------------------------------------------------------------------------
 
 🔌 API Usage Examples
 Start API Server
@@ -539,6 +560,8 @@ curl http://localhost:28126/api/ai
   "training_time": "2h 15m"
 }
 
+-----------------------------------------------------------------------------
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -561,9 +584,13 @@ curl http://localhost:28126/api/ai
 4. Update API endpoints in `cmd/kern/main.go`
 5. Add translations for new module
 
+-----------------------------------------------------------------------------
+
 ## 📄 License
 
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
+
+-----------------------------------------------------------------------------
 
 ## 🆘 Support
 
@@ -571,6 +598,8 @@ This project is licensed under the GNU GPLv3 License - see the LICENSE file for 
 - **API Documentation**: See above sections
 - **Issues**: [GitHub Issues](https://github.com/karimkiniabulatov/kern/issues)
 - **Questions**: Check existing issues or create new one
+
+-----------------------------------------------------------------------------
 
 ## 🎯 Technical Highlights
 
@@ -592,6 +621,7 @@ This project is licensed under the GNU GPLv3 License - see the LICENSE file for 
 - **Access Control**: Firewall and network segmentation support
 - **Minimal Footprint**: No persistent data storage required
 
+-----------------------------------------------------------------------------
 ## 🔄 Version History
 
 ### v1.2.0 (Current)
@@ -615,6 +645,10 @@ This project is licensed under the GNU GPLv3 License - see the LICENSE file for 
 
 ---
 
+-----------------------------------------------------------------------------
+
 **Enjoy monitoring your system with kern! 🎯**
+
+-----------------------------------------------------------------------------
 
 *Monitor locally, access globally - kern makes system monitoring accessible everywhere.*
