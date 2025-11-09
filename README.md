@@ -5,6 +5,7 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful T
 ![kern demo](https://img.shields.io/badge/version-1.2.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/license-GPLv3-green)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)
 
 ## ✨ Features
 
@@ -26,36 +27,49 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful T
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+**System Requirements:**
+- Linux, macOS, or Windows
+- Go 1.21+ (automatically installed if missing)
+- Basic system tools: `df`, `lscpu`, `free`, `ip`
+
+**Optional Dependencies:**
+- NVIDIA GPUs: `nvidia-smi` (included with NVIDIA drivers)
+- AMD GPUs: `rocm-smi` (included with ROCm)
+- AI Monitoring: Python with TensorFlow/PyTorch
+- Mining Monitoring: Mining software (xmrig, ethminer, etc.)
+
 ### Installation
 
 ```bash
-# Quick install
-go install github.com/karimkiniabulatov/kern@latest
+# Quick install (recommended)
+curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
 
-# Or clone and build
+# Or clone and build manually
 git clone https://github.com/karimkiniabulatov/kern
 cd kern
 chmod +x ./scripts/install.sh
 ./scripts/install.sh
 
------------------------------------------------------------------------------
+# Docker (coming soon)
+# docker run -it karimkini/kern:latest
 
-### Troubleshooting
+--------------------------------------------------------------------------------------------------
 
-If you encounter permission issues:
+Language Setup
 
+# List all supported languages
+kern --list-languages
 
-# Make all scripts executable
-chmod +x scripts/*.sh
+# Download a language pack (e.g., French)
+kern --download-lang fr
 
-# Or run the fix permissions script
-./scripts/fix-permissions.sh
+# Use the language (must be downloaded first)
+kern -l fr
 
-# If scripts still can't run, try:
-bash scripts/install.sh
-bash scripts/test.sh
-
------------------------------------------------------------------------------
+# Check if language is available on your system
+kern -l es  # Will show warning if Spanish not downloaded
 
 Basic Usage
 
@@ -74,29 +88,34 @@ kern --all
 # Custom refresh rate
 kern --refresh=3
 
-# Russian interface
+# Russian interface (must be downloaded first)
 kern -l ru
-
-# Download and use French language
-kern --download-lang fr
-kern -l fr
-
-# List all supported languages
-kern --list-languages
-
-# Start API server on default port 28126
-kern -r
-
-# Start API server on custom port
-kern -r 26001
 
 # Show logo during monitoring
 kern --logo
 
-# Show version and logo
+# Show version
 kern -v
 
-Advanced Usage
+--------------------------------------------------------------------------------------------------
+
+🎯 Advanced Usage
+Smart Module Selection
+kern remembers your last used modules:
+
+# First run: shows CPU, Memory, Disk, Network by default
+kern
+
+# If you run with specific modules:
+kern --gpu --ai
+
+# Next time you run without arguments, it will show GPU and AI
+kern  # Shows GPU and AI (your last used modules)
+
+# To reset to defaults, use --all
+kern --all
+
+Combined Monitoring
 
 # GPU and AI training monitoring
 kern --gpu --ai
@@ -107,13 +126,13 @@ kern --mining --detailed
 # Combined monitoring for AI workloads
 kern --cpu --gpu --ai --refresh=1
 
-# Remote monitoring with all modules on custom port
-kern --all -r 26001
+# System administrator view
+kern --cpu --mem --disk --net --refresh=5
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 🌐 Remote Monitoring
-kern supports multiple remote monitoring protocols and access methods:
+kern supports multiple remote monitoring protocols:
 
 API-Based Monitoring
 
@@ -156,25 +175,17 @@ Cloud Instances: Monitor AWS, GCP, Azure VMs
 API Endpoints
 All endpoints return JSON data:
 
-GET /api/cpu - CPU information and usage
-
-GET /api/mem - Memory and swap usage
-
-GET /api/disk - Disk usage and filesystems
-
-GET /api/net - Network interfaces and traffic
-
-GET /api/gpu - GPU information and metrics
-
-GET /api/ai - AI training processes and VRAM
-
-GET /api/mining - Mining activity and efficiency
-
-GET /api/system - System information and version
-
-GET /health - Health check endpoint
-
-GET / - API information and endpoints
+Endpoint	Description	Authentication
+GET /api/cpu	CPU information and usage	None
+GET /api/mem	Memory and swap usage	None
+GET /api/disk	Disk usage and filesystems	None
+GET /api/net	Network interfaces and traffic	None
+GET /api/gpu	GPU information and metrics	None
+GET /api/ai	AI training processes and VRAM	None
+GET /api/mining	Mining activity and efficiency	None
+GET /api/system	System information and version	None
+GET /health	Health check endpoint	None
+GET /	API information and endpoints	None
 
 Example API Usage
 
@@ -208,7 +219,7 @@ ssh user@remote-host 'kern --all --refresh=2'
 ssh -L 28126:localhost:28126 user@remote-host &
 kern --api http://localhost:28126
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 🎨 TUI Interface
 The Terminal User Interface provides:
@@ -246,7 +257,7 @@ Power: 285 W / 320 W
 
 Press 'q' to quit | Auto-refresh every 2 seconds
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 🎮 GPU Monitoring
 Supported GPUs
@@ -269,7 +280,15 @@ Core and memory clock speeds
 
 Performance state
 
------------------------------------------------------------------------------
+Requirements
+
+# For NVIDIA GPUs
+sudo apt install nvidia-driver-535 nvidia-utils-535
+
+# For AMD GPUs (ROCm)
+sudo apt install rocm-smi-lib
+
+--------------------------------------------------------------------------------------------------
 
 🤖 AI Training Monitoring
 Detected Frameworks
@@ -296,7 +315,18 @@ Loss and accuracy metrics
 
 Epoch progress and training time
 
------------------------------------------------------------------------------
+Example AI Output:
+
+AI Training
+Framework: PyTorch
+Processes: 2
+VRAM: 12450 MB / 16384 MB
+Model: resnet-50
+Batch Size: 32 | Throughput: 45.7 samples/sec
+Epoch: 12 | Loss: 0.234 | Accuracy: 89.2%
+Training Time: 2h 15m
+
+--------------------------------------------------------------------------------------------------
 
 ⛏️ Mining Monitoring
 Supported Algorithms
@@ -323,7 +353,20 @@ Uptime and pool information
 
 24-hour revenue estimation
 
------------------------------------------------------------------------------
+Example Mining Output:
+
+Mining Information
+Algorithm: Ethash (Ethereum)
+Hashrate: 85.2 MH/s
+Shares: 1452/1460 (99.5%)
+Temperature: ██████████ 68.5°C
+Power: 285 W
+Efficiency: 0.30 MH/s/W
+Uptime: 3d 12h
+24h Revenue: ~$4.25
+Pool: ethermine.org
+
+--------------------------------------------------------------------------------------------------
 
 🌍 Language Support
 kern supports 50+ languages with automatic download capability:
@@ -345,15 +388,33 @@ kern --list-languages
 # Download a language pack
 kern --download-lang fr
 
-# Use downloaded language
+# Use downloaded language (must be downloaded first)
 kern -l fr
 
 # Download multiple languages
 kern --download-lang es
-kern --download-lang de
+kern --download-lang de  
 kern --download-lang ja
 
------------------------------------------------------------------------------
+# Check current language configuration
+cat ~/.config/kern/kern.json | grep language
+
+Important Note About Languages
+Language packs must be downloaded before use. If you try to use a language that isn't downloaded, kern will:
+
+Show a warning message
+
+Fall back to English
+
+Suggest the download command
+
+Example:
+
+kern -l fr
+# Output: Language 'fr' is not supported. Using English.
+#         Use 'kern --download-lang fr' to download language pack.
+
+--------------------------------------------------------------------------------------------------
 
 📁 Project Structure
 
@@ -390,7 +451,8 @@ kern/
 ├── scripts/                        # Install/test scripts
 │   ├── install.sh
 │   ├── test.sh
-│   └── test_api.sh
+│   ├── test_api.sh
+│   └── update-deps.sh
 ├── man/                            # Manual page
 │   └── kern.1
 ├── .github/
@@ -399,31 +461,50 @@ kern/
 ├── go.sum
 └── README.md
 
------------------------------------------------------------------------------
-
 🛠 Installation Details
 Dependencies
+Required:
+
 Go 1.21+ (automatically installed if missing)
 
 System tools: df, lscpu, free, ip (installed automatically)
 
+Optional:
+
 GPU monitoring: nvidia-smi (NVIDIA) or rocm-smi (AMD)
+
+AI monitoring: Python with ML frameworks
+
+Mining monitoring: Mining software
 
 Manual Installation
 
-# One-line install
-curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
-
-# Or run manually
-./scripts/install.sh
-
-# Build from source
+# Clone repository
 git clone https://github.com/karimkiniabulatov/kern
 cd kern
-go build -o kern ./cmd/kern
-./kern
 
------------------------------------------------------------------------------
+# Make scripts executable
+chmod +x scripts/*.sh
+
+# Run installation script
+./scripts/install.sh
+
+# Or build manually
+go build -o kern ./cmd/kern
+sudo cp kern /usr/local/bin/
+
+Docker Installation
+
+# Build from Dockerfile
+docker build -t kern .
+
+# Run container
+docker run -it --rm kern
+
+# With host networking for full system access
+docker run -it --rm --net=host --pid=host kern
+
+--------------------------------------------------------------------------------------------------
 
 📋 Usage Tips
 Interactive Controls
@@ -476,15 +557,20 @@ Language Support:
 
 --list-languages - List all supported languages
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 🧪 Testing
 
-# Run test suite
+# Run complete test suite
 ./scripts/test.sh
 
 # Test API functionality  
 ./scripts/test_api.sh
+
+# Test specific modules
+kern --cpu --refresh=1
+kern --gpu --ai
+kern --mining --detailed
 
 # Test language support
 kern --list-languages
@@ -497,15 +583,18 @@ go build -o kern ./cmd/kern && ./kern --cpu --refresh=1
 # Test remote monitoring
 kern -r 28126 &
 curl http://localhost:28126/api/cpu
+kill %1
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 🔌 API Usage Examples
+
 Start API Server
 
 kern -r 28126
 
 API Response Examples
+
 CPU Information:
 
 curl http://localhost:28126/api/cpu
@@ -525,8 +614,6 @@ curl http://localhost:28126/api/cpu
 
 GPU Information:
 
-curl http://localhost:28126/api/gpu
-
 {
   "model": "NVIDIA GeForce RTX 4080",
   "driver_version": "535.104.05",
@@ -544,8 +631,6 @@ curl http://localhost:28126/api/gpu
 
 AI Training Information:
 
-curl http://localhost:28126/api/ai
-
 {
   "framework": "PyTorch",
   "process_count": 2,
@@ -560,95 +645,139 @@ curl http://localhost:28126/api/ai
   "training_time": "2h 15m"
 }
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
-## 🤝 Contributing
+🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+Fork the repository
 
-### Adding New Languages
+Create a feature branch: git checkout -b feature/amazing-feature
 
-1. Add translation file to `i18n/` directory
-2. Update supported languages list in `internal/i18n/translations.go`
-3. Test with: `kern -l your_language_code`
+Commit changes: git commit -m 'Add amazing feature'
 
-### Adding New Monitoring Modules
+Push to branch: git push origin feature/amazing-feature
 
-1. Create module in `internal/` directory
-2. Implement `Summary()` function returning structured data
-3. Add TUI rendering in `internal/ui/tui.go`
-4. Update API endpoints in `cmd/kern/main.go`
-5. Add translations for new module
+Open a Pull Request
 
------------------------------------------------------------------------------
+Adding New Languages
+Add translation file to i18n/ directory
 
-## 📄 License
+Update supported languages list in internal/i18n/translations.go
+
+Test with: kern -l your_language_code
+
+Adding New Monitoring Modules
+Create module in internal/ directory
+
+Implement Summary() function returning structured data
+
+Add TUI rendering in internal/ui/tui.go
+
+Update API endpoints in cmd/kern/main.go
+
+Add translations for new module
+
+--------------------------------------------------------------------------------------------------
+
+📄 License
 
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
 
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
-## 🆘 Support
+🆘 Support
+Documentation: man kern
 
-- **Documentation**: `man kern`
-- **API Documentation**: See above sections
-- **Issues**: [GitHub Issues](https://github.com/karimkiniabulatov/kern/issues)
-- **Questions**: Check existing issues or create new one
+API Documentation: See above sections
 
------------------------------------------------------------------------------
+Issues: GitHub Issues
 
-## 🎯 Technical Highlights
+Questions: Check existing issues or create new one
 
-### New TUI Architecture
-- **Double Buffering**: Eliminates screen flickering completely
-- **Event-Driven**: Responsive to keyboard and resize events
-- **Color Management**: Professional color scheme with semantic meaning
-- **Cross-Platform**: Consistent experience across Linux, macOS, Windows
+Troubleshooting
 
-### Performance Optimizations
-- **Concurrent Data Collection**: All system metrics gathered in parallel
-- **Efficient Rendering**: Only changed content is updated
-- **Memory Efficient**: Minimal allocations during updates
-- **Network Optimized**: Efficient remote data transfer
+Common Issues:
 
-### Security Features
-- **API Security**: Can be protected with reverse proxy and TLS
-- **SSH Integration**: Secure remote access via SSH tunnels
-- **Access Control**: Firewall and network segmentation support
-- **Minimal Footprint**: No persistent data storage required
+# Permission issues with scripts
+chmod +x scripts/*.sh
 
------------------------------------------------------------------------------
-## 🔄 Version History
+# Language not working
+kern --download-lang LANG_CODE
+kern -l LANG_CODE
 
-### v1.2.0 (Current)
-- Added GPU monitoring (NVIDIA/AMD support)
-- Added AI training monitoring
-- Added cryptocurrency mining monitoring
-- Enhanced remote monitoring with multiple protocols
-- Improved TUI with better histograms
-- Expanded API endpoints
+# GPU monitoring not working
+nvidia-smi  # Check if NVIDIA drivers are installed
+rocm-smi    # Check if ROCm is installed
 
-### v1.1.0
-- Initial TUI implementation
-- Multi-language support
-- Basic remote API
-- Core monitoring modules
+# Build issues
+./scripts/update-deps.sh
+go clean -modcache
+go mod tidy
 
-### v1.0.0
-- Initial release
-- Basic system monitoring
-- Command-line interface
+--------------------------------------------------------------------------------------------------
 
----
+🎯 Technical Highlights
+New TUI Architecture
+Double Buffering: Eliminates screen flickering completely
 
------------------------------------------------------------------------------
+Event-Driven: Responsive to keyboard and resize events
 
-**Enjoy monitoring your system with kern! 🎯**
+Color Management: Professional color scheme with semantic meaning
 
------------------------------------------------------------------------------
+Cross-Platform: Consistent experience across Linux, macOS, Windows
 
-*Monitor locally, access globally - kern makes system monitoring accessible everywhere.*
+Performance Optimizations
+Concurrent Data Collection: All system metrics gathered in parallel
+
+Efficient Rendering: Only changed content is updated
+
+Memory Efficient: Minimal allocations during updates
+
+Network Optimized: Efficient remote data transfer
+
+Security Features
+API Security: Can be protected with reverse proxy and TLS
+
+SSH Integration: Secure remote access via SSH tunnels
+
+Access Control: Firewall and network segmentation support
+
+Minimal Footprint: No persistent data storage required
+
+--------------------------------------------------------------------------------------------------
+
+🔄 Version History
+v1.2.0 (Current)
+Added GPU monitoring (NVIDIA/AMD support)
+
+Added AI training monitoring
+
+Added cryptocurrency mining monitoring
+
+Enhanced remote monitoring with multiple protocols
+
+Improved TUI with better histograms
+
+Expanded API endpoints
+
+Smart module preferences
+
+v1.1.0
+Initial TUI implementation
+
+Multi-language support
+
+Basic remote API
+
+Core monitoring modules
+
+v1.0.0
+Initial release
+
+Basic system monitoring
+
+Command-line interface
+
+--------------------------------------------------------------------------------------------------
+
+Enjoy monitoring your system with kern! 🎯

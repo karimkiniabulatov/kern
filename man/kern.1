@@ -1,197 +1,316 @@
-.TH KERN 1 "2025-11-03" "kern" "System Monitoring Tool"
+
+## Улучшенная man страница (kern.1)
+
+```man
+.TH KERN 1 "2025-11-03" "kern v1.2.0" "System Monitoring Tool"
 .SH NAME
 kern \- real-time system monitoring tool with TUI and REST API
 .SH SYNOPSIS
 .B kern
-[\-acdhmnvg] [\-\-ai] [\-\-mining] [\-\-refresh=\fISECONDS\fR] [\-l \fILANG\fR] [\-r \fIPORT\fR] [\-\-detailed]
+[\fIOPTIONS\fR]
+.br
 .B kern
-[\-\-api \fIURL\fR] [\-\-ssh \fIHOST\fR] [\-\-download-lang \fICODE\fR] [\-\-list-languages]
+\fB\-a\fR | \fB\-\-all\fR
+.br
+.B kern
+\fB\-c\fR | \fB\-\-cpu\fR
+.br
+.B kern
+\fB\-d\fR | \fB\-\-disk\fR
+.br
+.B kern
+\fB\-m\fR | \fB\-\-mem\fR
+.br
+.B kern
+\fB\-n\fR | \fB\-\-net\fR
+.br
+.B kern
+\fB\-g\fR | \fB\-\-gpu\fR
+.br
+.B kern
+\fB\-\-ai\fR
+.br
+.B kern
+\fB\-\-mining\fR
+.br
+.B kern
+\fB\-r\fR [\fIPORT\fR] | \fB\-\-remote\fR [\fIPORT\fR]
+.br
+.B kern
+\fB\-\-api\fR \fIURL\fR
+.br
+.B kern
+\fB\-\-ssh\fR \fIHOST\fR
 .SH DESCRIPTION
 .B kern
-is a comprehensive system monitoring tool that provides real-time information
-about disk usage, CPU performance, memory utilization, network statistics,
-GPU monitoring, AI training processes, and cryptocurrency mining activity.
-It features a professional Terminal User Interface (TUI) with double buffering
-to eliminate screen flickering, support for multiple languages with automatic
-download, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
+is a comprehensive system monitoring tool that provides real-time information about system resources including disk usage, CPU performance, memory utilization, network statistics, GPU metrics, AI training processes, and cryptocurrency mining activity.
+
+The tool features a professional Terminal User Interface (TUI) with double buffering to eliminate screen flickering, support for multiple languages with automatic download capability, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
+
+.B kern
+remembers your last used monitoring modules and will automatically show them when run without arguments.
 .SH OPTIONS
 .TP
-.B \-a, \-\-all
-Show all system information (default).
+.BR \-a ", " \-\-all
+Show all system information. This is the default behavior on first run.
 .TP
-.B \-c, \-\-cpu
-Show CPU information only.
+.BR \-c ", " \-\-cpu
+Show CPU information only, including model, cores, threads, usage percentage, frequency, and load averages.
 .TP
-.B \-d, \-\-disk
-Show disk information only.
+.BR \-d ", " \-\-disk
+Show disk information only, including filesystem type, size, usage, and mount points.
 .TP
-.B \-h, \-\-help
-Show help message.
+.BR \-m ", " \-\-mem
+Show memory information only, including RAM and swap usage with visual graphs.
 .TP
-.B \-m, \-\-mem
-Show memory information only.
+.BR \-n ", " \-\-net
+Show network information only, including interface status, IP/MAC addresses, and traffic statistics.
 .TP
-.B \-n, \-\-net
-Show network information only.
-.TP
-.B \-g, \-\-gpu
-Show GPU information only (requires NVIDIA or AMD drivers).
+.BR \-g ", " \-\-gpu
+Show GPU information only. Requires NVIDIA drivers (nvidia-smi) or AMD ROCm (rocm-smi).
 .TP
 .B \-\-ai
-Show AI training information only.
+Show AI training information only, including framework detection, VRAM usage, and training metrics.
 .TP
 .B \-\-mining
-Show cryptocurrency mining information only.
+Show cryptocurrency mining information only, including algorithm, hashrate, and efficiency metrics.
 .TP
-.B \-v, \-\-version
-Show version information and logo.
+.BR \-v ", " \-\-version
+Show version information and application logo.
 .TP
-.B \-\-refresh=\fISECONDS\fR
-Set refresh interval in seconds (default: 2).
+.BR \-h ", " \-\-help
+Show comprehensive help message.
 .TP
-.B \-l \fILANG\fR
-Set interface language. Use \-\-list-languages to see all supported codes.
+.BI \-\-refresh= SECONDS
+Set refresh interval in seconds. Default is 2 seconds. Minimum is 1 second.
 .TP
-.B \-r \fIPORT\fR
-Start remote API server on specified port (default: 28126).
+.BI \-l " LANG" "\fR, " \-\-lang " LANG"
+Set interface language. Language pack must be downloaded first using \fB\-\-download-lang\fR. Use \fB\-\-list-languages\fR to see all supported codes.
+.TP
+.BI \-r " [PORT]" "\fR, " \-\-remote " [PORT]"
+Start remote API server on specified port. Default port is 28126 if not specified.
 .TP
 .B \-\-detailed
-Show detailed CPU core information (individual core usage).
+Show detailed CPU core information including individual core usage percentages.
 .TP
-.B \-\-api \fIURL\fR
-Monitor remote server via HTTP/HTTPS API.
+.BI \-\-api " URL"
+Monitor remote server via HTTP/HTTPS API. URL should be in format http://host:port or https://host:port.
 .TP
-.B \-\-ssh \fIHOST\fR
-Monitor remote server via SSH.
+.BI \-\-ssh " HOST"
+Monitor remote server via SSH. Format should be user@hostname.
 .TP
-.B \-\-download-lang \fICODE\fR
-Download language pack for specified language code.
+.BI \-\-download-lang " CODE"
+Download language pack for specified language code. The language will be available for use after download.
 .TP
 .B \-\-list-languages
-List all supported language codes.
+List all supported language codes with their full names.
 .TP
 .B \-\-logo
-Show application logo during monitoring.
+Show application logo during monitoring display.
 .SH TUI CONTROLS
-When running in interactive mode, the following controls are available:
+When running in interactive TUI mode, the following controls are available:
 .TP
-.B q, Q, ESC
-Quit the application
+.B q ", " Q ", " ESC
+Quit the application gracefully.
 .TP
 .B Ctrl+C
-Quit the application
+Quit the application (same as q).
 .TP
 .B Terminal Resize
-Interface automatically adapts to terminal size changes
+Interface automatically adapts to terminal size changes and redraws appropriately.
+.SH SMART MODULE PREFERENCES
+.B kern
+automatically remembers which modules you used last and will show them when you run the program without any arguments.
+
+Example:
+.IP
+$ kern --gpu --ai
+.br
+# kern remembers GPU and AI modules
+.br
+$ kern
+.br
+# Shows only GPU and AI information (your last used modules)
+.br
+$ kern --all
+.br
+# Resets to show all modules
 .SH REMOTE MONITORING
 .B kern
-supports multiple remote monitoring protocols:
-.TP
-.B HTTP/HTTPS API
-REST API accessible via HTTP or HTTPS (with TLS termination)
-.TP
-.B SSH
-Direct SSH execution or SSH tunneling
-.TP
-.B Local Network
-Access within local network segments
-.TP
-.B Global Internet
-Access via public IP with port forwarding
-.SH API
-When started with the
-.B \-r
-option,
-.B kern
-provides a REST API on the specified port (28126 by default):
-.TP
-.B GET /api/cpu
-Returns JSON with CPU information.
-.TP
-.B GET /api/mem
-Returns JSON with memory information.
-.TP
-.B GET /api/disk
-Returns JSON with disk information.
-.TP
-.B GET /api/net
-Returns JSON with network information.
-.TP
-.B GET /api/gpu
-Returns JSON with GPU information.
-.TP
-.B GET /api/ai
-Returns JSON with AI training information.
-.TP
-.B GET /api/mining
-Returns JSON with mining information.
-.TP
-.B GET /api/system
-Returns JSON with system information.
-.TP
-.B GET /health
-Returns health status.
-.PP
-Example usage:
+supports multiple remote monitoring protocols for distributed system monitoring:
+.SS HTTP/HTTPS API
+Start kern in server mode on the remote machine and access it via HTTP or HTTPS:
 .IP
+.B Remote machine:
 kern -r 28126
 .br
-curl http://localhost:28126/api/cpu
+.B Local machine:
+kern --api http://remote-ip:28126
+.SS SSH Monitoring
+Execute kern directly on remote machines via SSH:
+.IP
+kern --ssh user@remote-host
 .br
-kern --api http://192.168.1.100:28126
+kern --ssh user@remote-host --api http://localhost:28126
+.SS Network Access
+.IP \(bu 3
+Local Network: Access within same network segment
+.IP \(bu 3
+Global Internet: Access via public IP with port forwarding
+.IP \(bu 3
+VPN Networks: Access through corporate or private VPNs
+.IP \(bu 3
+Cloud Instances: Monitor AWS, GCP, Azure VMs
+.SH API ENDPOINTS
+When running in server mode (\fB-r\fR), kern provides these REST API endpoints:
+.TP
+.B GET /api/cpu
+Returns JSON with CPU information, usage, and load averages.
+.TP
+.B GET /api/mem
+Returns JSON with memory and swap usage information.
+.TP
+.B GET /api/disk
+Returns JSON with disk usage and filesystem information.
+.TP
+.B GET /api/net
+Returns JSON with network interfaces and traffic statistics.
+.TP
+.B GET /api/gpu
+Returns JSON with GPU information, temperature, and utilization.
+.TP
+.B GET /api/ai
+Returns JSON with AI training processes and VRAM usage.
+.TP
+.B GET /api/mining
+Returns JSON with mining activity and efficiency metrics.
+.TP
+.B GET /api/system
+Returns JSON with system information and kern version.
+.TP
+.B GET /health
+Returns health status check.
+.TP
+.B GET /
+Returns API information and available endpoints.
 .SH GPU MONITORING
-GPU monitoring requires:
-.IP \(bu 3
-NVIDIA GPUs: nvidia-smi utility (included with NVIDIA drivers)
-.IP \(bu 3
-AMD GPUs: rocm-smi utility (included with ROCm)
+GPU monitoring requires specific drivers and utilities:
+.TP
+.B NVIDIA GPUs
+Requires nvidia-smi utility (included with NVIDIA drivers).
+Install with: sudo apt install nvidia-driver-535 nvidia-utils-535
+.TP
+.B AMD GPUs
+Requires rocm-smi utility (included with ROCm).
+Install with: sudo apt install rocm-smi-lib
 .PP
 GPU monitoring provides:
 .IP \(bu 3
 Temperature and utilization metrics
 .IP \(bu 3
-Memory usage (VRAM)
+Memory usage (VRAM) and capacity
 .IP \(bu 3
-Power consumption and clock speeds
+Power consumption and limits
+.IP \(bu 3
+Core and memory clock speeds
 .IP \(bu 3
 Fan speed and performance state
 .SH AI TRAINING MONITORING
-AI training detection monitors for:
+AI training detection monitors for these frameworks:
 .IP \(bu 3
-TensorFlow, PyTorch, Keras, and HuggingFace processes
+TensorFlow and Keras
 .IP \(bu 3
-VRAM usage by AI frameworks
+PyTorch and TorchVision
 .IP \(bu 3
-Training metrics (loss, accuracy, throughput)
+HuggingFace Transformers
 .IP \(bu 3
-Batch size and epoch information
+Jupyter notebooks
+.IP \(bu 3
+Custom training scripts
+.PP
+AI metrics include:
+.IP \(bu 3
+Active training processes count
+.IP \(bu 3
+VRAM usage and allocation
+.IP \(bu 3
+Model name and batch size
+.IP \(bu 3
+Training throughput (samples/sec)
+.IP \(bu 3
+Loss and accuracy metrics
+.IP \(bu 3
+Epoch progress and training time
 .SH MINING MONITORING
-Mining detection identifies:
-.IP \(bu 3
-Popular mining software (xmrig, ethminer, t-rex, etc.)
-.IP \(bu 3
-Mining algorithms (RandomX, Ethash, SHA-256)
-.IP \(bu 3
-Hashrate and share statistics
-.IP \(bu 3
-Power efficiency and profitability estimates
-.SH INTERACTIVE COMMANDS
+Mining detection identifies popular mining software and algorithms:
 .TP
-.B q, Q, ESC
-Quit the application.
+.B Supported Algorithms
+RandomX (Monero), Ethash (Ethereum), SHA-256 (Bitcoin), KAWPOW (Ravencoin), BeamHash (Beam)
+.TP
+.B Detected Software
+xmrig, cgminer, bfgminer, ethminer, t-rex, lolminer, nbminer, phoenixminer, gminer
+.PP
+Mining metrics include:
+.IP \(bu 3
+Hashrate and algorithm detection
+.IP \(bu 3
+Valid and invalid shares
+.IP \(bu 3
+GPU temperature and power usage
+.IP \(bu 3
+Mining efficiency (hash/watt)
+.IP \(bu 3
+Uptime and pool information
+.IP \(bu 3
+24-hour revenue estimation
+.SH LANGUAGE SUPPORT
+.B kern
+supports 50+ languages with automatic download capability.
+.SS Important Note
+Language packs must be downloaded before they can be used. If you try to use a language that isn't available, kern will:
+.IP 1. 3
+Show a warning message
+.IP 2. 3
+Fall back to English
+.IP 3. 3
+Suggest the download command
+.SS Language Management
+.IP
+$ kern --list-languages
+.br
+$ kern --download-lang fr
+.br
+$ kern -l fr
+.br
+$ kern --download-lang es
+.br
+$ kern -l es
+.SH FILES
+.TP
+.I ~/.config/kern/kern.json
+User configuration file storing preferences, language setting, and last used modules.
+.TP
+.I ~/.config/kern/i18n/
+User directory containing downloaded language packs.
+.TP
+.I /usr/local/share/kern/i18n/
+System directory containing built-in language files.
+.TP
+.I /usr/local/share/man/man1/kern.1
+This manual page.
 .SH EXAMPLES
 .TP
 .B kern
-Monitor all system resources with default settings.
+Monitor all system resources with default settings. On first run shows CPU, memory, disk, and network. Subsequent runs show last used modules.
 .TP
 .B kern \-d \-m
 Monitor only disk and memory usage.
 .TP
 .B kern \-\-refresh=5 \-l ru
-Update every 5 seconds with Russian interface.
+Update every 5 seconds with Russian interface (if Russian language pack is downloaded).
 .TP
 .B kern \-\-detailed
-Show detailed CPU core information.
+Show detailed CPU core information including individual core usage.
 .TP
 .B kern \-g \-\-ai
 Monitor GPU and AI training processes.
@@ -222,29 +341,20 @@ List all supported languages.
 .TP
 .B kern \-\-logo
 Show application logo during monitoring.
-.SH FILES
-.TP
-.I ~/.config/kern/kern.json
-Configuration file storing user preferences.
-.TP
-.I ~/.config/kern/i18n/
-Directory containing downloaded language packs.
-.TP
-.I /usr/local/share/kern/i18n/
-System directory containing language files.
 .SH EXIT STATUS
-Returns 0 on success, 1 on error.
+.B kern
+exits with 0 on success, and >0 if an error occurs.
 .SH SEE ALSO
 .BR top (1),
 .BR htop (1),
+.BR nvidia-smi (1),
+.BR rocm-smi (1),
 .BR df (1),
 .BR free (1),
-.BR lscpu (1),
-.BR nvidia-smi (1),
-.BR rocm-smi (1)
+.BR lscpu (1)
 .SH BUGS
 Report bugs at https://github.com/karimkiniabulatov/kern/issues
 .SH AUTHORS
-Karim Kiniabulatov.
+Karim Kiniabulatov and contributors.
 .SH LICENSE
-GNU GPLv3
+GNU General Public License v3.0 or later.
