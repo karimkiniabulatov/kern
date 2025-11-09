@@ -150,7 +150,7 @@ func main() {
 		return
 	}
 
-	// Определяем какие модули показывать
+	// Определяем какие модули показывать на основе флагов
 	showDisk := *flagDisk || *flagAll
 	showCPU := *flagCPU || *flagAll
 	showMem := *flagMem || *flagAll
@@ -159,13 +159,39 @@ func main() {
 	showAI := *flagAI || *flagAll
 	showMining := *flagMining || *flagAll
 
-	// Если не указано никаких модулей, показываем все по умолчанию (кроме GPU/AI/Mining)
-	if !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && !*flagGPU && !*flagAI && !*flagMining && !*flagAll {
-		showDisk = true
-		showCPU = true
-		showMem = true
-		showNet = true
-		// GPU, AI, Mining по умолчанию отключены
+	// NEW: Smart default behavior - use last used modules if no flags provided
+	noFlagsProvided := !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && 
+	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAll
+
+	if noFlagsProvided {
+		// Check if we have last used modules saved
+		if cfg.LastUsedModules != nil {
+			// Use last used modules
+			showDisk = cfg.LastUsedModules.ShowDisk
+			showCPU = cfg.LastUsedModules.ShowCPU
+			showMem = cfg.LastUsedModules.ShowMem
+			showNet = cfg.LastUsedModules.ShowNet
+			showGPU = cfg.LastUsedModules.ShowGPU
+			showAI = cfg.LastUsedModules.ShowAI
+			showMining = cfg.LastUsedModules.ShowMining
+			
+			// If no modules were selected in last usage, use default modules
+			if !showDisk && !showCPU && !showMem && !showNet && !showGPU && !showAI && !showMining {
+				showDisk = true
+				showCPU = true
+				showMem = true
+				showNet = true
+			}
+		} else {
+			// First run or no saved preferences - use default modules
+			showDisk = true
+			showCPU = true
+			showMem = true
+			showNet = true
+		}
+	} else {
+		// Flags were provided - save these as last used modules
+		cfg.UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining)
 	}
 
 	// Передаем флаги в конфиг
