@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -125,7 +124,7 @@ func main() {
 		return
 	}
 
-	// NEW: Check for remote server mode first
+	// NEW: Check for remote server mode first - simple and clean
 	if *flagRemote || *flagRemotePort != 28126 {
 		port := *flagRemotePort
 		if port <= 0 || port > 65535 {
