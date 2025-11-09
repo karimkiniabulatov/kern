@@ -144,3 +144,8 @@ func getDefaultConfig(language string) *Config {
 		ShowMining:  false,
 	}
 }
+
+// GetDefaultConfig returns a default configuration (public version for main package)
+func GetDefaultConfig(language string) *Config {
+	return getDefaultConfig(language)
+}

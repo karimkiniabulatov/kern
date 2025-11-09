@@ -37,7 +37,8 @@ var (
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote    = flag.Int("r", 0, "Start remote API on specified port (default: 28126)")
+	flagRemote    = flag.Bool("r", false, "Start remote API server (default port: 28126)")
+	flagRemotePort = flag.Int("remote-port", 28126, "Port for remote API server")
 	flagVersion   = flag.Bool("v", false, "Show version")
 	flagHelp      = flag.Bool("h", false, "Show help")
 	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
@@ -60,6 +61,7 @@ func main() {
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
+	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
 
 	flag.Usage = func() {
 		showLogo()
@@ -70,7 +72,8 @@ func main() {
 		fmt.Println("\nRemote Monitoring:")
 		fmt.Println("  --api URL          Monitor remote server via HTTP/HTTPS API")
 		fmt.Println("  --ssh HOST         Monitor remote server via SSH")
-		fmt.Println("  -r, --remote PORT  Start API server on port (default: 28126)")
+		fmt.Println("  -r, --remote       Start API server on default port 28126")
+		fmt.Println("  --remote-port PORT Start API server on custom port")
 		fmt.Println("\nExamples:")
 		fmt.Println("  kern                       # Show all system information")
 		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
@@ -80,7 +83,7 @@ func main() {
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
 		fmt.Println("  kern -r                    # Start API server on port 28126")
-		fmt.Println("  kern -r 26001             # Start API server on custom port")
+		fmt.Println("  kern --remote-port 26001   # Start API server on custom port")
 		fmt.Println("  kern --api http://192.168.1.100:28126 # Monitor remote via HTTP")
 		fmt.Println("  kern --api https://example.com:28126 # Monitor remote via HTTPS")
 		fmt.Println("  kern --ssh user@host       # Monitor remote via SSH")
@@ -122,6 +125,23 @@ func main() {
 		return
 	}
 
+	// NEW: Check for remote server mode first
+	if *flagRemote || *flagRemotePort != 28126 {
+		port := *flagRemotePort
+		if port <= 0 || port > 65535 {
+			port = 28126
+		}
+		
+		// Load minimal config for API server
+		cfg, err := config.Load("")
+		if err != nil {
+			cfg = config.GetDefaultConfig("")
+		}
+		
+		startRemoteServer(cfg, port)
+		return
+	}
+
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
 	if err != nil {
@@ -139,38 +159,6 @@ func main() {
 	if *flagLang != "" {
 		cfg.Language = *flagLang
 		cfg.Save()
-	}
-
-	// NEW: Improved remote server detection
-	// Check if remote flag is provided (with or without value)
-	args := flag.Args()
-	remoteMode := false
-	port := 28126 // порт по умолчанию для API
-
-	// Check for -r flag with value
-	if *flagRemote != 0 {
-		remoteMode = true
-		port = *flagRemote
-	} else {
-		// Check for -r flag without value in args
-		for i, arg := range args {
-			if arg == "-r" || arg == "--remote" {
-				remoteMode = true
-				if i+1 < len(args) {
-					// Try to parse next argument as port number
-					if p, err := strconv.Atoi(args[i+1]); err == nil && p > 0 && p < 65536 {
-						port = p
-					}
-				}
-				break
-			}
-		}
-	}
-
-	// Если указан порт для remote, запускаем сервер
-	if remoteMode {
-		startRemoteServer(cfg, port)
-		return
 	}
 
 	// Определяем какие модули показывать на основе флагов
