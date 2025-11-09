@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -140,12 +141,34 @@ func main() {
 		cfg.Save()
 	}
 
-	// Если указан порт для remote, запускаем сервер
+	// NEW: Improved remote server detection
+	// Check if remote flag is provided (with or without value)
+	args := flag.Args()
+	remoteMode := false
+	port := 28126 // порт по умолчанию для API
+
+	// Check for -r flag with value
 	if *flagRemote != 0 {
-		port := *flagRemote
-		if port == 0 {
-			port = 28126 // порт по умолчанию для API
+		remoteMode = true
+		port = *flagRemote
+	} else {
+		// Check for -r flag without value in args
+		for i, arg := range args {
+			if arg == "-r" || arg == "--remote" {
+				remoteMode = true
+				if i+1 < len(args) {
+					// Try to parse next argument as port number
+					if p, err := strconv.Atoi(args[i+1]); err == nil && p > 0 && p < 65536 {
+						port = p
+					}
+				}
+				break
+			}
 		}
+	}
+
+	// Если указан порт для remote, запускаем сервер
+	if remoteMode {
 		startRemoteServer(cfg, port)
 		return
 	}
@@ -387,93 +410,160 @@ func collectData(cfg *config.Config) map[string]interface{} {
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
-	if port == 0 {
+	if port <= 0 || port > 65535 {
 		port = 28126 // порт по умолчанию для API
 	}
 
 	showLogo()
 	log.Printf("Starting remote API server on port %d...", port)
 
+	// Create a new mux to avoid global http.HandleFunc conflicts
+	mux := http.NewServeMux()
+
 	// CPU endpoint
-	http.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := cpu.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// Memory endpoint
-	http.HandleFunc("/api/mem", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mem", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := mem.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// Disk endpoint
-	http.HandleFunc("/api/disk", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/disk", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := disk.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// Network endpoint
-	http.HandleFunc("/api/net", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/net", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := net.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// NEW: GPU endpoint
-	http.HandleFunc("/api/gpu", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/gpu", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := gpu.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// NEW: AI endpoint
-	http.HandleFunc("/api/ai", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/ai", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := ai.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// NEW: Mining endpoint
-	http.HandleFunc("/api/mining", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/mining", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		data, err := mining.Summary()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
 			return
 		}
 		json.NewEncoder(w).Encode(data)
 	})
 
 	// System info endpoint
-	http.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		systemInfo := map[string]interface{}{
 			"version": version,
 			"time":    time.Now().Format(time.RFC3339),
@@ -482,14 +572,30 @@ func startRemoteServer(cfg *config.Config, port int) {
 	})
 
 	// Health check endpoint
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
 	// Root endpoint with API info
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
 		apiInfo := map[string]interface{}{
 			"name":    "kern API",
 			"version": version,
@@ -513,6 +619,11 @@ func startRemoteServer(cfg *config.Config, port int) {
 		json.NewEncoder(w).Encode(apiInfo)
 	})
 
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+
 	log.Printf("API server running on http://localhost:%d", port)
 	log.Printf("Available endpoints:")
 	log.Printf("  GET /api/cpu    - CPU information")
@@ -530,10 +641,24 @@ func startRemoteServer(cfg *config.Config, port int) {
 	log.Printf("  Remote: http://your-ip:%d/api/cpu", port)
 	log.Printf("  HTTPS:  Configure reverse proxy with TLS")
 	log.Printf("  SSH:    Use SSH tunneling: ssh -L %d:localhost:%d user@host", port, port)
+	log.Printf("")
+	log.Printf("Press Ctrl+C to stop the server")
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		log.Printf("Shutting down API server...")
+		server.Close()
+	}()
+
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Failed to start API server: %v", err)
 	}
+
+	log.Printf("API server stopped")
 }
 
 // NEW: Remote API monitoring function
