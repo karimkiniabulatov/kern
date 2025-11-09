@@ -113,7 +113,7 @@ func (r *Renderer) renderCPUToBuffer(data interface{}) {
 			r.config.T("cpu.cores"), cpuInfo.Cores, r.config.T("cpu.cores"), 
 			cpuInfo.Threads, r.config.T("cpu.threads")))
 
-		graph := r.createSimpleGraph(cpuInfo.Usage, 25)
+		graph := r.createSimpleGraph(cpuInfo.Usage, 10)
 		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;215m%.1f%%\033[0m",
 			r.config.T("cpu.usage"), graph, cpuInfo.Usage))
 
@@ -124,9 +124,11 @@ func (r *Renderer) renderCPUToBuffer(data interface{}) {
 		if r.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 			r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m", r.config.T("cpu.core_usage")))
 			for i, usage := range cpuInfo.CoreUsage {
-				coreGraph := r.createSimpleGraph(usage, 15)
-				r.addLineToBuffer(fmt.Sprintf("  %s %d: %s \033[38;5;215m%.1f%%\033[0m",
-					r.config.T("cpu.core"), i+1, coreGraph, usage))
+				coreGraph := r.createSimpleGraph(usage, 10)
+				// Форматируем номер ядра с ведущим нулем для ядер 0-9
+				coreNumber := fmt.Sprintf("%02d", i+1)
+				r.addLineToBuffer(fmt.Sprintf("  %s %s: %s \033[38;5;215m%.1f%%\033[0m",
+					r.config.T("cpu.core"), coreNumber, coreGraph, usage))
 			}
 		}
 	}
@@ -137,14 +139,14 @@ func (r *Renderer) renderMemoryToBuffer(data interface{}) {
 	r.addHeaderToBuffer(r.config.T("memory.title"))
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 25)
+		ramGraph := r.createSimpleGraph(memInfo.UsagePercent, 10)
 		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 			r.config.T("memory.ram"), memInfo.Used, memInfo.Total, ramGraph, memInfo.UsagePercent))
 
 		r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("common.available"), memInfo.Available))
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
-			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 25)
+			swapGraph := r.createSimpleGraph(memInfo.SwapUsagePercent, 10)
 			r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;154m%.1f%%\033[0m",
 				r.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, swapGraph, memInfo.SwapUsagePercent))
 		}
@@ -169,7 +171,7 @@ func (r *Renderer) renderDiskToBuffer(data interface{}) {
 					r.config.T("disk.filesystem"), d.Filesystem, devType))
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", r.config.T("disk.mounted"), mountPoint))
 				
-				diskGraph := r.createSimpleGraph(d.UsePercent, 25)
+				diskGraph := r.createSimpleGraph(d.UsePercent, 10)
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s / %s %s \033[38;5;216m%.1f%%\033[0m",
 					r.config.T("disk.usage"), d.Used, d.Size, diskGraph, d.UsePercent))
 				
@@ -193,7 +195,7 @@ func (r *Renderer) renderNetworkToBuffer(data interface{}) {
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "IP Address", netInfo.IPAddress))
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s", "MAC Address", netInfo.MACAddress))
 				
-				activityGraph := r.createSimpleGraph(netInfo.ActivityPercent, 25)
+				activityGraph := r.createSimpleGraph(netInfo.ActivityPercent, 10)
 				r.addLineToBuffer(fmt.Sprintf("\033[36m%s:\033[0m %s \033[38;5;165m%.1f%%\033[0m",
 					"Activity", activityGraph, netInfo.ActivityPercent))
 				
