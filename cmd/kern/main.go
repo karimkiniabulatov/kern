@@ -23,29 +23,40 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/ai"
 	"github.com/karimkiniabulatov/kern/internal/mining"
 	"github.com/karimkiniabulatov/kern/internal/ui"
+	"github.com/karimkiniabulatov/kern/internal/service"
 )
 
 var (
-	flagDisk      = flag.Bool("d", false, "Show disk information")
-	flagCPU       = flag.Bool("c", false, "Show CPU information")
-	flagMem       = flag.Bool("m", false, "Show memory information")
-	flagNet       = flag.Bool("n", false, "Show network information")
-	flagGPU       = flag.Bool("g", false, "Show GPU information")
-	flagAI        = flag.Bool("ai", false, "Show AI training information")
-	flagMining    = flag.Bool("mining", false, "Show mining information")
-	flagAll       = flag.Bool("a", false, "Show all information")
-	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
-	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
-	flagRemote    = flag.Bool("r", false, "Start remote API server (default port: 28126)")
+	flagDisk       = flag.Bool("d", false, "Show disk information")
+	flagCPU        = flag.Bool("c", false, "Show CPU information")
+	flagMem        = flag.Bool("m", false, "Show memory information")
+	flagNet        = flag.Bool("n", false, "Show network information")
+	flagGPU        = flag.Bool("g", false, "Show GPU information")
+	flagAI         = flag.Bool("ai", false, "Show AI training information")
+	flagMining     = flag.Bool("mining", false, "Show mining information")
+	flagAll        = flag.Bool("a", false, "Show all information")
+	flagRefresh    = flag.Int("refresh", 2, "Refresh interval in seconds")
+	flagLang       = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
+	flagRemote     = flag.Bool("r", false, "Start remote API server (default port: 28126)")
 	flagRemotePort = flag.Int("remote-port", 28126, "Port for remote API server")
-	flagVersion   = flag.Bool("v", false, "Show version")
-	flagHelp      = flag.Bool("h", false, "Show help")
-	flagDetailed  = flag.Bool("detailed", false, "Show detailed CPU core information")
-	flagDownload  = flag.String("download-lang", "", "Download language pack (e.g., 'fr' for French)")
-	flagListLangs = flag.Bool("list-languages", false, "List all supported languages")
-	flagLogo      = flag.Bool("logo", false, "Show logo during monitoring")
-	flagAPI       = flag.String("api", "", "Monitor remote server via API (http://host:port)")
-	flagSSH       = flag.String("ssh", "", "Monitor remote server via SSH (user@host)")
+	flagVersion    = flag.Bool("v", false, "Show version")
+	flagHelp       = flag.Bool("h", false, "Show help")
+	flagDetailed   = flag.Bool("detailed", false, "Show detailed CPU core information")
+	flagDownload   = flag.String("download-lang", "", "Download language pack (e.g., 'fr' for French)")
+	flagListLangs  = flag.Bool("list-languages", false, "List all supported languages")
+	flagLogo       = flag.Bool("logo", false, "Show logo during monitoring")
+	flagAPI        = flag.String("api", "", "Monitor remote server via API (http://host:port)")
+	flagSSH        = flag.String("ssh", "", "Monitor remote server via SSH (user@host)")
+	
+	// Новые флаги для управления демоном
+	flagDaemon     = flag.Bool("daemon", false, "Start kern as a daemon service")
+	flagStart      = flag.Bool("start-service", false, "Start the kern daemon")
+	flagStop       = flag.Bool("stop-service", false, "Stop the kern daemon")
+	flagRestart    = flag.Bool("restart-service", false, "Restart the kern daemon")
+	flagStatus     = flag.Bool("service-status", false, "Show daemon status")
+	flagEnable     = flag.Bool("enable-service", false, "Enable auto-start on boot")
+	flagDisable    = flag.Bool("disable-service", false, "Disable auto-start on boot")
+	flagEnsureRunning = flag.Bool("ensure-running", false, "Ensure daemon is running")
 )
 
 const version = "1.2.0"
@@ -61,6 +72,13 @@ func main() {
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
 	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
+	
+	// Альтернативные имена для сервисных команд
+	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
+	flag.BoolVar(flagStart, "start", false, "Start the kern daemon")
+	flag.BoolVar(flagStop, "stop", false, "Stop the kern daemon")
+	flag.BoolVar(flagRestart, "restart", false, "Restart the kern daemon")
+	flag.BoolVar(flagStatus, "status", false, "Show daemon status")
 
 	flag.Usage = func() {
 		showLogo()
@@ -73,6 +91,15 @@ func main() {
 		fmt.Println("  --ssh HOST         Monitor remote server via SSH")
 		fmt.Println("  -r, --remote       Start API server on default port 28126")
 		fmt.Println("  --remote-port PORT Start API server on custom port")
+		fmt.Println("\nService Management:")
+		fmt.Println("  --daemon, --dmn           Start kern as a daemon service")
+		fmt.Println("  --start-service, --start  Start the kern daemon")
+		fmt.Println("  --stop-service, --stop    Stop the kern daemon")
+		fmt.Println("  --restart-service, --restart Restart the kern daemon")
+		fmt.Println("  --service-status, --status Show daemon status")
+		fmt.Println("  --enable-service          Enable auto-start on boot")
+		fmt.Println("  --disable-service         Disable auto-start on boot")
+		fmt.Println("  --ensure-running          Ensure daemon is running")
 		fmt.Println("\nExamples:")
 		fmt.Println("  kern                       # Show all system information")
 		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
@@ -88,9 +115,30 @@ func main() {
 		fmt.Println("  kern --ssh user@host       # Monitor remote via SSH")
 		fmt.Println("  kern --download-lang fr    # Download French language pack")
 		fmt.Println("  kern --logo                # Show logo during monitoring")
+		fmt.Println("  kern --daemon              # Start as daemon service")
+		fmt.Println("  kern --start-service       # Start the daemon")
+		fmt.Println("  kern --stop-service        # Stop the daemon")
+		fmt.Println("  kern --status              # Show daemon status")
+		fmt.Println("  kern --ensure-running      # Ensure daemon is running")
 	}
 
 	flag.Parse()
+
+	// Обработка сервисных команд ДО всего остального
+	if *flagStart || *flagStop || *flagRestart || *flagStatus || *flagEnable || *flagDisable {
+		handleServiceCommands()
+		return
+	}
+
+	if *flagDaemon {
+		startAsDaemon()
+		return
+	}
+
+	if *flagEnsureRunning {
+		ensureDaemonRunning()
+		return
+	}
 
 	if *flagHelp {
 		flag.Usage()
@@ -219,6 +267,98 @@ func main() {
 
 	// Запускаем мониторинг
 	runMonitor(cfg, *flagLogo)
+}
+
+// Новая функция для гарантированного запуска
+func ensureDaemonRunning() {
+	cfg, err := config.Load("")
+	if err != nil {
+		cfg = config.GetDefaultConfig("")
+	}
+
+	daemonManager := service.NewDaemonManager(cfg)
+	
+	if err := daemonManager.EnsureRunning(); err != nil {
+		log.Fatalf("Failed to ensure daemon is running: %v", err)
+	}
+	
+	status := daemonManager.Status()
+	fmt.Printf("✅ kern daemon is running on port %d\n", status["port"].(int))
+	fmt.Printf("🌐 API URL: http://localhost:%d\n", status["port"].(int))
+}
+
+// Новая функция для обработки сервисных команд
+func handleServiceCommands() {
+	cfg, err := config.Load("")
+	if err != nil {
+		cfg = config.GetDefaultConfig("")
+	}
+
+	daemonManager := service.NewDaemonManager(cfg)
+
+	switch {
+	case *flagStart:
+		if err := daemonManager.StartDaemon(); err != nil {
+			log.Fatalf("Failed to start daemon: %v", err)
+		}
+		fmt.Println("✅ kern daemon started successfully")
+		
+	case *flagStop:
+		if err := daemonManager.StopDaemon(); err != nil {
+			log.Fatalf("Failed to stop daemon: %v", err)
+		}
+		fmt.Println("✅ kern daemon stopped successfully")
+		
+	case *flagRestart:
+		if err := daemonManager.RestartDaemon(); err != nil {
+			log.Fatalf("Failed to restart daemon: %v", err)
+		}
+		fmt.Println("✅ kern daemon restarted successfully")
+		
+	case *flagStatus:
+		status := daemonManager.Status()
+		fmt.Println("🔍 kern Daemon Status:")
+		for key, value := range status {
+			fmt.Printf("  %s: %v\n", key, value)
+		}
+		
+	case *flagEnable:
+		if err := daemonManager.EnableAutoStart(); err != nil {
+			log.Fatalf("Failed to enable auto-start: %v", err)
+		}
+		fmt.Println("✅ Auto-start enabled for kern daemon")
+		
+	case *flagDisable:
+		if err := daemonManager.DisableAutoStart(); err != nil {
+			log.Fatalf("Failed to disable auto-start: %v", err)
+		}
+		fmt.Println("✅ Auto-start disabled for kern daemon")
+	}
+}
+
+// Функция для запуска в режиме демона
+func startAsDaemon() {
+	cfg, err := config.Load("")
+	if err != nil {
+		cfg = config.GetDefaultConfig("")
+	}
+
+	daemonManager := service.NewDaemonManager(cfg)
+	
+	// Убедимся, что демон включен в конфиге
+	daemonCfg := daemonManager.GetConfig()
+	if !daemonCfg.Enabled {
+		daemonCfg.Enabled = true
+		daemonManager.SaveConfig()
+	}
+
+	fmt.Printf("🚀 Starting kern daemon on port %d...\n", daemonCfg.Port)
+	fmt.Printf("📝 Log file: %s\n", daemonCfg.LogFile)
+	fmt.Printf("📌 PID file: %s\n", daemonCfg.PIDFile)
+	fmt.Println("Press Ctrl+C to stop the daemon")
+
+	// Запускаем API сервер (используем существующую функцию)
+	startRemoteServer(cfg, daemonCfg.Port)
 }
 
 func showLogo() {

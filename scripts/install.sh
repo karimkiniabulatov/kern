@@ -114,15 +114,32 @@ fi
 echo "Installing globally..."
 go install ./cmd/kern
 
+# Install service management script
+echo "Installing service management script..."
+if [ -f "scripts/kern-service.sh" ]; then
+    sudo cp scripts/kern-service.sh /usr/local/bin/kern-service
+    sudo chmod +x /usr/local/bin/kern-service
+    echo "✓ Service management script installed"
+else
+    echo "⚠ Service management script not found at scripts/kern-service.sh"
+fi
+
+# Create log directory and files
+echo "Creating log directory..."
+sudo mkdir -p /var/log/kern
+sudo touch /var/log/kern.log
+sudo chmod 666 /var/log/kern.log
+echo "✓ Log directory created at /var/log/kern"
+
 # Install man page with proper permissions
 echo "Installing man page..."
 if command -v install &> /dev/null; then
     sudo install -g 0 -o 0 -m 0644 man/kern.1 /usr/local/share/man/man1/kern.1 2>/dev/null && \
-    sudo mandb >/dev/null 2>&1 && echo "Man page installed successfully" || echo "Man page installation failed - continuing..."
+    sudo mandb >/dev/null 2>&1 && echo "✓ Man page installed successfully" || echo "⚠ Man page installation failed - continuing..."
 else
     sudo mkdir -p /usr/local/share/man/man1
     sudo cp man/kern.1 /usr/local/share/man/man1/ 2>/dev/null && \
-    sudo mandb >/dev/null 2>&1 && echo "Man page installed successfully" || echo "Man page installation failed - continuing..."
+    sudo mandb >/dev/null 2>&1 && echo "✓ Man page installed successfully" || echo "⚠ Man page installation failed - continuing..."
 fi
 
 # Install i18n files
@@ -131,14 +148,14 @@ if [ -d "i18n" ]; then
     # Copy to system directory
     sudo mkdir -p /usr/local/share/kern/i18n
     sudo cp i18n/active.*.json /usr/local/share/kern/i18n/ 2>/dev/null && \
-    echo "System language files installed successfully" || echo "System language files installation failed - continuing..."
+    echo "✓ System language files installed successfully" || echo "⚠ System language files installation failed - continuing..."
     
     # Copy to user config directory
     mkdir -p ~/.config/kern/i18n
     cp i18n/active.*.json ~/.config/kern/i18n/ 2>/dev/null && \
-    echo "User language files installed successfully" || echo "User language files installation failed - continuing..."
+    echo "✓ User language files installed successfully" || echo "⚠ User language files installation failed - continuing..."
 else
-    echo "No i18n directory found - skipping language files installation"
+    echo "⚠ No i18n directory found - skipping language files installation"
 fi
 
 # Ensure script permissions are set
@@ -162,6 +179,90 @@ if [ -f "$KERN_PATH" ]; then
 else
     echo "Installation failed. You can run locally with: ./kern"
 fi
+
+# Configure kern daemon
+echo "Configuring kern daemon..."
+
+# Create config directory
+mkdir -p ~/.config/kern
+
+# Enable and start kern daemon
+echo "Enabling and starting kern daemon..."
+if command -v kern &> /dev/null; then
+    kern --enable-service 2>/dev/null || echo "⚠ Could not enable service automatically"
+else
+    "$(go env GOPATH)/bin/kern" --enable-service 2>/dev/null || echo "⚠ Could not enable service automatically"
+fi
+
+# Check daemon status
+echo "Checking daemon status..."
+if command -v kern &> /dev/null; then
+    if kern --service-status 2>/dev/null | grep -q "running.*true"; then
+        echo "✅ kern daemon is running and accessible via API"
+        echo "🌐 API URL: http://localhost:28126"
+    else
+        echo "⚠ Daemon might not be running. Starting manually..."
+        kern --start-service 2>/dev/null || echo "⚠ Could not start service automatically"
+        sleep 2
+    fi
+else
+    echo "⚠ kern command not found in PATH, skipping daemon status check"
+fi
+
+# Test API connectivity
+echo "Testing API connectivity..."
+if curl -s http://localhost:28126/health > /dev/null 2>&1; then
+    echo "✅ API server is responding correctly"
+else
+    echo "❌ API server is not responding. Check logs with: kern-service logs"
+    echo "   You can start the daemon manually with: kern --start-service"
+fi
+
+# Re-install service management script to ensure it's available
+echo "Ensuring service management script is installed..."
+if [ -f "scripts/kern-service.sh" ]; then
+    sudo cp scripts/kern-service.sh /usr/local/bin/kern-service
+    sudo chmod +x /usr/local/bin/kern-service
+    echo "✓ Service management script updated"
+fi
+
+echo ""
+echo "🎉 Installation complete!"
+echo ""
+echo "📋 Quick start:"
+echo "   kern-service status    # Check daemon status"
+echo "   curl http://localhost:28126/api/cpu  # Test API"
+echo "   kern-service logs      # View logs"
+echo ""
+echo "🌐 API endpoints:"
+echo "   http://localhost:28126/api/cpu"
+echo "   http://localhost:28126/api/mem" 
+echo "   http://localhost:28126/api/disk"
+echo "   http://localhost:28126/api/gpu"
+echo "   http://localhost:28126/api/ai"
+echo "   http://localhost:28126/api/mining"
+echo ""
+echo "💡 The API server is now running in the background and will"
+echo "   automatically start on system boot."
+
+# Display service management information
+echo ""
+echo "Service management commands:"
+echo "  kern-service start    - Start daemon"
+echo "  kern-service stop     - Stop daemon"
+echo "  kern-service status   - Check status"
+echo "  kern-service enable   - Enable auto-start"
+echo "  kern-service disable  - Disable auto-start"
+echo "  kern-service logs     - View logs"
+echo ""
+echo "Direct kern commands:"
+echo "  kern --daemon         - Start as daemon service"
+echo "  kern --start-service  - Start the kern daemon"
+echo "  kern --stop-service   - Stop the kern daemon"
+echo "  kern --status         - Show daemon status"
+echo "  kern --enable-service - Enable auto-start on boot"
+echo "  kern --disable-service - Disable auto-start on boot"
+echo "  kern --ensure-running - Ensure daemon is running"
 
 echo ""
 echo "Usage examples:"
