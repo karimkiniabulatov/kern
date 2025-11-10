@@ -1,7 +1,3 @@
-
-## Улучшенная man страница (kern.1)
-
-```man
 .TH KERN 1 "2025-11-03" "kern v1.2.0" "System Monitoring Tool"
 .SH NAME
 kern \- real-time system monitoring tool with TUI and REST API
@@ -46,6 +42,9 @@ kern \- real-time system monitoring tool with TUI and REST API
 is a comprehensive system monitoring tool that provides real-time information about system resources including disk usage, CPU performance, memory utilization, network statistics, GPU metrics, AI training processes, and cryptocurrency mining activity.
 
 The tool features a professional Terminal User Interface (TUI) with double buffering to eliminate screen flickering, support for multiple languages with automatic download capability, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
+
+.B kern
+automatically starts a background API server on port 28126 during installation, providing immediate access to monitoring data via REST API without any manual configuration.
 
 .B kern
 remembers your last used monitoring modules and will automatically show them when run without arguments.
@@ -107,6 +106,33 @@ List all supported language codes with their full names.
 .TP
 .B \-\-logo
 Show application logo during monitoring display.
+.TP
+.B \-\-start-service
+Start the kern daemon service.
+.TP
+.B \-\-stop-service
+Stop the kern daemon service.
+.TP
+.B \-\-restart-service
+Restart the kern daemon service.
+.TP
+.B \-\-service-status
+Show daemon service status information.
+.TP
+.B \-\-enable-service
+Enable auto-start of kern daemon on system boot.
+.TP
+.B \-\-disable-service
+Disable auto-start of kern daemon.
+.TP
+.B \-\-ensure-running
+Ensure daemon is running (automatically starts if not running).
+.SH AUTOMATIC BACKGROUND API
+.B kern
+automatically starts a background API server on port 28126 during installation. This server provides REST API access to all monitoring data without requiring manual intervention.
+
+The API server starts automatically on system boot if auto-start is enabled (default behavior).
+
 .SH TUI CONTROLS
 When running in interactive TUI mode, the following controls are available:
 .TP
@@ -139,7 +165,7 @@ $ kern --all
 .B kern
 supports multiple remote monitoring protocols for distributed system monitoring:
 .SS HTTP/HTTPS API
-Start kern in server mode on the remote machine and access it via HTTP or HTTPS:
+Access kern API servers running on remote machines:
 .IP
 .B Remote machine:
 kern -r 28126
@@ -266,6 +292,8 @@ Uptime and pool information
 .SH LANGUAGE SUPPORT
 .B kern
 supports 50+ languages with automatic download capability.
+.SS Supported Languages
+ar(Arabic), ba(Bashkir), be(Belarusian), bg(Bulgarian), bn(Bengali), bo(Tibetan), bs(Bosnian), cs(Czech), cv(Chuvash), da(Danish), de(German), el(Greek), en(English), es(Spanish), et(Estonian), fa(Persian), fi(Finnish), fr(French), gu(Gujarati), he(Hebrew), hi(Hindi), hr(Croatian), hu(Hungarian), hy(Armenian), id(Indonesian), it(Italian), ja(Japanese), ka(Georgian), kk(Kazakh), ko(Korean), ky(Kyrgyz), lt(Lithuanian), lv(Latvian), mk(Macedonian), ml(Malayalam), mn(Mongolian), mr(Marathi), ms(Malay), nb(Norwegian Bokmål), ne(Nepali), nl(Dutch), pl(Polish), pt(Portuguese), ro(Romanian), ru(Russian), si(Sinhala), sk(Slovak), sl(Slovenian), sq(Albanian), sr(Serbian), sv(Swedish), ta(Tamil), te(Telugu), th(Thai), tl(Tagalog), tr(Turkish), tt(Tatar), uk(Ukrainian), ur(Urdu), uz(Uzbek), vi(Vietnamese), zh(Chinese)
 .SS Important Note
 Language packs must be downloaded before they can be used. If you try to use a language that isn't available, kern will:
 .IP 1. 3
@@ -290,27 +318,36 @@ $ kern -l es
 .I ~/.config/kern/kern.json
 User configuration file storing preferences, language setting, and last used modules.
 .TP
+.I ~/.config/kern/daemon.json
+Daemon service configuration including auto-start settings.
+.TP
 .I ~/.config/kern/i18n/
 User directory containing downloaded language packs.
 .TP
 .I /usr/local/share/kern/i18n/
 System directory containing built-in language files.
 .TP
+.I /var/log/kern-daemon.log
+Daemon service log file.
+.TP
+.I /tmp/kern-daemon.pid
+Daemon process ID file.
+.TP
 .I /usr/local/share/man/man1/kern.1
 This manual page.
 .SH EXAMPLES
 .TP
 .B kern
-Monitor all system resources with default settings. On first run shows CPU, memory, disk, and network. Subsequent runs show last used modules.
+Monitor all system resources with default settings.
 .TP
 .B kern \-d \-m
 Monitor only disk and memory usage.
 .TP
 .B kern \-\-refresh=5 \-l ru
-Update every 5 seconds with Russian interface (if Russian language pack is downloaded).
+Update every 5 seconds with Russian interface.
 .TP
 .B kern \-\-detailed
-Show detailed CPU core information including individual core usage.
+Show detailed CPU core information.
 .TP
 .B kern \-g \-\-ai
 Monitor GPU and AI training processes.
@@ -320,9 +357,6 @@ Monitor cryptocurrency mining activity.
 .TP
 .B kern \-r
 Start remote API server on default port 28126.
-.TP
-.B kern \-r 26001
-Start remote API server on custom port 26001.
 .TP
 .B kern \-\-api http://192.168.1.100:28126
 Monitor remote server via HTTP API.
@@ -341,6 +375,15 @@ List all supported languages.
 .TP
 .B kern \-\-logo
 Show application logo during monitoring.
+.TP
+.B kern \-\-start-service
+Start kern daemon.
+.TP
+.B kern \-\-service-status
+Check daemon status.
+.TP
+.B kern \-\-enable-service
+Enable auto-start on boot.
 .SH EXIT STATUS
 .B kern
 exits with 0 on success, and >0 if an error occurs.
