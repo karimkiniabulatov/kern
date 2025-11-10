@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-
-	"github.com/karimkiniabulatov/kern/internal/config"
 )
 
 type DaemonConfig struct {
@@ -24,14 +22,12 @@ type DaemonConfig struct {
 
 type DaemonManager struct {
 	config     *DaemonConfig
-	appConfig  *config.Config
 	httpServer *http.Server
 }
 
-func NewDaemonManager(appConfig *config.Config) *DaemonManager {
+func NewDaemonManager() *DaemonManager {
 	return &DaemonManager{
-		config:    loadDaemonConfig(),
-		appConfig: appConfig,
+		config: loadDaemonConfig(),
 	}
 }
 
@@ -44,7 +40,12 @@ func loadDaemonConfig() *DaemonConfig {
 	configFile := filepath.Join(configPath, "daemon.json")
 	data, err := os.ReadFile(configFile)
 	if err != nil {
-		return getDefaultDaemonConfig()
+		// Если файла нет, создаем дефолтный и сразу сохраняем
+		defaultConfig := getDefaultDaemonConfig()
+		defaultConfig.Enabled = true // ВКЛЮЧАЕМ по умолчанию!
+		defaultConfig.AutoStart = true // АВТОСТАРТ по умолчанию!
+		saveDaemonConfig(defaultConfig)
+		return defaultConfig
 	}
 
 	var daemonConfig DaemonConfig
@@ -55,7 +56,7 @@ func loadDaemonConfig() *DaemonConfig {
 	return &daemonConfig
 }
 
-func (dm *DaemonManager) SaveConfig() error {
+func saveDaemonConfig(config *DaemonConfig) error {
 	configPath, err := getDaemonConfigPath()
 	if err != nil {
 		return err
@@ -66,7 +67,7 @@ func (dm *DaemonManager) SaveConfig() error {
 	}
 
 	configFile := filepath.Join(configPath, "daemon.json")
-	data, err := json.MarshalIndent(dm.config, "", "  ")
+	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -84,51 +85,87 @@ func getDaemonConfigPath() (string, error) {
 
 func getDefaultDaemonConfig() *DaemonConfig {
 	return &DaemonConfig{
-		Enabled:   false,
+		Enabled:   true,  // ВКЛЮЧЕНО по умолчанию!
 		Port:      28126,
-		AutoStart: false,
-		LogFile:   "/var/log/kern.log",
-		PIDFile:   "/var/run/kern.pid",
+		AutoStart: true,  // АВТОСТАРТ по умолчанию!
+		LogFile:   "/var/log/kern-daemon.log",
+		PIDFile:   "/tmp/kern-daemon.pid",
 	}
 }
 
 // StartDaemon starts the API server in background mode
 func (dm *DaemonManager) StartDaemon() error {
-	if !dm.config.Enabled {
-		return fmt.Errorf("daemon is not enabled")
-	}
-
-	// Check if already running
+	// Если уже запущен, останавливаем сначала
 	if dm.IsRunning() {
-		return fmt.Errorf("kern daemon is already running")
+		log.Println("⚠️ Daemon already running, restarting...")
+		dm.StopDaemon()
+		time.Sleep(2 * time.Second)
 	}
 
-	// Start in background
-	cmd := exec.Command("kern", "--remote", strconv.Itoa(dm.config.Port))
+	// Собираем команду
+	cmdArgs := []string{"--remote", strconv.Itoa(dm.config.Port)}
 	
-	// Redirect output to log file
+	// Если есть лог файл, добавляем логирование
+	if dm.config.LogFile != "" {
+		// Убедимся, что директория для логов существует
+		logDir := filepath.Dir(dm.config.LogFile)
+		os.MkdirAll(logDir, 0755)
+	}
+
+	cmd := exec.Command("kern", cmdArgs...)
+	
+	// Направляем вывод в лог файл или в /dev/null
 	if dm.config.LogFile != "" {
 		logFile, err := os.OpenFile(dm.config.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
-			return fmt.Errorf("failed to open log file: %v", err)
+			log.Printf("⚠️ Cannot open log file: %v, using stdout", err)
+		} else {
+			cmd.Stdout = logFile
+			cmd.Stderr = logFile
 		}
-		cmd.Stdout = logFile
-		cmd.Stderr = logFile
+	} else {
+		// Если лог файл не указан, направляем в /dev/null
+		nullFile, _ := os.OpenFile("/dev/null", os.O_WRONLY, 0644)
+		cmd.Stdout = nullFile
+		cmd.Stderr = nullFile
 	}
 
-	// Start process
+	// Запускаем процесс в фоне
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start daemon: %v", err)
 	}
 
-	// Save PID
+	// Сохраняем PID
 	if err := dm.savePID(cmd.Process.Pid); err != nil {
-		cmd.Process.Kill()
-		return fmt.Errorf("failed to save PID: %v", err)
+		log.Printf("⚠️ Failed to save PID: %v", err)
 	}
 
-	log.Printf("✅ kern daemon started on port %d (PID: %d)", dm.config.Port, cmd.Process.Pid)
+	// Ждем немного чтобы сервер успел запуститься
+	time.Sleep(1 * time.Second)
+
+	// Проверяем, что сервер действительно запустился
+	if !dm.checkServerRunning() {
+		// Если не запустился, пытаемся убить процесс и возвращаем ошибку
+		cmd.Process.Kill()
+		return fmt.Errorf("daemon started but API server is not responding")
+	}
+
+	log.Printf("✅ kern daemon started successfully on port %d (PID: %d)", dm.config.Port, cmd.Process.Pid)
 	return nil
+}
+
+// checkServerRunning проверяет, что API сервер действительно работает
+func (dm *DaemonManager) checkServerRunning() bool {
+	url := fmt.Sprintf("http://localhost:%d/health", dm.config.Port)
+	
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	
+	return resp.StatusCode == http.StatusOK
 }
 
 // StopDaemon stops the running daemon
@@ -144,21 +181,27 @@ func (dm *DaemonManager) StopDaemon() error {
 		return fmt.Errorf("process not found: %v", err)
 	}
 
-	// Send SIGTERM
+	// Пытаемся корректно завершить
 	if err := process.Signal(os.Interrupt); err != nil {
-		// Try force kill
+		// Если не получается, убиваем форсированно
 		if err := process.Kill(); err != nil {
+			dm.removePID()
 			return fmt.Errorf("failed to stop daemon: %v", err)
 		}
 	}
 
+	// Ждем завершения
+	time.Sleep(1 * time.Second)
 	dm.removePID()
+	
 	log.Printf("✅ kern daemon stopped (PID: %d)", pid)
 	return nil
 }
 
 // RestartDaemon restarts the daemon
 func (dm *DaemonManager) RestartDaemon() error {
+	log.Println("🔄 Restarting kern daemon...")
+	
 	if err := dm.StopDaemon(); err != nil {
 		log.Printf("⚠️ Could not stop daemon: %v", err)
 	}
@@ -179,22 +222,35 @@ func (dm *DaemonManager) IsRunning() bool {
 		return false
 	}
 
-	// Check if process is still alive
-	return process.Signal(os.Signal(nil)) == nil
+	// Проверяем что процесс жив И сервер отвечает
+	if process.Signal(os.Signal(nil)) != nil {
+		return false
+	}
+
+	return dm.checkServerRunning()
 }
 
 // Status returns daemon status information
 func (dm *DaemonManager) Status() map[string]interface{} {
+	isRunning := dm.IsRunning()
 	status := map[string]interface{}{
 		"enabled":    dm.config.Enabled,
 		"auto_start": dm.config.AutoStart,
 		"port":       dm.config.Port,
-		"running":    dm.IsRunning(),
+		"running":    isRunning,
+		"api_url":    fmt.Sprintf("http://localhost:%d", dm.config.Port),
 	}
 
-	if dm.IsRunning() {
+	if isRunning {
 		pid, _ := dm.getPID()
 		status["pid"] = pid
+		
+		// Проверяем доступность API
+		if dm.checkServerRunning() {
+			status["api_status"] = "healthy"
+		} else {
+			status["api_status"] = "unresponsive"
+		}
 	}
 
 	return status
@@ -205,16 +261,18 @@ func (dm *DaemonManager) EnableAutoStart() error {
 	dm.config.AutoStart = true
 	dm.config.Enabled = true
 	
-	if err := dm.SaveConfig(); err != nil {
+	if err := saveDaemonConfig(dm.config); err != nil {
 		return fmt.Errorf("failed to save auto-start config: %v", err)
 	}
 
-	// Create systemd service file
-	if err := dm.createSystemdService(); err != nil {
-		return fmt.Errorf("failed to create systemd service: %v", err)
+	// Сразу запускаем демона если он не запущен
+	if !dm.IsRunning() {
+		if err := dm.StartDaemon(); err != nil {
+			return fmt.Errorf("failed to start daemon: %v", err)
+		}
 	}
 
-	log.Printf("✅ Auto-start enabled for kern daemon")
+	log.Printf("✅ Auto-start enabled and daemon started on port %d", dm.config.Port)
 	return nil
 }
 
@@ -222,7 +280,7 @@ func (dm *DaemonManager) EnableAutoStart() error {
 func (dm *DaemonManager) DisableAutoStart() error {
 	dm.config.AutoStart = false
 	
-	if err := dm.SaveConfig(); err != nil {
+	if err := saveDaemonConfig(dm.config); err != nil {
 		return fmt.Errorf("failed to save config: %v", err)
 	}
 
@@ -230,9 +288,34 @@ func (dm *DaemonManager) DisableAutoStart() error {
 	return nil
 }
 
+// EnsureRunning гарантирует что демон запущен
+func (dm *DaemonManager) EnsureRunning() error {
+	if dm.IsRunning() {
+		return nil
+	}
+
+	if !dm.config.Enabled {
+		return fmt.Errorf("daemon is disabled in configuration")
+	}
+
+	log.Println("🚀 Starting kern daemon (ensure running)...")
+	return dm.StartDaemon()
+}
+
+// GetConfig returns current daemon configuration
+func (dm *DaemonManager) GetConfig() *DaemonConfig {
+	return dm.config
+}
+
+// UpdateConfig updates and saves daemon configuration
+func (dm *DaemonManager) UpdateConfig(newConfig *DaemonConfig) error {
+	dm.config = newConfig
+	return saveDaemonConfig(newConfig)
+}
+
 func (dm *DaemonManager) savePID(pid int) error {
 	if dm.config.PIDFile == "" {
-		return nil
+		dm.config.PIDFile = "/tmp/kern-daemon.pid"
 	}
 	return os.WriteFile(dm.config.PIDFile, []byte(strconv.Itoa(pid)), 0644)
 }
@@ -254,62 +337,4 @@ func (dm *DaemonManager) removePID() {
 	if dm.config.PIDFile != "" {
 		os.Remove(dm.config.PIDFile)
 	}
-}
-
-func (dm *DaemonManager) createSystemdService() error {
-	serviceContent := `[Unit]
-Description=kern System Monitoring Daemon
-After=network.target
-
-[Service]
-Type=simple
-User=%s
-ExecStart=/usr/local/bin/kern --daemon
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-`
-
-	// Get current user
-	user := os.Getenv("USER")
-	if user == "" {
-		user = "root"
-	}
-
-	serviceFile := fmt.Sprintf("/etc/systemd/system/kern.service", user)
-	
-	// Check if we have write permissions
-	if _, err := os.Stat("/etc/systemd/system"); os.IsNotExist(err) {
-		log.Printf("⚠️ Systemd directory not found, skipping service creation")
-		return nil
-	}
-
-	// Try to create service file (requires sudo)
-	cmd := exec.Command("sudo", "sh", "-c", 
-		fmt.Sprintf("echo '%s' > %s", fmt.Sprintf(serviceContent, user), serviceFile))
-	
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to create systemd service (need sudo): %v", err)
-	}
-
-	// Enable the service
-	enableCmd := exec.Command("sudo", "systemctl", "enable", "kern.service")
-	if err := enableCmd.Run(); err != nil {
-		return fmt.Errorf("failed to enable service: %v", err)
-	}
-
-	return nil
-}
-
-func (dm *DaemonManager) GetConfig() *DaemonConfig {
-	return dm.config
-}
-
-func (dm *DaemonManager) UpdateConfig(newConfig *DaemonConfig) error {
-	dm.config = newConfig
-	return dm.SaveConfig()
 }
