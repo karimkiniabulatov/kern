@@ -1,0 +1,46 @@
+package disk
+
+import "testing"
+
+func TestDiskSummary(t *testing.T) {
+	disks, err := Summary()
+	if err != nil {
+		t.Fatalf("Failed to get disk info: %v", err)
+	}
+
+	if len(disks) == 0 {
+		t.Log("No disks found (might be normal in test environment)")
+		return
+	}
+
+	for _, disk := range disks {
+		if disk.Filesystem == "" {
+			t.Error("Disk filesystem should not be empty")
+		}
+
+		if disk.UsePercent < 0 || disk.UsePercent > 100 {
+			t.Errorf("Disk usage percent should be between 0 and 100, got %.2f", disk.UsePercent)
+		}
+	}
+}
+
+func TestSkipFilesystem(t *testing.T) {
+	testCases := []struct {
+		filesystem string
+		mountPoint string
+		shouldSkip bool
+	}{
+		{"/dev/sda1", "/", false},
+		{"tmpfs", "/tmp", true},
+		{"devtmpfs", "/dev", true},
+		{"/dev/loop0", "/snap/core", true},
+	}
+
+	for _, tc := range testCases {
+		result := shouldSkipFilesystem(tc.filesystem, tc.mountPoint)
+		if result != tc.shouldSkip {
+			t.Errorf("shouldSkipFilesystem(%q, %q) = %v, want %v", 
+				tc.filesystem, tc.mountPoint, result, tc.shouldSkip)
+		}
+	}
+}
