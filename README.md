@@ -3,9 +3,9 @@
 ![kern demo](https://img.shields.io/badge/version-1.2.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/license-GPLv3-green)
-![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows%20%7C%20Android-lightgrey)
 
-A comprehensive, real-time system monitoring tool written in Go with beautiful TUI interface, support for 50+ languages, and multi-protocol remote monitoring.
+A comprehensive, real-time system monitoring tool written in Go with beautiful TUI interface, support for 50+ languages, and multi-protocol remote monitoring. Runs on desktop systems and Android via terminal emulators.
 
 ## ✨ Features
 
@@ -23,7 +23,7 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful T
 - **🌍 Global Access**: Monitor local and remote systems across networks
 - **🚀 Auto-daemon**: Background API server starts automatically on installation
 - **⌨️ Interactive**: Press 'q' or ESC to quit gracefully
-- **🔧 Cross-platform**: Works on Linux, macOS, Windows
+- **🔧 Cross-platform**: Works on Linux, macOS, Windows, Android (terminal emulators)
 - **📱 Resize Support**: Automatic redraw on terminal resize
 
 ## 🚀 Quick Start
@@ -241,23 +241,26 @@ Press 'q' to quit | Auto-refresh every 2 seconds
 -------------------------------------------------------------------------------------
 📱 Android Support
 
-kern runs on Android devices through terminal emulators like Termux:
+kern runs on Android devices through terminal emulators like Termux, providing full system monitoring capabilities for remote servers and local network devices.
 
-# Install in Termux
-
+# Install in Termux (recommended terminal emulator)
 pkg update && pkg install wget
 wget https://github.com/karimkiniabulatov/kern/releases/download/v1.2.0/kern-android-arm64
 chmod +x kern-android-arm64
 ./kern-android-arm64 --api http://your-server:28126
+
 Features on Android:
+- Monitor remote servers via SSH/HTTP/HTTPS
+- Connect to kern API servers on your network
+- Full TUI interface with all monitoring modules
+- Lightweight and optimized for mobile terminals
+- Perfect for sysadmins on the go
 
-Monitor remote servers via SSH/HTTP
-
-Connect to kern API servers on your network
-
-Lightweight and terminal-optimized
-
-Full TUI interface support
+Available Android binaries:
+- `kern-android-arm64` - Modern ARM64 devices
+- `kern-android-arm` - Older ARM devices
+- `kern-android-amd64` - x86_64 devices
+- `kern-android-386` - x86 devices
 
 -------------------------------------------------------------------------------------
 
@@ -294,21 +297,18 @@ kern --download-lang ja
 -------------------------------------------------------------------------------------
 
 🛠 Installation Details
+
 System Requirements
-OS: Linux, macOS, Windows
-
-Architecture: AMD64, ARM64
-
-Dependencies: Go 1.21+ (auto-installed), basic system tools
+- **OS**: Linux, macOS, Windows, Android (via Termux or other terminal emulators)
+- **Architecture**: AMD64, ARM64, ARM, x86, x86_64
+- **Dependencies**: Go 1.21+ (auto-installed), basic system tools
+- **Android**: Requires terminal emulator (Termux recommended)
 
 Optional Dependencies
-NVIDIA GPU: nvidia-smi (included with drivers)
-
-AMD GPU: rocm-smi (included with ROCm)
-
-AI Monitoring: Python with ML frameworks
-
-Mining Monitoring: Mining software detection
+- NVIDIA GPU: nvidia-smi (included with drivers)
+- AMD GPU: rocm-smi (included with ROCm)
+- AI Monitoring: Python with ML frameworks
+- Mining Monitoring: Mining software detection
 
 Manual Installation
 
