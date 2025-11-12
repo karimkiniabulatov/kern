@@ -1,103 +1,106 @@
 #!/bin/bash
+
 set -e
 
-echo "🔨 Building kern binaries for release..."
+echo "Building kern - System Monitoring Tool"
 
-# Проверяем зависимости
-check_dependencies() {
-    local deps=("go" "wget" "unzip" "zip")
-    for dep in "${deps[@]}"; do
-        if ! command -v "$dep" &> /dev/null; then
-            echo "❌ Error: $dep is required but not installed"
-            exit 1
-        fi
-    done
-}
-check_dependencies
+# Создаем директории для сборки
+mkdir -p build
+cd build
 
-# Создаем директорию для бинарников
-mkdir -p dist
-rm -rf dist/*
-
-# Определяем версию из main.go
-VERSION=$(grep 'const version' cmd/kern/main.go | awk -F'"' '{print $2}')
-echo "Building version: $VERSION"
-
-# Флаги для сборки
-LDFLAGS="-s -w -X main.version=$VERSION"
-
-# 📦 Сборка для Desktop платформ
+# Сборка для различных платформ
 echo "Building for Linux..."
-GOOS=linux GOARCH=amd64 go build -ldflags="$LDFLAGS" -o "dist/kern-linux-amd64" ./cmd/kern
-GOOS=linux GOARCH=arm64 go build -ldflags="$LDFLAGS" -o "dist/kern-linux-arm64" ./cmd/kern
+GOOS=linux GOARCH=amd64 go build -o kern-linux-amd64 ../cmd/kern
+GOOS=linux GOARCH=arm64 go build -o kern-linux-arm64 ../cmd/kern
 
 echo "Building for Windows..."
-GOOS=windows GOARCH=amd64 go build -ldflags="$LDFLAGS" -o "dist/kern-windows-amd64.exe" ./cmd/kern
+GOOS=windows GOARCH=amd64 go build -o kern-windows-amd64.exe ../cmd/kern
 
 echo "Building for macOS..."
-GOOS=darwin GOARCH=amd64 go build -ldflags="$LDFLAGS" -o "dist/kern-darwin-amd64" ./cmd/kern
-GOOS=darwin GOARCH=arm64 go build -ldflags="$LDFLAGS" -o "dist/kern-darwin-arm64" ./cmd/kern
+GOOS=darwin GOARCH=amd64 go build -o kern-darwin-amd64 ../cmd/kern
+GOOS=darwin GOARCH=arm64 go build -o kern-darwin-arm64 ../cmd/kern
 
-# 📱 Сборка для Android (опционально)
+# Android сборка
 echo "Building for Android..."
+export CGO_ENABLED=1
+export GOOS=android
 
-if [ -z "$ANDROID_NDK_HOME" ] && [ "$1" != "--force-android" ]; then
-    echo "⚠️ ANDROID_NDK_HOME not set. Skipping Android build."
-    echo "   Use './scripts/build-release.sh --force-android' to install NDK automatically"
-else
-    # [Ваш существующий код Android сборки...]
-    echo "✅ Android build completed"
-fi
+# ARM64
+export GOARCH=arm64
+export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
+go build -ldflags="-s -w" -o kern-android-arm64 ../cmd/kern
 
-# 🗜️ Создаем архивы для релиза
-echo "Creating release archives..."
+# ARM
+export GOARCH=arm
+export GOARM=7
+export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang
+go build -ldflags="-s -w" -o kern-android-arm ../cmd/kern
 
-create_archive() {
-    local platform=$1
-    local binary=$2
-    local archive_name="kern-v${VERSION}-${platform}"
-    
-    echo "📦 Packaging $archive_name"
-    
-    if [[ $platform == windows* ]]; then
-        cp "$binary" "kern.exe"
-        zip -j "dist/${archive_name}.zip" "kern.exe" README.md man/kern.1
-        rm -f "kern.exe"
-    else
-        cp "$binary" "kern"
-        tar -czf "dist/${archive_name}.tar.gz" \
-            --transform="s,^,${archive_name}/," \
-            "kern" README.md man/kern.1
-        rm -f "kern"
-    fi
-}
+# AMD64
+export GOARCH=amd64
+export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang
+go build -ldflags="-s -w" -o kern-android-amd64 ../cmd/kern
 
-# Создаем архивы для каждой платформы
-create_archive "linux-amd64" "dist/kern-linux-amd64"
-create_archive "linux-arm64" "dist/kern-linux-arm64" 
-create_archive "windows-amd64" "dist/kern-windows-amd64.exe"
-create_archive "darwin-amd64" "dist/kern-darwin-amd64"
-create_archive "darwin-arm64" "dist/kern-darwin-arm64"
+# 386
+export GOARCH=386
+export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android21-clang
+go build -ldflags="-s -w" -o kern-android-386 ../cmd/kern
 
-# 🎯 Создаем чексуммы
-echo "Creating checksums..."
-cd dist
-sha256sum * > sha256sums.txt
-cd ..
+echo "Creating Android APK package..."
+mkdir -p android-package/lib/arm64-v8a
+mkdir -p android-package/lib/armeabi-v7a
+mkdir -p android-package/lib/x86_64
+mkdir -p android-package/lib/x86
 
-# 📊 Показываем информацию о размерах
-echo ""
-echo "📊 Build Summary:"
-echo "=================="
-for file in dist/kern-*; do
-    if [ -f "$file" ] && [[ "$file" != *".tar.gz" ]] && [[ "$file" != *".zip" ]] && [[ "$file" != *".txt" ]]; then
-        size=$(du -h "$file" | cut -f1)
-        echo "  $(basename $file): $size"
-    fi
-done
+# Копируем бинарники в структуру APK
+cp kern-android-arm64 android-package/lib/arm64-v8a/libkern.so
+cp kern-android-arm android-package/lib/armeabi-v7a/libkern.so
+cp kern-android-amd64 android-package/lib/x86_64/libkern.so
+cp kern-android-386 android-package/lib/x86/libkern.so
 
-echo ""
-echo "🎯 Next steps:"
-echo "   - Test binaries: ./dist/kern-linux-amd64 --version"
-echo "   - Create release: ./scripts/create-github-release.sh"
-echo "   - Upload files to GitHub release"
+# Создаем базовую структуру APK
+mkdir -p android-package/META-INF
+mkdir -p android-package/res
+mkdir -p android-package/assets
+
+# Создаем манифест для Android
+cat > android-package/AndroidManifest.xml << 'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kern.monitor"
+    android:versionCode="1"
+    android:versionName="1.2.0">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+EOF
+
+echo "Creating distribution archive..."
+mkdir -p dist
+cp kern-* dist/
+cp -r android-package dist/
+
+# Создаем архив с релизом
+tar -czf kern-v1.2.0-release.tar.gz -C dist .
+
+echo "Build complete! Files are in build/dist/"
+echo "Android package structure created in build/dist/android-package/"
