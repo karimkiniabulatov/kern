@@ -106,12 +106,13 @@ Full documentation available at: https://github.com/karimkiniabulatov/kern
 EOF
 
 # Создаем архив с релизом
-tar -czf kern-v1.2.0-release.tar.gz -C dist .
+cd ..
+tar -czf kern-v1.2.0-release.tar.gz -C build/dist .
 
 echo ""
 echo "🎉 Build complete!"
 echo "📁 Files are in: build/dist/"
-echo "📦 Archive: build/kern-v1.2.0-release.tar.gz"
+echo "📦 Archive: kern-v1.2.0-release.tar.gz"
 
 if [ "$ANDROID_BUILD_SUCCESS" = true ]; then
     echo ""
@@ -121,7 +122,7 @@ if [ "$ANDROID_BUILD_SUCCESS" = true ]; then
     echo "  ✅ kern-android-amd64    (x86_64 devices)"
     echo "  ✅ kern-android-386      (x86 devices)"
     echo ""
-    echo "See dist/ANDROID-README.md for Android installation instructions"
+    echo "See build/dist/ANDROID-README.md for Android installation instructions"
 else
     echo ""
     echo "⚠️  Android builds were skipped"
