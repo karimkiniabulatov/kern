@@ -516,6 +516,38 @@ Add translations for new module
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
 
 -------------------------------------------------------------------------------------
+💖 Support the Project
+
+kern is developed with ❤️ as an open-source project. If you find it useful and want to support its development, consider making a donation. Your support helps:
+
+- 🚀 Accelerate new feature development
+- 📱 Improve Android and mobile support
+- 🐛 Faster bug fixes and stability improvements
+- 🌍 Support for more platforms and architectures
+- 📚 Better documentation and tutorials
+
+### 🔗 Cryptocurrency Donations
+
+**Bitcoin (BTC):**
+
+1GymM3w4fmbWj6K6dHydgGWYwMckCpHVAn
+
+**Ethereum (ERC20):**
+
+0x78509af08ce7f9c4a34dd87612d47aceef9b534c
+
+### Other Ways to Support
+
+- ⭐ **Star the repository** on GitHub
+- 🐛 **Report bugs** and issues
+- 💡 **Suggest new features**
+- 🔧 **Contribute code** or documentation
+- 📢 **Share** with your friends and colleagues
+
+### 🙏 Thank You!
+
+Thank you to all the contributors and users who make kern better every day! Your support, whether through code, donations, or simply using the tool, is greatly appreciated.
+-------------------------------------------------------------------------------------
 
 🆘 Support
 Documentation: man kern
