@@ -1,106 +1,132 @@
-#!/bin/bash
+# Копируем Android package если он был создан
+if [ "$ANDROID_BUILD_SUCCESS" = true ]; then
+    cp -r android-package dist/
+    
+    # Создаем README для Android
+    cat > dist/ANDROID-README.md << 'EOF'
+# kern for Android
 
-set -e
+## Installation
 
-echo "Building kern - System Monitoring Tool"
+### Method 1: Standalone binary (Recommended)
+1. Copy the appropriate binary to your Android device:
+   - kern-android-arm64 for most modern devices (ARM64)
+   - kern-android-arm for older ARM devices
+   - kern-android-amd64 for x86_64 devices
+   - kern-android-386 for x86 devices
 
-# Создаем директории для сборки
-mkdir -p build
-cd build
+2. Push to device using ADB:
+adb push kern-android-arm64 /data/local/tmp/kern
+adb shell chmod +x /data/local/tmp/kern
+adb shell /data/local/tmp/kern --cpu --mem
 
-# Сборка для различных платформ
-echo "Building for Linux..."
-GOOS=linux GOARCH=amd64 go build -o kern-linux-amd64 ../cmd/kern
-GOOS=linux GOARCH=arm64 go build -o kern-linux-arm64 ../cmd/kern
+3. Or copy via file manager and run in terminal.
 
-echo "Building for Windows..."
-GOOS=windows GOARCH=amd64 go build -o kern-windows-amd64.exe ../cmd/kern
+### Method 2: Using Termux
+1. Install Termux from Google Play Store or F-Droid
+2. Copy the binary to Termux home directory
+3. Make executable and run:
+cp kern-android-arm64 ~/kern
+chmod +x ~/kern
+./kern --cpu --mem --net
 
-echo "Building for macOS..."
-GOOS=darwin GOARCH=amd64 go build -o kern-darwin-amd64 ../cmd/kern
-GOOS=darwin GOARCH=arm64 go build -o kern-darwin-arm64 ../cmd/kern
+## Usage Examples on Android
+# Basic system info
+./kern
 
-# Android сборка
-echo "Building for Android..."
-export CGO_ENABLED=1
-export GOOS=android
+# CPU and memory only
+./kern --cpu --mem
 
-# ARM64
-export GOARCH=arm64
-export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
-go build -ldflags="-s -w" -o kern-android-arm64 ../cmd/kern
+# Network monitoring
+./kern --net
 
-# ARM
-export GOARCH=arm
-export GOARM=7
-export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang
-go build -ldflags="-s -w" -o kern-android-arm ../cmd/kern
+# Start API server (requires network permissions)
+./kern --remote
 
-# AMD64
-export GOARCH=amd64
-export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang
-go build -ldflags="-s -w" -o kern-android-amd64 ../cmd/kern
+## Limitations on Android
+- Some system metrics may require root access
+- GPU monitoring works only on supported devices with proper drivers
+- Network monitoring may be limited by Android permissions
+- Disk monitoring shows internal storage only
 
-# 386
-export GOARCH=386
-export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android21-clang
-go build -ldflags="-s -w" -o kern-android-386 ../cmd/kern
+## Required Permissions
+- INTERNET (for remote monitoring)
+- ACCESS_NETWORK_STATE (for network stats)
+- READ_EXTERNAL_STORAGE (for config files)
+- WRITE_EXTERNAL_STORAGE (for logs)
 
-echo "Creating Android APK package..."
-mkdir -p android-package/lib/arm64-v8a
-mkdir -p android-package/lib/armeabi-v7a
-mkdir -p android-package/lib/x86_64
-mkdir -p android-package/lib/x86
-
-# Копируем бинарники в структуру APK
-cp kern-android-arm64 android-package/lib/arm64-v8a/libkern.so
-cp kern-android-arm android-package/lib/armeabi-v7a/libkern.so
-cp kern-android-amd64 android-package/lib/x86_64/libkern.so
-cp kern-android-386 android-package/lib/x86/libkern.so
-
-# Создаем базовую структуру APK
-mkdir -p android-package/META-INF
-mkdir -p android-package/res
-mkdir -p android-package/assets
-
-# Создаем манифест для Android
-cat > android-package/AndroidManifest.xml << 'EOF'
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kern.monitor"
-    android:versionCode="1"
-    android:versionName="1.2.0">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-        
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-</manifest>
+## Troubleshooting
+- If you get "permission denied", ensure binary is executable: chmod +x kern
+- For full system access, root may be required
+- Some features may not work on all Android versions
 EOF
+fi
 
-echo "Creating distribution archive..."
-mkdir -p dist
-cp kern-* dist/
-cp -r android-package dist/
+# Создаем общий README
+cat > dist/README.md << 'EOF'
+# kern v1.2.0 - System Monitoring Tool
+
+## Available Binaries
+
+### Desktop Platforms
+- kern-linux-amd64 - Linux 64-bit
+- kern-linux-arm64 - Linux ARM64
+- kern-windows-amd64.exe - Windows 64-bit
+- kern-darwin-amd64 - macOS Intel
+- kern-darwin-arm64 - macOS Apple Silicon
+
+### Android Platforms
+- kern-android-arm64 - Android ARM64 (most devices)
+- kern-android-arm - Android ARM
+- kern-android-amd64 - Android x86_64
+- kern-android-386 - Android x86
+
+## Quick Start
+
+### Linux/macOS
+chmod +x kern-linux-amd64
+./kern-linux-amd64
+
+### Windows
+kern-windows-amd64.exe
+
+### Android
+See ANDROID-README.md for detailed instructions.
+
+## Features
+- CPU, Memory, Disk, Network monitoring
+- GPU monitoring (NVIDIA/AMD)
+- AI training process detection
+- Mining software monitoring
+- Remote API server
+- Cross-platform support
+
+## Documentation
+Full documentation available at: https://github.com/karimkiniabulatov/kern
+EOF
 
 # Создаем архив с релизом
 tar -czf kern-v1.2.0-release.tar.gz -C dist .
 
-echo "Build complete! Files are in build/dist/"
-echo "Android package structure created in build/dist/android-package/"
+echo ""
+echo "🎉 Build complete!"
+echo "📁 Files are in: build/dist/"
+echo "📦 Archive: build/kern-v1.2.0-release.tar.gz"
+
+if [ "$ANDROID_BUILD_SUCCESS" = true ]; then
+    echo ""
+    echo "📱 Android builds successful:"
+    echo "  ✅ kern-android-arm64    (ARM64 devices)"
+    echo "  ✅ kern-android-arm      (ARM devices)" 
+    echo "  ✅ kern-android-amd64    (x86_64 devices)"
+    echo "  ✅ kern-android-386      (x86 devices)"
+    echo ""
+    echo "See dist/ANDROID-README.md for Android installation instructions"
+else
+    echo ""
+    echo "⚠️  Android builds were skipped"
+    echo "To build for Android, ensure ANDROID_NDK_HOME is set and run again"
+fi
+
+echo ""
+echo "🚀 Release ready for distribution!"
