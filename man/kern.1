@@ -1,6 +1,7 @@
 .TH KERN 1 "2025-11-03" "kern v1.2.0" "System Monitoring Tool"
 .SH NAME
 kern \- real-time system monitoring tool with TUI and REST API
+
 .SH SYNOPSIS
 .B kern
 [\fIOPTIONS\fR]
@@ -37,17 +38,40 @@ kern \- real-time system monitoring tool with TUI and REST API
 .br
 .B kern
 \fB\-\-ssh\fR \fIHOST\fR
+
 .SH DESCRIPTION
 .B kern
-is a comprehensive system monitoring tool that provides real-time information about system resources including disk usage, CPU performance, memory utilization, network statistics, GPU metrics, AI training processes, and cryptocurrency mining activity.
+is a comprehensive system monitoring tool that provides real-time information 
+about system resources including disk usage, CPU performance, memory utilization, 
+network statistics, GPU metrics, AI training processes, and cryptocurrency mining activity.
 
-The tool features a professional Terminal User Interface (TUI) with double buffering to eliminate screen flickering, support for multiple languages with automatic download capability, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
+The tool features a professional Terminal User Interface (TUI) with double buffering
+to eliminate screen flickering, support for multiple languages with automatic download 
+capability, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
 
 .B kern
-automatically starts a background API server on port 28126 during installation, providing immediate access to monitoring data via REST API without any manual configuration.
+automatically starts a background API server on port 28126 during installation, 
+providing immediate access to monitoring data via REST API without any manual configuration.
 
 .B kern
 remembers your last used monitoring modules and will automatically show them when run without arguments.
+
+.SH PLATFORMS
+.B kern
+supports the following platforms:
+
+.B Linux:
+AMD64, ARM64, ARMv7 architectures
+
+.B macOS:  
+Intel and Apple Silicon (AMD64, ARM64)
+
+.B Windows:
+AMD64 architecture
+
+.B Android:
+ARM64 architecture (via terminal emulators)
+
 .SH OPTIONS
 .TP
 .BR \-a ", " \-\-all
@@ -127,6 +151,7 @@ Disable auto-start of kern daemon.
 .TP
 .B \-\-ensure-running
 Ensure daemon is running (automatically starts if not running).
+
 .SH AUTOMATIC BACKGROUND API
 .B kern
 automatically starts a background API server on port 28126 during installation. This server provides REST API access to all monitoring data without requiring manual intervention.
@@ -144,6 +169,7 @@ Quit the application (same as q).
 .TP
 .B Terminal Resize
 Interface automatically adapts to terminal size changes and redraws appropriately.
+
 .SH SMART MODULE PREFERENCES
 .B kern
 automatically remembers which modules you used last and will show them when you run the program without any arguments.
@@ -161,9 +187,11 @@ $ kern
 $ kern --all
 .br
 # Resets to show all modules
+
 .SH REMOTE MONITORING
 .B kern
 supports multiple remote monitoring protocols for distributed system monitoring:
+
 .SS HTTP/HTTPS API
 Access kern API servers running on remote machines:
 .IP
@@ -187,6 +215,7 @@ Global Internet: Access via public IP with port forwarding
 VPN Networks: Access through corporate or private VPNs
 .IP \(bu 3
 Cloud Instances: Monitor AWS, GCP, Azure VMs
+
 .SH API ENDPOINTS
 When running in server mode (\fB-r\fR), kern provides these REST API endpoints:
 .TP
@@ -219,6 +248,7 @@ Returns health status check.
 .TP
 .B GET /
 Returns API information and available endpoints.
+
 .SH GPU MONITORING
 GPU monitoring requires specific drivers and utilities:
 .TP
@@ -289,6 +319,7 @@ Mining efficiency (hash/watt)
 Uptime and pool information
 .IP \(bu 3
 24-hour revenue estimation
+
 .SH LANGUAGE SUPPORT
 .B kern
 supports 50+ languages with automatic download capability.
@@ -313,6 +344,70 @@ $ kern -l fr
 $ kern --download-lang es
 .br
 $ kern -l es
+
+.SH ANDROID SUPPORT
+.B kern
+can run on Android devices through terminal emulators like Termux, ConnectBot, or JuiceSSH.
+
+.SS Android Installation
+.IP 1. 3
+Install a terminal emulator (Termux recommended)
+.IP 2. 3
+Download the ARM64 binary for Android
+.IP 3. 3
+Make it executable: \fBchmod +x kern\fR
+.IP 4. 3
+Run: \fB./kern\fR
+
+.SS Remote Monitoring from Android
+The Android version can monitor remote systems using various protocols:
+
+.B SSH Monitoring:
+.RS
+.IP \(bu 3
+Connect to remote servers via SSH
+.IP \(bu 3
+Monitor systems in your local network or over the internet
+.IP \(bu 3
+Use built-in SSH clients in terminal emulators
+.RE
+
+.B HTTP/HTTPS API Monitoring:
+.RS  
+.IP \(bu 3
+Connect to kern API servers running on remote machines
+.IP \(bu 3
+Monitor systems via REST API (port 28126)
+.IP \(bu 3
+Works over WiFi, mobile data, or VPN
+.RE
+
+.B Example Android Usage:
+.RS
+.IP
+# Monitor remote server via API
+.br
+\fBkern --api http://192.168.1.100:28126\fR
+.IP
+# Monitor via SSH
+.br  
+\fBkern --ssh user@server-ip\fR
+.IP
+# Local monitoring on Android device
+.br
+\fBkern --cpu --mem\fR
+.RE
+
+.B Requirements:
+.RS
+.IP \(bu 3
+Android 7.0 or later
+.IP \(bu 3
+Terminal emulator with network permissions
+.IP \(bu 3
+Network connectivity to target systems
+.RE
+
 .SH FILES
 .TP
 .I ~/.config/kern/kern.json
@@ -384,6 +479,7 @@ Check daemon status.
 .TP
 .B kern \-\-enable-service
 Enable auto-start on boot.
+
 .SH EXIT STATUS
 .B kern
 exits with 0 on success, and >0 if an error occurs.

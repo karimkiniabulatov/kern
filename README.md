@@ -239,6 +239,27 @@ Swap: 2.1G / 8.0G ████████████████████�
 Press 'q' to quit | Auto-refresh every 2 seconds
 
 -------------------------------------------------------------------------------------
+📱 Android Support
+
+kern runs on Android devices through terminal emulators like Termux:
+
+# Install in Termux
+
+pkg update && pkg install wget
+wget https://github.com/karimkiniabulatov/kern/releases/download/v1.2.0/kern-android-arm64
+chmod +x kern-android-arm64
+./kern-android-arm64 --api http://your-server:28126
+Features on Android:
+
+Monitor remote servers via SSH/HTTP
+
+Connect to kern API servers on your network
+
+Lightweight and terminal-optimized
+
+Full TUI interface support
+
+-------------------------------------------------------------------------------------
 
 🌍 Language Support
 
