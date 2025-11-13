@@ -1,4 +1,5 @@
 kern - Advanced System Monitoring Tool
+
 https://img.shields.io/badge/version-1.2.0-blue
 https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go
 https://img.shields.io/badge/license-GPLv3-green
