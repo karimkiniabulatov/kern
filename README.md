@@ -39,8 +39,8 @@ curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/
 Or clone and build:
 
 git clone https://github.com/karimkiniabulatov/kern
-chmod +x ./scripts/install.sh
 cd kern
+chmod +x ./scripts/install.sh
 ./scripts/install.sh
 
 Immediate Access
