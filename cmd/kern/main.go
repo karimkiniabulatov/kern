@@ -59,7 +59,7 @@ var (
 	flagEnsureRunning = flag.Bool("ensure-running", false, "Ensure daemon is running")
 )
 
-const version = "1.2.0"
+const version = "1.2.1"
 
 func init() {
 	// Для Windows: настраиваем цветной вывод

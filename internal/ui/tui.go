@@ -122,7 +122,7 @@ func (t *TUI) renderLogo(startRow int, width int) int {
 		" ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║",
 		" ██║  ██╗███████╗██║  ██║██║ ╚████║",
 		" ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝",
-		" kern v1.2.0 - System Monitoring Tool",
+		" kern v1.2.1 - System Monitoring Tool",
 	}
 
 	cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
