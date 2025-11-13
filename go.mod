@@ -4,6 +4,7 @@ go 1.21
 
 require (
     github.com/gdamore/tcell/v2 v2.7.1
+    github.com/mattn/go-colorable v0.1.13
     github.com/mattn/go-runewidth v0.0.15
     golang.org/x/term v0.18.0
     golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect for Android

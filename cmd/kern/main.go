@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -24,6 +25,7 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mining"
 	"github.com/karimkiniabulatov/kern/internal/ui"
 	"github.com/karimkiniabulatov/kern/internal/service"
+	"github.com/mattn/go-colorable"
 )
 
 var (
@@ -59,7 +61,20 @@ var (
 
 const version = "1.2.0"
 
+func init() {
+	// Для Windows: настраиваем цветной вывод
+	if runtime.GOOS == "windows" {
+		colorable.EnableColorsStdout(nil)
+	}
+}
+
 func main() {
+	// Проверяем, запущены ли мы в неинтерактивном режиме Windows
+	if isWindowsNonInteractive() {
+		runWindowsServiceMode()
+		return
+	}
+	
 	// Добавляем альтернативные имена флагов
 	flag.BoolVar(flagDisk, "disk", false, "Show disk information")
 	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
@@ -260,6 +275,34 @@ func main() {
 
 	// Запускаем мониторинг
 	runMonitor(cfg, *flagLogo)
+}
+
+func isWindowsNonInteractive() bool {
+	if runtime.GOOS != "windows" {
+		return false
+	}
+	
+	// Проверяем, есть ли интерактивная консоль
+	fi, err := os.Stdout.Stat()
+	if err != nil {
+		return true
+	}
+	
+	return (fi.Mode() & os.ModeCharDevice) == 0
+}
+
+func runWindowsServiceMode() {
+	fmt.Println("kern v" + version + " - System Monitoring Tool")
+	fmt.Println("Running in Windows service mode...")
+	fmt.Println("Use 'kern --remote' to start API server")
+	fmt.Println("Or run in PowerShell/CMD for interactive TUI")
+	
+	// Запускаем API сервер по умолчанию в сервисном режиме
+	cfg, err := config.Load("")
+	if err != nil {
+		cfg = config.GetDefaultConfig("")
+	}
+	startRemoteServer(cfg, 28126)
 }
 
 func showLogo() {
