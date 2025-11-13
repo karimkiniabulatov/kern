@@ -562,6 +562,7 @@ go build -o kern ./cmd/kern
 
 📁 Project Structure
 
+```text
 kern/
 ├── 📄 cmd/kern/main.go          # CLI entry point
 ├── 📂 internal/
@@ -580,6 +581,7 @@ kern/
 ├── 🔧 scripts/                  # Management scripts
 ├── 📖 man/                      # Documentation
 └── 📄 README.md
+```
 
 
 🤝 Contributing
