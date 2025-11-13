@@ -3,7 +3,7 @@ kern - Advanced System Monitoring Tool
 ![version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![license](https://img.shields.io/badge/license-GPLv3-green)
-![platform](https://img.shields.io/badge/platform-Linux%2520%257C%2520macOS%2520%257C%2520Windows%2520%257C%2520Android-lightgrey)
+![platform](https://img.shields.io/badge/platform-Linux%20|%20macOS%20|%20Windows%20|%20Android-lightgrey)
 
 A comprehensive, real-time system monitoring tool written in Go with beautiful TUI interface, support for 50+ languages, and multi-protocol remote monitoring. Runs on desktop systems and Android via terminal emulators.
 
@@ -563,23 +563,23 @@ go build -o kern ./cmd/kern
 📁 Project Structure
 
 kern/
-├── cmd/kern/main.go          # CLI entry point
-├── internal/
-│   ├── config/               # Configuration handling
-│   ├── cpu/                  # CPU monitoring
-│   ├── disk/                 # Disk monitoring
-│   ├── mem/                  # Memory monitoring
-│   ├── net/                  # Network monitoring
-│   ├── gpu/                  # GPU monitoring
-│   ├── ai/                   # AI training monitoring
-│   ├── mining/               # Mining monitoring
-│   ├── service/              # Daemon management
-│   ├── ui/                   # Terminal interface
-│   └── i18n/                 # Translation system
-├── i18n/                     # Language packs (50+)
-├── scripts/                  # Management scripts
-├── man/                      # Documentation
-└── README.md
+├── 📄 cmd/kern/main.go          # CLI entry point
+├── 📂 internal/
+│   ├── ⚙️  config/              # Configuration handling
+│   ├── ⚡  cpu/                 # CPU monitoring
+│   ├── 💾 disk/                 # Disk monitoring
+│   ├── 🧠 mem/                  # Memory monitoring
+│   ├── 🌐 net/                  # Network monitoring
+│   ├── 🎮 gpu/                  # GPU monitoring
+│   ├── 🤖 ai/                   # AI training monitoring
+│   ├── ⛏️  mining/              # Mining monitoring
+│   ├── 🔧 service/              # Daemon management
+│   ├── 🎨 ui/                   # Terminal interface
+│   └── 🌐 i18n/                 # Translation system
+├── 📚 i18n/                     # Language packs (50+)
+├── 🔧 scripts/                  # Management scripts
+├── 📖 man/                      # Documentation
+└── 📄 README.md
 
 
 🤝 Contributing
