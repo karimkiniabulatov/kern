@@ -563,22 +563,22 @@ go build -o kern ./cmd/kern
 📁 Project Structure
 
 kern/
-├── 📄 cmd/kern/main.go          # CLI entry point
+├── 📄 cmd/kern/main.go           # CLI entry point
 ├── 📂 internal/
-│   ├── ⚙️ config/               # Configuration handling
-│   ├── ⚡ cpu/                  # CPU monitoring
-│   ├── 💾 disk/                 # Disk monitoring
-│   ├── 🧠 mem/                  # Memory monitoring
-│   ├── 🌐 net/                  # Network monitoring
-│   ├── 🎮 gpu/                  # GPU monitoring
-│   ├── 🤖 ai/                   # AI training monitoring
-│   ├── ⛏️ mining/               # Mining monitoring
-│   ├── 🔧 service/              # Daemon management
-│   ├── 🎨 ui/                   # Terminal interface
-│   └── 🌐 i18n/                 # Translation system
-├── 📚 i18n/                     # Language packs (50+)
-├── 🔧 scripts/                  # Management scripts
-├── 📖 man/                      # Documentation
+│   ├── ⚙️ config/                # Configuration handling
+│   ├── ⚡ cpu/                   # CPU monitoring
+│   ├── 💾 disk/                  # Disk monitoring
+│   ├── 🧠 mem/                   # Memory monitoring
+│   ├── 🌐 net/                   # Network monitoring
+│   ├── 🎮 gpu/                   # GPU monitoring
+│   ├── 🤖 ai/                    # AI training monitoring
+│   ├── ⛏️ mining/                # Mining monitoring
+│   ├── 🔧 service/               # Daemon management
+│   ├── 🎨 ui/                    # Terminal interface
+│   └── 🌐 i18n/                  # Translation system
+├── 📚 i18n/                      # Language packs (50+)
+├── 🔧 scripts/                   # Management scripts
+├── 📖 man/                       # Documentation
 └── 📄 README.md
 
 -------------------------------------------------------------------------------------------
