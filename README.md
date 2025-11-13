@@ -33,7 +33,7 @@ A comprehensive, real-time system monitoring tool written in Go with beautiful T
 ### Installation
 
 **Quick install (recommended):**
-
+```text
 curl -sSL https://raw.githubusercontent.com/karimkiniabulatov/kern/main/scripts/install.sh | bash
 
 Or clone and build:
@@ -77,6 +77,7 @@ kern -l zh
 Show version and logo:
 
 kern -v
+```
 -------------------------------------------------------------------------------------------
 
 🎯 Core Monitoring Modules
@@ -176,11 +177,11 @@ kern --mining
 kern starts an API server automatically on port 28126:
 
 No manual start required - it's always running!:
-
+```text
 curl http://localhost:28126/api/cpu
 curl http://localhost:28126/api/gpu
 curl http://localhost:28126/health
-
+```
 -------------------------------------------------------------------------------------------
 
 🛠️ Service Management
@@ -200,14 +201,14 @@ kern --enable-service
 🌍 Remote Access
 
 Monitor remote servers via API:
-
+```text
 kern --api http://192.168.1.100:28126
 kern --api https://monitoring.example.com:28126
 
 SSH-based monitoring:
 
 kern --api http://server1:28126 --api http://server2:28126
-
+```
 -------------------------------------------------------------------------------------------
 
 📡 API Endpoints
@@ -249,7 +250,7 @@ The professional Terminal User Interface provides:
 ⌨️ Keyboard controls with intuitive navigation
 
 Example TUI Output:
-
+```text
 CPU Information
 Model: AMD Ryzen 7 5800X
 Cores: 8 cores, 16 threads
@@ -263,18 +264,19 @@ Available: 16.8G
 Swap: 2.1G / 8.0G ███████████████████████ 26.2%
 
 Press 'q' to quit | Auto-refresh every 2 seconds
-
+```
 📱 Android Support
 
 kern runs on Android devices through terminal emulators like Termux, providing full system monitoring capabilities for remote servers and local network devices.
 
 Install in Termux (recommended terminal emulator):
-
+```text
 pkg update && pkg install wget
+
 wget https://github.com/karimkiniabulatov/kern/releases/download/v1.2.0/kern-android-arm64
 chmod +x kern-android-arm64
 ./kern-android-arm64 --api http://your-server:28126
-
+```
 Features on Android:
 
 📡 Monitor remote servers via SSH/HTTP/HTTPS
