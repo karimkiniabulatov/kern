@@ -239,7 +239,10 @@ This project is licensed under the GNU GPLv3 License - see the LICENSE file for 
 
 💖 Support the Project
 
-kern is developed with ❤️ as an open-source project. If you find it useful and want to support its development, consider making a donation. Your support helps:
+kern is developed with ❤️ as an open-source project. 
+If you find it useful and want to support its development, consider making a donation. 
+
+Your support helps:
 
 🚀 Accelerate new feature development
 
@@ -254,10 +257,12 @@ kern is developed with ❤️ as an open-source project. If you find it useful a
 🔗 Cryptocurrency Donations
 
 Bitcoin (BTC):
+
 ```text
 1GymM3w4fmbWj6K6dHydgGWYwMckCpHVAn
 ```
 Ethereum (ERC20):
+
 ```text
 0x78509af08ce7f9c4a34dd87612d47aceef9b534c
 ```
