@@ -425,91 +425,116 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 
 func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
     row := t.renderHeader(startRow, t.config.T("audio.title"), width)
-    
-    switch audioData := data.(type) {
-    case *audio.AudioInfo:
-        // Input Devices с гистограммой уровня
-        if len(audioData.InputDevices) > 0 {
-            row = t.printLine(row, 0, fmt.Sprintf("%c Input Devices: %d", 0x266A, len(audioData.InputDevices)), 
+
+    if audioInfo, ok := data.(*audio.AudioInfo); ok {
+        // Audio devices
+        if len(audioInfo.InputDevices) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d device(s)", 
+                t.config.T("audio.input_devices"), len(audioInfo.InputDevices)), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-            
-            // VU-метр входного сигнала
-            inputGraph := t.createCompactGraph(audioData.PeakLevel, 12)
-            row = t.printLine(row, 2, fmt.Sprintf("Input Level: %s %.1f dB", inputGraph, audioData.InputLevel), 
+        }
+        
+        if len(audioInfo.OutputDevices) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d device(s)", 
+                t.config.T("audio.output_devices"), len(audioInfo.OutputDevices)), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        }
+
+        // Audio levels with VU meters
+        if audioInfo.InputLevel != 0 {
+            inputGraph := t.createDetailedGraph(audioInfo.PeakLevel, 15)
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f dB", 
+                t.config.T("audio.input_level"), inputGraph, audioInfo.InputLevel), 
                 tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
         }
 
-        // Output Devices с гистограммой уровня  
-        if len(audioData.OutputDevices) > 0 {
-            row = t.printLine(row, 0, fmt.Sprintf("%c Output Devices: %d", 0x266B, len(audioData.OutputDevices)), 
+        if audioInfo.OutputLevel != 0 {
+            outputGraph := t.createDetailedGraph(audioInfo.PeakLevel, 15)
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f dB", 
+                t.config.T("audio.output_level"), outputGraph, audioInfo.OutputLevel), 
+                tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+        }
+
+        // Active streams
+        if len(audioInfo.ActiveStreams) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %d", 
+                t.config.T("audio.active_streams"), len(audioInfo.ActiveStreams)), 
+                tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+            
+            for i, stream := range audioInfo.ActiveStreams {
+                if i < 2 { // Show max 2 streams
+                    row = t.printLine(row, 2, fmt.Sprintf("%s (%s) - %s", 
+                        stream.Process, stream.Type, stream.Format), 
+                        tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+                }
+            }
+        }
+
+        // Audio metrics
+        if audioInfo.SampleRate != "" {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %s", 
+                t.config.T("audio.sample_rate"), audioInfo.SampleRate,
+                t.config.T("audio.bit_depth"), audioInfo.BitDepth), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-            
-            // VU-метр выходного сигнала
-            outputGraph := t.createCompactGraph(audioData.PeakLevel, 12)
-            row = t.printLine(row, 2, fmt.Sprintf("Output Level: %s %.1f dB", outputGraph, audioData.OutputLevel),
-                tcell.StyleDefault.Foreground(tcell.ColorLightGreen), width)
         }
 
-        // Частотный спектр (гистограмма)
-        if len(audioData.FrequencyBands) > 0 {
-            row = t.printLine(row, 0, "Frequency Spectrum:", tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
-            
-            // Создаем многострочную гистограмму спектра
-            spectrumRows := t.createSpectrumGraph(audioData.FrequencyBands, 4, 8) // 4 строки высотой, 8 полос
-            for _, spectrumLine := range spectrumRows {
-                row = t.printLine(row, 2, spectrumLine, tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
+        if audioInfo.Latency != "" {
+            row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+                t.config.T("audio.latency"), audioInfo.Latency), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        }
+
+        // Spectrum analyzer
+        if len(audioInfo.FrequencyBands) > 0 {
+            row = t.printLine(row, 0, "Spectrum Analyzer:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            spectrumLine := ""
+            for _, band := range audioInfo.FrequencyBands {
+                level := int(band / 10) // Convert percentages to levels 0-10
+                if level > 10 {
+                    level = 10
+                }
+                if level < 0 {
+                    level = 0
+                }
+                spectrumLine += strings.Repeat("█", level) + " "
             }
+            row = t.printLine(row, 2, spectrumLine, tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
         }
 
-        // Active Streams с индикаторами активности
-        if len(audioData.ActiveStreams) > 0 {
-            row = t.printLine(row, 0, fmt.Sprintf("%c Active Streams: %d", 0x266C, len(audioData.ActiveStreams)), 
+        // VU meter info
+        if audioInfo.PeakLevel > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("VU Meter - Peak: %.1f%%, RMS: %.1f%%", 
+                audioInfo.PeakLevel, audioInfo.RMSLevel), 
                 tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
-            
-            for i, stream := range audioData.ActiveStreams {
-                if i >= 3 { // Ограничиваем количество отображаемых потоков
-                    row = t.printLine(row, 2, fmt.Sprintf("... and %d more", len(audioData.ActiveStreams)-3), 
-                        tcell.StyleDefault.Foreground(tcell.ColorGray), width)
-                    break
-                }
-                
-                // Индикатор активности потока
-                activity := float64(stream.SampleRate) / 192000.0 * 100
-                if activity > 100 {
-                    activity = 100
-                }
-                streamGraph := t.createCompactGraph(activity, 8)
-                
-                streamType := "CAP"
-                if stream.Type == "playback" {
-                    streamType = "PLAY"
-                }
-                
-                row = t.printLine(row, 2, fmt.Sprintf("%s [%s]: %s %dHz %dch", 
-                    stream.Process, streamType, streamGraph, stream.SampleRate, stream.Channels),
-                    tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
-            }
-        } else {
-            row = t.printLine(row, 0, "No active audio streams", 
-                tcell.StyleDefault.Foreground(tcell.ColorGray), width)
         }
-
-        // Audio Metrics
-        row = t.printLine(row, 0, fmt.Sprintf("Sample Rate: %s | Bit Depth: %s", 
-            audioData.SampleRate, audioData.BitDepth), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-        row = t.printLine(row, 0, fmt.Sprintf("Latency: %s", audioData.Latency), 
-            tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-
-    case map[string]string:
-        if errorMsg, exists := audioData["error"]; exists {
+    } else if errorData, ok := data.(map[string]string); ok {
+        // Handle error case
+        if errorMsg, exists := errorData["error"]; exists {
             row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), 
                 tcell.StyleDefault.Foreground(tcell.ColorRed), width)
         }
-    default:
+    } else {
         row = t.printLine(row, 0, "No audio data available", 
             tcell.StyleDefault.Foreground(tcell.ColorGray), width)
     }
     return row + 1
+}
+
+// Переименованный метод для создания детализированных графиков
+func (t *TUI) createDetailedGraph(percent float64, width int) string {
+    filled := int(percent * float64(width) / 100)
+    if filled > width {
+        filled = width
+    }
+    if filled < 0 {
+        filled = 0
+    }
+    
+    graph := strings.Repeat("█", filled)
+    if filled < width {
+        graph += strings.Repeat("░", width-filled)
+    }
+    return graph
 }
 
 // NEW: Функция для создания многострочной гистограммы спектра
@@ -755,6 +780,7 @@ func (t *TUI) createCompactGraph(percentage float64, width int) string {
     if filled < 0 {
         filled = 0
     }
+    
     
     empty := width - filled
     
