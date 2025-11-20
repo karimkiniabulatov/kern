@@ -23,6 +23,8 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/gpu"
 	"github.com/karimkiniabulatov/kern/internal/ai"
 	"github.com/karimkiniabulatov/kern/internal/mining"
+	"github.com/karimkiniabulatov/kern/internal/audio"
+	"github.com/karimkiniabulatov/kern/internal/video"
 	"github.com/karimkiniabulatov/kern/internal/ui"
 	"github.com/karimkiniabulatov/kern/internal/service"
 	"github.com/mattn/go-colorable"
@@ -36,6 +38,8 @@ var (
 	flagGPU       = flag.Bool("g", false, "Show GPU information")
 	flagAI        = flag.Bool("ai", false, "Show AI training information")
 	flagMining    = flag.Bool("mining", false, "Show mining information")
+	flagAudio     = flag.Bool("audio", false, "Show audio stream information")
+	flagVideo     = flag.Bool("video", false, "Show video stream information")
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
@@ -75,6 +79,8 @@ func main() {
 	flag.BoolVar(flagMem, "mem", false, "Show memory information")
 	flag.BoolVar(flagNet, "net", false, "Show network information")
 	flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
+	flag.BoolVar(flagAudio, "a", false, "Show audio stream information")
+	flag.BoolVar(flagVideo, "v", false, "Show video stream information")
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
@@ -110,6 +116,7 @@ func main() {
 		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
 		fmt.Println("  kern --gpu --ai           # Show GPU and AI training info")
 		fmt.Println("  kern --mining             # Show mining information")
+		fmt.Println("  kern --audio --video      # Show audio and video streams")
 		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
 		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
 		fmt.Println("  kern --detailed            # Show detailed CPU core info")
@@ -218,10 +225,12 @@ func main() {
 	showGPU := *flagGPU || *flagAll
 	showAI := *flagAI || *flagAll
 	showMining := *flagMining || *flagAll
+	showAudio := *flagAudio || *flagAll
+	showVideo := *flagVideo || *flagAll
 
 	// NEW: Smart default behavior - use last used modules if no flags provided
 	noFlagsProvided := !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && 
-	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAll
+	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAudio && !*flagVideo && !*flagAll
 
 	if noFlagsProvided {
 		// Check if we have last used modules saved
@@ -234,9 +243,11 @@ func main() {
 			showGPU = cfg.LastUsedModules.ShowGPU
 			showAI = cfg.LastUsedModules.ShowAI
 			showMining = cfg.LastUsedModules.ShowMining
+			showAudio = cfg.LastUsedModules.ShowAudio
+			showVideo = cfg.LastUsedModules.ShowVideo
 			
 			// If no modules were selected in last usage, use default modules
-			if !showDisk && !showCPU && !showMem && !showNet && !showGPU && !showAI && !showMining {
+			if !showDisk && !showCPU && !showMem && !showNet && !showGPU && !showAI && !showMining && !showAudio && !showVideo {
 				showDisk = true
 				showCPU = true
 				showMem = true
@@ -251,7 +262,7 @@ func main() {
 		}
 	} else {
 		// Flags were provided - save these as last used modules
-		cfg.UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining)
+		cfg.UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining, showAudio, showVideo)
 	}
 
 	// Передаем флаги в конфиг
@@ -262,6 +273,8 @@ func main() {
 	cfg.ShowGPU = showGPU
 	cfg.ShowAI = showAI
 	cfg.ShowMining = showMining
+	cfg.ShowAudio = showAudio
+	cfg.ShowVideo = showVideo
 	cfg.DetailedCPU = *flagDetailed
 	if *flagRefresh > 0 {
 		cfg.RefreshRate = *flagRefresh
@@ -354,7 +367,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		err    error
 	}
 
-	resultChan := make(chan result, 7) // Increased buffer size for new modules
+	resultChan := make(chan result, 9) // Increased buffer size for new modules
 
 	// Launch goroutines only for enabled modules
 	if cfg.ShowDisk {
@@ -409,6 +422,22 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		}()
 	}
 
+	// NEW: Audio monitoring
+	if cfg.ShowAudio {
+		go func() {
+			data, err := audio.Summary()
+			resultChan <- result{"audio", data, err}
+		}()
+	}
+
+	// NEW: Video monitoring
+	if cfg.ShowVideo {
+		go func() {
+			data, err := video.Summary()
+			resultChan <- result{"video", data, err}
+		}()
+	}
+
 	// Collect results
 	results := make(map[string]interface{})
 	moduleCount := 0
@@ -431,6 +460,12 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		moduleCount++
 	}
 	if cfg.ShowMining {
+		moduleCount++
+	}
+	if cfg.ShowAudio {
+		moduleCount++
+	}
+	if cfg.ShowVideo {
 		moduleCount++
 	}
 
@@ -590,6 +625,44 @@ func startRemoteServer(cfg *config.Config, port int) {
 		json.NewEncoder(w).Encode(data)
 	})
 
+	// NEW: Audio endpoint
+	mux.HandleFunc("/api/audio", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
+		data, err := audio.Summary()
+		if err != nil {
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
+	// NEW: Video endpoint
+	mux.HandleFunc("/api/video", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		
+		if r.Method == "OPTIONS" {
+			return
+		}
+		
+		data, err := video.Summary()
+		if err != nil {
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(data)
+	})
+
 	// System info endpoint
 	mux.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -644,6 +717,8 @@ func startRemoteServer(cfg *config.Config, port int) {
 				"/api/gpu",
 				"/api/ai",
 				"/api/mining",
+				"/api/audio",
+				"/api/video",
 				"/api/system",
 				"/health",
 			},
@@ -670,6 +745,8 @@ func startRemoteServer(cfg *config.Config, port int) {
 	log.Printf("  GET /api/gpu    - GPU information")
 	log.Printf("  GET /api/ai     - AI training information")
 	log.Printf("  GET /api/mining - Mining information")
+	log.Printf("  GET /api/audio  - Audio stream information")
+	log.Printf("  GET /api/video  - Video stream information")
 	log.Printf("  GET /api/system - System information")
 	log.Printf("  GET /health     - Health check")
 	log.Printf("")
@@ -730,7 +807,7 @@ func monitorRemoteAPI(apiURL string) {
 
 // NEW: Fetch data from remote API
 func fetchRemoteData(baseURL string) (map[string]interface{}, error) {
-	endpoints := []string{"cpu", "mem", "disk", "net", "gpu", "ai", "mining"}
+	endpoints := []string{"cpu", "mem", "disk", "net", "gpu", "ai", "mining", "audio", "video"}
 	results := make(map[string]interface{})
 
 	for _, endpoint := range endpoints {
