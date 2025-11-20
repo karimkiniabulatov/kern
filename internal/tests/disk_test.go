@@ -1,9 +1,12 @@
-package disk
+package tests
 
-import "testing"
+import (
+	"testing"
+	disk "github.com/karimkiniabulatov/kern/internal/disk"
+)
 
 func TestDiskSummary(t *testing.T) {
-	disks, err := Summary()
+	disks, err := disk.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get disk info: %v", err)
 	}
@@ -37,7 +40,7 @@ func TestSkipFilesystem(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		result := shouldSkipFilesystem(tc.filesystem, tc.mountPoint)
+		result := disk.ShouldSkipFilesystem(tc.filesystem, tc.mountPoint)
 		if result != tc.shouldSkip {
 			t.Errorf("shouldSkipFilesystem(%q, %q) = %v, want %v", 
 				tc.filesystem, tc.mountPoint, result, tc.shouldSkip)

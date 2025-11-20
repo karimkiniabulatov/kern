@@ -1,9 +1,12 @@
-package config
+package tests
 
-import "testing"
+import (
+	"testing"
+	config "github.com/karimkiniabulatov/kern/internal/config"
+)
 
 func TestDefaultConfig(t *testing.T) {
-	cfg := getDefaultConfig("en")
+	cfg := config.GetDefaultConfig("en")
 	
 	if cfg.Language != "en" {
 		t.Errorf("Expected language 'en', got '%s'", cfg.Language)
@@ -15,7 +18,7 @@ func TestDefaultConfig(t *testing.T) {
 }
 
 func TestConfigSaveLoad(t *testing.T) {
-	cfg := &Config{
+	cfg := &config.Config{
 		Language:    "ru",
 		RefreshRate: 5,
 		Colors:      true,
@@ -30,7 +33,7 @@ func TestConfigSaveLoad(t *testing.T) {
 		t.Errorf("Failed to save config: %v", err)
 	}
 
-	loadedCfg, err := Load("")
+	loadedCfg, err := config.Load("")
 	if err != nil {
 		t.Errorf("Failed to load config: %v", err)
 	}
@@ -41,7 +44,7 @@ func TestConfigSaveLoad(t *testing.T) {
 }
 
 func TestModulePreferences(t *testing.T) {
-	cfg := getDefaultConfig("en")
+	cfg := config.GetDefaultConfig("en")
 	
 	// Test updating last used modules
 	cfg.UpdateLastUsedModules(true, false, true, false, true, false, true)

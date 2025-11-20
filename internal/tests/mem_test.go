@@ -1,9 +1,12 @@
-package mem
+package tests
 
-import "testing"
+import (
+	"testing"
+	mem "github.com/karimkiniabulatov/kern/internal/mem"
+)
 
 func TestMemorySummary(t *testing.T) {
-	info, err := Summary()
+	info, err := mem.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get memory info: %v", err)
 	}

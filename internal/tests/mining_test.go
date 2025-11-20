@@ -1,9 +1,12 @@
-package mining
+package tests
 
-import "testing"
+import (
+	"testing"
+	mining "github.com/karimkiniabulatov/kern/internal/mining"
+)
 
 func TestMiningSummary(t *testing.T) {
-	info, err := Summary()
+	info, err := mining.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get mining info: %v", err)
 	}

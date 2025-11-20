@@ -1,9 +1,12 @@
-package ai
+package tests
 
-import "testing"
+import (
+	"testing"
+	ai "github.com/karimkiniabulatov/kern/internal/ai"
+)
 
 func TestAISummary(t *testing.T) {
-	info, err := Summary()
+	info, err := ai.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get AI info: %v", err)
 	}

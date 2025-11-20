@@ -1,9 +1,12 @@
-package gpu
+package tests
 
-import "testing"
+import (
+	"testing"
+	gpu "github.com/karimkiniabulatov/kern/internal/gpu"
+)
 
 func TestGPUSummary(t *testing.T) {
-	info, err := Summary()
+	info, err := gpu.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get GPU info: %v", err)
 	}

@@ -1,9 +1,12 @@
-package net
+package tests
 
-import "testing"
+import (
+	"testing"
+	net "github.com/karimkiniabulatov/kern/internal/net"
+)
 
 func TestNetworkSummary(t *testing.T) {
-	networks, err := Summary()
+	networks, err := net.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get network info: %v", err)
 	}
@@ -33,7 +36,7 @@ func TestFormatSpeed(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		result := formatSpeed(tc.input)
+		result := net.FormatSpeed(tc.input)
 		if result != tc.expected {
 			t.Errorf("formatSpeed(%.0f) = %s, want %s", tc.input, result, tc.expected)
 		}

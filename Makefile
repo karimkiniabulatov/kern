@@ -42,7 +42,7 @@ clean:
 
 test:
 	@echo "Running tests..."
-	go test ./...
+	go test ./internal/...
 
 # Для разработки
 dev:

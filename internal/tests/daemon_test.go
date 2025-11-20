@@ -1,9 +1,12 @@
-package service
+package tests
 
-import "testing"
+import (
+	"testing"
+	service "github.com/karimkiniabulatov/kern/internal/service"
+)
 
 func TestDaemonConfig(t *testing.T) {
-	dm := NewDaemonManager()
+	dm := service.NewDaemonManager()
 	cfg := dm.GetConfig()
 
 	if cfg.Port <= 0 || cfg.Port > 65535 {
@@ -16,7 +19,7 @@ func TestDaemonConfig(t *testing.T) {
 }
 
 func TestDaemonManagerCreation(t *testing.T) {
-	dm := NewDaemonManager()
+	dm := service.NewDaemonManager()
 	
 	if dm == nil {
 		t.Error("DaemonManager should not be nil")

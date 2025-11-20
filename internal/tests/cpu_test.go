@@ -1,9 +1,12 @@
-package cpu
+package tests
 
-import "testing"
+import (
+	"testing"
+	cpu "github.com/karimkiniabulatov/kern/internal/cpu"
+)
 
 func TestCPUInfo(t *testing.T) {
-	info, err := Summary()
+	info, err := cpu.Summary()
 	if err != nil {
 		t.Fatalf("Failed to get CPU info: %v", err)
 	}
@@ -23,7 +26,7 @@ func TestCPUInfo(t *testing.T) {
 
 func TestCPUUsageCalculation(t *testing.T) {
 	// Test that usage calculation doesn't panic
-	_, err := getCPUUsage()
+	_, err := cpu.GetCPUUsage()
 	if err != nil {
 		t.Logf("getCPUUsage returned error (might be normal on some systems): %v", err)
 	}
