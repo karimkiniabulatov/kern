@@ -236,7 +236,7 @@ Submit a pull request
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
 
 -----------------------------------------------------------------------------------------
-
+```
 💖 Support the Project
 
 kern is developed with ❤️ as an open-source project. 
