@@ -81,10 +81,13 @@ func main() {
 	flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
 	flag.BoolVar(flagAI, "ai", false, "Show AI training information")
 	flag.BoolVar(flagMining, "mining", false, "Show mining information")
+	
+	// ИСПРАВЛЕНО: регистрируем разные флаги для коротких и длинных вариантов audio/video
 	flag.BoolVar(flagAudio, "au", false, "Show audio stream information")
 	flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
 	flag.BoolVar(flagVideo, "vi", false, "Show video stream information")
 	flag.BoolVar(flagVideo, "video", false, "Show video stream information")
+	
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
