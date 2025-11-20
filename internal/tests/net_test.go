@@ -38,7 +38,7 @@ func TestFormatSpeed(t *testing.T) {
 	for _, tc := range testCases {
 		result := net.FormatSpeed(tc.input)
 		if result != tc.expected {
-			t.Errorf("formatSpeed(%.0f) = %s, want %s", tc.input, result, tc.expected)
+			t.Errorf("FormatSpeed(%.0f) = %s, want %s", tc.input, result, tc.expected)
 		}
 	}
 }

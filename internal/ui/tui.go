@@ -375,33 +375,28 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
 					t.config.T("mining.hashrate"), miningData.Hashrate), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
-
-			if miningData.SharesValid > 0 {
-				row = t.printLine(row, 0, fmt.Sprintf("%s: %d / %d", 
-					t.config.T("mining.shares"), miningData.SharesValid, miningData.SharesInvalid), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
-			}
-
+			
 			if miningData.PowerConsumption != "" {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
 					t.config.T("mining.power"), miningData.PowerConsumption), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 			}
-
+			
 			if miningData.Temperature > 0 {
 				tempGraph := t.createCompactGraph(miningData.Temperature, 10)
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1fC", 
 					t.config.T("mining.temperature"), tempGraph, miningData.Temperature), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 			}
-
-			if miningData.Efficiency != "" {
-				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
-					t.config.T("mining.efficiency"), miningData.Efficiency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			
+			if miningData.SharesValid > 0 {
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %d/%d", 
+					t.config.T("mining.shares"), miningData.SharesValid, miningData.SharesInvalid), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
-
+			
 			if miningData.Uptime != "" {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
 					t.config.T("mining.uptime"), miningData.Uptime), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			}
-
+			
 			if miningData.Revenue24h != "" {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
 					t.config.T("mining.revenue_24h"), miningData.Revenue24h), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
@@ -422,7 +417,7 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 
 // Audio rendering function
 func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
-	row := t.renderHeader(startRow, "Audio Information", width)
+	row := t.renderHeader(startRow, "Audio Streams", width)
 
 	switch audioData := data.(type) {
 	case *audio.AudioInfo:
@@ -446,7 +441,7 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 		if len(audioData.ActiveStreams) > 0 {
 			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, stream := range audioData.ActiveStreams {
-				row = t.printLine(row, 2, fmt.Sprintf("%s (%s)", stream.Process, stream.Type), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+				row = t.printLine(row, 2, fmt.Sprintf("%s (%s) - %s", stream.Process, stream.Type, stream.Format), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
 		}
 
@@ -456,12 +451,15 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 				audioData.InputLevel, audioData.OutputLevel), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 		}
 
-		// Audio metrics
 		if audioData.SampleRate != "" {
 			row = t.printLine(row, 0, fmt.Sprintf("Format: %s %s %s", 
 				audioData.SampleRate, audioData.BitDepth, audioData.Latency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
-
+	case map[string]string:
+		// Handle error case
+		if errorMsg, exists := audioData["error"]; exists {
+			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+		}
 	default:
 		row = t.printLine(row, 0, "No audio data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 	}
@@ -470,7 +468,7 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 
 // Video rendering function
 func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
-	row := t.renderHeader(startRow, "Video Information", width)
+	row := t.renderHeader(startRow, "Video Streams", width)
 
 	switch videoData := data.(type) {
 	case *video.VideoInfo:
@@ -486,56 +484,34 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 		if len(videoData.ActiveStreams) > 0 {
 			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, stream := range videoData.ActiveStreams {
-				streamInfo := fmt.Sprintf("%s (%s)", stream.Process, stream.Type)
-				if stream.Codec != "" {
-					streamInfo += fmt.Sprintf(" - %s", stream.Codec)
-				}
-				row = t.printLine(row, 2, streamInfo, tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+				row = t.printLine(row, 2, fmt.Sprintf("%s - %s %s", 
+					stream.Process, stream.Resolution, stream.Framerate), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
 		}
 
 		// GPU encoders
-		if videoData.GPUEncoders != nil && len(videoData.GPUEncoders) > 0 {
+		if len(videoData.GPUEncoders) > 0 {
 			row = t.printLine(row, 0, "GPU Encoders:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, encoder := range videoData.GPUEncoders {
-				encoderInfo := encoder.Name
-				if encoder.Type != "" {
-					encoderInfo += fmt.Sprintf(" (%s)", encoder.Type)
-				}
-				row = t.printLine(row, 2, encoderInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				row = t.printLine(row, 2, fmt.Sprintf("%s - %s", encoder.Name, encoder.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			}
 		}
 
 		// Encoding status
 		if videoData.EncodingStatus != "" {
-			statusColor := tcell.ColorGray
-			if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
-				statusColor = tcell.ColorLightCoral
-			}
-			row = t.printLine(row, 0, fmt.Sprintf("Encoding: %s", videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor), width)
+			row = t.printLine(row, 0, fmt.Sprintf("Encoding: %s", videoData.EncodingStatus), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 		}
 
 		// Performance metrics
-		if videoData.Bitrate != "" {
-			performanceInfo := fmt.Sprintf("Bitrate: %s", videoData.Bitrate)
-			if videoData.Resolution != "" {
-				performanceInfo += fmt.Sprintf(" | Resolution: %s", videoData.Resolution)
-			}
-			if videoData.FrameRate > 0 {
-				performanceInfo += fmt.Sprintf(" | %.1f FPS", videoData.FrameRate)
-			}
-			if videoData.Codec != "" {
-				performanceInfo += fmt.Sprintf(" | %s", videoData.Codec)
-			}
-			row = t.printLine(row, 0, performanceInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-		} else if videoData.Resolution != "" {
-			resolutionInfo := fmt.Sprintf("Resolution: %s", videoData.Resolution)
-			if videoData.FrameRate > 0 {
-				resolutionInfo += fmt.Sprintf(" | %.1f FPS", videoData.FrameRate)
-			}
-			row = t.printLine(row, 0, resolutionInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		if videoData.Framerate > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("Performance: %.1f FPS | %.1f%% GPU | %s", 
+				videoData.Framerate, videoData.GPUUtilization, videoData.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 		}
-
+	case map[string]string:
+		// Handle error case
+		if errorMsg, exists := videoData["error"]; exists {
+			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+		}
 	default:
 		row = t.printLine(row, 0, "No video data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 	}
@@ -544,13 +520,13 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 
 func (t *TUI) renderHeader(startRow int, title string, width int) int {
 	style := tcell.StyleDefault.Foreground(tcell.ColorWhite).Bold(true)
-	t.printCentered(startRow, "╔"+strings.Repeat("═", width-2)+"╗", style, width)
-	t.printCentered(startRow+1, "║ "+title+strings.Repeat(" ", width-len(title)-4)+" ║", style, width)
-	t.printCentered(startRow+2, "╚"+strings.Repeat("═", width-2)+"╝", style, width)
+	t.printCentered(startRow, "┌"+strings.Repeat("─", width-2)+"┐", style, width)
+	t.printCentered(startRow+1, "│ "+title+strings.Repeat(" ", width-len(title)-4)+" │", style, width)
+	t.printCentered(startRow+2, "└"+strings.Repeat("─", width-2)+"┘", style, width)
 	return startRow + 3
 }
 
-func (t *TUI) renderFooter(startRow int, width int, height int) {
+func (t *TUI) renderFooter(startRow int, width, height int) {
 	if startRow >= height-2 {
 		return
 	}
@@ -558,75 +534,77 @@ func (t *TUI) renderFooter(startRow int, width int, height int) {
 	footerText := "Press 'q' or Ctrl+C to exit | kern v1.2.1"
 	style := tcell.StyleDefault.Foreground(tcell.ColorGray)
 	
-	// Fill the remaining space with empty lines
-	for row := startRow; row < height-1; row++ {
-		t.printLine(row, 0, "", style, width)
+	// Fill empty space if needed
+	for row := startRow; row < height-2; row++ {
+		t.printLine(row, 0, "", tcell.StyleDefault, width)
 	}
 	
 	t.printCentered(height-1, footerText, style, width)
 }
 
 func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	screenWidth, screenHeight := t.screen.Size()
-	if row < 0 || row >= screenHeight {
+	if row < 0 || row >= t.screen.Size().Height {
 		return
 	}
-	
+
 	textLen := len(text)
 	start := (width - textLen) / 2
 	if start < 0 {
 		start = 0
 	}
-	
-	for i, ch := range text {
-		if start+i < width {
-			t.screen.SetContent(start+i, row, ch, nil, style)
+
+	for i := 0; i < width; i++ {
+		if i >= start && i < start+textLen {
+			t.screen.SetContent(i, row, rune(text[i-start]), nil, style)
+		} else {
+			t.screen.SetContent(i, row, ' ', nil, style)
 		}
 	}
 }
 
 func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	screenWidth, screenHeight := t.screen.Size()
-	if row < 0 || row >= screenHeight {
+	if row < 0 || row >= t.screen.Size().Height {
 		return row
 	}
-	
+
 	// Handle text that might be longer than available width
 	availableWidth := width - indent - 1
 	if len(text) > availableWidth {
 		text = text[:availableWidth-3] + "..."
 	}
-	
+
 	for i, ch := range text {
-		if indent+i < width {
-			t.screen.SetContent(indent+i, row, ch, nil, style)
+		if indent+i >= width {
+			break
 		}
+		t.screen.SetContent(indent+i, row, ch, nil, style)
 	}
-	
+
 	return row + 1
 }
 
-func (t *TUI) createCompactGraph(percent float64, width int) string {
+func (t *TUI) createCompactGraph(percent float64, length int) string {
 	if percent < 0 {
 		percent = 0
 	}
 	if percent > 100 {
 		percent = 100
 	}
-	
-	filled := int((percent / 100) * float64(width))
-	if filled > width {
-		filled = width
+
+	filled := int((percent / 100) * float64(length))
+	if filled > length {
+		filled = length
 	}
-	
-	graph := ""
-	for i := 0; i < width; i++ {
+
+	graph := "["
+	for i := 0; i < length; i++ {
 		if i < filled {
 			graph += "█"
 		} else {
 			graph += "░"
 		}
 	}
+	graph += "]"
 	return graph
 }
 
@@ -634,11 +612,11 @@ func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
 	if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
 		return "SSD"
 	} else if strings.Contains(filesystem, "sd") {
-		return "HDD"
+		return "HDD" 
+	} else if strings.Contains(filesystem, "mmc") {
+		return "eMMC"
 	} else if mountPoint == "/" {
 		return "ROOT"
-	} else if strings.Contains(mountPoint, "home") {
-		return "HOME"
 	}
 	return "STORAGE"
 }

@@ -8,23 +8,24 @@ import (
 )
 
 type VideoInfo struct {
-	VideoDevices   []VideoDevice
-	ActiveStreams  []VideoStream
-	GPUEncoders    []VideoEncoder
-	Resolution     string
-	FrameRate      float64
-	Bitrate        string
-	Codec          string
-	EncodingStatus string // idle/encoding/decoding
+	VideoDevices    []VideoDevice
+	ActiveStreams   []VideoStream
+	GPUEncoders     []VideoEncoder
+	EncodingStatus  string
+	Framerate       float64
+	GPUUtilization  float64
+	Bitrate         string
+	Resolution      string
+	Codec           string
 }
 
 type VideoDevice struct {
-	Name     string
-	ID       string
-	Type     string // camera/encoder/decoder
-	Formats  []string
-	Status   string
-	Driver   string
+	Name    string
+	ID      string
+	Type    string // camera/encoder/decoder
+	Formats []string
+	Status  string
+	Driver  string
 }
 
 type VideoStream struct {
@@ -33,17 +34,17 @@ type VideoStream struct {
 	Type       string // capture/encode/decode/playback
 	Device     string
 	Resolution string
-	FrameRate  float64
+	Framerate  float64
 	Bitrate    string
 	Codec      string
 }
 
 type VideoEncoder struct {
-	Name      string
-	Type      string // hardware/software
-	Codecs    []string
-	Active    bool
-	Utilization float64
+	Name         string
+	Type         string // hardware/software
+	Codecs       []string
+	Active       bool
+	Utilization  float64
 }
 
 func Summary() (*VideoInfo, error) {
@@ -244,7 +245,7 @@ func (v *VideoInfo) getVideoMetrics() {
 	// Set default metrics based on detected streams
 	if len(v.ActiveStreams) > 0 {
 		v.Resolution = "1920x1080"
-		v.FrameRate = 30.0
+		v.Framerate = 30.0
 		v.Bitrate = "4.5 Mbps"
 		v.Codec = "H.264"
 		
@@ -262,11 +263,25 @@ func (v *VideoInfo) getVideoMetrics() {
 		} else {
 			v.EncodingStatus = "active"
 		}
+
+		// Calculate GPU utilization
+		totalUtil := 0.0
+		activeEncoders := 0
+		for _, encoder := range v.GPUEncoders {
+			if encoder.Active {
+				totalUtil += encoder.Utilization
+				activeEncoders++
+			}
+		}
+		if activeEncoders > 0 {
+			v.GPUUtilization = totalUtil / float64(activeEncoders)
+		}
 	} else {
 		v.EncodingStatus = "idle"
 		v.Resolution = "N/A"
-		v.FrameRate = 0
+		v.Framerate = 0
 		v.Bitrate = "N/A"
 		v.Codec = "N/A"
+		v.GPUUtilization = 0
 	}
 }
