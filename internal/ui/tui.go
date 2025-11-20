@@ -156,7 +156,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 10)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
@@ -486,20 +486,28 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 		if len(videoData.ActiveStreams) > 0 {
 			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, stream := range videoData.ActiveStreams {
-				row = t.printLine(row, 2, fmt.Sprintf("%s (%s) %s", 
-					stream.Process, stream.Type, stream.Resolution), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+				streamInfo := fmt.Sprintf("%s (%s)", stream.Process, stream.Type)
+				if stream.Format != "" {
+					streamInfo += fmt.Sprintf(" - %s", stream.Format)
+				}
+				row = t.printLine(row, 2, streamInfo, tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
 		}
 
-		// GPU encoders
-		if len(videoData.GPUEncoders) > 0 {
+		// GPU encoders - проверяем существование поля
+		if videoData.GPUEncoders != nil && len(videoData.GPUEncoders) > 0 {
 			row = t.printLine(row, 0, "GPU Encoders:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, encoder := range videoData.GPUEncoders {
-				row = t.printLine(row, 2, fmt.Sprintf("%s (%s)", encoder.Name, encoder.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				// Используем доступные поля
+				encoderInfo := encoder.Name
+				if encoder.Type != "" {
+					encoderInfo += fmt.Sprintf(" (%s)", encoder.Type)
+				}
+				row = t.printLine(row, 2, encoderInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			}
 		}
 
-		// Encoding status
+		// Encoding status - используем доступные поля
 		if videoData.EncodingStatus != "" {
 			statusColor := tcell.ColorGray
 			if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
@@ -508,10 +516,15 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			row = t.printLine(row, 0, fmt.Sprintf("Encoding: %s", videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor), width)
 		}
 
-		// Performance metrics
-		if videoData.FPS > 0 {
-			row = t.printLine(row, 0, fmt.Sprintf("Performance: %.1f FPS | Bitrate: %s", 
-				videoData.FPS, videoData.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		// Performance metrics - используем доступные поля
+		if videoData.Bitrate != "" {
+			performanceInfo := fmt.Sprintf("Bitrate: %s", videoData.Bitrate)
+			if videoData.Resolution != "" {
+				performanceInfo += fmt.Sprintf(" | Resolution: %s", videoData.Resolution)
+			}
+			row = t.printLine(row, 0, performanceInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		} else if videoData.Resolution != "" {
+			row = t.printLine(row, 0, fmt.Sprintf("Resolution: %s", videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 
 	default:
@@ -520,95 +533,101 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-func (t *TUI) renderFooter(row int, width int, height int) {
-	if row >= height-1 {
-		row = height - 1
-	}
-	footer := fmt.Sprintf("Press 'q' to quit | Auto-refresh every %d seconds", t.config.RefreshRate)
-	t.printCentered(row, footer, tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+func (t *TUI) renderHeader(startRow int, title string, width int) int {
+	style := tcell.StyleDefault.Foreground(tcell.ColorWhite).Bold(true)
+	t.printCentered(startRow, "╔"+strings.Repeat("═", width-2)+"╗", style, width)
+	t.printCentered(startRow+1, "║ "+title+strings.Repeat(" ", width-len(title)-4)+" ║", style, width)
+	t.printCentered(startRow+2, "╚"+strings.Repeat("═", width-2)+"╝", style, width)
+	return startRow + 3
 }
 
-func (t *TUI) renderHeader(row int, text string, width int) int {
-	style := tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true)
-	t.printLine(row, 0, text, style, width)
-	return row + 1
-}
-
-func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	_, screenHeight := t.screen.Size()
-	if row >= screenHeight {
-		return row
-	}
-
-	// Apply indentation
-	indentSpaces := ""
-	for i := 0; i < indent; i++ {
-		indentSpaces += " "
-	}
-	fullText := indentSpaces + text
-
-	// Truncate if too long for screen
-	if len(fullText) > width {
-		fullText = fullText[:width]
-	}
-
-	for col, ch := range fullText {
-		if col >= width {
-			break
-		}
-		t.screen.SetContent(col, row, ch, nil, style)
-	}
-	return row + 1
-}
-
-func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	_, screenHeight := t.screen.Size()
-	if row >= screenHeight {
+func (t *TUI) renderFooter(startRow int, width int, height int) {
+	if startRow >= height-2 {
 		return
 	}
 
-	col := (width - len(text)) / 2
-	if col < 0 {
-		col = 0
+	footerText := "Press 'q' or Ctrl+C to exit | kern v1.2.1"
+	style := tcell.StyleDefault.Foreground(tcell.ColorGray)
+	
+	// Fill the remaining space with empty lines
+	for row := startRow; row < height-1; row++ {
+		t.printLine(row, 0, "", style, width)
 	}
+	
+	t.printCentered(height-1, footerText, style, width)
+}
 
+func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
+	if row < 0 || row >= t.screen.Size().Height {
+		return
+	}
+	
+	textLen := len(text)
+	start := (width - textLen) / 2
+	if start < 0 {
+		start = 0
+	}
+	
 	for i, ch := range text {
-		if col+i >= width {
-			break
+		if start+i < width {
+			t.screen.SetContent(start+i, row, ch, nil, style)
 		}
-		t.screen.SetContent(col+i, row, ch, nil, style)
 	}
 }
 
+func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
+	if row < 0 || row >= t.screen.Size().Height {
+		return row
+	}
+	
+	// Handle text that might be longer than available width
+	availableWidth := width - indent - 1
+	if len(text) > availableWidth {
+		text = text[:availableWidth-3] + "..."
+	}
+	
+	for i, ch := range text {
+		if indent+i < width {
+			t.screen.SetContent(indent+i, row, ch, nil, style)
+		}
+	}
+	
+	return row + 1
+}
+
 func (t *TUI) createCompactGraph(percent float64, width int) string {
+	if percent < 0 {
+		percent = 0
+	}
 	if percent > 100 {
 		percent = 100
 	}
-
+	
+	filled := int((percent / 100) * float64(width))
+	if filled > width {
+		filled = width
+	}
+	
 	graph := ""
-	usedSegments := int(percent / (100.0 / float64(width)))
-
 	for i := 0; i < width; i++ {
-		if i < usedSegments {
-			graph += "█" // ASCII 219 - сплошной блок
+		if i < filled {
+			graph += "█"
 		} else {
-			graph += "░" // ASCII 176 - светлый затененный блок
+			graph += "░"
 		}
 	}
 	return graph
 }
 
 func (t *TUI) getDeviceType(filesystem, mountPoint string) string {
-	if strings.Contains(filesystem, "md") {
-		return "RAID"
-	} else if strings.Contains(filesystem, "nvme") {
-		return "NVMe"
+	if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
+		return "SSD"
 	} else if strings.Contains(filesystem, "sd") {
-		return "SSD/HDD"
-	} else if mountPoint == "/boot/efi" {
-		return "UEFI"
-	} else if strings.Contains(filesystem, "vd") {
-		return "Virtual"
+		return "HDD"
+	} else if mountPoint == "/" {
+		return "ROOT"
+	} else if strings.Contains(mountPoint, "home") {
+		return "HOME"
 	}
-	return "Disk"
+	return "STORAGE"
 }
