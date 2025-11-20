@@ -69,12 +69,6 @@ func init() {
 }
 
 func main() {
-	// Проверяем, запущены ли мы в неинтерактивном режиме Windows
-	if isWindowsNonInteractive() {
-		runWindowsServiceMode()
-		return
-	}
-	
 	// Добавляем альтернативные имена флагов
 	flag.BoolVar(flagDisk, "disk", false, "Show disk information")
 	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
@@ -275,34 +269,6 @@ func main() {
 
 	// Запускаем мониторинг
 	runMonitor(cfg, *flagLogo)
-}
-
-func isWindowsNonInteractive() bool {
-	if runtime.GOOS != "windows" {
-		return false
-	}
-	
-	// Проверяем, есть ли интерактивная консоль
-	fi, err := os.Stdout.Stat()
-	if err != nil {
-		return true
-	}
-	
-	return (fi.Mode() & os.ModeCharDevice) == 0
-}
-
-func runWindowsServiceMode() {
-	fmt.Println("kern v" + version + " - System Monitoring Tool")
-	fmt.Println("Running in Windows service mode...")
-	fmt.Println("Use 'kern --remote' to start API server")
-	fmt.Println("Or run in PowerShell/CMD for interactive TUI")
-	
-	// Запускаем API сервер по умолчанию в сервисном режиме
-	cfg, err := config.Load("")
-	if err != nil {
-		cfg = config.GetDefaultConfig("")
-	}
-	startRemoteServer(cfg, 28126)
 }
 
 func showLogo() {
@@ -852,23 +818,23 @@ func handleServiceCommands() {
 		if err := daemonManager.StartDaemon(); err != nil {
 			log.Fatalf("Failed to start daemon: %v", err)
 		}
-		fmt.Println("✅ kern daemon started successfully")
+		fmt.Println("kern daemon started successfully")
 		
 	case *flagStop:
 		if err := daemonManager.StopDaemon(); err != nil {
 			log.Fatalf("Failed to stop daemon: %v", err)
 		}
-		fmt.Println("✅ kern daemon stopped successfully")
+		fmt.Println("kern daemon stopped successfully")
 		
 	case *flagRestart:
 		if err := daemonManager.RestartDaemon(); err != nil {
 			log.Fatalf("Failed to restart daemon: %v", err)
 		}
-		fmt.Println("✅ kern daemon restarted successfully")
+		fmt.Println("kern daemon restarted successfully")
 		
 	case *flagStatus:
 		status := daemonManager.Status()
-		fmt.Println("🔍 kern Daemon Status:")
+		fmt.Println("kern Daemon Status:")
 		for key, value := range status {
 			fmt.Printf("  %s: %v\n", key, value)
 		}
@@ -877,13 +843,13 @@ func handleServiceCommands() {
 		if err := daemonManager.EnableAutoStart(); err != nil {
 			log.Fatalf("Failed to enable auto-start: %v", err)
 		}
-		fmt.Println("✅ Auto-start enabled for kern daemon")
+		fmt.Println("Auto-start enabled for kern daemon")
 		
 	case *flagDisable:
 		if err := daemonManager.DisableAutoStart(); err != nil {
 			log.Fatalf("Failed to disable auto-start: %v", err)
 		}
-		fmt.Println("✅ Auto-start disabled for kern daemon")
+		fmt.Println("Auto-start disabled for kern daemon")
 	}
 }
 
@@ -895,8 +861,8 @@ func ensureDaemonRunning() {
 	}
 	
 	status := daemonManager.Status()
-	fmt.Printf("✅ kern daemon is running on port %d\n", status["port"].(int))
-	fmt.Printf("🌐 API URL: http://localhost:%d\n", status["port"].(int))
+	fmt.Printf("kern daemon is running on port %d\n", status["port"].(int))
+	fmt.Printf("API URL: http://localhost:%d\n", status["port"].(int))
 }
 
 func startAsDaemon() {
@@ -909,9 +875,9 @@ func startAsDaemon() {
 		daemonManager.UpdateConfig(daemonCfg)
 	}
 
-	fmt.Printf("🚀 Starting kern daemon on port %d...\n", daemonCfg.Port)
-	fmt.Printf("📝 Log file: %s\n", daemonCfg.LogFile)
-	fmt.Printf("📌 PID file: %s\n", daemonCfg.PIDFile)
+	fmt.Printf("Starting kern daemon on port %d...\n", daemonCfg.Port)
+	fmt.Printf("Log file: %s\n", daemonCfg.LogFile)
+	fmt.Printf("PID file: %s\n", daemonCfg.PIDFile)
 	fmt.Println("Press Ctrl+C to stop the daemon")
 
 	// Запускаем API сервер

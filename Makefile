@@ -1,7 +1,7 @@
-.PHONY: all build linux windows macos android clean install
+.PHONY: all build linux windows macos clean install
 
 BINARY_NAME=kern
-VERSION=1.2.0
+VERSION=1.2.1
 
 all: build
 
@@ -21,11 +21,6 @@ windows:
 macos:
 	@echo "Building for MacOS..."
 	GOOS=darwin GOARCH=amd64 go build -o bin/$(BINARY_NAME)-macos ./cmd/kern
-
-android:
-	@echo "Building for Android..."
-	cd android && ./scripts/setup-android.sh
-	cd android && ./scripts/build-android.sh
 
 release: linux windows macos
 	@echo "Creating release packages..."
