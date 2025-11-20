@@ -31,6 +31,7 @@ import (
 )
 
 var (
+	// Основные флаги мониторинга
 	flagDisk      = flag.Bool("d", false, "Show disk information")
 	flagCPU       = flag.Bool("c", false, "Show CPU information")
 	flagMem       = flag.Bool("m", false, "Show memory information")
@@ -40,6 +41,12 @@ var (
 	flagMining    = flag.Bool("mining", false, "Show mining information")
 	flagAudio     = flag.Bool("audio", false, "Show audio stream information")
 	flagVideo     = flag.Bool("video", false, "Show video stream information")
+	
+	// Короткие версии для audio и video
+	flagAudioShort = flag.Bool("au", false, "Show audio stream information (short)")
+	flagVideoShort = flag.Bool("vi", false, "Show video stream information (short)")
+	
+	// Общие флаги
 	flagAll       = flag.Bool("a", false, "Show all information")
 	flagRefresh   = flag.Int("refresh", 2, "Refresh interval in seconds")
 	flagLang      = flag.String("l", "", "Language code (e.g., 'ru' for Russian)")
@@ -53,6 +60,8 @@ var (
 	flagLogo      = flag.Bool("logo", false, "Show logo during monitoring")
 	flagAPI       = flag.String("api", "", "Monitor remote server via API (http://host:port)")
 	flagSSH       = flag.String("ssh", "", "Monitor remote server via SSH (user@host)")
+	
+	// Сервисные флаги
 	flagDaemon    = flag.Bool("daemon", false, "Start kern as a daemon service")
 	flagStart     = flag.Bool("start-service", false, "Start the kern daemon")
 	flagStop      = flag.Bool("stop-service", false, "Stop the kern daemon")
@@ -73,23 +82,7 @@ func init() {
 }
 
 func main() {
-	// Добавляем альтернативные имена флагов
-	flag.BoolVar(flagDisk, "disk", false, "Show disk information")
-	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
-	flag.BoolVar(flagMem, "mem", false, "Show memory information")
-	flag.BoolVar(flagNet, "net", false, "Show network information")
-	flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
-	flag.BoolVar(flagAI, "ai", false, "Show AI training information")
-	flag.BoolVar(flagMining, "mining", false, "Show mining information")
-	
-	// ИСПРАВЛЕНИЕ: регистрируем каждый флаг только ОДИН раз
-	flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
-	flag.BoolVar(flagVideo, "video", false, "Show video stream information")
-	
-	// Короткие варианты (если нужны) - как отдельные флаги
-	flag.BoolVar(flagAudio, "au", false, "Show audio stream information (short)")
-	flag.BoolVar(flagVideo, "vi", false, "Show video stream information (short)")
-	
+	// Регистрируем только альтернативные имена для общих флагов
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
@@ -228,6 +221,7 @@ func main() {
 	}
 
 	// Определяем какие модули показывать на основе флагов
+	// Объединяем короткие и длинные версии флагов
 	showDisk := *flagDisk || *flagAll
 	showCPU := *flagCPU || *flagAll
 	showMem := *flagMem || *flagAll
@@ -235,12 +229,13 @@ func main() {
 	showGPU := *flagGPU || *flagAll
 	showAI := *flagAI || *flagAll
 	showMining := *flagMining || *flagAll
-	showAudio := *flagAudio || *flagAll
-	showVideo := *flagVideo || *flagAll
+	showAudio := *flagAudio || *flagAudioShort || *flagAll
+	showVideo := *flagVideo || *flagVideoShort || *flagAll
 
 	// NEW: Smart default behavior - use last used modules if no flags provided
 	noFlagsProvided := !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && 
-	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAudio && !*flagVideo && !*flagAll
+	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAudio && 
+	                  !*flagAudioShort && !*flagVideo && !*flagVideoShort && !*flagAll
 
 	if noFlagsProvided {
 		// Check if we have last used modules saved
