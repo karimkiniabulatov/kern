@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"math/rand"
 )
 
 type AudioInfo struct {
@@ -16,6 +17,11 @@ type AudioInfo struct {
 	SampleRate      string
 	BitDepth        string
 	Latency         string
+	
+	// NEW: Для гистограмм
+	FrequencyBands  []float64 // Частотные полосы для спектр-анализатора (0-100%)
+	PeakLevel       float64   // Пиковый уровень для VU-метра (0-100%)
+	RMSLevel        float64   // Среднеквадратичный уровень (0-100%)
 }
 
 type AudioDevice struct {
@@ -45,6 +51,7 @@ func Summary() (*AudioInfo, error) {
 		InputDevices:  []AudioDevice{},
 		OutputDevices: []AudioDevice{},
 		ActiveStreams: []AudioStream{},
+		FrequencyBands: make([]float64, 8), // 8 частотных полос
 	}
 
 	// Detect audio devices
@@ -55,6 +62,9 @@ func Summary() (*AudioInfo, error) {
 	
 	// Get audio levels and metrics
 	info.getAudioMetrics()
+	
+	// Generate frequency spectrum data (симуляция для демонстрации)
+	info.generateFrequencyData()
 
 	return info, nil
 }
@@ -252,6 +262,9 @@ func (a *AudioInfo) getAudioMetrics() {
 	a.SampleRate = "48 kHz"
 	a.BitDepth = "16-bit"
 	a.Latency = "23.4 ms"
+	
+	// Calculate peak and RMS levels for VU meters
+	a.calculateVUMetrics()
 }
 
 func (a *AudioInfo) parseAudioLevels(output, direction string) {
@@ -275,5 +288,47 @@ func (a *AudioInfo) parseAudioLevels(output, direction string) {
 		a.InputLevel = currentLevel
 	} else {
 		a.OutputLevel = currentLevel
+	}
+}
+
+// NEW: Генерация данных для частотного спектра
+func (a *AudioInfo) generateFrequencyData() {
+	// Симуляция частотного спектра (в реальности нужно получать от аудиодрайвера)
+	for i := range a.FrequencyBands {
+		// Базовый уровень шума
+		level := rand.Float64() * 20
+		
+		// Добавляем пики на разных частотах для реалистичности
+		switch i {
+		case 1, 2: // Низкие частоты
+			level += rand.Float64() * 40
+		case 3, 4: // Средние частоты  
+			level += rand.Float64() * 60
+		case 5, 6: // Высокие частоты
+			level += rand.Float64() * 30
+		}
+		
+		if level > 100 {
+			level = 100
+		}
+		a.FrequencyBands[i] = level
+	}
+}
+
+// NEW: Расчет метрик для VU-метров
+func (a *AudioInfo) calculateVUMetrics() {
+	// Конвертируем dB уровни в проценты для VU-метров
+	// -96dB = 0%, 0dB = 100%
+	a.PeakLevel = (a.InputLevel + 96) / 96 * 100
+	if a.PeakLevel < 0 {
+		a.PeakLevel = 0
+	} else if a.PeakLevel > 100 {
+		a.PeakLevel = 100
+	}
+	
+	// RMS обычно на 6-12dB ниже пика
+	a.RMSLevel = a.PeakLevel * 0.7
+	if a.RMSLevel < 0 {
+		a.RMSLevel = 0
 	}
 }

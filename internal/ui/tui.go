@@ -423,85 +423,143 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-// Audio rendering function
 func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
-	row := t.renderHeader(startRow, "Audio Streams", width)
+    row := t.renderHeader(startRow, t.config.T("audio.title"), width)
+    
+    switch audioData := data.(type) {
+    case *audio.AudioInfo:
+        // Input Devices с гистограммой уровня
+        if len(audioData.InputDevices) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%c Input Devices: %d", 0x266A, len(audioData.InputDevices)), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            
+            // VU-метр входного сигнала
+            inputGraph := t.createCompactGraph(audioData.PeakLevel, 12)
+            row = t.printLine(row, 2, fmt.Sprintf("Input Level: %s %.1f dB", inputGraph, audioData.InputLevel), 
+                tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+        }
 
-	switch audioData := data.(type) {
-	case *audio.AudioInfo:
-		// Input devices
-		if len(audioData.InputDevices) > 0 {
-			row = t.printLine(row, 0, "Input Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
-			for i, device := range audioData.InputDevices {
-				if i >= 2 { // Limit to 2 devices
-					break
-				}
-				row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
-					tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-			}
-		}
+        // Output Devices с гистограммой уровня  
+        if len(audioData.OutputDevices) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%c Output Devices: %d", 0x266B, len(audioData.OutputDevices)), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+            
+            // VU-метр выходного сигнала
+            outputGraph := t.createCompactGraph(audioData.PeakLevel, 12)
+            row = t.printLine(row, 2, fmt.Sprintf("Output Level: %s %.1f dB", outputGraph, audioData.OutputLevel),
+                tcell.StyleDefault.Foreground(tcell.ColorLightGreen), width)
+        }
 
-		// Output devices
-		if len(audioData.OutputDevices) > 0 {
-			row = t.printLine(row, 0, "Output Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
-			for i, device := range audioData.OutputDevices {
-				if i >= 2 { // Limit to 2 devices
-					break
-				}
-				row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
-					tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
-			}
-		}
+        // Частотный спектр (гистограмма)
+        if len(audioData.FrequencyBands) > 0 {
+            row = t.printLine(row, 0, "Frequency Spectrum:", tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+            
+            // Создаем многострочную гистограмму спектра
+            spectrumRows := t.createSpectrumGraph(audioData.FrequencyBands, 4, 8) // 4 строки высотой, 8 полос
+            for _, spectrumLine := range spectrumRows {
+                row = t.printLine(row, 2, spectrumLine, tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
+            }
+        }
 
-		// Active streams
-		if len(audioData.ActiveStreams) > 0 {
-			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorGreen).Bold(true), width)
-			for i, stream := range audioData.ActiveStreams {
-				if i >= 3 { // Limit to 3 streams
-					break
-				}
-				streamType := "Playback"
-				if stream.Type == "capture" {
-					streamType = "Capture"
-				}
-				row = t.printLine(row, 2, fmt.Sprintf("%s: %s (%s)", streamType, stream.Process, stream.Format), 
-					tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
-			}
-		} else {
-			row = t.printLine(row, 0, "No active audio streams", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
-		}
+        // Active Streams с индикаторами активности
+        if len(audioData.ActiveStreams) > 0 {
+            row = t.printLine(row, 0, fmt.Sprintf("%c Active Streams: %d", 0x266C, len(audioData.ActiveStreams)), 
+                tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+            
+            for i, stream := range audioData.ActiveStreams {
+                if i >= 3 { // Ограничиваем количество отображаемых потоков
+                    row = t.printLine(row, 2, fmt.Sprintf("... and %d more", len(audioData.ActiveStreams)-3), 
+                        tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+                    break
+                }
+                
+                // Индикатор активности потока
+                activity := float64(stream.SampleRate) / 192000.0 * 100
+                if activity > 100 {
+                    activity = 100
+                }
+                streamGraph := t.createCompactGraph(activity, 8)
+                
+                streamType := "CAP"
+                if stream.Type == "playback" {
+                    streamType = "PLAY"
+                }
+                
+                row = t.printLine(row, 2, fmt.Sprintf("%s [%s]: %s %dHz %dch", 
+                    stream.Process, streamType, streamGraph, stream.SampleRate, stream.Channels),
+                    tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
+            }
+        } else {
+            row = t.printLine(row, 0, "No active audio streams", 
+                tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+        }
 
-		// Audio levels
-		if audioData.InputLevel != 0 || audioData.OutputLevel != 0 {
-			row = t.printLine(row, 0, "Audio Levels:", tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true), width)
-			
-			if audioData.InputLevel != 0 {
-				inputGraph := t.createCompactGraph((audioData.InputLevel + 96) / 96 * 100, 10)
-				row = t.printLine(row, 2, fmt.Sprintf("Input: %s %.1f dB", inputGraph, audioData.InputLevel), 
-					tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
-			}
-			
-			if audioData.OutputLevel != 0 {
-				outputGraph := t.createCompactGraph((audioData.OutputLevel + 96) / 96 * 100, 10)
-				row = t.printLine(row, 2, fmt.Sprintf("Output: %s %.1f dB", outputGraph, audioData.OutputLevel), 
-					tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
-			}
-		}
+        // Audio Metrics
+        row = t.printLine(row, 0, fmt.Sprintf("Sample Rate: %s | Bit Depth: %s", 
+            audioData.SampleRate, audioData.BitDepth), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+        row = t.printLine(row, 0, fmt.Sprintf("Latency: %s", audioData.Latency), 
+            tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
-		// Audio metrics
-		row = t.printLine(row, 0, fmt.Sprintf("Sample Rate: %s | Bit Depth: %s | Latency: %s", 
-			audioData.SampleRate, audioData.BitDepth, audioData.Latency), 
-			tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+    case map[string]string:
+        if errorMsg, exists := audioData["error"]; exists {
+            row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), 
+                tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+        }
+    default:
+        row = t.printLine(row, 0, "No audio data available", 
+            tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+    }
+    return row + 1
+}
 
-	case map[string]string:
-		// Handle error case
-		if errorMsg, exists := audioData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
-		}
-	default:
-		row = t.printLine(row, 0, "No audio data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
-	}
-	return row + 1
+// NEW: Функция для создания многострочной гистограммы спектра
+func (t *TUI) createSpectrumGraph(bands []float64, height int, width int) []string {
+    if len(bands) == 0 {
+        return []string{"[no data]"}
+    }
+
+    rows := make([]string, height)
+    for i := range rows {
+        rows[i] = ""
+    }
+
+    // Нормализуем ширину полос
+    bandWidth := width / len(bands)
+    if bandWidth < 1 {
+        bandWidth = 1
+    }
+
+    for bandIdx, level := range bands {
+        // Высота столбца от 0 до height
+        barHeight := int((level / 100) * float64(height))
+        if barHeight > height {
+            barHeight = height
+        }
+
+        // Строим столбец снизу вверх
+        for row := height - 1; row >= 0; row-- {
+            char := " "
+            if row < barHeight {
+                // Разные символы для разных уровней
+                if row == barHeight-1 && barHeight == height {
+                    char = "█" // Верхний уровень
+                } else if row >= barHeight-2 {
+                    char = "▓" // Высокий уровень
+                } else if row >= barHeight-4 {
+                    char = "▒" // Средний уровень  
+                } else {
+                    char = "░" // Низкий уровень
+                }
+            }
+            
+            // Добавляем символы для текущей полосы
+            for w := 0; w < bandWidth; w++ {
+                rows[row] += char
+            }
+        }
+    }
+
+    return rows
 }
 
 // Video rendering function - СОВМЕСТИМАЯ ВЕРСИЯ
@@ -682,4 +740,32 @@ func (t *TUI) getDeviceType(filesystem string, mountPoint string) string {
 		return "System"
 	}
 	return "Storage"
+}
+
+// NEW: Функция для создания компактной гистограммы (добавить в конец файла)
+func (t *TUI) createCompactGraph(percentage float64, width int) string {
+    if width <= 0 {
+        width = 10
+    }
+    
+    filled := int((percentage / 100) * float64(width))
+    if filled > width {
+        filled = width
+    }
+    if filled < 0 {
+        filled = 0
+    }
+    
+    empty := width - filled
+    
+    graph := "["
+    for i := 0; i < filled; i++ {
+        graph += "█"
+    }
+    for i := 0; i < empty; i++ {
+        graph += "─"
+    }
+    graph += "]"
+    
+    return graph
 }
