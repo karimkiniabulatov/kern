@@ -504,33 +504,79 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-// Video rendering function - УПРОЩЕННАЯ ВЕРСИЯ
+// Video rendering function - СОВМЕСТИМАЯ ВЕРСИЯ
 func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, "Video Streams", width)
 
 	switch videoData := data.(type) {
 	case *video.VideoInfo:
-		// Базовая информация о видео
-		row = t.printLine(row, 0, "Video Monitoring Active", tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
-		
-		// Простая информация о доступных устройствах
-		if len(videoData.VideoDevices) > 0 {
-			row = t.printLine(row, 0, fmt.Sprintf("Devices: %d available", len(videoData.VideoDevices)), 
-				tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		// Статус кодирования
+		statusGraph := t.createCompactGraph(0, 10)
+		if videoData.EncodingStatus == "encoding" {
+			statusGraph = t.createCompactGraph(80, 10) // Примерная загрузка при кодировании
+		} else if videoData.EncodingStatus == "active" {
+			statusGraph = t.createCompactGraph(40, 10) // Примерная загрузка при активности
 		}
-		
+		row = t.printLine(row, 0, fmt.Sprintf("Status: %s %s", statusGraph, videoData.EncodingStatus), 
+			tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+
+		// Видео устройства
+		if len(videoData.VideoDevices) > 0 {
+			row = t.printLine(row, 0, "Video Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			for i, device := range videoData.VideoDevices {
+				if i >= 2 { // Limit to 2 devices
+					break
+				}
+				row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
+					tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			}
+		}
+
 		// Активные потоки
 		if len(videoData.ActiveStreams) > 0 {
-			row = t.printLine(row, 0, fmt.Sprintf("Active Streams: %d", len(videoData.ActiveStreams)), 
-				tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorGreen).Bold(true), width)
+			for i, stream := range videoData.ActiveStreams {
+				if i >= 3 { // Limit to 3 streams
+					break
+				}
+				row = t.printLine(row, 2, fmt.Sprintf("%s: %s (%s)", stream.Type, stream.Process, stream.Codec), 
+					tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+			}
 		} else {
 			row = t.printLine(row, 0, "No active video streams", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 		}
 
 		// GPU энкодеры
 		if len(videoData.GPUEncoders) > 0 {
-			row = t.printLine(row, 0, fmt.Sprintf("GPU Encoders: %d available", len(videoData.GPUEncoders)), 
-				tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+			row = t.printLine(row, 0, "GPU Encoders:", tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true), width)
+			for i, encoder := range videoData.GPUEncoders {
+				if i >= 2 { // Limit to 2 encoders
+					break
+				}
+				status := "idle"
+				if encoder.Active {
+					status = "active"
+				}
+				utilGraph := t.createCompactGraph(encoder.Utilization, 10)
+				row = t.printLine(row, 2, fmt.Sprintf("%s [%s] %s %.1f%%", 
+					encoder.Name, encoder.Type, utilGraph, encoder.Utilization), 
+					tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+			}
+		}
+
+		// Видео метрики
+		if videoData.Framerate > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("Resolution: %s | FPS: %.1f | Bitrate: %s", 
+				videoData.Resolution, videoData.Framerate, videoData.Bitrate), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		}
+
+		// Использование GPU
+		if videoData.GPUUtilization > 0 {
+			gpuGraph := t.createCompactGraph(videoData.GPUUtilization, 10)
+			row = t.printLine(row, 0, fmt.Sprintf("GPU Utilization: %s %.1f%%", 
+				gpuGraph, videoData.GPUUtilization), 
+				tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 		}
 
 	case map[string]string:
@@ -561,7 +607,7 @@ func (t *TUI) renderFooter(startRow int, width int, height int) {
 }
 
 func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	screenWidth, screenHeight := t.screen.Size()
+	_, screenHeight := t.screen.Size()
 	if row >= screenHeight-1 {
 		return row
 	}
@@ -586,7 +632,7 @@ func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, wid
 }
 
 func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	screenWidth, screenHeight := t.screen.Size()
+	_, screenHeight := t.screen.Size()
 	if row < 0 || row >= screenHeight {
 		return
 	}
