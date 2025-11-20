@@ -13,6 +13,8 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/gpu"
 	"github.com/karimkiniabulatov/kern/internal/ai"
 	"github.com/karimkiniabulatov/kern/internal/mining"
+	"github.com/karimkiniabulatov/kern/internal/audio"
+	"github.com/karimkiniabulatov/kern/internal/video"
 )
 
 type TUI struct {
@@ -76,24 +78,38 @@ func (t *TUI) Render(data map[string]interface{}) {
 		}
 	}
 
-	// NEW: GPU monitoring
+	// GPU monitoring
 	if t.config.ShowGPU {
 		if gpuData, exists := data["gpu"]; exists {
 			row = t.renderGPU(row, width, gpuData)
 		}
 	}
 
-	// NEW: AI training monitoring  
+	// AI training monitoring  
 	if t.config.ShowAI {
 		if aiData, exists := data["ai"]; exists {
 			row = t.renderAI(row, width, aiData)
 		}
 	}
 
-	// NEW: Mining monitoring
+	// Mining monitoring
 	if t.config.ShowMining {
 		if miningData, exists := data["mining"]; exists {
 			row = t.renderMining(row, width, miningData)
+		}
+	}
+
+	// Audio monitoring
+	if t.config.ShowAudio {
+		if audioData, exists := data["audio"]; exists {
+			row = t.renderAudio(row, width, audioData)
+		}
+	}
+
+	// Video monitoring
+	if t.config.ShowVideo {
+		if videoData, exists := data["video"]; exists {
+			row = t.renderVideo(row, width, videoData)
 		}
 	}
 
@@ -229,7 +245,7 @@ func (t *TUI) renderNetwork(startRow int, width int, data interface{}) int {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
 					"Activity", activityGraph, netInfo.ActivityPercent), tcell.StyleDefault.Foreground(tcell.ColorFuchsia), width)
 
-				row = t.printLine(row, 0, fmt.Sprintf("%s: %s↓ / %s↑",
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s / %s↑",
 					"Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 				count++
@@ -242,7 +258,7 @@ func (t *TUI) renderNetwork(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-// NEW: GPU rendering function
+// GPU rendering function
 func (t *TUI) renderGPU(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("gpu.title"), width)
 
@@ -257,7 +273,7 @@ func (t *TUI) renderGPU(startRow int, width int, data interface{}) int {
 		
 		if gpuData.GPUTemp > 0 {
 			tempGraph := t.createCompactGraph(gpuData.GPUTemp, 10)
-			row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f°C", 
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1fC", 
 				t.config.T("gpu.temperature"), tempGraph, gpuData.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 		}
 
@@ -294,7 +310,7 @@ func (t *TUI) renderGPU(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-// NEW: AI training rendering function
+// AI training rendering function
 func (t *TUI) renderAI(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("ai.title"), width)
 
@@ -345,7 +361,7 @@ func (t *TUI) renderAI(startRow int, width int, data interface{}) int {
 	return row + 1
 }
 
-// NEW: Mining rendering function
+// Mining rendering function
 func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("mining.title"), width)
 
@@ -370,7 +386,7 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 
 			if miningData.Temperature > 0 {
 				tempGraph := t.createCompactGraph(miningData.Temperature, 10)
-				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f°C", 
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1fC", 
 					t.config.T("mining.temperature"), tempGraph, miningData.Temperature), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 			}
 
@@ -408,6 +424,197 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 		}
 	default:
 		row = t.printLine(row, 0, t.config.T("mining.not_detected"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+	}
+	return row + 1
+}
+
+// Audio rendering function
+func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("audio.title"), width)
+
+	switch audioData := data.(type) {
+	case *audio.AudioInfo:
+		// Input devices
+		if len(audioData.InputDevices) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("audio.input_devices")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			for i, device := range audioData.InputDevices {
+				if i < 2 { // Show max 2 devices
+					statusColor := tcell.ColorGreen
+					if device.Status != "active" {
+						statusColor = tcell.ColorGray
+					}
+					row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
+						tcell.StyleDefault.Foreground(statusColor), width)
+				}
+			}
+		}
+
+		// Output devices
+		if len(audioData.OutputDevices) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("audio.output_devices")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			for i, device := range audioData.OutputDevices {
+				if i < 2 { // Show max 2 devices
+					statusColor := tcell.ColorGreen
+					if device.Status != "active" {
+						statusColor = tcell.ColorGray
+					}
+					row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
+						tcell.StyleDefault.Foreground(statusColor), width)
+				}
+			}
+		}
+
+		// Audio levels
+		if audioData.InputLevel != 0 || audioData.OutputLevel != 0 {
+			inputGraph := t.createCompactGraph((audioData.InputLevel+96)/96*100, 10)
+			outputGraph := t.createCompactGraph((audioData.OutputLevel+96)/96*100, 10)
+			
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f dB", 
+				t.config.T("audio.input_level"), inputGraph, audioData.InputLevel), 
+				tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f dB", 
+				t.config.T("audio.output_level"), outputGraph, audioData.OutputLevel), 
+				tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+		}
+
+		// Active streams
+		if len(audioData.ActiveStreams) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %d", 
+				t.config.T("audio.active_streams"), len(audioData.ActiveStreams)), 
+				tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+			
+			for i, stream := range audioData.ActiveStreams {
+				if i < 2 { // Show max 2 streams
+					row = t.printLine(row, 2, fmt.Sprintf("%s (%s)", stream.Process, stream.Type), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				}
+			}
+		} else {
+			row = t.printLine(row, 0, t.config.T("audio.no_streams"), 
+				tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+		}
+
+		// Audio metrics
+		if audioData.SampleRate != "" {
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %s | %s: %s", 
+				t.config.T("audio.sample_rate"), audioData.SampleRate,
+				t.config.T("audio.bit_depth"), audioData.BitDepth,
+				t.config.T("audio.latency"), audioData.Latency), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+		}
+
+	case map[string]string:
+		// Handle error case
+		if errorMsg, exists := audioData["error"]; exists {
+			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+		}
+	default:
+		row = t.printLine(row, 0, t.config.T("audio.no_data"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+	}
+	return row + 1
+}
+
+// Video rendering function
+func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
+	row := t.renderHeader(startRow, t.config.T("video.title"), width)
+
+	switch videoData := data.(type) {
+	case *video.VideoInfo:
+		// Video devices
+		if len(videoData.VideoDevices) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("video.devices")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			for i, device := range videoData.VideoDevices {
+				if i < 2 { // Show max 2 devices
+					statusColor := tcell.ColorGreen
+					if device.Status != "active" {
+						statusColor = tcell.ColorGray
+					}
+					row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", device.Name, device.Status), 
+						tcell.StyleDefault.Foreground(statusColor), width)
+				}
+			}
+		}
+
+		// GPU encoders
+		if len(videoData.GPUEncoders) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s:", t.config.T("video.encoders")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			for i, encoder := range videoData.GPUEncoders {
+				if i < 2 { // Show max 2 encoders
+					activeStatus := "inactive"
+					activeColor := tcell.ColorGray
+					if encoder.Active {
+						activeStatus = "active"
+						activeColor = tcell.ColorGreen
+					}
+					
+					row = t.printLine(row, 2, fmt.Sprintf("%s [%s]", encoder.Name, activeStatus), 
+						tcell.StyleDefault.Foreground(activeColor), width)
+					
+					if encoder.Utilization > 0 {
+						utilGraph := t.createCompactGraph(encoder.Utilization, 10)
+						row = t.printLine(row, 4, fmt.Sprintf("%s: %s %.1f%%", 
+							t.config.T("video.utilization"), utilGraph, encoder.Utilization), 
+							tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+					}
+				}
+			}
+		}
+
+		// Active streams
+		if len(videoData.ActiveStreams) > 0 {
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %d", 
+				t.config.T("video.active_streams"), len(videoData.ActiveStreams)), 
+				tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+			
+			for i, stream := range videoData.ActiveStreams {
+				if i < 2 { // Show max 2 streams
+					row = t.printLine(row, 2, fmt.Sprintf("%s (%s)", stream.Process, stream.Type), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+				}
+			}
+		} else {
+			row = t.printLine(row, 0, t.config.T("video.no_streams"), 
+				tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+		}
+
+		// Video metrics
+		if videoData.EncodingStatus != "idle" {
+			statusColor := tcell.ColorGray
+			if videoData.EncodingStatus == "encoding" {
+				statusColor = tcell.ColorLightCoral
+			} else if videoData.EncodingStatus == "active" {
+				statusColor = tcell.ColorGreen
+			}
+			
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+				t.config.T("video.status"), videoData.EncodingStatus), 
+				tcell.StyleDefault.Foreground(statusColor), width)
+			
+			if videoData.Resolution != "" && videoData.Resolution != "N/A" {
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s | %s: %.1f fps | %s: %s", 
+					t.config.T("video.resolution"), videoData.Resolution,
+					t.config.T("video.frame_rate"), videoData.FrameRate,
+					t.config.T("video.bitrate"), videoData.Bitrate), 
+					tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			}
+
+			if videoData.Codec != "" && videoData.Codec != "N/A" {
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+					t.config.T("video.codec"), videoData.Codec), 
+					tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			}
+		} else {
+			row = t.printLine(row, 0, t.config.T("video.idle"), 
+				tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+		}
+
+	case map[string]string:
+		// Handle error case
+		if errorMsg, exists := videoData["error"]; exists {
+			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+		}
+	default:
+		row = t.printLine(row, 0, t.config.T("video.no_data"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 	}
 	return row + 1
 }

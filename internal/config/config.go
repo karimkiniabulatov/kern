@@ -21,6 +21,8 @@ type Config struct {
 	ShowGPU     bool   `json:"show_gpu"`
 	ShowAI      bool   `json:"show_ai"`
 	ShowMining  bool   `json:"show_mining"`
+	ShowAudio   bool   `json:"show_audio"`
+	ShowVideo   bool   `json:"show_video"`
 	
 	// NEW: User preferences for default view
 	LastUsedModules *ModulePreferences `json:"last_used_modules,omitempty"`
@@ -34,6 +36,8 @@ type ModulePreferences struct {
 	ShowGPU    bool `json:"show_gpu"`
 	ShowAI     bool `json:"show_ai"`
 	ShowMining bool `json:"show_mining"`
+	ShowAudio  bool `json:"show_audio"`
+	ShowVideo  bool `json:"show_video"`
 }
 
 func (c *Config) T(key string) string {
@@ -41,7 +45,7 @@ func (c *Config) T(key string) string {
 }
 
 // UpdateLastUsedModules updates the last used module preferences
-func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining bool) {
+func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining, showAudio, showVideo bool) {
 	if c.LastUsedModules == nil {
 		c.LastUsedModules = &ModulePreferences{}
 	}
@@ -53,6 +57,8 @@ func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, show
 	c.LastUsedModules.ShowGPU = showGPU
 	c.LastUsedModules.ShowAI = showAI
 	c.LastUsedModules.ShowMining = showMining
+	c.LastUsedModules.ShowAudio = showAudio
+	c.LastUsedModules.ShowVideo = showVideo
 	
 	// Save the updated config
 	c.Save()
@@ -68,6 +74,8 @@ func (c *Config) UseLastUsedModules() {
 		c.ShowGPU = c.LastUsedModules.ShowGPU
 		c.ShowAI = c.LastUsedModules.ShowAI
 		c.ShowMining = c.LastUsedModules.ShowMining
+		c.ShowAudio = c.LastUsedModules.ShowAudio
+		c.ShowVideo = c.LastUsedModules.ShowVideo
 	}
 }
 
@@ -142,6 +150,8 @@ func getDefaultConfig(language string) *Config {
 		ShowGPU:     false,
 		ShowAI:      false,
 		ShowMining:  false,
+		ShowAudio:   false,
+		ShowVideo:   false,
 	}
 }
 
