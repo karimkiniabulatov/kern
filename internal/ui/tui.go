@@ -156,7 +156,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 10)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
@@ -487,18 +487,17 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, stream := range videoData.ActiveStreams {
 				streamInfo := fmt.Sprintf("%s (%s)", stream.Process, stream.Type)
-				if stream.Format != "" {
-					streamInfo += fmt.Sprintf(" - %s", stream.Format)
+				if stream.Codec != "" {
+					streamInfo += fmt.Sprintf(" - %s", stream.Codec)
 				}
 				row = t.printLine(row, 2, streamInfo, tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
 		}
 
-		// GPU encoders - проверяем существование поля
+		// GPU encoders
 		if videoData.GPUEncoders != nil && len(videoData.GPUEncoders) > 0 {
 			row = t.printLine(row, 0, "GPU Encoders:", tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 			for _, encoder := range videoData.GPUEncoders {
-				// Используем доступные поля
 				encoderInfo := encoder.Name
 				if encoder.Type != "" {
 					encoderInfo += fmt.Sprintf(" (%s)", encoder.Type)
@@ -507,7 +506,7 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			}
 		}
 
-		// Encoding status - используем доступные поля
+		// Encoding status
 		if videoData.EncodingStatus != "" {
 			statusColor := tcell.ColorGray
 			if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
@@ -516,15 +515,25 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			row = t.printLine(row, 0, fmt.Sprintf("Encoding: %s", videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor), width)
 		}
 
-		// Performance metrics - используем доступные поля
+		// Performance metrics
 		if videoData.Bitrate != "" {
 			performanceInfo := fmt.Sprintf("Bitrate: %s", videoData.Bitrate)
 			if videoData.Resolution != "" {
 				performanceInfo += fmt.Sprintf(" | Resolution: %s", videoData.Resolution)
 			}
+			if videoData.FrameRate > 0 {
+				performanceInfo += fmt.Sprintf(" | %.1f FPS", videoData.FrameRate)
+			}
+			if videoData.Codec != "" {
+				performanceInfo += fmt.Sprintf(" | %s", videoData.Codec)
+			}
 			row = t.printLine(row, 0, performanceInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		} else if videoData.Resolution != "" {
-			row = t.printLine(row, 0, fmt.Sprintf("Resolution: %s", videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			resolutionInfo := fmt.Sprintf("Resolution: %s", videoData.Resolution)
+			if videoData.FrameRate > 0 {
+				resolutionInfo += fmt.Sprintf(" | %.1f FPS", videoData.FrameRate)
+			}
+			row = t.printLine(row, 0, resolutionInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 
 	default:
@@ -558,7 +567,8 @@ func (t *TUI) renderFooter(startRow int, width int, height int) {
 }
 
 func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	if row < 0 || row >= t.screen.Size().Height {
+	screenWidth, screenHeight := t.screen.Size()
+	if row < 0 || row >= screenHeight {
 		return
 	}
 	
@@ -576,7 +586,8 @@ func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) 
 }
 
 func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	if row < 0 || row >= t.screen.Size().Height {
+	screenWidth, screenHeight := t.screen.Size()
+	if row < 0 || row >= screenHeight {
 		return row
 	}
 	
