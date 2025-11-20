@@ -49,6 +49,13 @@ dev:
 	@echo "Starting in development mode..."
 	go run ./cmd/kern --all --refresh=1
 
+# Clean development build - always recreates dependencies
+dev-clean:
+	@echo "Clean development build..."
+	rm -f go.sum
+	go mod download
+	go build -o bin/$(BINARY_NAME) ./cmd/kern
+
 .PHONY: docker
 docker:
 	@echo "Building Docker image..."
