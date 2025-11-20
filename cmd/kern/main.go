@@ -82,11 +82,13 @@ func main() {
 	flag.BoolVar(flagAI, "ai", false, "Show AI training information")
 	flag.BoolVar(flagMining, "mining", false, "Show mining information")
 	
-	// ИСПРАВЛЕНО: регистрируем разные флаги для коротких и длинных вариантов audio/video
-	flag.BoolVar(flagAudio, "au", false, "Show audio stream information")
+	// ИСПРАВЛЕНИЕ: регистрируем каждый флаг только ОДИН раз
 	flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
-	flag.BoolVar(flagVideo, "vi", false, "Show video stream information")
 	flag.BoolVar(flagVideo, "video", false, "Show video stream information")
+	
+	// Короткие варианты (если нужны) - как отдельные флаги
+	flag.BoolVar(flagAudio, "au", false, "Show audio stream information (short)")
+	flag.BoolVar(flagVideo, "vi", false, "Show video stream information (short)")
 	
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
