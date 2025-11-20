@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -84,12 +85,21 @@ func getDaemonConfigPath() (string, error) {
 }
 
 func getDefaultDaemonConfig() *DaemonConfig {
+	// Кроссплатформенные пути по умолчанию
+	logFile := "/var/log/kern-daemon.log"
+	pidFile := "/tmp/kern-daemon.pid"
+	
+	if runtime.GOOS == "windows" {
+		logFile = filepath.Join(os.TempDir(), "kern-daemon.log")
+		pidFile = filepath.Join(os.TempDir(), "kern-daemon.pid")
+	}
+
 	return &DaemonConfig{
 		Enabled:   true,  // ВКЛЮЧЕНО по умолчанию!
 		Port:      28126,
 		AutoStart: true,  // АВТОСТАРТ по умолчанию!
-		LogFile:   "/var/log/kern-daemon.log",
-		PIDFile:   "/tmp/kern-daemon.pid",
+		LogFile:   logFile,
+		PIDFile:   pidFile,
 	}
 }
 
@@ -97,7 +107,7 @@ func getDefaultDaemonConfig() *DaemonConfig {
 func (dm *DaemonManager) StartDaemon() error {
 	// Если уже запущен, останавливаем сначала
 	if dm.IsRunning() {
-		log.Println("⚠️ Daemon already running, restarting...")
+		log.Println("Daemon already running, restarting...")
 		dm.StopDaemon()
 		time.Sleep(2 * time.Second)
 	}
@@ -114,18 +124,22 @@ func (dm *DaemonManager) StartDaemon() error {
 
 	cmd := exec.Command("kern", cmdArgs...)
 	
-	// Направляем вывод в лог файл или в /dev/null
+	// Направляем вывод в лог файл или в /dev/null (nul на Windows)
 	if dm.config.LogFile != "" {
 		logFile, err := os.OpenFile(dm.config.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
-			log.Printf("⚠️ Cannot open log file: %v, using stdout", err)
+			log.Printf("Cannot open log file: %v, using stdout", err)
 		} else {
 			cmd.Stdout = logFile
 			cmd.Stderr = logFile
 		}
 	} else {
-		// Если лог файл не указан, направляем в /dev/null
-		nullFile, _ := os.OpenFile("/dev/null", os.O_WRONLY, 0644)
+		// Если лог файл не указан, направляем в nul (/dev/null на Unix)
+		nullPath := "/dev/null"
+		if runtime.GOOS == "windows" {
+			nullPath = "nul"
+		}
+		nullFile, _ := os.OpenFile(nullPath, os.O_WRONLY, 0644)
 		cmd.Stdout = nullFile
 		cmd.Stderr = nullFile
 	}
@@ -137,7 +151,7 @@ func (dm *DaemonManager) StartDaemon() error {
 
 	// Сохраняем PID
 	if err := dm.savePID(cmd.Process.Pid); err != nil {
-		log.Printf("⚠️ Failed to save PID: %v", err)
+		log.Printf("Failed to save PID: %v", err)
 	}
 
 	// Ждем немного чтобы сервер успел запуститься
@@ -150,7 +164,7 @@ func (dm *DaemonManager) StartDaemon() error {
 		return fmt.Errorf("daemon started but API server is not responding")
 	}
 
-	log.Printf("✅ kern daemon started successfully on port %d (PID: %d)", dm.config.Port, cmd.Process.Pid)
+	log.Printf("kern daemon started successfully on port %d (PID: %d)", dm.config.Port, cmd.Process.Pid)
 	return nil
 }
 
@@ -194,16 +208,16 @@ func (dm *DaemonManager) StopDaemon() error {
 	time.Sleep(1 * time.Second)
 	dm.removePID()
 	
-	log.Printf("✅ kern daemon stopped (PID: %d)", pid)
+	log.Printf("kern daemon stopped (PID: %d)", pid)
 	return nil
 }
 
 // RestartDaemon restarts the daemon
 func (dm *DaemonManager) RestartDaemon() error {
-	log.Println("🔄 Restarting kern daemon...")
+	log.Println("Restarting kern daemon...")
 	
 	if err := dm.StopDaemon(); err != nil {
-		log.Printf("⚠️ Could not stop daemon: %v", err)
+		log.Printf("Could not stop daemon: %v", err)
 	}
 
 	time.Sleep(2 * time.Second)
@@ -272,7 +286,7 @@ func (dm *DaemonManager) EnableAutoStart() error {
 		}
 	}
 
-	log.Printf("✅ Auto-start enabled and daemon started on port %d", dm.config.Port)
+	log.Printf("Auto-start enabled and daemon started on port %d", dm.config.Port)
 	return nil
 }
 
@@ -284,7 +298,7 @@ func (dm *DaemonManager) DisableAutoStart() error {
 		return fmt.Errorf("failed to save config: %v", err)
 	}
 
-	log.Printf("✅ Auto-start disabled for kern daemon")
+	log.Printf("Auto-start disabled for kern daemon")
 	return nil
 }
 
@@ -298,7 +312,7 @@ func (dm *DaemonManager) EnsureRunning() error {
 		return fmt.Errorf("daemon is disabled in configuration")
 	}
 
-	log.Println("🚀 Starting kern daemon (ensure running)...")
+	log.Println("Starting kern daemon (ensure running)...")
 	return dm.StartDaemon()
 }
 
@@ -315,7 +329,12 @@ func (dm *DaemonManager) UpdateConfig(newConfig *DaemonConfig) error {
 
 func (dm *DaemonManager) savePID(pid int) error {
 	if dm.config.PIDFile == "" {
-		dm.config.PIDFile = "/tmp/kern-daemon.pid"
+		// Кроссплатформенный путь по умолчанию
+		if runtime.GOOS == "windows" {
+			dm.config.PIDFile = filepath.Join(os.TempDir(), "kern-daemon.pid")
+		} else {
+			dm.config.PIDFile = "/tmp/kern-daemon.pid"
+		}
 	}
 	return os.WriteFile(dm.config.PIDFile, []byte(strconv.Itoa(pid)), 0644)
 }

@@ -1,4 +1,4 @@
-.TH KERN 1 "2025-11-03" "kern v1.2.0" "System Monitoring Tool"
+.TH KERN 1 "2025-11-03" "kern v1.2.1" "System Monitoring Tool"
 .SH NAME
 kern \- real-time system monitoring tool with TUI and REST API
 
@@ -69,8 +69,13 @@ Intel and Apple Silicon (AMD64, ARM64)
 .B Windows:
 AMD64 architecture
 
-.B Android:
-ARM64 architecture (via terminal emulators)
+.SH LANGUAGE SUPPORT
+.B kern
+supports 50+ languages with automatic download capability.
+.SS Supported Languages
+ar(Arabic), ba(Bashkir), be(Belarusian), bg(Bulgarian), bn(Bengali), bo(Tibetan), bs(Bosnian), cs(Czech), cv(Chuvash), da(Danish), de(German), el(Greek), en(English), es(Spanish), et(Estonian), fa(Persian), fi(Finnish), fr(French), gu(Gujarati), he(Hebrew), hi(Hindi), hr(Croatian), hu(Hungarian), hy(Armenian), id(Indonesian), it(Italian), ja(Japanese), ka(Georgian), kk(Kazakh), ko(Korean), ky(Kyrgyz), lt(Lithuanian), lv(Latvian), mk(Macedonian), ml(Malayalam), mn(Mongolian), mr(Marathi), ms(Malay), nb(Norwegian Bokmål), ne(Nepali), nl(Dutch), pl(Polish), pt(Portuguese), ro(Romanian), ru(Russian), si(Sinhala), sk(Slovak), sl(Slovenian), sq(Albanian), sr(Serbian), sv(Swedish), ta(Tamil), te(Telugu), th(Thai), tl(Tagalog), tr(Turkish), tt(Tatar), uk(Ukrainian), ur(Urdu), uz(Uzbek), vi(Vietnamese), zh(Chinese)
+
+For correct display of non-Latin alphabets, the corresponding language fonts must be installed on your system.
 
 .SH OPTIONS
 .TP
@@ -123,13 +128,16 @@ Monitor remote server via HTTP/HTTPS API. URL should be in format http://host:po
 Monitor remote server via SSH. Format should be user@hostname.
 .TP
 .BI \-\-download-lang " CODE"
-Download language pack for specified language code. The language will be available for use after download.
+Download language pack for specified language code.
 .TP
 .B \-\-list-languages
-List all supported language codes with their full names.
+List all supported language codes.
 .TP
 .B \-\-logo
-Show application logo during monitoring display.
+Show application logo during monitoring.
+.TP
+.B \-\-daemon
+Start kern as a daemon service.
 .TP
 .B \-\-start-service
 Start the kern daemon service.
@@ -141,359 +149,91 @@ Stop the kern daemon service.
 Restart the kern daemon service.
 .TP
 .B \-\-service-status
-Show daemon service status information.
+Show daemon service status.
 .TP
 .B \-\-enable-service
-Enable auto-start of kern daemon on system boot.
+Enable auto-start on system boot.
 .TP
 .B \-\-disable-service
-Disable auto-start of kern daemon.
+Disable auto-start on system boot.
 .TP
 .B \-\-ensure-running
-Ensure daemon is running (automatically starts if not running).
+Ensure daemon service is running.
 
-.SH AUTOMATIC BACKGROUND API
-.B kern
-automatically starts a background API server on port 28126 during installation. This server provides REST API access to all monitoring data without requiring manual intervention.
-
-The API server starts automatically on system boot if auto-start is enabled (default behavior).
-
-.SH TUI CONTROLS
-When running in interactive TUI mode, the following controls are available:
-.TP
-.B q ", " Q ", " ESC
-Quit the application gracefully.
-.TP
-.B Ctrl+C
-Quit the application (same as q).
-.TP
-.B Terminal Resize
-Interface automatically adapts to terminal size changes and redraws appropriately.
-
-.SH SMART MODULE PREFERENCES
-.B kern
-automatically remembers which modules you used last and will show them when you run the program without any arguments.
-
-Example:
-.IP
-$ kern --gpu --ai
-.br
-# kern remembers GPU and AI modules
-.br
-$ kern
-.br
-# Shows only GPU and AI information (your last used modules)
-.br
-$ kern --all
-.br
-# Resets to show all modules
-
-.SH REMOTE MONITORING
-.B kern
-supports multiple remote monitoring protocols for distributed system monitoring:
-
-.SS HTTP/HTTPS API
-Access kern API servers running on remote machines:
-.IP
-.B Remote machine:
-kern -r 28126
-.br
-.B Local machine:
-kern --api http://remote-ip:28126
-.SS SSH Monitoring
-Execute kern directly on remote machines via SSH:
-.IP
-kern --ssh user@remote-host
-.br
-kern --ssh user@remote-host --api http://localhost:28126
-.SS Network Access
-.IP \(bu 3
-Local Network: Access within same network segment
-.IP \(bu 3
-Global Internet: Access via public IP with port forwarding
-.IP \(bu 3
-VPN Networks: Access through corporate or private VPNs
-.IP \(bu 3
-Cloud Instances: Monitor AWS, GCP, Azure VMs
-
-.SH API ENDPOINTS
-When running in server mode (\fB-r\fR), kern provides these REST API endpoints:
-.TP
-.B GET /api/cpu
-Returns JSON with CPU information, usage, and load averages.
-.TP
-.B GET /api/mem
-Returns JSON with memory and swap usage information.
-.TP
-.B GET /api/disk
-Returns JSON with disk usage and filesystem information.
-.TP
-.B GET /api/net
-Returns JSON with network interfaces and traffic statistics.
-.TP
-.B GET /api/gpu
-Returns JSON with GPU information, temperature, and utilization.
-.TP
-.B GET /api/ai
-Returns JSON with AI training processes and VRAM usage.
-.TP
-.B GET /api/mining
-Returns JSON with mining activity and efficiency metrics.
-.TP
-.B GET /api/system
-Returns JSON with system information and kern version.
-.TP
-.B GET /health
-Returns health status check.
-.TP
-.B GET /
-Returns API information and available endpoints.
-
-.SH GPU MONITORING
-GPU monitoring requires specific drivers and utilities:
-.TP
-.B NVIDIA GPUs
-Requires nvidia-smi utility (included with NVIDIA drivers).
-Install with: sudo apt install nvidia-driver-535 nvidia-utils-535
-.TP
-.B AMD GPUs
-Requires rocm-smi utility (included with ROCm).
-Install with: sudo apt install rocm-smi-lib
-.PP
-GPU monitoring provides:
-.IP \(bu 3
-Temperature and utilization metrics
-.IP \(bu 3
-Memory usage (VRAM) and capacity
-.IP \(bu 3
-Power consumption and limits
-.IP \(bu 3
-Core and memory clock speeds
-.IP \(bu 3
-Fan speed and performance state
-.SH AI TRAINING MONITORING
-AI training detection monitors for these frameworks:
-.IP \(bu 3
-TensorFlow and Keras
-.IP \(bu 3
-PyTorch and TorchVision
-.IP \(bu 3
-HuggingFace Transformers
-.IP \(bu 3
-Jupyter notebooks
-.IP \(bu 3
-Custom training scripts
-.PP
-AI metrics include:
-.IP \(bu 3
-Active training processes count
-.IP \(bu 3
-VRAM usage and allocation
-.IP \(bu 3
-Model name and batch size
-.IP \(bu 3
-Training throughput (samples/sec)
-.IP \(bu 3
-Loss and accuracy metrics
-.IP \(bu 3
-Epoch progress and training time
-.SH MINING MONITORING
-Mining detection identifies popular mining software and algorithms:
-.TP
-.B Supported Algorithms
-RandomX (Monero), Ethash (Ethereum), SHA-256 (Bitcoin), KAWPOW (Ravencoin), BeamHash (Beam)
-.TP
-.B Detected Software
-xmrig, cgminer, bfgminer, ethminer, t-rex, lolminer, nbminer, phoenixminer, gminer
-.PP
-Mining metrics include:
-.IP \(bu 3
-Hashrate and algorithm detection
-.IP \(bu 3
-Valid and invalid shares
-.IP \(bu 3
-GPU temperature and power usage
-.IP \(bu 3
-Mining efficiency (hash/watt)
-.IP \(bu 3
-Uptime and pool information
-.IP \(bu 3
-24-hour revenue estimation
-
-.SH LANGUAGE SUPPORT
-.B kern
-supports 50+ languages with automatic download capability.
-.SS Supported Languages
-ar(Arabic), ba(Bashkir), be(Belarusian), bg(Bulgarian), bn(Bengali), bo(Tibetan), bs(Bosnian), cs(Czech), cv(Chuvash), da(Danish), de(German), el(Greek), en(English), es(Spanish), et(Estonian), fa(Persian), fi(Finnish), fr(French), gu(Gujarati), he(Hebrew), hi(Hindi), hr(Croatian), hu(Hungarian), hy(Armenian), id(Indonesian), it(Italian), ja(Japanese), ka(Georgian), kk(Kazakh), ko(Korean), ky(Kyrgyz), lt(Lithuanian), lv(Latvian), mk(Macedonian), ml(Malayalam), mn(Mongolian), mr(Marathi), ms(Malay), nb(Norwegian Bokmål), ne(Nepali), nl(Dutch), pl(Polish), pt(Portuguese), ro(Romanian), ru(Russian), si(Sinhala), sk(Slovak), sl(Slovenian), sq(Albanian), sr(Serbian), sv(Swedish), ta(Tamil), te(Telugu), th(Thai), tl(Tagalog), tr(Turkish), tt(Tatar), uk(Ukrainian), ur(Urdu), uz(Uzbek), vi(Vietnamese), zh(Chinese)
-.SS Important Note
-Language packs must be downloaded before they can be used. If you try to use a language that isn't available, kern will:
-.IP 1. 3
-Show a warning message
-.IP 2. 3
-Fall back to English
-.IP 3. 3
-Suggest the download command
-.SS Language Management
-.IP
-$ kern --list-languages
-.br
-$ kern --download-lang fr
-.br
-$ kern -l fr
-.br
-$ kern --download-lang es
-.br
-$ kern -l es
-
-.SH ANDROID SUPPORT
-.B kern
-can run on Android devices through terminal emulators like Termux, ConnectBot, or JuiceSSH.
-
-.SS Android Installation
-.IP 1. 3
-Install a terminal emulator (Termux recommended)
-.IP 2. 3
-Download the ARM64 binary for Android
-.IP 3. 3
-Make it executable: \fBchmod +x kern\fR
-.IP 4. 3
-Run: \fB./kern\fR
-
-.SS Remote Monitoring from Android
-The Android version can monitor remote systems using various protocols:
-
-.B SSH Monitoring:
-.RS
-.IP \(bu 3
-Connect to remote servers via SSH
-.IP \(bu 3
-Monitor systems in your local network or over the internet
-.IP \(bu 3
-Use built-in SSH clients in terminal emulators
-.RE
-
-.B HTTP/HTTPS API Monitoring:
-.RS  
-.IP \(bu 3
-Connect to kern API servers running on remote machines
-.IP \(bu 3
-Monitor systems via REST API (port 28126)
-.IP \(bu 3
-Works over WiFi, mobile data, or VPN
-.RE
-
-.B Example Android Usage:
-.RS
-.IP
-# Monitor remote server via API
-.br
-\fBkern --api http://192.168.1.100:28126\fR
-.IP
-# Monitor via SSH
-.br  
-\fBkern --ssh user@server-ip\fR
-.IP
-# Local monitoring on Android device
-.br
-\fBkern --cpu --mem\fR
-.RE
-
-.B Requirements:
-.RS
-.IP \(bu 3
-Android 7.0 or later
-.IP \(bu 3
-Terminal emulator with network permissions
-.IP \(bu 3
-Network connectivity to target systems
-.RE
-
-.SH FILES
-.TP
-.I ~/.config/kern/kern.json
-User configuration file storing preferences, language setting, and last used modules.
-.TP
-.I ~/.config/kern/daemon.json
-Daemon service configuration including auto-start settings.
-.TP
-.I ~/.config/kern/i18n/
-User directory containing downloaded language packs.
-.TP
-.I /usr/local/share/kern/i18n/
-System directory containing built-in language files.
-.TP
-.I /var/log/kern-daemon.log
-Daemon service log file.
-.TP
-.I /tmp/kern-daemon.pid
-Daemon process ID file.
-.TP
-.I /usr/local/share/man/man1/kern.1
-This manual page.
 .SH EXAMPLES
 .TP
 .B kern
-Monitor all system resources with default settings.
+Show all system information using smart defaults (remembers last used modules).
 .TP
-.B kern \-d \-m
-Monitor only disk and memory usage.
+.B kern --cpu --mem
+Show only CPU and memory information.
 .TP
-.B kern \-\-refresh=5 \-l ru
-Update every 5 seconds with Russian interface.
+.B kern --gpu --ai
+Show GPU and AI training information.
 .TP
-.B kern \-\-detailed
-Show detailed CPU core information.
+.B kern --mining
+Show cryptocurrency mining information.
 .TP
-.B kern \-g \-\-ai
-Monitor GPU and AI training processes.
+.B kern -d -l ru
+Show disk information with Russian interface.
 .TP
-.B kern \-\-mining
-Monitor cryptocurrency mining activity.
+.B kern --refresh=5
+Update display every 5 seconds.
 .TP
-.B kern \-r
-Start remote API server on default port 28126.
+.B kern --detailed
+Show detailed CPU core usage information.
 .TP
-.B kern \-\-api http://192.168.1.100:28126
+.B kern -r
+Start API server on default port 28126.
+.TP
+.B kern --remote-port 8080
+Start API server on port 8080.
+.TP
+.B kern --api http://192.168.1.100:28126
 Monitor remote server via HTTP API.
 .TP
-.B kern \-\-api https://monitoring.example.com:28126
+.B kern --api https://monitor.example.com:28126
 Monitor remote server via HTTPS API.
 .TP
-.B kern \-\-ssh user@remote\-host
+.B kern --ssh user@hostname
 Monitor remote server via SSH.
 .TP
-.B kern \-\-download\-lang fr
+.B kern --download-lang fr
 Download French language pack.
 .TP
-.B kern \-\-list\-languages
-List all supported languages.
+.B kern --start-service
+Start kern daemon service.
 .TP
-.B kern \-\-logo
-Show application logo during monitoring.
-.TP
-.B kern \-\-start-service
-Start kern daemon.
-.TP
-.B kern \-\-service-status
-Check daemon status.
-.TP
-.B kern \-\-enable-service
-Enable auto-start on boot.
+.B kern --service-status
+Check daemon service status.
 
-.SH EXIT STATUS
-.B kern
-exits with 0 on success, and >0 if an error occurs.
+.SH FILES
+.TP
+.B ~/.config/kern/kern.json
+User configuration file.
+.TP
+.B ~/.config/kern/daemon.json
+Daemon service configuration.
+.TP
+.B /var/log/kern-daemon.log
+Daemon log file (Linux/macOS).
+.TP
+.B %TEMP%\\kern-daemon.log
+Daemon log file (Windows).
+
+.SH ENVIRONMENT
+.TP
+.B KERN_LANG
+Default language code (overrides configuration).
+
+.SH BUGS
+Report bugs at https://github.com/karimkiniabulatov/kern/issues
+
+.SH AUTHOR
+Karim Kiniabulatov and contributors.
+
 .SH SEE ALSO
 .BR top (1),
 .BR htop (1),
 .BR nvidia-smi (1),
-.BR rocm-smi (1),
-.BR df (1),
-.BR free (1),
-.BR lscpu (1)
-.SH BUGS
-Report bugs at https://github.com/karimkiniabulatov/kern/issues
-.SH AUTHORS
-Karim Kiniabulatov and contributors.
-.SH LICENSE
-GNU General Public License v3.0 or later.
+.BR rocm-smi (1)
