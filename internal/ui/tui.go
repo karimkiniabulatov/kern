@@ -553,13 +553,14 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 				if i >= 2 { // Limit to 2 encoders
 					break
 				}
-				status := "idle"
-				if encoder.Active {
-					status = "active"
-				}
+				// Убрана неиспользуемая переменная status
 				utilGraph := t.createCompactGraph(encoder.Utilization, 10)
-				row = t.printLine(row, 2, fmt.Sprintf("%s [%s] %s %.1f%%", 
-					encoder.Name, encoder.Type, utilGraph, encoder.Utilization), 
+				activeStatus := "idle"
+				if encoder.Active {
+					activeStatus = "active"
+				}
+				row = t.printLine(row, 2, fmt.Sprintf("%s [%s] %s %.1f%% (%s)", 
+					encoder.Name, encoder.Type, utilGraph, encoder.Utilization, activeStatus), 
 					tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 			}
 		}
