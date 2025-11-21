@@ -298,7 +298,15 @@ func showLogo() {
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
  kern v` + version + " - System Monitoring Tool\n"
-	fmt.Print("\033[1;36m" + logo + "\033[0m")
+	
+	// Кроссплатформенный цветной вывод
+	if runtime.GOOS == "windows" {
+		// Для Windows используем colorable
+		fmt.Fprint(colorable.NewColorableStdout(), "\033[1;36m"+logo+"\033[0m")
+	} else {
+		// Для Unix-систем используем обычные ANSI коды
+		fmt.Print("\033[1;36m" + logo + "\033[0m")
+	}
 }
 
 func runMonitor(cfg *config.Config, showLogo bool) {
@@ -312,6 +320,11 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 	// Обработка сигналов для гарантированного выхода
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	// Для Windows добавляем дополнительные сигналы
+	if runtime.GOOS == "windows" {
+		signal.Notify(sigChan, syscall.SIGQUIT)
+	}
 
 	// Канал для выхода
 	quitChan := make(chan bool, 1)
@@ -682,6 +695,8 @@ func startRemoteServer(cfg *config.Config, port int) {
 		systemInfo := map[string]interface{}{
 			"version": version,
 			"time":    time.Now().Format(time.RFC3339),
+			"os":      runtime.GOOS,
+			"arch":    runtime.GOARCH,
 		}
 		json.NewEncoder(w).Encode(systemInfo)
 	})
@@ -714,6 +729,8 @@ func startRemoteServer(cfg *config.Config, port int) {
 		apiInfo := map[string]interface{}{
 			"name":    "kern API",
 			"version": version,
+			"os":      runtime.GOOS,
+			"arch":    runtime.GOARCH,
 			"endpoints": []string{
 				"/api/cpu",
 				"/api/mem",
@@ -767,6 +784,11 @@ func startRemoteServer(cfg *config.Config, port int) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
+	// Для Windows добавляем дополнительные сигналы
+	if runtime.GOOS == "windows" {
+		signal.Notify(sigChan, syscall.SIGQUIT)
+	}
+
 	go func() {
 		<-sigChan
 		log.Printf("Shutting down API server...")
@@ -791,7 +813,12 @@ func monitorRemoteAPI(apiURL string) {
 	defer ticker.Stop()
 
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	// Для Windows добавляем дополнительные сигналы
+	if runtime.GOOS == "windows" {
+		signal.Notify(sigChan, syscall.SIGQUIT)
+	}
 
 	for {
 		select {
@@ -802,11 +829,24 @@ func monitorRemoteAPI(apiURL string) {
 				continue
 			}
 			displayRemoteData(data)
-			fmt.Println("\033[2J\033[H") // Clear screen and move cursor to top
+			// Кроссплатформенная очистка экрана
+			clearScreen()
 		case <-sigChan:
 			fmt.Println("\nExiting remote monitoring...")
 			return
 		}
+	}
+}
+
+// Кроссплатформенная функция очистки экрана
+func clearScreen() {
+	switch runtime.GOOS {
+	case "windows":
+		// Для Windows
+		fmt.Print("\033[2J\033[H")
+	default:
+		// Для Unix-систем
+		fmt.Print("\033[2J\033[H")
 	}
 }
 
@@ -859,7 +899,7 @@ func monitorRemoteSSH(sshHost string) {
 	showLogo()
 	fmt.Printf("SSH monitoring for %s\n", sshHost)
 	fmt.Println("Note: SSH monitoring requires kern installed on remote host")
-	fmt.Println("Example: ssh %s 'kern --all --refresh=2'", sshHost)
+	fmt.Printf("Example: ssh %s 'kern --all --refresh=2'\n", sshHost)
 	fmt.Println("")
 	fmt.Println("For full SSH integration, use:")
 	fmt.Println("  kern --ssh user@host --api http://localhost:28126")

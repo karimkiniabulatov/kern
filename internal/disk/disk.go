@@ -3,6 +3,7 @@ package disk
 import (
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -17,14 +18,41 @@ type DiskInfo struct {
 }
 
 func Summary() ([]DiskInfo, error) {
-	// Use df command to get disk information
+	switch runtime.GOOS {
+	case "windows":
+		return getWindowsDiskInfo()
+	case "darwin":
+		return getDarwinDiskInfo()
+	default:
+		return getLinuxDiskInfo()
+	}
+}
+
+func getLinuxDiskInfo() ([]DiskInfo, error) {
 	cmd := exec.Command("df", "-h")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
-
 	return parseDFOutput(string(output))
+}
+
+func getDarwinDiskInfo() ([]DiskInfo, error) {
+	cmd := exec.Command("df", "-h")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+	return parseDFOutput(string(output))
+}
+
+func getWindowsDiskInfo() ([]DiskInfo, error) {
+	cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+	return parseWMICOutput(string(output))
 }
 
 func parseDFOutput(output string) ([]DiskInfo, error) {
@@ -65,6 +93,66 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 	}
 
 	return disks, nil
+}
+
+func parseWMICOutput(output string) ([]DiskInfo, error) {
+	lines := strings.Split(output, "\n")
+	var disks []DiskInfo
+
+	for i, line := range lines {
+		if i == 0 || strings.TrimSpace(line) == "" {
+			continue // Skip header and empty lines
+		}
+
+		// Split by whitespace, handling multiple spaces
+		re := regexp.MustCompile(`\s+`)
+		fields := re.Split(line, -1)
+
+		if len(fields) >= 3 {
+			// Windows output: Caption FreeSpace Size
+			// Example: C: 1234567890 12345678900
+			freeSpace, err := strconv.ParseUint(fields[1], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			totalSize, err := strconv.ParseUint(fields[2], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			used := totalSize - freeSpace
+			usePercent := 0.0
+			if totalSize > 0 {
+				usePercent = float64(used) / float64(totalSize) * 100
+			}
+
+			disk := DiskInfo{
+				Filesystem: fields[0],
+				Size:       formatBytes(totalSize),
+				Used:       formatBytes(used),
+				Available:  formatBytes(freeSpace),
+				UsePercent: usePercent,
+				MountedOn:  fields[0], // In Windows, the drive letter is the mount point
+			}
+			disks = append(disks, disk)
+		}
+	}
+
+	return disks, nil
+}
+
+func formatBytes(bytes uint64) string {
+	const unit = 1024
+	if bytes < unit {
+		return strconv.FormatUint(bytes, 10) + " B"
+	}
+	div, exp := uint64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return strconv.FormatFloat(float64(bytes)/float64(div), 'f', 1, 64) + " " + string("KMGTPE"[exp]) + "B"
 }
 
 func shouldSkipFilesystem(filesystem, mountPoint string) bool {

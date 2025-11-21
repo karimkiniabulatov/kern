@@ -2,7 +2,9 @@ package net
 
 import (
 	"fmt"
+	"net"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -39,7 +41,6 @@ func Summary() ([]NetworkInfo, error) {
 		}
 	}
 
-	// Remove duplicates - keep only unique interfaces
 	return removeDuplicateInterfaces(networks), nil
 }
 
@@ -60,7 +61,22 @@ func removeDuplicateInterfaces(networks []NetworkInfo) []NetworkInfo {
 func getNetworkInterfaces() ([]NetworkInfo, error) {
 	var interfaces []NetworkInfo
 
-	// Получаем базовую информацию об интерфейсах
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxNetworkInterfaces()
+	case "windows":
+		return getWindowsNetworkInterfaces()
+	case "darwin":
+		return getMacOSNetworkInterfaces()
+	default:
+		return getFallbackNetworkInterfaces()
+	}
+}
+
+func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
+	var interfaces []NetworkInfo
+
+	// Получаем базовую информацию об интерфейсах через ip команды
 	cmd := exec.Command("ip", "-o", "addr", "show")
 	output, err := cmd.Output()
 	if err != nil {
@@ -82,19 +98,18 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
 
 			// Получаем IP адрес
 			if len(fields) >= 6 && fields[2] == "inet" {
-				// Extract only the IP address without subnet mask
 				ipParts := strings.Split(fields[3], "/")
 				iface.IPAddress = ipParts[0]
 			}
 
 			// Получаем MAC адрес и статус
-			if mac, status, err := getMACAndStatus(iface.Interface); err == nil {
+			if mac, status, err := getLinuxMACAndStatus(iface.Interface); err == nil {
 				iface.MACAddress = mac
 				iface.Status = status
 			}
 
 			// Получаем статистику и скорость
-			if rx, tx, err := getNetworkStatsRaw(iface.Interface); err == nil {
+			if rx, tx, err := getLinuxNetworkStats(iface.Interface); err == nil {
 				iface.RXBytes = rx
 				iface.TXBytes = tx
 				iface.RXSpeed, iface.TXSpeed, iface.ActivityPercent = calculateNetworkSpeed(iface.Interface, rx, tx)
@@ -107,7 +122,143 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
 	return interfaces, nil
 }
 
-func getMACAndStatus(iface string) (string, string, error) {
+func getWindowsNetworkInterfaces() ([]NetworkInfo, error) {
+	var interfaces []NetworkInfo
+
+	// Используем net.Interfaces для получения информации об интерфейсах
+	netInterfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, netIface := range netInterfaces {
+		iface := NetworkInfo{
+			Interface:  netIface.Name,
+			MACAddress: netIface.HardwareAddr.String(),
+			Status:     "DOWN",
+		}
+
+		// Определяем статус
+		if netIface.Flags&net.FlagUp != 0 {
+			iface.Status = "UP"
+		}
+
+		// Получаем IP адреса
+		addrs, err := netIface.Addrs()
+		if err == nil {
+			for _, addr := range addrs {
+				if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+					if ipNet.IP.To4() != nil {
+						iface.IPAddress = ipNet.IP.String()
+						break
+					}
+				}
+			}
+		}
+
+		// Получаем статистику через PowerShell
+		if rx, tx, err := getWindowsNetworkStats(iface.Interface); err == nil {
+			iface.RXBytes = rx
+			iface.TXBytes = tx
+			iface.RXSpeed, iface.TXSpeed, iface.ActivityPercent = calculateNetworkSpeed(iface.Interface, rx, tx)
+		}
+
+		interfaces = append(interfaces, iface)
+	}
+
+	return interfaces, nil
+}
+
+func getMacOSNetworkInterfaces() ([]NetworkInfo, error) {
+	var interfaces []NetworkInfo
+
+	// Используем net.Interfaces для macOS
+	netInterfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, netIface := range netInterfaces {
+		iface := NetworkInfo{
+			Interface:  netIface.Name,
+			MACAddress: netIface.HardwareAddr.String(),
+			Status:     "DOWN",
+		}
+
+		// Определяем статус
+		if netIface.Flags&net.FlagUp != 0 {
+			iface.Status = "UP"
+		}
+
+		// Получаем IP адреса
+		addrs, err := netIface.Addrs()
+		if err == nil {
+			for _, addr := range addrs {
+				if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+					if ipNet.IP.To4() != nil {
+						iface.IPAddress = ipNet.IP.String()
+						break
+					}
+				}
+			}
+		}
+
+		// Получаем статистику через netstat
+		if rx, tx, err := getMacOSNetworkStats(iface.Interface); err == nil {
+			iface.RXBytes = rx
+			iface.TXBytes = tx
+			iface.RXSpeed, iface.TXSpeed, iface.ActivityPercent = calculateNetworkSpeed(iface.Interface, rx, tx)
+		}
+
+		interfaces = append(interfaces, iface)
+	}
+
+	return interfaces, nil
+}
+
+func getFallbackNetworkInterfaces() ([]NetworkInfo, error) {
+	var interfaces []NetworkInfo
+
+	// Fallback реализация используя только net package
+	netInterfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, netIface := range netInterfaces {
+		iface := NetworkInfo{
+			Interface:  netIface.Name,
+			MACAddress: netIface.HardwareAddr.String(),
+			Status:     "DOWN",
+		}
+
+		if netIface.Flags&net.FlagUp != 0 {
+			iface.Status = "UP"
+		}
+
+		addrs, err := netIface.Addrs()
+		if err == nil {
+			for _, addr := range addrs {
+				if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+					if ipNet.IP.To4() != nil {
+						iface.IPAddress = ipNet.IP.String()
+						break
+					}
+				}
+			}
+		}
+
+		// Для неизвестных платформ статистика недоступна
+		iface.RXSpeed = "N/A"
+		iface.TXSpeed = "N/A"
+
+		interfaces = append(interfaces, iface)
+	}
+
+	return interfaces, nil
+}
+
+func getLinuxMACAndStatus(iface string) (string, string, error) {
 	cmd := exec.Command("ip", "link", "show", iface)
 	output, err := cmd.Output()
 	if err != nil {
@@ -136,8 +287,7 @@ func getMACAndStatus(iface string) (string, string, error) {
 	return mac, status, nil
 }
 
-func getNetworkStatsRaw(iface string) (uint64, uint64, error) {
-	// Получаем сырые данные из /sys/class/net/
+func getLinuxNetworkStats(iface string) (uint64, uint64, error) {
 	rxPath := fmt.Sprintf("/sys/class/net/%s/statistics/rx_bytes", iface)
 	txPath := fmt.Sprintf("/sys/class/net/%s/statistics/tx_bytes", iface)
 
@@ -157,28 +307,80 @@ func getNetworkStatsRaw(iface string) (uint64, uint64, error) {
 	return rxBytes, txBytes, nil
 }
 
+func getWindowsNetworkStats(iface string) (uint64, uint64, error) {
+	// Используем PowerShell для получения статистики сети в Windows
+	cmd := exec.Command("powershell", "-Command", 
+		"Get-NetAdapterStatistics | Where-Object {$_.Name -eq '"+iface+"'} | Select-Object ReceivedBytes, SentBytes")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	var rxBytes, txBytes uint64
+
+	for _, line := range lines {
+		if strings.Contains(line, "ReceivedBytes") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 {
+				rxBytes, _ = strconv.ParseUint(fields[1], 10, 64)
+			}
+		}
+		if strings.Contains(line, "SentBytes") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 {
+				txBytes, _ = strconv.ParseUint(fields[1], 10, 64)
+			}
+		}
+	}
+
+	return rxBytes, txBytes, nil
+}
+
+func getMacOSNetworkStats(iface string) (uint64, uint64, error) {
+	// Используем netstat для получения статистики в macOS
+	cmd := exec.Command("netstat", "-bi")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	var rxBytes, txBytes uint64
+
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) >= 4 && fields[0] == iface {
+			// Поле 6 обычно содержит received bytes, поле 9 - transmitted bytes
+			if len(fields) >= 10 {
+				rxBytes, _ = strconv.ParseUint(fields[6], 10, 64)
+				txBytes, _ = strconv.ParseUint(fields[9], 10, 64)
+				break
+			}
+		}
+	}
+
+	return rxBytes, txBytes, nil
+}
+
 func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, string, float64) {
 	now := time.Now()
 	
-	// Проверяем есть ли предыдущие статистики
 	if last, exists := lastNetworkStats[iface]; exists {
 		timeDiff := now.Sub(last.Time).Seconds()
 		if timeDiff > 0 {
 			rxSpeed := float64(currentRX-last.RXBytes) / timeDiff
 			txSpeed := float64(currentTX-last.TXBytes) / timeDiff
 			
-			// Конвертируем в человекочитаемый формат
 			rxSpeedStr := formatSpeed(rxSpeed)
 			txSpeedStr := formatSpeed(txSpeed)
 			
-			// Рассчитываем общую активность (в процентах от 1 Гбит/с)
 			totalSpeed := rxSpeed + txSpeed
-			activity := (totalSpeed / 125000000) * 100 // 1 Гбит/с = 125000000 байт/с
+			activity := (totalSpeed / 125000000) * 100
 			if activity > 100 {
 				activity = 100
 			}
 
-			// Обновляем последние статистики
 			lastNetworkStats[iface] = struct {
 				RXBytes uint64
 				TXBytes uint64
@@ -189,7 +391,6 @@ func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, s
 		}
 	}
 
-	// Первое измерение
 	lastNetworkStats[iface] = struct {
 		RXBytes uint64
 		TXBytes uint64
@@ -199,7 +400,6 @@ func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, s
 	return "0B/s", "0B/s", 0
 }
 
-// FormatSpeed is exported for testing
 func FormatSpeed(bytesPerSec float64) string {
 	return formatSpeed(bytesPerSec)
 }

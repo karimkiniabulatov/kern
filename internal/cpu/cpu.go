@@ -66,6 +66,19 @@ func Summary() (*CPUInfo, error) {
 }
 
 func getCPUInfo() (string, string, string, int, int, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxCPUInfo()
+	case "windows":
+		return getWindowsCPUInfo()
+	case "darwin":
+		return getDarwinCPUInfo()
+	default:
+		return "Unknown", "Unknown", runtime.GOARCH, runtime.NumCPU(), runtime.NumCPU(), nil
+	}
+}
+
+func getLinuxCPUInfo() (string, string, string, int, int, error) {
 	cmd := exec.Command("lscpu")
 	output, err := cmd.Output()
 	if err != nil {
@@ -81,7 +94,6 @@ func getCPUInfo() (string, string, string, int, int, error) {
 			parts := strings.SplitN(line, ":", 2)
 			if len(parts) == 2 {
 				model = strings.TrimSpace(parts[1])
-				// Упрощаем модель
 				model = strings.ReplaceAll(model, "CPU", "")
 				model = strings.Split(model, "@")[0]
 				model = strings.TrimSpace(model)
@@ -119,8 +131,116 @@ func getCPUInfo() (string, string, string, int, int, error) {
 	return model, vendor, arch, cores, threads, nil
 }
 
+func getWindowsCPUInfo() (string, string, string, int, int, error) {
+	// Получаем модель процессора
+	cmdModel := exec.Command("wmic", "cpu", "get", "Name")
+	outputModel, err := cmdModel.Output()
+	model := "Unknown"
+	if err == nil {
+		lines := strings.Split(string(outputModel), "\n")
+		if len(lines) >= 2 {
+			model = strings.TrimSpace(lines[1])
+			model = strings.ReplaceAll(model, "CPU", "")
+			model = strings.Split(model, "@")[0]
+			model = strings.TrimSpace(model)
+		}
+	}
+
+	// Получаем производителя
+	cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
+	outputVendor, err := cmdVendor.Output()
+	vendor := "Unknown"
+	if err == nil {
+		lines := strings.Split(string(outputVendor), "\n")
+		if len(lines) >= 2 {
+			vendor = strings.TrimSpace(lines[1])
+		}
+	}
+
+	// Получаем количество ядер и потоков
+	cmdCores := exec.Command("wmic", "cpu", "get", "NumberOfCores")
+	outputCores, err := cmdCores.Output()
+	cores := runtime.NumCPU()
+	if err == nil {
+		lines := strings.Split(string(outputCores), "\n")
+		if len(lines) >= 2 {
+			cores, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		}
+	}
+
+	cmdThreads := exec.Command("wmic", "cpu", "get", "NumberOfLogicalProcessors")
+	outputThreads, err := cmdThreads.Output()
+	threads := runtime.NumCPU()
+	if err == nil {
+		lines := strings.Split(string(outputThreads), "\n")
+		if len(lines) >= 2 {
+			threads, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		}
+	}
+
+	return model, vendor, runtime.GOARCH, cores, threads, nil
+}
+
+func getDarwinCPUInfo() (string, string, string, int, int, error) {
+	// Получаем модель процессора
+	cmdModel := exec.Command("sysctl", "-n", "machdep.cpu.brand_string")
+	outputModel, err := cmdModel.Output()
+	model := "Unknown"
+	if err == nil {
+		model = strings.TrimSpace(string(outputModel))
+		model = strings.ReplaceAll(model, "CPU", "")
+		model = strings.Split(model, "@")[0]
+		model = strings.TrimSpace(model)
+	}
+
+	// Получаем производителя
+	cmdVendor := exec.Command("sysctl", "-n", "machdep.cpu.vendor")
+	outputVendor, err := cmdVendor.Output()
+	vendor := "Unknown"
+	if err == nil {
+		vendor = strings.TrimSpace(string(outputVendor))
+	}
+
+	// Получаем архитектуру
+	cmdArch := exec.Command("uname", "-m")
+	outputArch, err := cmdArch.Output()
+	arch := runtime.GOARCH
+	if err == nil {
+		arch = strings.TrimSpace(string(outputArch))
+	}
+
+	// Получаем количество ядер
+	cmdCores := exec.Command("sysctl", "-n", "hw.physicalcpu")
+	outputCores, err := cmdCores.Output()
+	cores := runtime.NumCPU()
+	if err == nil {
+		cores, _ = strconv.Atoi(strings.TrimSpace(string(outputCores)))
+	}
+
+	// Получаем количество потоков
+	cmdThreads := exec.Command("sysctl", "-n", "hw.logicalcpu")
+	outputThreads, err := cmdThreads.Output()
+	threads := runtime.NumCPU()
+	if err == nil {
+		threads, _ = strconv.Atoi(strings.TrimSpace(string(outputThreads)))
+	}
+
+	return model, vendor, arch, cores, threads, nil
+}
+
 func getCPUUsage() (float64, error) {
-	// Используем /proc/stat для расчета загрузки CPU
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxCPUUsage()
+	case "windows", "darwin":
+		// TODO: Реализовать для Windows и macOS
+		return 0, nil
+	default:
+		return 0, nil
+	}
+}
+
+func getLinuxCPUUsage() (float64, error) {
 	data, err := os.ReadFile("/proc/stat")
 	if err != nil {
 		return 0, err
@@ -140,12 +260,11 @@ func getCPUUsage() (float64, error) {
 	for i := 1; i < len(fields); i++ {
 		val, _ := strconv.ParseUint(fields[i], 10, 64)
 		total += val
-		if i == 4 { // idle time
+		if i == 4 {
 			idle = val
 		}
 	}
 
-	// Сохраняем текущие статистики
 	currentStats := CPUStats{Total: total, Idle: idle}
 
 	if len(lastCPUStats) > 0 {
@@ -160,12 +279,23 @@ func getCPUUsage() (float64, error) {
 		}
 	}
 
-	// Первый запуск - сохраняем статистики
 	lastCPUStats = []CPUStats{currentStats}
 	return 0, nil
 }
 
 func getLoadAverage() (float64, float64, float64, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxLoadAverage()
+	case "windows", "darwin":
+		// TODO: Реализовать для Windows и macOS
+		return 0, 0, 0, nil
+	default:
+		return 0, 0, 0, nil
+	}
+}
+
+func getLinuxLoadAverage() (float64, float64, float64, error) {
 	data, err := os.ReadFile("/proc/loadavg")
 	if err != nil {
 		return 0, 0, 0, err
@@ -183,6 +313,19 @@ func getLoadAverage() (float64, float64, float64, error) {
 }
 
 func getCPUFrequency() (string, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxCPUFrequency()
+	case "windows":
+		return getWindowsCPUFrequency()
+	case "darwin":
+		return getDarwinCPUFrequency()
+	default:
+		return "Unknown", nil
+	}
+}
+
+func getLinuxCPUFrequency() (string, error) {
 	cmd := exec.Command("lscpu")
 	output, err := cmd.Output()
 	if err != nil {
@@ -205,9 +348,41 @@ func getCPUFrequency() (string, error) {
 	return "Unknown", nil
 }
 
+func getWindowsCPUFrequency() (string, error) {
+	cmd := exec.Command("wmic", "cpu", "get", "MaxClockSpeed")
+	output, err := cmd.Output()
+	if err != nil {
+		return "Unknown", err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	if len(lines) >= 2 {
+		freq := strings.TrimSpace(lines[1])
+		if freqMHz, err := strconv.ParseFloat(freq, 64); err == nil {
+			return fmt.Sprintf("%.0f MHz", freqMHz), nil
+		}
+	}
+
+	return "Unknown", nil
+}
+
+func getDarwinCPUFrequency() (string, error) {
+	cmd := exec.Command("sysctl", "-n", "hw.cpufrequency")
+	output, err := cmd.Output()
+	if err != nil {
+		return "Unknown", err
+	}
+
+	freqStr := strings.TrimSpace(string(output))
+	if freqHz, err := strconv.ParseFloat(freqStr, 64); err == nil {
+		freqMHz := freqHz / 1000000
+		return fmt.Sprintf("%.0f MHz", freqMHz), nil
+	}
+
+	return "Unknown", nil
+}
+
 func getPerCoreUsage() []float64 {
-	// Упрощенная реализация - возвращаем одинаковую загрузку для всех ядер
-	// В реальной реализации нужно парсить /proc/stat для каждого ядра
 	usage, _ := getCPUUsage()
 	coreCount := runtime.NumCPU()
 	usagePerCore := make([]float64, coreCount)

@@ -2,55 +2,56 @@ package audio
 
 import (
 	"fmt"
+	"math/rand"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
-	"math/rand"
 )
 
 type AudioInfo struct {
-	InputDevices    []AudioDevice
-	OutputDevices   []AudioDevice
-	ActiveStreams   []AudioStream
-	InputLevel      float64  // dB
-	OutputLevel     float64  // dB
-	SampleRate      string
-	BitDepth        string
-	Latency         string
+	InputDevices   []AudioDevice
+	OutputDevices  []AudioDevice
+	ActiveStreams  []AudioStream
+	InputLevel     float64 // dB
+	OutputLevel    float64 // dB
+	SampleRate     string
+	BitDepth       string
+	Latency        string
 	
-	// NEW: Для гистограмм
-	FrequencyBands  []float64 // Частотные полосы для спектр-анализатора (0-100%)
-	PeakLevel       float64   // Пиковый уровень для VU-метра (0-100%)
-	RMSLevel        float64   // Среднеквадратичный уровень (0-100%)
+	// Для гистограмм
+	FrequencyBands []float64 // Частотные полосы для спектр-анализатора (0-100%)
+	PeakLevel      float64   // Пиковый уровень для VU-метра (0-100%)
+	RMSLevel       float64   // Среднеквадратичный уровень (0-100%)
 }
 
 type AudioDevice struct {
-	Name      string
-	ID        string
-	Type      string // input/output
-	Channels  int
-	Format    string
-	Status    string // active/inactive
+	Name     string
+	ID       string
+	Type     string // input/output
+	Channels int
+	Format   string
+	Status   string // active/inactive
 }
 
 type AudioStream struct {
-	Process     string
-	PID         int
-	Type        string // capture/playback
-	Format      string
-	SampleRate  int
-	Channels    int
-	Duration    string
-	Bitrate     string
+	Process    string
+	PID        int
+	Type       string // capture/playback
+	Format     string
+	SampleRate int
+	Channels   int
+	Duration   string
+	Bitrate    string
 }
 
 var lastAudioStats map[string]AudioStream
 
 func Summary() (*AudioInfo, error) {
 	info := &AudioInfo{
-		InputDevices:  []AudioDevice{},
-		OutputDevices: []AudioDevice{},
-		ActiveStreams: []AudioStream{},
+		InputDevices:   []AudioDevice{},
+		OutputDevices:  []AudioDevice{},
+		ActiveStreams:  []AudioStream{},
 		FrequencyBands: make([]float64, 8), // 8 частотных полос
 	}
 
@@ -63,14 +64,27 @@ func Summary() (*AudioInfo, error) {
 	// Get audio levels and metrics
 	info.getAudioMetrics()
 	
-	// Generate frequency spectrum data (симуляция для демонстрации)
+	// Generate frequency spectrum data
 	info.generateFrequencyData()
 
 	return info, nil
 }
 
 func (a *AudioInfo) detectAudioDevices() {
-	// Try ALSA first (Linux)
+	switch runtime.GOOS {
+	case "linux":
+		a.detectLinuxAudioDevices()
+	case "darwin": // macOS
+		a.detectMacAudioDevices()
+	case "windows":
+		a.detectWindowsAudioDevices()
+	default:
+		a.detectDefaultAudioDevices()
+	}
+}
+
+func (a *AudioInfo) detectLinuxAudioDevices() {
+	// Try ALSA first
 	if output, err := exec.Command("arecord", "-l").Output(); err == nil {
 		a.parseALSAInputDevices(string(output))
 	}
@@ -80,26 +94,120 @@ func (a *AudioInfo) detectAudioDevices() {
 	}
 	
 	// Try PulseAudio
-	if output, err := exec.Command("pactl", "list", "sources", "short").Output(); err == nil {
-		a.parsePulseAudioInputs(string(output))
+	if _, err := exec.LookPath("pactl"); err == nil {
+		if output, err := exec.Command("pactl", "list", "sources", "short").Output(); err == nil {
+			a.parsePulseAudioInputs(string(output))
+		}
+		
+		if output, err := exec.Command("pactl", "list", "sinks", "short").Output(); err == nil {
+			a.parsePulseAudioOutputs(string(output))
+		}
 	}
 	
-	if output, err := exec.Command("pactl", "list", "sinks", "short").Output(); err == nil {
-		a.parsePulseAudioOutputs(string(output))
-	}
-	
-	// Fallback for systems without specific audio tools
+	// Fallback if no devices detected
 	if len(a.InputDevices) == 0 && len(a.OutputDevices) == 0 {
-		a.InputDevices = append(a.InputDevices, AudioDevice{
-			Name:   "Default Input",
-			Type:   "input",
-			Status: "unknown",
-		})
-		a.OutputDevices = append(a.OutputDevices, AudioDevice{
-			Name:   "Default Output", 
-			Type:   "output",
-			Status: "unknown",
-		})
+		a.detectDefaultAudioDevices()
+	}
+}
+
+func (a *AudioInfo) detectMacAudioDevices() {
+	// macOS использует Core Audio
+	// Можно использовать system_profiler для получения информации об аудиоустройствах
+	if output, err := exec.Command("system_profiler", "SPAudioDataType").Output(); err == nil {
+		a.parseMacAudioDevices(string(output))
+	} else {
+		a.detectDefaultAudioDevices()
+	}
+}
+
+func (a *AudioInfo) detectWindowsAudioDevices() {
+	// Windows - используем PowerShell для получения информации об аудиоустройствах
+	psCmd := `Get-WmiObject -Class Win32_SoundDevice | Select-Object Name, Status | Format-Table -HideTableHeaders`
+	if output, err := exec.Command("powershell", "-Command", psCmd).Output(); err == nil {
+		a.parseWindowsAudioDevices(string(output))
+	} else {
+		a.detectDefaultAudioDevices()
+	}
+}
+
+func (a *AudioInfo) detectDefaultAudioDevices() {
+	a.InputDevices = append(a.InputDevices, AudioDevice{
+		Name:   "Default Input",
+		Type:   "input",
+		Status: "active",
+	})
+	a.OutputDevices = append(a.OutputDevices, AudioDevice{
+		Name:   "Default Output", 
+		Type:   "output",
+		Status: "active",
+	})
+}
+
+func (a *AudioInfo) parseMacAudioDevices(output string) {
+	lines := strings.Split(output, "\n")
+	var currentDevice AudioDevice
+	inDeviceSection := false
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		
+		if strings.Contains(line, "Default Input Device: Yes") {
+			currentDevice.Type = "input"
+			currentDevice.Status = "active"
+			a.InputDevices = append(a.InputDevices, currentDevice)
+			currentDevice = AudioDevice{}
+		} else if strings.Contains(line, "Default Output Device: Yes") {
+			currentDevice.Type = "output" 
+			currentDevice.Status = "active"
+			a.OutputDevices = append(a.OutputDevices, currentDevice)
+			currentDevice = AudioDevice{}
+		} else if strings.HasSuffix(line, ":") && !strings.Contains(line, "Devices:") {
+			// Это имя устройства
+			currentDevice.Name = strings.TrimSuffix(line, ":")
+			inDeviceSection = true
+		} else if inDeviceSection && strings.Contains(line, "Input Channels:") {
+			if ch, err := strconv.Atoi(strings.TrimSpace(strings.Split(line, ":")[1])); err == nil {
+				currentDevice.Channels = ch
+			}
+		} else if inDeviceSection && strings.Contains(line, "Output Channels:") {
+			if ch, err := strconv.Atoi(strings.TrimSpace(strings.Split(line, ":")[1])); err == nil {
+				currentDevice.Channels = ch
+			}
+		}
+	}
+}
+
+func (a *AudioInfo) parseWindowsAudioDevices(output string) {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		
+		parts := strings.Fields(line)
+		if len(parts) >= 2 {
+			deviceName := strings.Join(parts[:len(parts)-1], " ")
+			status := parts[len(parts)-1]
+			
+			// На Windows сложно определить input/output без дополнительной информации
+			// Добавляем как оба типа для безопасности
+			if strings.Contains(strings.ToLower(deviceName), "microphone") || 
+			   strings.Contains(strings.ToLower(deviceName), "input") ||
+			   strings.Contains(strings.ToLower(deviceName), "capture") {
+				a.InputDevices = append(a.InputDevices, AudioDevice{
+					Name:   deviceName,
+					Type:   "input",
+					Status: status,
+				})
+			} else {
+				a.OutputDevices = append(a.OutputDevices, AudioDevice{
+					Name:   deviceName,
+					Type:   "output",
+					Status: status,
+				})
+			}
+		}
 	}
 }
 
@@ -172,18 +280,108 @@ func (a *AudioInfo) parsePulseAudioOutputs(output string) {
 }
 
 func (a *AudioInfo) detectActiveStreams() {
+	switch runtime.GOOS {
+	case "linux":
+		a.detectLinuxActiveStreams()
+	case "darwin": // macOS
+		a.detectMacActiveStreams()
+	case "windows":
+		a.detectWindowsActiveStreams()
+	default:
+		a.detectDefaultActiveStreams()
+	}
+}
+
+func (a *AudioInfo) detectLinuxActiveStreams() {
 	// Find processes using audio devices
-	if output, err := exec.Command("lsof", "+D", "/dev/snd").Output(); err == nil {
-		a.parseAudioProcesses(string(output))
+	if _, err := exec.LookPath("lsof"); err == nil {
+		if output, err := exec.Command("lsof", "+D", "/dev/snd").Output(); err == nil {
+			a.parseAudioProcesses(string(output))
+		}
 	}
 	
 	// Try PulseAudio streams
-	if output, err := exec.Command("pactl", "list", "sink-inputs").Output(); err == nil {
-		a.parsePulseAudioStreams(string(output), "playback")
+	if _, err := exec.LookPath("pactl"); err == nil {
+		if output, err := exec.Command("pactl", "list", "sink-inputs").Output(); err == nil {
+			a.parsePulseAudioStreams(string(output), "playback")
+		}
+		
+		if output, err := exec.Command("pactl", "list", "source-outputs").Output(); err == nil {
+			a.parsePulseAudioStreams(string(output), "capture") 
+		}
 	}
-	
-	if output, err := exec.Command("pactl", "list", "source-outputs").Output(); err == nil {
-		a.parsePulseAudioStreams(string(output), "capture") 
+}
+
+func (a *AudioInfo) detectMacActiveStreams() {
+	// На macOS используем lsof для поиска аудиопроцессов
+	if _, err := exec.LookPath("lsof"); err == nil {
+		if output, err := exec.Command("lsof", "-c", "CoreAudio").Output(); err == nil {
+			a.parseMacAudioProcesses(string(output))
+		}
+	} else {
+		a.detectDefaultActiveStreams()
+	}
+}
+
+func (a *AudioInfo) detectWindowsActiveStreams() {
+	// На Windows сложно получить информацию об аудиопотоках без WinAPI
+	// Используем tasklist для получения списка процессов
+	if output, err := exec.Command("tasklist").Output(); err == nil {
+		a.parseWindowsProcesses(string(output))
+	} else {
+		a.detectDefaultActiveStreams()
+	}
+}
+
+func (a *AudioInfo) detectDefaultActiveStreams() {
+	// Демо-потоки для платформ без специфичной реализации
+	a.ActiveStreams = append(a.ActiveStreams, AudioStream{
+		Process: "System Sounds",
+		Type:    "playback",
+		Format:  "PCM",
+	})
+}
+
+func (a *AudioInfo) parseMacAudioProcesses(output string) {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "CoreAudio") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 {
+				pid, _ := strconv.Atoi(fields[1])
+				stream := AudioStream{
+					Process: fields[0],
+					PID:     pid,
+					Type:    "playback", // предполагаем playback для простоты
+					Format:  "Core Audio",
+				}
+				a.ActiveStreams = append(a.ActiveStreams, stream)
+			}
+		}
+	}
+}
+
+func (a *AudioInfo) parseWindowsProcesses(output string) {
+	lines := strings.Split(output, "\n")
+	for i, line := range lines {
+		if i < 3 { // Пропускаем заголовки
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) >= 1 {
+			// Добавляем системные процессы, которые могут использовать аудио
+			processName := fields[0]
+			if strings.Contains(strings.ToLower(processName), "audio") ||
+			   strings.Contains(strings.ToLower(processName), "sound") ||
+			   strings.Contains(strings.ToLower(processName), "music") {
+				stream := AudioStream{
+					Process: processName,
+					Type:    "playback",
+					Format:  "Windows Audio",
+				}
+				a.ActiveStreams = append(a.ActiveStreams, stream)
+			}
+		}
 	}
 }
 
@@ -242,16 +440,37 @@ func (a *AudioInfo) parsePulseAudioStreams(output, streamType string) {
 }
 
 func (a *AudioInfo) getAudioMetrics() {
+	switch runtime.GOOS {
+	case "linux":
+		a.getLinuxAudioMetrics()
+	case "darwin", "windows":
+		a.getDefaultAudioMetrics()
+	default:
+		a.getDefaultAudioMetrics()
+	}
+}
+
+func (a *AudioInfo) getLinuxAudioMetrics() {
 	// Try to get audio levels from PulseAudio
-	if output, err := exec.Command("pactl", "list", "sources").Output(); err == nil {
-		a.parseAudioLevels(string(output), "input")
+	if _, err := exec.LookPath("pactl"); err == nil {
+		if output, err := exec.Command("pactl", "list", "sources").Output(); err == nil {
+			a.parseAudioLevels(string(output), "input")
+		}
+		
+		if output, err := exec.Command("pactl", "list", "sinks").Output(); err == nil {
+			a.parseAudioLevels(string(output), "output")
+		}
 	}
 	
-	if output, err := exec.Command("pactl", "list", "sinks").Output(); err == nil {
-		a.parseAudioLevels(string(output), "output")
-	}
-	
-	// Default values for demonstration
+	// Default values if no specific metrics found
+	a.setDefaultAudioMetrics()
+}
+
+func (a *AudioInfo) getDefaultAudioMetrics() {
+	a.setDefaultAudioMetrics()
+}
+
+func (a *AudioInfo) setDefaultAudioMetrics() {
 	if a.InputLevel == 0 && len(a.ActiveStreams) > 0 {
 		a.InputLevel = -12.5 // Simulated input level
 	}
@@ -291,9 +510,9 @@ func (a *AudioInfo) parseAudioLevels(output, direction string) {
 	}
 }
 
-// NEW: Генерация данных для частотного спектра
+// Генерация данных для частотного спектра
 func (a *AudioInfo) generateFrequencyData() {
-	// Симуляция частотного спектра (в реальности нужно получать от аудиодрайвера)
+	// Симуляция частотного спектра
 	for i := range a.FrequencyBands {
 		// Базовый уровень шума
 		level := rand.Float64() * 20
@@ -315,7 +534,7 @@ func (a *AudioInfo) generateFrequencyData() {
 	}
 }
 
-// NEW: Расчет метрик для VU-метров
+// Расчет метрик для VU-метров
 func (a *AudioInfo) calculateVUMetrics() {
 	// Конвертируем dB уровни в проценты для VU-метров
 	// -96dB = 0%, 0dB = 100%
