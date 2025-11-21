@@ -1,28 +1,28 @@
 {
-  "language": "Polish (Polski)", 
+  "language": "Polski",
   "language_code": "pl",
   "translations": {
     "common": {
-      "title": "kern - Monitor Systemu",
+      "title": "kern - Monitor systemu",
       "refresh": "Odśwież",
       "seconds": "sek",
       "error": "Błąd",
       "unknown": "Nieznany",
       "total": "Razem",
-      "used": "Używane", 
+      "used": "Użyte",
       "free": "Wolne",
       "available": "Dostępne",
       "status": "Status",
       "up": "DZIAŁA",
-      "down": "NIEDZIAŁA"
+      "down": "ZATRZYMANE"
     },
     "cpu": {
-      "title": "Informacje o CPU",
+      "title": "Informacje o procesorze",
       "model": "Model",
       "cores": "Rdzenie",
       "threads": "Wątki",
       "usage": "Użycie",
-      "frequency": "Częstotliwość", 
+      "frequency": "Częstotliwość",
       "load": "Obciążenie",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,8 +30,8 @@
       "load_average": "Średnie obciążenie"
     },
     "memory": {
-      "title": "Informacje o pamięci", 
-      "ram": "RAM",
+      "title": "Informacje o pamięci",
+      "ram": "Pamięć RAM",
       "swap": "Swap",
       "physical": "Pamięć fizyczna",
       "virtual": "Pamięć wirtualna"
@@ -40,7 +40,7 @@
       "title": "Informacje o dysku",
       "filesystem": "System plików",
       "size": "Rozmiar",
-      "mounted": "Zamontowany na", 
+      "mounted": "Zamontowany na",
       "usage": "Użycie",
       "storage": "Przechowywanie"
     },
@@ -49,13 +49,13 @@
       "interface": "Interfejs",
       "received": "Odebrane",
       "sent": "Wysłane",
-      "bytes": "bajty",
-      "packets": "pakiety",
+      "bytes": "bajtów",
+      "packets": "pakietów",
       "errors": "Błędy",
       "network_interfaces": "Interfejsy sieciowe"
     },
     "gpu": {
-      "title": "Informacje o GPU",
+      "title": "Informacje o karcie graficznej",
       "model": "Model",
       "driver": "Sterownik",
       "temperature": "Temperatura",
@@ -67,10 +67,10 @@
       "fan_speed": "Prędkość wentylatora"
     },
     "ai": {
-      "title": "Szkolenie AI",
+      "title": "Szkolenie SI",
       "framework": "Framework",
       "processes": "Procesy",
-      "vram": "VRAM",
+      "vram": "Pamięć wideo",
       "model": "Model",
       "batch_size": "Rozmiar partii",
       "throughput": "Przepustowość",
@@ -78,7 +78,7 @@
       "loss": "Strata",
       "accuracy": "Dokładność",
       "training_time": "Czas szkolenia",
-      "no_training": "Nie wykryto szkolenia AI"
+      "no_training": "Nie wykryto szkolenia SI"
     },
     "mining": {
       "title": "Informacje o kopaniu",
@@ -89,13 +89,37 @@
       "power": "Moc",
       "efficiency": "Wydajność",
       "uptime": "Czas pracy",
-      "revenue_24h": "Zysk 24h",
+      "revenue_24h": "Dochód 24h",
       "pool": "Pool",
       "not_detected": "Nie wykryto aktywności kopania"
     },
+    "audio": {
+      "title": "Informacje o strumieniu audio",
+      "streams": "Strumienie",
+      "sample_rate": "Częstotliwość próbkowania",
+      "channels": "Kanały",
+      "format": "Format",
+      "state": "Stan",
+      "playing": "Odtwarzanie",
+      "paused": "Wstrzymane",
+      "stopped": "Zatrzymane",
+      "no_audio": "Nie wykryto strumieni audio"
+    },
+    "video": {
+      "title": "Informacje o strumieniu wideo",
+      "streams": "Strumienie",
+      "resolution": "Rozdzielczość",
+      "frame_rate": "Klatkaż",
+      "codec": "Kodek",
+      "state": "Stan",
+      "playing": "Odtwarzanie",
+      "paused": "Wstrzymane",
+      "stopped": "Zatrzymane",
+      "no_video": "Nie wykryto strumieni wideo"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Pionowy", 
+      "vertical": "Pionowy",
       "horizontal": "Poziomy",
       "loading": "Ładowanie...",
       "no_data": "Brak danych",
@@ -106,12 +130,14 @@
       "version": "Wersja",
       "all": "Wszystkie informacje",
       "disk_only": "Tylko dysk",
-      "cpu_only": "Tylko CPU",
-      "memory_only": "Tylko pamięć", 
+      "cpu_only": "Tylko procesor",
+      "memory_only": "Tylko pamięć",
       "network_only": "Tylko sieć",
-      "gpu_only": "Tylko GPU",
-      "ai_only": "Tylko szkolenie AI",
+      "gpu_only": "Tylko karta graficzna",
+      "ai_only": "Tylko szkolenie SI",
       "mining_only": "Tylko kopanie",
+      "audio_only": "Tylko audio",
+      "video_only": "Tylko wideo",
       "refresh_rate": "Częstotliwość odświeżania",
       "language": "Język",
       "remote": "Tryb zdalny",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Nie znaleziono polecenia: %s",
       "invalid_port": "Nieprawidłowy port: %d",
-      "invalid_refresh": "Nieprawidłowy interwał odświeżania: %d", 
+      "invalid_refresh": "Nieprawidłowy interwał odświeżania: %d",
       "config_load_failed": "Nie udało się załadować konfiguracji",
       "module_failed": "Moduł %s nie powiódł się: %v",
       "nvidia_smi_not_found": "Nie znaleziono nvidia-smi. Monitorowanie GPU wymaga sterowników NVIDIA",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Rozpoczęto monitorowanie",
-      "updating_every": "Aktualizacja co %d sekund", 
+      "updating_every": "Aktualizacja co %d sekund",
       "press_ctrl_c": "Naciśnij Ctrl+C, aby wyjść",
       "remote_mode": "Tryb zdalny na porcie %d",
-      "gpu_detected": "Wykryto GPU: %s",
-      "ai_training_detected": "Wykryto procesy szkolenia AI: %d",
-      "mining_detected": "Wykryto aktywność kopania: %s"
+      "gpu_detected": "Wykryto kartę graficzną: %s",
+      "ai_training_detected": "Wykryto procesy szkolenia SI: %d",
+      "mining_detected": "Wykryto aktywność kopania: %s",
+      "audio_detected": "Wykryto strumienie audio: %d",
+      "video_detected": "Wykryto strumienie wideo: %d"
     }
   }
 }

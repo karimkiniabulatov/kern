@@ -1,5 +1,5 @@
 {
-  "language": "Ukrainian (Українська)", 
+  "language": "Українська",
   "language_code": "uk",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Помилка",
       "unknown": "Невідомо",
       "total": "Всього",
-      "used": "Використано", 
+      "used": "Використано",
       "free": "Вільно",
       "available": "Доступно",
       "status": "Статус",
       "up": "ПРАЦЮЄ",
-      "down": "НЕ ПРАЦЮЄ"
+      "down": "ЗУПИНЕНО"
     },
     "cpu": {
-      "title": "Інформація про CPU",
+      "title": "Інформація про процесор",
       "model": "Модель",
       "cores": "Ядра",
       "threads": "Потоки",
       "usage": "Використання",
-      "frequency": "Частота", 
+      "frequency": "Частота",
       "load": "Навантаження",
       "load_1min": "1 хв",
       "load_5min": "5 хв",
@@ -30,8 +30,8 @@
       "load_average": "Середнє навантаження"
     },
     "memory": {
-      "title": "Інформація про пам'ять", 
-      "ram": "ОЗП",
+      "title": "Інформація про пам'ять",
+      "ram": "Оперативна пам'ять",
       "swap": "Своп",
       "physical": "Фізична пам'ять",
       "virtual": "Віртуальна пам'ять"
@@ -40,28 +40,28 @@
       "title": "Інформація про диск",
       "filesystem": "Файлова система",
       "size": "Розмір",
-      "mounted": "Змонтовано на", 
+      "mounted": "Змонтовано на",
       "usage": "Використання",
       "storage": "Сховище"
     },
     "network": {
-      "title": "Мережева інформація",
+      "title": "Інформація про мережу",
       "interface": "Інтерфейс",
       "received": "Отримано",
       "sent": "Відправлено",
-      "bytes": "байтів",
+      "bytes": "байт",
       "packets": "пакетів",
       "errors": "Помилки",
       "network_interfaces": "Мережеві інтерфейси"
     },
     "gpu": {
-      "title": "Інформація про GPU",
+      "title": "Інформація про відеокарту",
       "model": "Модель",
       "driver": "Драйвер",
       "temperature": "Температура",
       "memory": "Пам'ять",
       "utilization": "Використання",
-      "power": "Потужність",
+      "power": "Енергія",
       "clock_core": "Тактова частота ядра",
       "clock_memory": "Тактова частота пам'яті",
       "fan_speed": "Швидкість вентилятора"
@@ -70,7 +70,7 @@
       "title": "Навчання ШІ",
       "framework": "Фреймворк",
       "processes": "Процеси",
-      "vram": "VRAM",
+      "vram": "Відеопам'ять",
       "model": "Модель",
       "batch_size": "Розмір партії",
       "throughput": "Пропускна здатність",
@@ -84,34 +84,60 @@
       "title": "Інформація про майнінг",
       "algorithm": "Алгоритм",
       "hashrate": "Хешрейт",
-      "shares": "Шери",
+      "shares": "Шари",
       "temperature": "Температура",
-      "power": "Потужність",
+      "power": "Енергія",
       "efficiency": "Ефективність",
       "uptime": "Час роботи",
       "revenue_24h": "Дохід за 24 год",
       "pool": "Пул",
       "not_detected": "Активність майнінгу не виявлено"
     },
+    "audio": {
+      "title": "Інформація про аудіопотік",
+      "streams": "Потоки",
+      "sample_rate": "Частота дискретизації",
+      "channels": "Канали",
+      "format": "Формат",
+      "state": "Стан",
+      "playing": "Відтворення",
+      "paused": "Призупинено",
+      "stopped": "Зупинено",
+      "no_audio": "Аудіопотоки не виявлено"
+    },
+    "video": {
+      "title": "Інформація про відеопотік",
+      "streams": "Потоки",
+      "resolution": "Роздільна здатність",
+      "frame_rate": "Частота кадрів",
+      "codec": "Кодек",
+      "state": "Стан",
+      "playing": "Відтворення",
+      "paused": "Призупинено",
+      "stopped": "Зупинено",
+      "no_video": "Відеопотоки не виявлено"
+    },
     "ui": {
       "histogram": "Гістограма",
-      "vertical": "Вертикально", 
-      "horizontal": "Горизонтально",
+      "vertical": "Вертикальний",
+      "horizontal": "Горизонтальний",
       "loading": "Завантаження...",
       "no_data": "Немає даних",
-      "percent": "відсотків"
+      "percent": "відсоток"
     },
     "commands": {
       "help": "Допомога",
       "version": "Версія",
       "all": "Вся інформація",
       "disk_only": "Тільки диск",
-      "cpu_only": "Тільки CPU",
-      "memory_only": "Тільки пам'ять", 
+      "cpu_only": "Тільки процесор",
+      "memory_only": "Тільки пам'ять",
       "network_only": "Тільки мережа",
-      "gpu_only": "Тільки GPU",
+      "gpu_only": "Тільки відеокарта",
       "ai_only": "Тільки навчання ШІ",
       "mining_only": "Тільки майнінг",
+      "audio_only": "Тільки аудіо",
+      "video_only": "Тільки відео",
       "refresh_rate": "Частота оновлення",
       "language": "Мова",
       "remote": "Віддалений режим",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Команду не знайдено: %s",
       "invalid_port": "Недійсний порт: %d",
-      "invalid_refresh": "Недійсний інтервал оновлення: %d", 
+      "invalid_refresh": "Недійсний інтервал оновлення: %d",
       "config_load_failed": "Не вдалося завантажити конфігурацію",
-      "module_failed": "Модуль %s не вдався: %v",
+      "module_failed": "Модуль %s завершився помилкою: %v",
       "nvidia_smi_not_found": "nvidia-smi не знайдено. Для моніторингу GPU потрібні драйвери NVIDIA",
       "rocm_smi_not_found": "rocm-smi не знайдено. Для моніторингу AMD GPU потрібен ROCm"
     },
     "status": {
       "monitoring_started": "Моніторинг розпочато",
-      "updating_every": "Оновлення кожні %d секунд", 
+      "updating_every": "Оновлюється кожні %d секунд",
       "press_ctrl_c": "Натисніть Ctrl+C для виходу",
       "remote_mode": "Віддалений режим на порті %d",
-      "gpu_detected": "GPU виявлено: %s",
-      "ai_training_detected": "Процеси навчання ШІ виявлено: %d",
-      "mining_detected": "Активність майнінгу виявлено: %s"
+      "gpu_detected": "Відеокарта виявлена: %s",
+      "ai_training_detected": "Процеси навчання ШІ виявлені: %d",
+      "mining_detected": "Активність майнінгу виявлена: %s",
+      "audio_detected": "Аудіопотоки виявлені: %d",
+      "video_detected": "Відеопотоки виявлені: %d"
     }
   }
 }

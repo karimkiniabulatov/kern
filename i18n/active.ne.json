@@ -1,37 +1,37 @@
 {
-  "language": "Nepali (नेपाली)", 
+  "language": "नेपाली",
   "language_code": "ne",
   "translations": {
     "common": {
       "title": "kern - प्रणाली मोनिटर",
-      "refresh": "रिफ्रेस",
+      "refresh": "ताजा गर्नुहोस्",
       "seconds": "सेकेन्ड",
       "error": "त्रुटि",
       "unknown": "अज्ञात",
       "total": "कुल",
-      "used": "प्रयोग गरिएको", 
+      "used": "प्रयोग गरिएको",
       "free": "स्वतन्त्र",
       "available": "उपलब्ध",
       "status": "स्थिति",
-      "up": "चालू",
-      "down": "बन्द"
+      "up": "सक्रिय",
+      "down": "रोकिएको"
     },
     "cpu": {
-      "title": "CPU जानकारी",
+      "title": "सीपीयू जानकारी",
       "model": "मोडेल",
       "cores": "कोर",
       "threads": "थ्रेड",
       "usage": "प्रयोग",
-      "frequency": "आवृत्ति", 
+      "frequency": "आवृत्ति",
       "load": "लोड",
-      "load_1min": "1 मिनेट",
-      "load_5min": "5 मिनेट",
-      "load_15min": "15 मिनेट",
+      "load_1min": "१ मिनेट",
+      "load_5min": "५ मिनेट",
+      "load_15min": "१५ मिनेट",
       "load_average": "औसत लोड"
     },
     "memory": {
-      "title": "मेमोरी जानकारी", 
-      "ram": "RAM",
+      "title": "मेमोरी जानकारी",
+      "ram": "र्याम",
       "swap": "स्व्याप",
       "physical": "भौतिक मेमोरी",
       "virtual": "भर्चुअल मेमोरी"
@@ -40,7 +40,7 @@
       "title": "डिस्क जानकारी",
       "filesystem": "फाइल प्रणाली",
       "size": "आकार",
-      "mounted": "माउन्ट गरिएको", 
+      "mounted": "माउन्ट गरिएको",
       "usage": "प्रयोग",
       "storage": "भण्डारण"
     },
@@ -55,50 +55,74 @@
       "network_interfaces": "नेटवर्क इन्टरफेस"
     },
     "gpu": {
-      "title": "GPU जानकारी",
+      "title": "जीपीयू जानकारी",
       "model": "मोडेल",
       "driver": "ड्राइभर",
       "temperature": "तापक्रम",
       "memory": "मेमोरी",
-      "utilization": "प्रयोग",
-      "power": "पावर",
+      "utilization": "उपयोग",
+      "power": "शक्ति",
       "clock_core": "कोर क्लक",
       "clock_memory": "मेमोरी क्लक",
-      "fan_speed": "फ्यान स्पीड"
+      "fan_speed": "पंखा गति"
     },
     "ai": {
-      "title": "AI तालिम",
+      "title": "एआई प्रशिक्षण",
       "framework": "फ्रेमवर्क",
       "processes": "प्रक्रियाहरू",
-      "vram": "VRAM",
+      "vram": "भीर्याम",
       "model": "मोडेल",
       "batch_size": "ब्याच आकार",
       "throughput": "थ्रुपुट",
-      "epoch": "युग",
+      "epoch": "इपोक",
       "loss": "हानि",
       "accuracy": "शुद्धता",
-      "training_time": "तालिम समय",
-      "no_training": "AI तालिम फेला परेन"
+      "training_time": "प्रशिक्षण समय",
+      "no_training": "एआई प्रशिक्षण फेला परेन"
     },
     "mining": {
-      "title": "खनन जानकारी",
-      "algorithm": "एल्गोरिथ्म",
-      "hashrate": "ह्याश दर",
+      "title": "माइनिंग जानकारी",
+      "algorithm": "एल्गोरिदम",
+      "hashrate": "ह्यासरेट",
       "shares": "शेयर",
       "temperature": "तापक्रम",
-      "power": "पावर",
+      "power": "शक्ति",
       "efficiency": "दक्षता",
       "uptime": "अपटाइम",
-      "revenue_24h": "24घण्टा आय",
+      "revenue_24h": "२४ घण्टा आय",
       "pool": "पूल",
-      "not_detected": "खनन गतिविधि फेला परेन"
+      "not_detected": "माइनिंग गतिविधि फेला परेन"
+    },
+    "audio": {
+      "title": "अडियो स्ट्रिम जानकारी",
+      "streams": "स्ट्रिम",
+      "sample_rate": "नमूना दर",
+      "channels": "च्यानल",
+      "format": "ढाँचा",
+      "state": "अवस्था",
+      "playing": "चलिरहेको",
+      "paused": "पज गरिएको",
+      "stopped": "रोकिएको",
+      "no_audio": "अडियो स्ट्रिम फेला परेन"
+    },
+    "video": {
+      "title": "भिडियो स्ट्रिम जानकारी",
+      "streams": "स्ट्रिम",
+      "resolution": "रिजोल्यूशन",
+      "frame_rate": "फ्रेम दर",
+      "codec": "कोडेक",
+      "state": "अवस्था",
+      "playing": "चलिरहेको",
+      "paused": "पज गरिएको",
+      "stopped": "रोकिएको",
+      "no_video": "भिडियो स्ट्रिम फेला परेन"
     },
     "ui": {
       "histogram": "हिस्टोग्राम",
-      "vertical": "ठाडो", 
+      "vertical": "ठाडो",
       "horizontal": "तेर्सो",
-      "loading": "लोड हुदैछ...",
-      "no_data": "कुनै डाटा छैन",
+      "loading": "लोड हुँदै...",
+      "no_data": "डाटा छैन",
       "percent": "प्रतिशत"
     },
     "commands": {
@@ -106,13 +130,15 @@
       "version": "संस्करण",
       "all": "सबै जानकारी",
       "disk_only": "डिस्क मात्र",
-      "cpu_only": "CPU मात्र",
-      "memory_only": "मेमोरी मात्र", 
+      "cpu_only": "सीपीयू मात्र",
+      "memory_only": "मेमोरी मात्र",
       "network_only": "नेटवर्क मात्र",
-      "gpu_only": "GPU मात्र",
-      "ai_only": "AI तालिम मात्र",
-      "mining_only": "खनन मात्र",
-      "refresh_rate": "रिफ्रेस दर",
+      "gpu_only": "जीपीयू मात्र",
+      "ai_only": "एआई प्रशिक्षण मात्र",
+      "mining_only": "माइनिंग मात्र",
+      "audio_only": "अडियो मात्र",
+      "video_only": "भिडियो मात्र",
+      "refresh_rate": "ताजा गर्ने दर",
       "language": "भाषा",
       "remote": "रिमोट मोड",
       "port": "पोर्ट"
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "आदेश फेला परेन: %s",
       "invalid_port": "अमान्य पोर्ट: %d",
-      "invalid_refresh": "अमान्य रिफ्रेस अन्तराल: %d", 
+      "invalid_refresh": "अमान्य ताजा गर्ने अन्तराल: %d",
       "config_load_failed": "कन्फिग लोड गर्न असफल",
-      "module_failed": "मोड्युल %s असफल: %v",
-      "nvidia_smi_not_found": "nvidia-smi फेला परेन। GPU मोनिटरिङ्गको लागि NVIDIA ड्राइभर चाहिन्छ",
-      "rocm_smi_not_found": "rocm-smi फेला परेन। AMD GPU मोनिटरिङ्गको लागि ROCm चाहिन्छ"
+      "module_failed": "%s मोड्युल असफल: %v",
+      "nvidia_smi_not_found": "nvidia-smi फेला परेन। जीपीयू मोनिटरिंगको लागि एनभिडिया ड्राइभर चाहिन्छ",
+      "rocm_smi_not_found": "rocm-smi फेला परेन। एएमडी जीपीयू मोनिटरिंगको लागि आरओसीएम चाहिन्छ"
     },
     "status": {
-      "monitoring_started": "मोनिटरिङ्ग सुरु भयो",
-      "updating_every": "हरेक %d सेकेन्डमा अपडेट हुदैछ", 
-      "press_ctrl_c": "निस्कन Ctrl+C थिच्नुहोस्",
+      "monitoring_started": "मोनिटरिंग सुरु भयो",
+      "updating_every": "प्रत्येक %d सेकेन्डमा अद्यावधिक हुँदै",
+      "press_ctrl_c": "निस्कनको लागि Ctrl+C थिच्नुहोस्",
       "remote_mode": "पोर्ट %d मा रिमोट मोड",
-      "gpu_detected": "GPU फेला पर्यो: %s",
-      "ai_training_detected": "AI तालिम प्रक्रिया फेला पर्यो: %d",
-      "mining_detected": "खनन गतिविधि फेला पर्यो: %s"
+      "gpu_detected": "जीपीयू फेला पर्यो: %s",
+      "ai_training_detected": "एआई प्रशिक्षण प्रक्रिया फेला पर्यो: %d",
+      "mining_detected": "माइनिंग गतिविधि फेला पर्यो: %s",
+      "audio_detected": "अडियो स्ट्रिम फेला पर्यो: %d",
+      "video_detected": "भिडियो स्ट्रिम फेला पर्यो: %d"
     }
   }
 }

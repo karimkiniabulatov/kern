@@ -1,0 +1,167 @@
+{
+  "language": "සිංහල",
+  "language_code": "si",
+  "translations": {
+    "common": {
+      "title": "kern - පද්ධති නිරීක්ෂක",
+      "refresh": "නැවුම් කරන්න",
+      "seconds": "තත්පර",
+      "error": "දෝෂය",
+      "unknown": "නොදන්නා",
+      "total": "මුළු",
+      "used": "භාවිතා කළ",
+      "free": "නිදහස්",
+      "available": "ලබා ගත හැකි",
+      "status": "තත්වය",
+      "up": "ක්‍රියාත්මකයි",
+      "down": "නතර කළ"
+    },
+    "cpu": {
+      "title": "CPU තොරතුරු",
+      "model": "ආකෘතිය",
+      "cores": " cores",
+      "threads": "threads",
+      "usage": "භාවිතය",
+      "frequency": "සංඛ්‍යාතය",
+      "load": "පැටවුම",
+      "load_1min": "1 මිනි",
+      "load_5min": "5 මිනි",
+      "load_15min": "15 මිනි",
+      "load_average": "සාමාන්‍ය පැටවුම"
+    },
+    "memory": {
+      "title": "මතක තොරතුරු",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "භෞතික මතකය",
+      "virtual": "වර්චුවල් මතකය"
+    },
+    "disk": {
+      "title": "ඩිස්ක් තොරතුරු",
+      "filesystem": "ගොනු පද්ධතිය",
+      "size": "ප්‍රමාණය",
+      "mounted": "සවි කර ඇත",
+      "usage": "භාවිතය",
+      "storage": "ගබඩාව"
+    },
+    "network": {
+      "title": "ජාල තොරතුරු",
+      "interface": "අතුරු මුහුණත",
+      "received": "ලැබුණු",
+      "sent": "යවන ලද",
+      "bytes": "බයිට්",
+      "packets": "පැකට්",
+      "errors": "දෝෂ",
+      "network_interfaces": "ජාල අතුරු මුහුණත්"
+    },
+    "gpu": {
+      "title": "GPU තොරතුරු",
+      "model": "ආකෘතිය",
+      "driver": "ධාවකය",
+      "temperature": "උෂ්ණත්වය",
+      "memory": "මතකය",
+      "utilization": "භාවිතය",
+      "power": "බලය",
+      "clock_core": "Core ඔරලෝසුව",
+      "clock_memory": "මතක ඔරලෝසුව",
+      "fan_speed": "පංකා වේගය"
+    },
+    "ai": {
+      "title": "AI පුහුණුව",
+      "framework": "කාර්මුකය",
+      "processes": "ක්‍රියාවලි",
+      "vram": "VRAM",
+      "model": "ආකෘතිය",
+      "batch_size": "කණ්ඩායම් ප්‍රමාණය",
+      "throughput": "කාර්ය සාධනය",
+      "epoch": "යුගය",
+      "loss": "අලාභය",
+      "accuracy": "නිරවද්‍යතාව",
+      "training_time": "පුහුණු කාලය",
+      "no_training": "AI පුහුණුව හමු නොවීය"
+    },
+    "mining": {
+      "title": "Mining තොරතුරු",
+      "algorithm": "ඇල්ගොරිතමය",
+      "hashrate": "Hashrate",
+      "shares": "කොටස්",
+      "temperature": "උෂ්ණත්වය",
+      "power": "බලය",
+      "efficiency": "කාර්යක්ෂමතාව",
+      "uptime": "ක්‍රියාකාරී කාලය",
+      "revenue_24h": "පැය 24 ආදායම",
+      "pool": "Pool",
+      "not_detected": "Mining ක්‍රියාකාරකම් හමු නොවීය"
+    },
+    "audio": {
+      "title": "ශබ්ද ප්‍රවාහ තොරතුරු",
+      "streams": "ප්‍රවාහ",
+      "sample_rate": "සාම්පල අනුපාතය",
+      "channels": "නාලිකා",
+      "format": "ආකෘතිය",
+      "state": "තත්වය",
+      "playing": "වාදනය වේ",
+      "paused": "විරාම කළ",
+      "stopped": "නතර කළ",
+      "no_audio": "ශබ්ද ප්‍රවාහ හමු නොවීය"
+    },
+    "video": {
+      "title": "වීඩියෝ ප්‍රවාහ තොරතුරු",
+      "streams": "ප්‍රවාහ",
+      "resolution": "රෙසලුෂන්",
+      "frame_rate": "Frame අනුපාතය",
+      "codec": "කොඩෙක්",
+      "state": "තත්වය",
+      "playing": "වාදනය වේ",
+      "paused": "විරාම කළ",
+      "stopped": "නතර කළ",
+      "no_video": "වීඩියෝ ප්‍රවාහ හමු නොවීය"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "සිරස්",
+      "horizontal": "තිරස්",
+      "loading": "පූරණය වෙමින්...",
+      "no_data": "දත්ත නැත",
+      "percent": "සියයට"
+    },
+    "commands": {
+      "help": "උදව්",
+      "version": "පිටපත",
+      "all": "සියලුම තොරතුරු",
+      "disk_only": "ඩිස්ක් පමණි",
+      "cpu_only": "CPU පමණි",
+      "memory_only": "මතකය පමණි",
+      "network_only": "ජාලය පමණි",
+      "gpu_only": "GPU පමණි",
+      "ai_only": "AI පුහුණුව පමණි",
+      "mining_only": "Mining පමණි",
+      "audio_only": "ශබ්දය පමණි",
+      "video_only": "වීඩියෝ පමණි",
+      "refresh_rate": "නැවුම් කිරීමේ අනුපාතය",
+      "language": "භාෂාව",
+      "remote": "දුරස්ථ ප්‍රකාරය",
+      "port": "පොර්ට්"
+    },
+    "errors": {
+      "command_not_found": "විධානය හමු නොවීය: %s",
+      "invalid_port": "වලංගු නොවන පොර්ට්: %d",
+      "invalid_refresh": "වලංගු නොවන නැවුම් කිරීමේ විරාමය: %d",
+      "config_load_failed": "වින්‍යාසය පූරණය කිරීම අසාර්ථක විය",
+      "module_failed": "%s මොඩියුලය අසාර්ථක විය: %v",
+      "nvidia_smi_not_found": "nvidia-smi හමු නොවීය. GPU නිරීක්ෂණය සඳහා NVIDIA ධාවක අවශ්‍යය",
+      "rocm_smi_not_found": "rocm-smi හමු නොවීය. AMD GPU නිරීක්ෂණය සඳහා ROCm අවශ්‍යය"
+    },
+    "status": {
+      "monitoring_started": "නිරීක්ෂණය ආරම්භ විය",
+      "updating_every": "සෑම %d තත්පරයකට යාවත්කාලීන වේ",
+      "press_ctrl_c": "පිටවීමට Ctrl+C ඔබන්න",
+      "remote_mode": "පොර්ට් %d හි දුරස්ථ ප්‍රකාරය",
+      "gpu_detected": "GPU හමු විය: %s",
+      "ai_training_detected": "AI පුහුණු ක්‍රියාවලි හමු විය: %d",
+      "mining_detected": "Mining ක්‍රියාකාරකම් හමු විය: %s",
+      "audio_detected": "ශබ්ද ප්‍රවාහ හමු විය: %d",
+      "video_detected": "වීඩියෝ ප්‍රවාහ හමු විය: %d"
+    }
+  }
+}

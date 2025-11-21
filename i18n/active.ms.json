@@ -1,0 +1,167 @@
+{
+  "language": "Bahasa Melayu",
+  "language_code": "ms",
+  "translations": {
+    "common": {
+      "title": "kern - Pemantau Sistem",
+      "refresh": "Segar semula",
+      "seconds": "saat",
+      "error": "Ralat",
+      "unknown": "Tidak diketahui",
+      "total": "Jumlah",
+      "used": "Digunakan",
+      "free": "Bebas",
+      "available": "Tersedia",
+      "status": "Status",
+      "up": "HIDUP",
+      "down": "BERHENTI"
+    },
+    "cpu": {
+      "title": "Maklumat CPU",
+      "model": "Model",
+      "cores": "Teras",
+      "threads": "Benang",
+      "usage": "Penggunaan",
+      "frequency": "Frekuensi",
+      "load": "Beban",
+      "load_1min": "1 min",
+      "load_5min": "5 min",
+      "load_15min": "15 min",
+      "load_average": "Beban purata"
+    },
+    "memory": {
+      "title": "Maklumat Memori",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Memori Fizikal",
+      "virtual": "Memori Maya"
+    },
+    "disk": {
+      "title": "Maklumat Cakera",
+      "filesystem": "Sistem fail",
+      "size": "Saiz",
+      "mounted": "Dipasang pada",
+      "usage": "Penggunaan",
+      "storage": "Penyimpanan"
+    },
+    "network": {
+      "title": "Maklumat Rangkaian",
+      "interface": "Antara muka",
+      "received": "Diterima",
+      "sent": "Dihantar",
+      "bytes": "bait",
+      "packets": "paket",
+      "errors": "Ralat",
+      "network_interfaces": "Antara muka Rangkaian"
+    },
+    "gpu": {
+      "title": "Maklumat GPU",
+      "model": "Model",
+      "driver": "Pemacu",
+      "temperature": "Suhu",
+      "memory": "Memori",
+      "utilization": "Penggunaan",
+      "power": "Kuasa",
+      "clock_core": "Jam Teras",
+      "clock_memory": "Jam Memori",
+      "fan_speed": "Kelajuan Kipas"
+    },
+    "ai": {
+      "title": "Latihan AI",
+      "framework": "Rangka kerja",
+      "processes": "Proses",
+      "vram": "VRAM",
+      "model": "Model",
+      "batch_size": "Saiz Kelompok",
+      "throughput": "Throughput",
+      "epoch": "Epoch",
+      "loss": "Loss",
+      "accuracy": "Ketepatan",
+      "training_time": "Masa Latihan",
+      "no_training": "Tiada latihan AI dikesan"
+    },
+    "mining": {
+      "title": "Maklumat Perlombongan",
+      "algorithm": "Algoritma",
+      "hashrate": "Hashrate",
+      "shares": "Saham",
+      "temperature": "Suhu",
+      "power": "Kuasa",
+      "efficiency": "Kecekapan",
+      "uptime": "Masa aktif",
+      "revenue_24h": "Pendapatan 24j",
+      "pool": "Pool",
+      "not_detected": "Tiada aktiviti perlombongan dikesan"
+    },
+    "audio": {
+      "title": "Maklumat Aliran Audio",
+      "streams": "Aliran",
+      "sample_rate": "Kadar Sampel",
+      "channels": "Saluran",
+      "format": "Format",
+      "state": "Negeri",
+      "playing": "Main",
+      "paused": "Jeda",
+      "stopped": "Berhenti",
+      "no_audio": "Tiada aliran audio dikesan"
+    },
+    "video": {
+      "title": "Maklumat Aliran Video",
+      "streams": "Aliran",
+      "resolution": "Resolusi",
+      "frame_rate": "Kadar Bingkai",
+      "codec": "Codec",
+      "state": "Negeri",
+      "playing": "Main",
+      "paused": "Jeda",
+      "stopped": "Berhenti",
+      "no_video": "Tiada aliran video dikesan"
+    },
+    "ui": {
+      "histogram": "Histogram",
+      "vertical": "Menegak",
+      "horizontal": "Mendatar",
+      "loading": "Memuatkan...",
+      "no_data": "Tiada data",
+      "percent": "peratus"
+    },
+    "commands": {
+      "help": "Bantuan",
+      "version": "Versi",
+      "all": "Semua maklumat",
+      "disk_only": "Cakera sahaja",
+      "cpu_only": "CPU sahaja",
+      "memory_only": "Memori sahaja",
+      "network_only": "Rangkaian sahaja",
+      "gpu_only": "GPU sahaja",
+      "ai_only": "Latihan AI sahaja",
+      "mining_only": "Perlombongan sahaja",
+      "audio_only": "Audio sahaja",
+      "video_only": "Video sahaja",
+      "refresh_rate": "Kadar segar semula",
+      "language": "Bahasa",
+      "remote": "Mod jauh",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Arahan tidak ditemui: %s",
+      "invalid_port": "Port tidak sah: %d",
+      "invalid_refresh": "Selang segar semula tidak sah: %d",
+      "config_load_failed": "Gagal memuat konfigurasi",
+      "module_failed": "Modul %s gagal: %v",
+      "nvidia_smi_not_found": "nvidia-smi tidak ditemui. Pemantauan GPU memerlukan pemacu NVIDIA",
+      "rocm_smi_not_found": "rocm-smi tidak ditemui. Pemantauan AMD GPU memerlukan ROCm"
+    },
+    "status": {
+      "monitoring_started": "Pemantauan bermula",
+      "updating_every": "Mengemas kini setiap %d saat",
+      "press_ctrl_c": "Tekan Ctrl+C untuk keluar",
+      "remote_mode": "Mod jauh pada port %d",
+      "gpu_detected": "GPU dikesan: %s",
+      "ai_training_detected": "Proses latihan AI dikesan: %d",
+      "mining_detected": "Aktiviti perlombongan dikesan: %s",
+      "audio_detected": "Aliran audio dikesan: %d",
+      "video_detected": "Aliran video dikesan: %d"
+    }
+  }
+}

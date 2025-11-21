@@ -1,5 +1,5 @@
 {
-  "language": "Kazakh (Қазақша)", 
+  "language": "Қазақша",
   "language_code": "kk",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Қате",
       "unknown": "Белгісіз",
       "total": "Барлығы",
-      "used": "Пайдаланылған", 
+      "used": "Пайдаланылған",
       "free": "Бос",
       "available": "Қолжетімді",
-      "status": "Күй",
-      "up": "ҚОСУЛЫ",
-      "down": "ӨШІРУЛІ"
+      "status": "Статус",
+      "up": "ЖҰМЫС ІСТЕП ТҰР",
+      "down": "ТОҚТАТЫЛҒАН"
     },
     "cpu": {
-      "title": "CPU ақпараты",
+      "title": "Процессор туралы ақпарат",
       "model": "Модель",
       "cores": "Ядролар",
       "threads": "Ағындар",
       "usage": "Пайдалану",
-      "frequency": "Жиілік", 
+      "frequency": "Жиілік",
       "load": "Жүктеме",
       "load_1min": "1 мин",
       "load_5min": "5 мин",
@@ -30,22 +30,22 @@
       "load_average": "Орташа жүктеме"
     },
     "memory": {
-      "title": "Жад ақпараты", 
-      "ram": "RAM",
+      "title": "Жад туралы ақпарат",
+      "ram": "Жедел жад",
       "swap": "Своп",
-      "physical": "Физикалық жады",
-      "virtual": "Виртуалды жады"
+      "physical": "Физикалық жад",
+      "virtual": "Виртуалды жад"
     },
     "disk": {
-      "title": "Диск ақпараты",
-      "filesystem": "Файл жүйесі",
-      "size": "Өлшем",
-      "mounted": "Орнатылған", 
+      "title": "Диск туралы ақпарат",
+      "filesystem": "Файлдық жүйе",
+      "size": "Өлшемі",
+      "mounted": "Орнатылған",
       "usage": "Пайдалану",
       "storage": "Сақтау"
     },
     "network": {
-      "title": "Желі ақпараты",
+      "title": "Желі туралы ақпарат",
       "interface": "Интерфейс",
       "received": "Қабылданған",
       "sent": "Жіберілген",
@@ -55,7 +55,7 @@
       "network_interfaces": "Желі интерфейстері"
     },
     "gpu": {
-      "title": "GPU ақпараты",
+      "title": "Бейнекарта туралы ақпарат",
       "model": "Модель",
       "driver": "Драйвер",
       "temperature": "Температура",
@@ -64,41 +64,65 @@
       "power": "Қуат",
       "clock_core": "Ядро жиілігі",
       "clock_memory": "Жад жиілігі",
-      "fan_speed": "Вентилятор жылдамдығы"
+      "fan_speed": "Үрлегіш жылдамдығы"
     },
     "ai": {
-      "title": "AI оқыту",
+      "title": "Жасанды интеллект оқытуы",
       "framework": "Фреймворк",
       "processes": "Процестер",
-      "vram": "VRAM",
+      "vram": "Бейнежады",
       "model": "Модель",
       "batch_size": "Партия өлшемі",
-      "throughput": "Өткізу қабілеті",
+      "throughput": "Өнімділік",
       "epoch": "Эпоха",
       "loss": "Жоғалту",
       "accuracy": "Дәлдік",
       "training_time": "Оқыту уақыты",
-      "no_training": "AI оқыту табылмады"
+      "no_training": "Жасанды интеллект оқытуы анықталмады"
     },
     "mining": {
-      "title": "Майнинг ақпараты",
+      "title": "Майнинг туралы ақпарат",
       "algorithm": "Алгоритм",
-      "hashrate": "Хеш мөлшері",
-      "shares": "Пайлар",
+      "hashrate": "Хешрейт",
+      "shares": "Акциялар",
       "temperature": "Температура",
       "power": "Қуат",
       "efficiency": "Тиімділік",
       "uptime": "Жұмыс уақыты",
-      "revenue_24h": "24сағ табыс",
+      "revenue_24h": "24 сағаттық табыс",
       "pool": "Пул",
-      "not_detected": "Майнинг әрекеті табылмады"
+      "not_detected": "Майнинг әрекеті анықталмады"
+    },
+    "audio": {
+      "title": "Аудио ағыны туралы ақпарат",
+      "streams": "Ағындар",
+      "sample_rate": "Іріктеу жиілігі",
+      "channels": "Арналар",
+      "format": "Пішім",
+      "state": "Күй",
+      "playing": "Ойнатылуда",
+      "paused": "Кідірту",
+      "stopped": "Тоқтатылған",
+      "no_audio": "Аудио ағындары анықталмады"
+    },
+    "video": {
+      "title": "Бейне ағыны туралы ақпарат",
+      "streams": "Ағындар",
+      "resolution": "Ажыратымдылық",
+      "frame_rate": "Кадр жиілігі",
+      "codec": "Кодек",
+      "state": "Күй",
+      "playing": "Ойнатылуда",
+      "paused": "Кідірту",
+      "stopped": "Тоқтатылған",
+      "no_video": "Бейне ағындары анықталмады"
     },
     "ui": {
       "histogram": "Гистограмма",
-      "vertical": "Тік", 
+      "vertical": "Тік",
       "horizontal": "Көлденең",
       "loading": "Жүктелуде...",
-      "no_data": "Дерек жоқ",
+      "no_data": "Деректер жоқ",
       "percent": "пайыз"
     },
     "commands": {
@@ -106,34 +130,38 @@
       "version": "Нұсқа",
       "all": "Барлық ақпарат",
       "disk_only": "Тек диск",
-      "cpu_only": "Тек CPU",
-      "memory_only": "Тек жады", 
+      "cpu_only": "Тек процессор",
+      "memory_only": "Тек жад",
       "network_only": "Тек желі",
-      "gpu_only": "Тек GPU",
-      "ai_only": "Тек AI оқыту",
+      "gpu_only": "Тек бейнекарта",
+      "ai_only": "Тек ЖИ оқытуы",
       "mining_only": "Тек майнинг",
+      "audio_only": "Тек аудио",
+      "video_only": "Тек бейне",
       "refresh_rate": "Жаңарту жиілігі",
       "language": "Тіл",
-      "remote": "Қашықтықтан режим",
+      "remote": "Қашықтан режим",
       "port": "Порт"
     },
     "errors": {
-      "command_not_found": "Команда табылмады: %s",
+      "command_not_found": "Бұйрық табылмады: %s",
       "invalid_port": "Жарамсыз порт: %d",
-      "invalid_refresh": "Жарамсыз жаңарту аралығы: %d", 
-      "config_load_failed": "Конфигурацияны жүктеу сәтсіз",
-      "module_failed": "Модуль %s сәтсіз: %v",
+      "invalid_refresh": "Жарамсыз жаңарту аралығы: %d",
+      "config_load_failed": "Конфигурацияны жүктеу сәтсіз аяқталды",
+      "module_failed": "%s модулі сәтсіз: %v",
       "nvidia_smi_not_found": "nvidia-smi табылмады. GPU мониторингі үшін NVIDIA драйверлері қажет",
       "rocm_smi_not_found": "rocm-smi табылмады. AMD GPU мониторингі үшін ROCm қажет"
     },
     "status": {
       "monitoring_started": "Мониторинг басталды",
-      "updating_every": "Әр %d секунд сайын жаңартылады", 
+      "updating_every": "Әр %d секунд сайын жаңартылады",
       "press_ctrl_c": "Шығу үшін Ctrl+C басыңыз",
-      "remote_mode": "%D портында қашықтықтан режим",
-      "gpu_detected": "GPU табылды: %s",
-      "ai_training_detected": "AI оқыту процестері табылды: %d",
-      "mining_detected": "Майнинг әрекеті табылды: %s"
+      "remote_mode": "%d портында қашықтан режим",
+      "gpu_detected": "Бейнекарта анықталды: %s",
+      "ai_training_detected": "ЖИ оқыту процестері анықталды: %d",
+      "mining_detected": "Майнинг әрекеті анықталды: %s",
+      "audio_detected": "Аудио ағындары анықталды: %d",
+      "video_detected": "Бейне ағындары анықталды: %d"
     }
   }
 }

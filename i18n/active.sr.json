@@ -1,28 +1,28 @@
 {
-  "language": "Serbian (Српски)", 
+  "language": "Српски",
   "language_code": "sr",
   "translations": {
     "common": {
-      "title": "kern - Системски монитор",
+      "title": "kern - Монитор система",
       "refresh": "Освежи",
       "seconds": "сек",
       "error": "Грешка",
       "unknown": "Непознато",
       "total": "Укупно",
-      "used": "Искоришћено", 
+      "used": "Искоришћено",
       "free": "Слободно",
       "available": "Доступно",
       "status": "Статус",
-      "up": "УКЉУЧЕНО",
-      "down": "ИСКЉУЧЕНО"
+      "up": "РАДИ",
+      "down": "ЗАУСТАВЉЕНО"
     },
     "cpu": {
-      "title": "Информације о CPU",
+      "title": "Информације о процесору",
       "model": "Модел",
       "cores": "Језгра",
       "threads": "Нити",
-      "usage": "Искоришћење",
-      "frequency": "Фреквенција", 
+      "usage": "Коришћење",
+      "frequency": "Фреквенција",
       "load": "Оптерећење",
       "load_1min": "1 мин",
       "load_5min": "5 мин",
@@ -30,9 +30,9 @@
       "load_average": "Просечно оптерећење"
     },
     "memory": {
-      "title": "Информације о меморији", 
-      "ram": "RAM",
-      "swap": "Своп",
+      "title": "Информације о меморији",
+      "ram": "RAM меморија",
+      "swap": "Swap",
       "physical": "Физичка меморија",
       "virtual": "Виртуелна меморија"
     },
@@ -40,12 +40,12 @@
       "title": "Информације о диску",
       "filesystem": "Фајл систем",
       "size": "Величина",
-      "mounted": "Монтирано на", 
-      "usage": "Искоришћење",
+      "mounted": "Монтирано на",
+      "usage": "Коришћење",
       "storage": "Складиште"
     },
     "network": {
-      "title": "Мрежне информације",
+      "title": "Информације о мрежи",
       "interface": "Интерфејс",
       "received": "Примљено",
       "sent": "Послато",
@@ -55,22 +55,22 @@
       "network_interfaces": "Мрежни интерфејси"
     },
     "gpu": {
-      "title": "Информације о GPU",
+      "title": "Информације о графичкој картици",
       "model": "Модел",
       "driver": "Драјвер",
       "temperature": "Температура",
       "memory": "Меморија",
       "utilization": "Искоришћење",
-      "power": "Снага",
+      "power": "Енергија",
       "clock_core": "Такт језгра",
       "clock_memory": "Такт меморије",
       "fan_speed": "Брзина вентилатора"
     },
     "ai": {
-      "title": "AI обука",
+      "title": "Обука вештачке интелигенције",
       "framework": "Оквир",
       "processes": "Процеси",
-      "vram": "VRAM",
+      "vram": "Видео меморија",
       "model": "Модел",
       "batch_size": "Величина серије",
       "throughput": "Пропусност",
@@ -78,24 +78,48 @@
       "loss": "Губитак",
       "accuracy": "Тачност",
       "training_time": "Време обуке",
-      "no_training": "Није откривена AI обука"
+      "no_training": "Није откривена обука ВИ"
     },
     "mining": {
-      "title": "Информације о рударству",
+      "title": "Информације о рударењу",
       "algorithm": "Алгоритам",
-      "hashrate": "Хеш стопа",
+      "hashrate": "Хешрејт",
       "shares": "Удеси",
       "temperature": "Температура",
-      "power": "Снага",
+      "power": "Енергија",
       "efficiency": "Ефикасност",
       "uptime": "Време рада",
-      "revenue_24h": "24х приход",
+      "revenue_24h": "Приход за 24h",
       "pool": "Пул",
-      "not_detected": "Није откривена рударска активност"
+      "not_detected": "Није откривена активност рударења"
+    },
+    "audio": {
+      "title": "Информације о аудио стриму",
+      "streams": "Стримови",
+      "sample_rate": "Брзина узорковања",
+      "channels": "Канали",
+      "format": "Формат",
+      "state": "Стање",
+      "playing": "Репродукује",
+      "paused": "Паузирано",
+      "stopped": "Заустављено",
+      "no_audio": "Нису откривени аудио стримови"
+    },
+    "video": {
+      "title": "Информације о видео стриму",
+      "streams": "Стримови",
+      "resolution": "Резолуција",
+      "frame_rate": "Брзина кадрова",
+      "codec": "Кодек",
+      "state": "Стање",
+      "playing": "Репродукује",
+      "paused": "Паузирано",
+      "stopped": "Заустављено",
+      "no_video": "Нису откривени видео стримови"
     },
     "ui": {
       "histogram": "Хистограм",
-      "vertical": "Вертикално", 
+      "vertical": "Вертикално",
       "horizontal": "Хоризонтално",
       "loading": "Учитавање...",
       "no_data": "Нема података",
@@ -106,12 +130,14 @@
       "version": "Верзија",
       "all": "Све информације",
       "disk_only": "Само диск",
-      "cpu_only": "Само CPU",
-      "memory_only": "Само меморија", 
+      "cpu_only": "Само процесор",
+      "memory_only": "Само меморија",
       "network_only": "Само мрежа",
-      "gpu_only": "Само GPU",
-      "ai_only": "Само AI обука",
-      "mining_only": "Само рударство",
+      "gpu_only": "Само графичка",
+      "ai_only": "Само ВИ обука",
+      "mining_only": "Само рударење",
+      "audio_only": "Само аудио",
+      "video_only": "Само видео",
       "refresh_rate": "Брзина освежавања",
       "language": "Језик",
       "remote": "Даљински режим",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Команда није пронађена: %s",
       "invalid_port": "Неважећи порт: %d",
-      "invalid_refresh": "Неважећи интервал освежавања: %d", 
-      "config_load_failed": "Није успело учитавање конфигурације",
+      "invalid_refresh": "Неважећи интервал освежавања: %d",
+      "config_load_failed": "Учитавање конфигурације није успело",
       "module_failed": "Модул %s није успео: %v",
-      "nvidia_smi_not_found": "nvidia-smi није пронађен. Праћење GPU захтева NVIDIA драјвере",
-      "rocm_smi_not_found": "rocm-smi није пронађен. Праћење AMD GPU захтева ROCm"
+      "nvidia_smi_not_found": "nvidia-smi није пронађен. За надзор GPU су потребни NVIDIA драјвери",
+      "rocm_smi_not_found": "rocm-smi није пронађен. За надзор AMD GPU је потребан ROCm"
     },
     "status": {
-      "monitoring_started": "Праћење је покренуто",
-      "updating_every": "Ажурирање сваких %d секунди", 
+      "monitoring_started": "Надзор је покренут",
+      "updating_every": "Ажурира се сваких %d секунди",
       "press_ctrl_c": "Притисните Ctrl+C за излаз",
       "remote_mode": "Даљински режим на порту %d",
-      "gpu_detected": "GPU откривен: %s",
-      "ai_training_detected": "AI обуке процеси откривени: %d",
-      "mining_detected": "Рударска активност откривена: %s"
+      "gpu_detected": "Графичка картица откривена: %s",
+      "ai_training_detected": "Откривени процеси обуке ВИ: %d",
+      "mining_detected": "Откривена активност рударења: %s",
+      "audio_detected": "Откривени аудио стримови: %d",
+      "video_detected": "Откривени видео стримови: %d"
     }
   }
 }

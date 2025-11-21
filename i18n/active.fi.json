@@ -1,5 +1,5 @@
 {
-  "language": "Finnish (Suomi)", 
+  "language": "Suomi",
   "language_code": "fi",
   "translations": {
     "common": {
@@ -9,43 +9,43 @@
       "error": "Virhe",
       "unknown": "Tuntematon",
       "total": "Yhteensä",
-      "used": "Käytetty", 
+      "used": "Käytetty",
       "free": "Vapaa",
-      "available": "Käytettävissä",
+      "available": "Saatavilla",
       "status": "Tila",
-      "up": "YLÖS",
-      "down": "ALAS"
+      "up": "TOIMII",
+      "down": "PAYETTY"
     },
     "cpu": {
-      "title": "CPU-tiedot",
+      "title": "Suorittimen tiedot",
       "model": "Malli",
       "cores": "Ytimet",
       "threads": "Säikeet",
       "usage": "Käyttö",
-      "frequency": "Taajuus", 
-      "load": "Kuorma",
+      "frequency": "Taajuus",
+      "load": "Kuormitus",
       "load_1min": "1 min",
       "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Keskiarvoinen kuorma"
+      "load_average": "Keskimääräinen kuormitus"
     },
     "memory": {
-      "title": "Muistitiedot", 
-      "ram": "RAM",
+      "title": "Muistin tiedot",
+      "ram": "RAM-muisti",
       "swap": "Swap",
-      "physical": "Fysikaalinen muisti",
+      "physical": "Fyysinen muisti",
       "virtual": "Virtuaalimuisti"
     },
     "disk": {
-      "title": "Levytiedot",
+      "title": "Levyn tiedot",
       "filesystem": "Tiedostojärjestelmä",
       "size": "Koko",
-      "mounted": "Liitetty kohteeseen", 
+      "mounted": "Liitetty kohteeseen",
       "usage": "Käyttö",
       "storage": "Tallennus"
     },
     "network": {
-      "title": "Verkkotiedot",
+      "title": "Verkon tiedot",
       "interface": "Rajapinta",
       "received": "Vastaanotettu",
       "sent": "Lähetetty",
@@ -55,48 +55,72 @@
       "network_interfaces": "Verkkorajapinnat"
     },
     "gpu": {
-      "title": "GPU-tiedot",
+      "title": "Näytönohjaimen tiedot",
       "model": "Malli",
       "driver": "Ohjain",
       "temperature": "Lämpötila",
       "memory": "Muisti",
-      "utilization": "Käyttöaste",
+      "utilization": "Käyttö",
       "power": "Teho",
       "clock_core": "Ydintaajuus",
       "clock_memory": "Muistitaajuus",
       "fan_speed": "Tuulettimen nopeus"
     },
     "ai": {
-      "title": "AI-koulutus",
+      "title": "Tekoälyn koulutus",
       "framework": "Kehys",
       "processes": "Prosessit",
-      "vram": "VRAM",
+      "vram": "Videomuisti",
       "model": "Malli",
-      "batch_size": "Eräkoko",
-      "throughput": "Läpimeno",
+      "batch_size": "Erän koko",
+      "throughput": "Suorituskyky",
       "epoch": "Epookki",
       "loss": "Häviö",
       "accuracy": "Tarkkuus",
       "training_time": "Koulutusaika",
-      "no_training": "AI-koulutusta ei havaittu"
+      "no_training": "Tekoälyn koulutusta ei havaittu"
     },
     "mining": {
-      "title": "Louhintatiedot",
+      "title": "Louhinnan tiedot",
       "algorithm": "Algoritmi",
-      "hashrate": "Hash-nopeus",
+      "hashrate": "Hashrate",
       "shares": "Osakkeet",
       "temperature": "Lämpötila",
       "power": "Teho",
       "efficiency": "Tehokkuus",
-      "uptime": "Käyntiaika",
+      "uptime": "Käyttöaika",
       "revenue_24h": "24h tulot",
       "pool": "Pooli",
-      "not_detected": "Louhinta-aktiviteettia ei havaittu"
+      "not_detected": "Louhintatoimintaa ei havaittu"
+    },
+    "audio": {
+      "title": "Äänistreamin tiedot",
+      "streams": "Striimit",
+      "sample_rate": "Näytetaajuus",
+      "channels": "Kanavat",
+      "format": "Muoto",
+      "state": "Tila",
+      "playing": "Toistaa",
+      "paused": "Tauolla",
+      "stopped": "Pysäytetty",
+      "no_audio": "Äänistriimejä ei havaittu"
+    },
+    "video": {
+      "title": "Videostreamin tiedot",
+      "streams": "Striimit",
+      "resolution": "Resoluutio",
+      "frame_rate": "Kuvataajuus",
+      "codec": "Koodekki",
+      "state": "Tila",
+      "playing": "Toistaa",
+      "paused": "Tauolla",
+      "stopped": "Pysäytetty",
+      "no_video": "Videostriimejä ei havaittu"
     },
     "ui": {
       "histogram": "Histogrammi",
-      "vertical": "Pystysuora", 
-      "horizontal": "Vaakasuora",
+      "vertical": "Pysty",
+      "horizontal": "Vaaka",
       "loading": "Ladataan...",
       "no_data": "Ei dataa",
       "percent": "prosenttia"
@@ -106,12 +130,14 @@
       "version": "Versio",
       "all": "Kaikki tiedot",
       "disk_only": "Vain levy",
-      "cpu_only": "Vain CPU",
-      "memory_only": "Vain muisti", 
+      "cpu_only": "Vain suoritin",
+      "memory_only": "Vain muisti",
       "network_only": "Vain verkko",
-      "gpu_only": "Vain GPU",
-      "ai_only": "Vain AI-koulutus",
+      "gpu_only": "Vain näytönohjain",
+      "ai_only": "Vain tekoälyn koulutus",
       "mining_only": "Vain louhinta",
+      "audio_only": "Vain ääni",
+      "video_only": "Vain video",
       "refresh_rate": "Päivitystaajuus",
       "language": "Kieli",
       "remote": "Etätila",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Komentoa ei löytynyt: %s",
       "invalid_port": "Virheellinen portti: %d",
-      "invalid_refresh": "Virheellinen päivitysväli: %d", 
-      "config_load_failed": "Konfiguraation lataus epäonnistui",
+      "invalid_refresh": "Virheellinen päivitysväli: %d",
+      "config_load_failed": "Asetusten lataus epäonnistui",
       "module_failed": "Moduuli %s epäonnistui: %v",
-      "nvidia_smi_not_found": "nvidia-smi ei löytynyt. GPU-valvonta vaatii NVIDIA-ohjaimet",
-      "rocm_smi_not_found": "rocm-smi ei löytynyt. AMD GPU-valvonta vaatii ROCm"
+      "nvidia_smi_not_found": "nvidia-smi ei löytynyt. GPU:n valvonta vaatii NVIDIA-ohjaimia",
+      "rocm_smi_not_found": "rocm-smi ei löytynyt. AMD GPU:n valvonta vaatii ROCmia"
     },
     "status": {
       "monitoring_started": "Valvonta aloitettu",
-      "updating_every": "Päivitetään %d sekunnin välein", 
+      "updating_every": "Päivittää %d sekunnin välein",
       "press_ctrl_c": "Paina Ctrl+C poistuaksesi",
       "remote_mode": "Etätila portissa %d",
-      "gpu_detected": "GPU havaittu: %s",
-      "ai_training_detected": "AI-koulutusprosesseja havaittu: %d",
-      "mining_detected": "Louhinta-aktiviteetti havaittu: %s"
+      "gpu_detected": "Näytönohjain havaittu: %s",
+      "ai_training_detected": "Tekoälyn koulutusprosesseja havaittu: %d",
+      "mining_detected": "Louhintatoiminta havaittu: %s",
+      "audio_detected": "Äänistriimejä havaittu: %d",
+      "video_detected": "Videostriimejä havaittu: %d"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Estonian (Eesti)", 
+  "language": "Eesti",
   "language_code": "et",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Viga",
       "unknown": "Tundmatu",
       "total": "Kokku",
-      "used": "Kasutatud", 
+      "used": "Kasutatud",
       "free": "Vaba",
       "available": "Saadaval",
       "status": "Olek",
-      "up": "SEES",
-      "down": "VÄLJAS"
+      "up": "TOIMIB",
+      "down": "PEATATUD"
     },
     "cpu": {
-      "title": "CPU informatsioon",
+      "title": "Protsessori teave",
       "model": "Mudel",
       "cores": "Tuumad",
       "threads": "Lõimed",
       "usage": "Kasutus",
-      "frequency": "Sagedus", 
+      "frequency": "Sagedus",
       "load": "Koormus",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,22 +30,22 @@
       "load_average": "Keskmine koormus"
     },
     "memory": {
-      "title": "Mälu informatsioon", 
+      "title": "Mälu teave",
       "ram": "RAM",
-      "swap": "Vahemälu",
+      "swap": "Swap",
       "physical": "Füüsiline mälu",
       "virtual": "Virtuaalmälu"
     },
     "disk": {
-      "title": "Ketta informatsioon",
+      "title": "Ketta teave",
       "filesystem": "Failisüsteem",
       "size": "Suurus",
-      "mounted": "Paigaldatud", 
+      "mounted": "Paigaldatud",
       "usage": "Kasutus",
       "storage": "Salvestus"
     },
     "network": {
-      "title": "Võrgu informatsioon",
+      "title": "Võrgu teave",
       "interface": "Liides",
       "received": "Vastu võetud",
       "sent": "Saadetud",
@@ -55,7 +55,7 @@
       "network_interfaces": "Võrguliidesed"
     },
     "gpu": {
-      "title": "GPU informatsioon",
+      "title": "GPU teave",
       "model": "Mudel",
       "driver": "Draiver",
       "temperature": "Temperatuur",
@@ -67,23 +67,23 @@
       "fan_speed": "Ventilaatori kiirus"
     },
     "ai": {
-      "title": "AI treening",
+      "title": "Tehisintellekti treenimine",
       "framework": "Raamistik",
       "processes": "Protsessid",
-      "vram": "VRAM",
+      "vram": "Videomälu",
       "model": "Mudel",
       "batch_size": "Partii suurus",
       "throughput": "Läbilaskevõime",
       "epoch": "Epohh",
       "loss": "Kaotus",
       "accuracy": "Täpsus",
-      "training_time": "Treeningu aeg",
-      "no_training": "AI treeningut ei tuvastatud"
+      "training_time": "Treeningaeg",
+      "no_training": "Tehisintellekti treenimist ei tuvastatud"
     },
     "mining": {
-      "title": "Kaevandamise informatsioon",
+      "title": "Kaevandamise teave",
       "algorithm": "Algoritm",
-      "hashrate": "Hash kiirus",
+      "hashrate": "Hashrate",
       "shares": "Osad",
       "temperature": "Temperatuur",
       "power": "Võimsus",
@@ -93,9 +93,33 @@
       "pool": "Pool",
       "not_detected": "Kaevandamise tegevust ei tuvastatud"
     },
+    "audio": {
+      "title": "Helivoogude teave",
+      "streams": "Vood",
+      "sample_rate": "Diskreetimissagedus",
+      "channels": "Kanalid",
+      "format": "Vorming",
+      "state": "Olek",
+      "playing": "Mängib",
+      "paused": "Pausil",
+      "stopped": "Peatatud",
+      "no_audio": "Helivoogusid ei tuvastatud"
+    },
+    "video": {
+      "title": "Videovoogude teave",
+      "streams": "Vood",
+      "resolution": "Eraldusvõime",
+      "frame_rate": "Kaadrisagedus",
+      "codec": "Koodek",
+      "state": "Olek",
+      "playing": "Mängib",
+      "paused": "Pausil",
+      "stopped": "Peatatud",
+      "no_video": "Videovoogusid ei tuvastatud"
+    },
     "ui": {
       "histogram": "Histogramm",
-      "vertical": "Vertikaalne", 
+      "vertical": "Vertikaalne",
       "horizontal": "Horisontaalne",
       "loading": "Laadimine...",
       "no_data": "Andmeid pole",
@@ -104,14 +128,16 @@
     "commands": {
       "help": "Abi",
       "version": "Versioon",
-      "all": "Kogu informatsioon",
+      "all": "Kogu teave",
       "disk_only": "Ainult ketas",
-      "cpu_only": "Ainult CPU",
-      "memory_only": "Ainult mälu", 
+      "cpu_only": "Ainult protsessor",
+      "memory_only": "Ainult mälu",
       "network_only": "Ainult võrk",
       "gpu_only": "Ainult GPU",
-      "ai_only": "Ainult AI treening",
+      "ai_only": "Ainult AI treenimine",
       "mining_only": "Ainult kaevandamine",
+      "audio_only": "Ainult heli",
+      "video_only": "Ainult video",
       "refresh_rate": "Värskendussagedus",
       "language": "Keel",
       "remote": "Kaugrežiim",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Käsku ei leitud: %s",
       "invalid_port": "Vigane port: %d",
-      "invalid_refresh": "Vigane värskendusintervall: %d", 
+      "invalid_refresh": "Vigane värskendusintervall: %d",
       "config_load_failed": "Seadistuse laadimine ebaõnnestus",
       "module_failed": "Moodul %s ebaõnnestus: %v",
-      "nvidia_smi_not_found": "nvidia-smi ei leitud. GPU jälgimine nõuab NVIDIA draivereid",
-      "rocm_smi_not_found": "rocm-smi ei leitud. AMD GPU jälgimine nõuab ROCm"
+      "nvidia_smi_not_found": "nvidia-smi ei leitud. GPU monitorimiseks on vaja NVIDIA draivereid",
+      "rocm_smi_not_found": "rocm-smi ei leitud. AMD GPU monitorimiseks on vaja ROCmi"
     },
     "status": {
-      "monitoring_started": "Jälgimine alustatud",
-      "updating_every": "Uuendamine iga %d sekundi järel", 
+      "monitoring_started": "Monitorimine alustatud",
+      "updating_every": "Uuendab iga %d sekundi järel",
       "press_ctrl_c": "Väljumiseks vajutage Ctrl+C",
       "remote_mode": "Kaugrežiim pordil %d",
       "gpu_detected": "GPU tuvastatud: %s",
-      "ai_training_detected": "AI treeningu protsessid tuvastatud: %d",
-      "mining_detected": "Kaevandamise tegevus tuvastatud: %s"
+      "ai_training_detected": "AI treenimisprotsessid tuvastatud: %d",
+      "mining_detected": "Kaevandamise tegevus tuvastatud: %s",
+      "audio_detected": "Helivoogusid tuvastatud: %d",
+      "video_detected": "Videovoogusid tuvastatud: %d"
     }
   }
 }

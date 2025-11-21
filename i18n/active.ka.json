@@ -1,5 +1,5 @@
 {
-  "language": "Georgian (ქართული)", 
+  "language": "ქართული",
   "language_code": "ka",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "შეცდომა",
       "unknown": "უცნობი",
       "total": "სულ",
-      "used": "გამოყენებული", 
+      "used": "გამოყენებული",
       "free": "თავისუფალი",
       "available": "ხელმისაწვდომი",
       "status": "სტატუსი",
-      "up": "ჩართული",
-      "down": "გამორთული"
+      "up": "მუშაობს",
+      "down": "გაჩერებული"
     },
     "cpu": {
-      "title": "CPU ინფორმაცია",
+      "title": "პროცესორის ინფორმაცია",
       "model": "მოდელი",
-      "cores": "ბირთვები",
-      "threads": "ნაკადები",
+      "cores": "ბირთვი",
+      "threads": "ნაკადი",
       "usage": "გამოყენება",
-      "frequency": "სიხშირე", 
+      "frequency": "სიხშირე",
       "load": "დატვირთვა",
       "load_1min": "1 წთ",
       "load_5min": "5 წთ",
@@ -30,8 +30,8 @@
       "load_average": "საშუალო დატვირთვა"
     },
     "memory": {
-      "title": "მეხსიერების ინფორმაცია", 
-      "ram": "RAM",
+      "title": "მეხსიერების ინფორმაცია",
+      "ram": "ოპერატიული მეხსიერება",
       "swap": "Swap",
       "physical": "ფიზიკური მეხსიერება",
       "virtual": "ვირტუალური მეხსიერება"
@@ -40,9 +40,9 @@
       "title": "დისკის ინფორმაცია",
       "filesystem": "ფაილური სისტემა",
       "size": "ზომა",
-      "mounted": "მონტაჟებულია", 
+      "mounted": "დამონტაჟებულია",
       "usage": "გამოყენება",
-      "storage": "შენახვა"
+      "storage": "საცავი"
     },
     "network": {
       "title": "ქსელის ინფორმაცია",
@@ -55,22 +55,22 @@
       "network_interfaces": "ქსელის ინტერფეისები"
     },
     "gpu": {
-      "title": "GPU ინფორმაცია",
+      "title": "ვიდეოკარტის ინფორმაცია",
       "model": "მოდელი",
       "driver": "დრაივერი",
       "temperature": "ტემპერატურა",
       "memory": "მეხსიერება",
       "utilization": "გამოყენება",
-      "power": "სიმძლავრე",
-      "clock_core": "ბირთვის სიხშირე",
-      "clock_memory": "მეხსიერების სიხშირე",
-      "fan_speed": "გულშემატკივრის სიჩქარე"
+      "power": "ენერგია",
+      "clock_core": "ბირთვის საათი",
+      "clock_memory": "მეხსიერების საათი",
+      "fan_speed": "გულშემატკივარის სიჩქარე"
     },
     "ai": {
       "title": "AI ტრენინგი",
       "framework": "ფრეიმვორკი",
       "processes": "პროცესები",
-      "vram": "VRAM",
+      "vram": "ვიდეო მეხსიერება",
       "model": "მოდელი",
       "batch_size": "ბაჩის ზომა",
       "throughput": "გამტარუნარიანობა",
@@ -83,19 +83,43 @@
     "mining": {
       "title": "მაინინგის ინფორმაცია",
       "algorithm": "ალგორითმი",
-      "hashrate": "ჰეშრეიტი",
-      "shares": "წილი",
+      "hashrate": "ჰეშრეითი",
+      "shares": "შეარები",
       "temperature": "ტემპერატურა",
-      "power": "სიმძლავრე",
+      "power": "ენერგია",
       "efficiency": "ეფექტურობა",
       "uptime": "მუშაობის დრო",
-      "revenue_24h": "24ს შემოსავალი",
-      "pool": "პული",
+      "revenue_24h": "24სთ შემოსავალი",
+      "pool": "აუზი",
       "not_detected": "მაინინგის აქტივობა არ აღმოჩენილა"
+    },
+    "audio": {
+      "title": "აუდიო სტრიმის ინფორმაცია",
+      "streams": "სტრიმები",
+      "sample_rate": "სემპლის სიხშირე",
+      "channels": "არხები",
+      "format": "ფორმატი",
+      "state": "სტატუსი",
+      "playing": "შესრულება",
+      "paused": "დაპაუზებული",
+      "stopped": "გაჩერებული",
+      "no_audio": "აუდიო სტრიმები არ აღმოჩენილა"
+    },
+    "video": {
+      "title": "ვიდეო სტრიმის ინფორმაცია",
+      "streams": "სტრიმები",
+      "resolution": "რეზოლუცია",
+      "frame_rate": "კადრის სიხშირე",
+      "codec": "კოდეკი",
+      "state": "სტატუსი",
+      "playing": "შესრულება",
+      "paused": "დაპაუზებული",
+      "stopped": "გაჩერებული",
+      "no_video": "ვიდეო სტრიმები არ აღმოჩენილა"
     },
     "ui": {
       "histogram": "ჰისტოგრამა",
-      "vertical": "ვერტიკალური", 
+      "vertical": "ვერტიკალური",
       "horizontal": "ჰორიზონტალური",
       "loading": "იტვირთება...",
       "no_data": "მონაცემები არ არის",
@@ -106,12 +130,14 @@
       "version": "ვერსია",
       "all": "ყველა ინფორმაცია",
       "disk_only": "მხოლოდ დისკი",
-      "cpu_only": "მხოლოდ CPU",
-      "memory_only": "მხოლოდ მეხსიერება", 
+      "cpu_only": "მხოლოდ პროცესორი",
+      "memory_only": "მხოლოდ მეხსიერება",
       "network_only": "მხოლოდ ქსელი",
-      "gpu_only": "მხოლოდ GPU",
+      "gpu_only": "მხოლოდ ვიდეოკარტა",
       "ai_only": "მხოლოდ AI ტრენინგი",
       "mining_only": "მხოლოდ მაინინგი",
+      "audio_only": "მხოლოდ აუდიო",
+      "video_only": "მხოლოდ ვიდეო",
       "refresh_rate": "განახლების სიხშირე",
       "language": "ენა",
       "remote": "დისტანციური რეჟიმი",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "ბრძანება არ მოიძებნა: %s",
       "invalid_port": "არასწორი პორტი: %d",
-      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d", 
+      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d",
       "config_load_failed": "კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
       "module_failed": "მოდული %s ვერ მოხერხდა: %v",
-      "nvidia_smi_not_found": "nvidia-smi არ მოიძებნა. GPU მონიტორინგისთვის საჭიროა NVIDIA დრაივერები",
-      "rocm_smi_not_found": "rocm-smi არ მოიძებნა. AMD GPU მონიტორინგისთვის საჭიროა ROCm"
+      "nvidia_smi_not_found": "nvidia-smi არ მოიძებნა. GPU-ს მონიტორინგისთვის საჭიროა NVIDIA დრაივერები",
+      "rocm_smi_not_found": "rocm-smi არ მოიძებნა. AMD GPU-ს მონიტორინგისთვის საჭიროა ROCm"
     },
     "status": {
       "monitoring_started": "მონიტორინგი დაიწყო",
-      "updating_every": "განახლება ყოველ %d წამში", 
+      "updating_every": "განახლება ყოველ %d წამში",
       "press_ctrl_c": "გასასვლელად დააჭირეთ Ctrl+C",
       "remote_mode": "დისტანციური რეჟიმი პორტზე %d",
-      "gpu_detected": "GPU აღმოჩენილია: %s",
+      "gpu_detected": "ვიდეოკარტა აღმოჩენილია: %s",
       "ai_training_detected": "AI ტრენინგის პროცესები აღმოჩენილია: %d",
-      "mining_detected": "მაინინგის აქტივობა აღმოჩენილია: %s"
+      "mining_detected": "მაინინგის აქტივობა აღმოჩენილია: %s",
+      "audio_detected": "აუდიო სტრიმები აღმოჩენილია: %d",
+      "video_detected": "ვიდეო სტრიმები აღმოჩენილია: %d"
     }
   }
 }

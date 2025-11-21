@@ -1,5 +1,5 @@
 {
-  "language": "Hindi (हिन्दी)", 
+  "language": "हिन्दी",
   "language_code": "hi",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "त्रुटि",
       "unknown": "अज्ञात",
       "total": "कुल",
-      "used": "उपयोग किया गया", 
+      "used": "उपयोग किया गया",
       "free": "मुक्त",
       "available": "उपलब्ध",
       "status": "स्थिति",
@@ -22,7 +22,7 @@
       "cores": "कोर",
       "threads": "थ्रेड",
       "usage": "उपयोग",
-      "frequency": "आवृत्ति", 
+      "frequency": "फ्रीक्वेंसी",
       "load": "लोड",
       "load_1min": "1 मिनट",
       "load_5min": "5 मिनट",
@@ -30,26 +30,26 @@
       "load_average": "औसत लोड"
     },
     "memory": {
-      "title": "मेमोरी जानकारी", 
-      "ram": "रैम",
+      "title": "मेमोरी जानकारी",
+      "ram": "RAM",
       "swap": "स्वैप",
-      "physical": "भौतिक मेमोरी",
-      "virtual": "आभासी मेमोरी"
+      "physical": "फिजिकल मेमोरी",
+      "virtual": "वर्चुअल मेमोरी"
     },
     "disk": {
       "title": "डिस्क जानकारी",
       "filesystem": "फाइल सिस्टम",
-      "size": "आकार",
-      "mounted": "माउंटेड ऑन", 
+      "size": "साइज",
+      "mounted": "माउंटेड",
       "usage": "उपयोग",
-      "storage": "संग्रहण"
+      "storage": "स्टोरेज"
     },
     "network": {
       "title": "नेटवर्क जानकारी",
       "interface": "इंटरफेस",
       "received": "प्राप्त",
       "sent": "भेजा गया",
-      "bytes": "बाइट्स",
+      "bytes": "बाइट",
       "packets": "पैकेट",
       "errors": "त्रुटियाँ",
       "network_interfaces": "नेटवर्क इंटरफेस"
@@ -69,71 +69,99 @@
     "ai": {
       "title": "एआई ट्रेनिंग",
       "framework": "फ्रेमवर्क",
-      "processes": "प्रक्रियाएं",
+      "processes": "प्रोसेस",
       "vram": "वीरैम",
       "model": "मॉडल",
       "batch_size": "बैच साइज",
       "throughput": "थ्रूपुट",
-      "epoch": "युग",
+      "epoch": "ईपॉक",
       "loss": "लॉस",
-      "accuracy": "सटीकता",
-      "training_time": "प्रशिक्षण समय",
+      "accuracy": "एक्यूरेसी",
+      "training_time": "ट्रेनिंग समय",
       "no_training": "कोई एआई ट्रेनिंग नहीं मिली"
     },
     "mining": {
       "title": "माइनिंग जानकारी",
-      "algorithm": "एल्गोरिदम",
+      "algorithm": "अल्गोरिदम",
       "hashrate": "हैशरेट",
-      "shares": "शेयर्स",
+      "shares": "शेयर",
       "temperature": "तापमान",
       "power": "पावर",
-      "efficiency": "दक्षता",
+      "efficiency": "एफिशिएंसी",
       "uptime": "अपटाइम",
       "revenue_24h": "24 घंटे की आय",
       "pool": "पूल",
-      "not_detected": "कोई माइनिंग गतिविधि नहीं मिली"
+      "not_detected": "कोई माइनिंग एक्टिविटी नहीं मिली"
+    },
+    "audio": {
+      "title": "ऑडियो स्ट्रीम जानकारी",
+      "streams": "स्ट्रीम",
+      "sample_rate": "सैंपल रेट",
+      "channels": "चैनल",
+      "format": "फॉर्मेट",
+      "state": "स्टेट",
+      "playing": "चल रहा है",
+      "paused": "पॉज",
+      "stopped": "बंद",
+      "no_audio": "कोई ऑडियो स्ट्रीम नहीं मिली"
+    },
+    "video": {
+      "title": "वीडियो स्ट्रीम जानकारी",
+      "streams": "स्ट्रीम",
+      "resolution": "रिज़ॉल्यूशन",
+      "frame_rate": "फ्रेम रेट",
+      "codec": "कोडेक",
+      "state": "स्टेट",
+      "playing": "चल रहा है",
+      "paused": "पॉज",
+      "stopped": "बंद",
+      "no_video": "कोई वीडियो स्ट्रीम नहीं मिली"
     },
     "ui": {
       "histogram": "हिस्टोग्राम",
-      "vertical": "ऊर्ध्वाधर", 
-      "horizontal": "क्षैतिज",
+      "vertical": "वर्टिकल",
+      "horizontal": "हॉरिजॉन्टल",
       "loading": "लोड हो रहा है...",
       "no_data": "कोई डेटा नहीं",
       "percent": "प्रतिशत"
     },
     "commands": {
-      "help": "सहायता",
-      "version": "संस्करण",
-      "all": "सभी जानकारी",
-      "disk_only": "केवल डिस्क",
-      "cpu_only": "केवल सीपीयू",
-      "memory_only": "केवल मेमोरी", 
-      "network_only": "केवल नेटवर्क",
-      "gpu_only": "केवल जीपीयू",
-      "ai_only": "केवल एआई ट्रेनिंग",
-      "mining_only": "केवल माइनिंग",
+      "help": "हेल्प",
+      "version": "वर्जन",
+      "all": "सारी जानकारी",
+      "disk_only": "सिर्फ डिस्क",
+      "cpu_only": "सिर्फ सीपीयू",
+      "memory_only": "सिर्फ मेमोरी",
+      "network_only": "सिर्फ नेटवर्क",
+      "gpu_only": "सिर्फ जीपीयू",
+      "ai_only": "सिर्फ एआई ट्रेनिंग",
+      "mining_only": "सिर्फ माइनिंग",
+      "audio_only": "सिर्फ ऑडियो",
+      "video_only": "सिर्फ वीडियो",
       "refresh_rate": "रिफ्रेश रेट",
       "language": "भाषा",
       "remote": "रिमोट मोड",
       "port": "पोर्ट"
     },
     "errors": {
-      "command_not_found": "कमांड नहीं मिला: %s",
+      "command_not_found": "कमांड नहीं मिली: %s",
       "invalid_port": "अमान्य पोर्ट: %d",
-      "invalid_refresh": "अमान्य रिफ्रेश अंतराल: %d", 
-      "config_load_failed": "कॉन्फ़िगरेशन लोड करने में विफल",
-      "module_failed": "मॉड्यूल %s विफल: %v",
-      "nvidia_smi_not_found": "nvidia-smi नहीं मिला। जीपीयू मॉनिटरिंग के लिए NVIDIA ड्राइवरों की आवश्यकता है",
-      "rocm_smi_not_found": "rocm-smi नहीं मिला। AMD जीपीयू मॉनिटरिंग के लिए ROCm की आवश्यकता है"
+      "invalid_refresh": "अमान्य रिफ्रेश इंटरवल: %d",
+      "config_load_failed": "कॉन्फिग लोड नहीं हो पाई",
+      "module_failed": "मॉड्यूल %s फेल: %v",
+      "nvidia_smi_not_found": "nvidia-smi नहीं मिली। जीपीयू मॉनिटरिंग के लिए NVIDIA ड्राइवर जरूरी है",
+      "rocm_smi_not_found": "rocm-smi नहीं मिली। AMD जीपीयू मॉनिटरिंग के लिए ROCm जरूरी है"
     },
     "status": {
-      "monitoring_started": "मॉनिटरिंग शुरू हो गई",
-      "updating_every": "हर %d सेकंड में अपडेट हो रहा है", 
+      "monitoring_started": "मॉनिटरिंग शुरू हुई",
+      "updating_every": "हर %d सेकंड में अपडेट होता है",
       "press_ctrl_c": "बाहर निकलने के लिए Ctrl+C दबाएं",
-      "remote_mode": "पोर्ट %d पर रिमोट मोड",
-      "gpu_detected": "जीपीयू पाया गया: %s",
-      "ai_training_detected": "एआई ट्रेनिंग प्रक्रियाएं पाई गईं: %d",
-      "mining_detected": "माइनिंग गतिविधि पाई गई: %s"
+      "remote_mode": "रिमोट मोड पोर्ट %d",
+      "gpu_detected": "जीपीयू मिली: %s",
+      "ai_training_detected": "एआई ट्रेनिंग प्रोसेस मिली: %d",
+      "mining_detected": "माइनिंग एक्टिविटी मिली: %s",
+      "audio_detected": "ऑडियो स्ट्रीम मिली: %d",
+      "video_detected": "वीडियो स्ट्रीम मिली: %d"
     }
   }
 }

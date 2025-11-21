@@ -1,5 +1,5 @@
 {
-  "language": "Bashkir (Башҡорт)", 
+  "language": "Башҡортса",
   "language_code": "ba",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Хата",
       "unknown": "Билдәһеҙ",
       "total": "Барлығы",
-      "used": "Ҡулланылған", 
+      "used": "Ҡулланылған",
       "free": "Буш",
       "available": "Мөмкин",
       "status": "Хәл",
-      "up": "ЭШЛӘЙ",
-      "down": "ЭШЛӘМӘЙ"
+      "up": "Эшләй",
+      "down": "Туҡтатылған"
     },
     "cpu": {
-      "title": "CPU тураһында мәғлүмәт",
+      "title": "Процессор тураһында мәғлүмәт",
       "model": "Модель",
       "cores": "Ядролар",
       "threads": "Һептар",
       "usage": "Ҡулланыу",
-      "frequency": "Ешлыҡ", 
+      "frequency": "Ешлыҡ",
       "load": "Йөк",
       "load_1min": "1 мин",
       "load_5min": "5 мин",
@@ -30,8 +30,8 @@
       "load_average": "Уртаса йөк"
     },
     "memory": {
-      "title": "Хәтер тураһында мәғлүмәт", 
-      "ram": "RAM",
+      "title": "Хәтер тураһында мәғлүмәт",
+      "ram": "Оператив хәтер",
       "swap": "Своп",
       "physical": "Физик хәтер",
       "virtual": "Виртуаль хәтер"
@@ -39,8 +39,8 @@
     "disk": {
       "title": "Диск тураһында мәғлүмәт",
       "filesystem": "Файл системаһы",
-      "size": "Зурлыҡ",
-      "mounted": "Урынлашҡан", 
+      "size": "Күләм",
+      "mounted": "Урынлашҡан",
       "usage": "Ҡулланыу",
       "storage": "Хранилище"
     },
@@ -50,54 +50,78 @@
       "received": "Алынған",
       "sent": "Ебәрелгән",
       "bytes": "байт",
-      "packets": "пакет",
+      "packets": "пакеттар",
       "errors": "Хаталар",
       "network_interfaces": "Сесть интерфейстары"
     },
     "gpu": {
-      "title": "GPU тураһында мәғлүмәт",
+      "title": "Видеокарта тураһында мәғлүмәт",
       "model": "Модель",
       "driver": "Драйвер",
       "temperature": "Температура",
       "memory": "Хәтер",
       "utilization": "Ҡулланыу",
-      "power": "Көс",
+      "power": "Энергия",
       "clock_core": "Ядро ешлығы",
       "clock_memory": "Хәтер ешлығы",
       "fan_speed": "Вентилятор тиҙлеге"
     },
     "ai": {
-      "title": "AI өйрәнеү",
+      "title": "Яҫыл интеллектты өйрәтеү",
       "framework": "Фреймворк",
       "processes": "Процессар",
-      "vram": "VRAM",
+      "vram": "Видеохәтер",
       "model": "Модель",
       "batch_size": "Партия күләме",
-      "throughput": "Үткәргеслек",
+      "throughput": "Һелпем",
       "epoch": "Эпоха",
       "loss": "Юғалтыу",
       "accuracy": "Төгәллек",
-      "training_time": "Өйрәнеү ваҡыты",
-      "no_training": "AI өйрәнеү табылманы"
+      "training_time": "Өйрәтеү ваҡыты",
+      "no_training": "Яҫыл интеллектты өйрәтеү табылманы"
     },
     "mining": {
-      "title": "Мајнинг тураһында мәғлүмәт",
+      "title": "Майнинг тураһында мәғлүмәт",
       "algorithm": "Алгоритм",
-      "hashrate": "Хеш тиҙлеге",
-      "shares": "Пайлар",
+      "hashrate": "Хешрейт",
+      "shares": "Share-лар",
       "temperature": "Температура",
-      "power": "Көс",
+      "power": "Энергия",
       "efficiency": "Эффективлыҡ",
       "uptime": "Эш ваҡыты",
-      "revenue_24h": "24с табыш",
+      "revenue_24h": "24 сәғәтлек килем",
       "pool": "Пул",
-      "not_detected": "Мајнинг эшмәкәрлеге табылманы"
+      "not_detected": "Майнинг эшмәкәрлеге табылманы"
+    },
+    "audio": {
+      "title": "Аудиопоток тураһында мәғлүмәт",
+      "streams": "Потоктар",
+      "sample_rate": "Дискретизация ешлығы",
+      "channels": "Каналдар",
+      "format": "Формат",
+      "state": "Хәл",
+      "playing": "Уйнай",
+      "paused": "Туҡтатылған",
+      "stopped": "Туҡтаҡ",
+      "no_audio": "Аудиопотоктар табылманы"
+    },
+    "video": {
+      "title": "Видеопоток тураһында мәғлүмәт",
+      "streams": "Потоктар",
+      "resolution": "Разрешение",
+      "frame_rate": "Кадр ешлығы",
+      "codec": "Кодек",
+      "state": "Хәл",
+      "playing": "Уйнай",
+      "paused": "Туҡтатылған",
+      "stopped": "Туҡтаҡ",
+      "no_video": "Видеопотоктар табылманы"
     },
     "ui": {
       "histogram": "Гистограмма",
-      "vertical": "Тик", 
-      "horizontal": "Ятаң",
-      "loading": "Йөкләнеү...",
+      "vertical": "Вертикаль",
+      "horizontal": "Горизонталь",
+      "loading": "Йөкләй...",
       "no_data": "Мәғлүмәт юҡ",
       "percent": "процент"
     },
@@ -106,34 +130,38 @@
       "version": "Версия",
       "all": "Бөтә мәғлүмәт",
       "disk_only": "Диск ғына",
-      "cpu_only": "CPU ғына",
-      "memory_only": "Хәтер ғына", 
+      "cpu_only": "Процессор ғына",
+      "memory_only": "Хәтер ғына",
       "network_only": "Сесть ғына",
-      "gpu_only": "GPU ғына",
-      "ai_only": "AI өйрәнеү ғына",
-      "mining_only": "Мајнинг ғына",
+      "gpu_only": "Видеокарта ғына",
+      "ai_only": "Яҫыл интеллект ғына",
+      "mining_only": "Майнинг ғына",
+      "audio_only": "Аудио ғына",
+      "video_only": "Видео ғына",
       "refresh_rate": "Яңыртыу ешлығы",
       "language": "Тел",
-      "remote": "Ылыҫ режимы",
+      "remote": "Сығанаҡ режимы",
       "port": "Порт"
     },
     "errors": {
       "command_not_found": "Команда табылманы: %s",
-      "invalid_port": "Яраҡһыҙ порт: %d",
-      "invalid_refresh": "Яраҡһыҙ яңыртыу арауығы: %d", 
-      "config_load_failed": "Конфигурация йөкләү хатаһы",
-      "module_failed": "Модуль %s хатаһы: %v",
-      "nvidia_smi_not_found": "nvidia-smi табылманы. GPU күҙәтеү өсөн NVIDIA драйверҙары кәрәк",
-      "rocm_smi_not_found": "rocm-smi табылманы. AMD GPU күҙәтеү өсөн ROCm кәрәк"
+      "invalid_port": "Дөрөҫһөҙ порт: %d",
+      "invalid_refresh": "Дөрөҫһөҙ яңыртыу арауығы: %d",
+      "config_load_failed": "Конфигурацияны йөкләү хатаһы",
+      "module_failed": "%s модуле хатаһы: %v",
+      "nvidia_smi_not_found": "nvidia-smi табылманы. Видеокартаны күҙәтеү өсөн NVIDIA драйверҙары кәрәк",
+      "rocm_smi_not_found": "rocm-smi табылманы. AMD видеокартаһын күҙәтеү өсөн ROCm кәрәк"
     },
     "status": {
       "monitoring_started": "Күҙәтеү башланды",
-      "updating_every": "Һәр %d секундта яңыртыла", 
+      "updating_every": "Һәр %d секунд яңырана",
       "press_ctrl_c": "Сығыу өсөн Ctrl+C баҫығыҙ",
-      "remote_mode": "%d портында ылыҫ режимы",
-      "gpu_detected": "GPU табылды: %s",
-      "ai_training_detected": "AI өйрәнеү процессстары табылды: %d",
-      "mining_detected": "Мајнинг эшмәкәрлеге табылды: %s"
+      "remote_mode": "Сығанаҡ режимы %d портта",
+      "gpu_detected": "Видеокарта табылды: %s",
+      "ai_training_detected": "Яҫыл интеллектты өйрәтеү процессстары табылды: %d",
+      "mining_detected": "Майнинг эшмәкәрлеге табылды: %s",
+      "audio_detected": "Аудиопотоктар табылды: %d",
+      "video_detected": "Видеопотоктар табылды: %d"
     }
   }
 }

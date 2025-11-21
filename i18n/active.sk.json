@@ -1,5 +1,5 @@
 {
-  "language": "Slovak (Slovenčina)", 
+  "language": "Slovenčina",
   "language_code": "sk",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Chyba",
       "unknown": "Neznáme",
       "total": "Celkom",
-      "used": "Použité", 
+      "used": "Použité",
       "free": "Voľné",
       "available": "Dostupné",
       "status": "Stav",
-      "up": "ZAPNUTÉ",
-      "down": "VYPNUTÉ"
+      "up": "FUNGUE",
+      "down": "ZASTAVENÉ"
     },
     "cpu": {
-      "title": "Informácie o CPU",
+      "title": "Informácie o procesore",
       "model": "Model",
       "cores": "Jadrá",
       "threads": "Vlákna",
       "usage": "Využitie",
-      "frequency": "Frekvencia", 
+      "frequency": "Frekvencia",
       "load": "Zaťaženie",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,7 +30,7 @@
       "load_average": "Priemerné zaťaženie"
     },
     "memory": {
-      "title": "Informácie o pamäti", 
+      "title": "Informácie o pamäti",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fyzická pamäť",
@@ -40,12 +40,12 @@
       "title": "Informácie o disku",
       "filesystem": "Súborový systém",
       "size": "Veľkosť",
-      "mounted": "Pripojené na", 
+      "mounted": "Namontované na",
       "usage": "Využitie",
       "storage": "Úložisko"
     },
     "network": {
-      "title": "Sieťové informácie",
+      "title": "Informácie o sieti",
       "interface": "Rozhranie",
       "received": "Prijaté",
       "sent": "Odoslané",
@@ -55,7 +55,7 @@
       "network_interfaces": "Sieťové rozhrania"
     },
     "gpu": {
-      "title": "Informácie o GPU",
+      "title": "Informácie o grafickej karte",
       "model": "Model",
       "driver": "Ovládač",
       "temperature": "Teplota",
@@ -67,36 +67,60 @@
       "fan_speed": "Rýchlosť ventilátora"
     },
     "ai": {
-      "title": "AI tréning",
+      "title": "Tréning umelej inteligencie",
       "framework": "Framework",
       "processes": "Procesy",
-      "vram": "VRAM",
+      "vram": "Video pamäť",
       "model": "Model",
       "batch_size": "Veľkosť dávky",
-      "throughput": "Prenosová rýchlosť",
+      "throughput": "Priechodnosť",
       "epoch": "Epocha",
       "loss": "Strata",
       "accuracy": "Presnosť",
       "training_time": "Čas tréningu",
-      "no_training": "Nebol zistený AI tréning"
+      "no_training": "Nebol zistený tréning UI"
     },
     "mining": {
       "title": "Informácie o ťažbe",
       "algorithm": "Algoritmus",
-      "hashrate": "Hash rýchlosť",
+      "hashrate": "Hashrate",
       "shares": "Podiely",
       "temperature": "Teplota",
       "power": "Výkon",
       "efficiency": "Efektívnosť",
-      "uptime": "Doba prevádzky",
-      "revenue_24h": "24h výnos",
+      "uptime": "Doba činnosti",
+      "revenue_24h": "Príjem za 24h",
       "pool": "Pool",
       "not_detected": "Nebola zistená ťažobná aktivita"
     },
+    "audio": {
+      "title": "Informácie o audio prúde",
+      "streams": "Prúdy",
+      "sample_rate": "Vzorkovacia frekvencia",
+      "channels": "Kanály",
+      "format": "Formát",
+      "state": "Stav",
+      "playing": "Prehráva sa",
+      "paused": "Pozastavené",
+      "stopped": "Zastavené",
+      "no_audio": "Neboli zistené audio prúdy"
+    },
+    "video": {
+      "title": "Informácie o video prúde",
+      "streams": "Prúdy",
+      "resolution": "Rozlíšenie",
+      "frame_rate": "Počet snímok",
+      "codec": "Kodek",
+      "state": "Stav",
+      "playing": "Prehráva sa",
+      "paused": "Pozastavené",
+      "stopped": "Zastavené",
+      "no_video": "Neboli zistené video prúdy"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Vertikálne", 
-      "horizontal": "Horizontálne",
+      "vertical": "Vertikálny",
+      "horizontal": "Horizontálny",
       "loading": "Načítava sa...",
       "no_data": "Žiadne dáta",
       "percent": "percent"
@@ -106,34 +130,38 @@
       "version": "Verzia",
       "all": "Všetky informácie",
       "disk_only": "Iba disk",
-      "cpu_only": "Iba CPU",
-      "memory_only": "Iba pamäť", 
+      "cpu_only": "Iba procesor",
+      "memory_only": "Iba pamäť",
       "network_only": "Iba sieť",
-      "gpu_only": "Iba GPU",
-      "ai_only": "Iba AI tréning",
+      "gpu_only": "Iba grafická karta",
+      "ai_only": "Iba tréning UI",
       "mining_only": "Iba ťažba",
+      "audio_only": "Iba audio",
+      "video_only": "Iba video",
       "refresh_rate": "Frekvencia obnovovania",
       "language": "Jazyk",
       "remote": "Vzdialený režim",
       "port": "Port"
     },
     "errors": {
-      "command_not_found": "Príkaz nebol nájdený: %s",
+      "command_not_found": "Príkaz nenájdený: %s",
       "invalid_port": "Neplatný port: %d",
-      "invalid_refresh": "Neplatný interval obnovovania: %d", 
+      "invalid_refresh": "Neplatný interval obnovovania: %d",
       "config_load_failed": "Nepodarilo sa načítať konfiguráciu",
       "module_failed": "Modul %s zlyhal: %v",
-      "nvidia_smi_not_found": "nvidia-smi nebol nájdený. Sledovanie GPU vyžaduje ovládače NVIDIA",
-      "rocm_smi_not_found": "rocm-smi nebol nájdený. Sledovanie AMD GPU vyžaduje ROCm"
+      "nvidia_smi_not_found": "nvidia-smi nenájdený. Monitorovanie GPU vyžaduje ovládače NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nenájdený. Monitorovanie AMD GPU vyžaduje ROCm"
     },
     "status": {
-      "monitoring_started": "Sledovanie bolo spustené",
-      "updating_every": "Aktualizácia každých %d sekúnd", 
+      "monitoring_started": "Monitorovanie spustené",
+      "updating_every": "Aktualizuje sa každých %d sekúnd",
       "press_ctrl_c": "Stlačte Ctrl+C pre ukončenie",
       "remote_mode": "Vzdialený režim na porte %d",
-      "gpu_detected": "GPU zistené: %s",
-      "ai_training_detected": "AI tréningové procesy zistené: %d",
-      "mining_detected": "Ťažobná aktivita zistená: %s"
+      "gpu_detected": "Grafická karta zistená: %s",
+      "ai_training_detected": "Procesy tréningu UI zistené: %d",
+      "mining_detected": "Ťažobná aktivita zistená: %s",
+      "audio_detected": "Audio prúdy zistené: %d",
+      "video_detected": "Video prúdy zistené: %d"
     }
   }
 }

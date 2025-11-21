@@ -1,0 +1,167 @@
+{
+  "language": "O'zbek",
+  "language_code": "uz",
+  "translations": {
+    "common": {
+      "title": "kern - Tizim monitori",
+      "refresh": "Yangilash",
+      "seconds": "sek",
+      "error": "Xato",
+      "unknown": "Noma'lum",
+      "total": "Jami",
+      "used": "Ishlatilgan",
+      "free": "Bo'sh",
+      "available": "Mavjud",
+      "status": "Holat",
+      "up": "ISHLAMOQDA",
+      "down": "TO'XTATILGAN"
+    },
+    "cpu": {
+      "title": "Protsessor ma'lumoti",
+      "model": "Model",
+      "cores": "Yadrolar",
+      "threads": "Iplar",
+      "usage": "Ishlatish",
+      "frequency": "Chastota",
+      "load": "Yuk",
+      "load_1min": "1 min",
+      "load_5min": "5 min",
+      "load_15min": "15 min",
+      "load_average": "O'rtacha yuk"
+    },
+    "memory": {
+      "title": "Xotira ma'lumoti",
+      "ram": "RAM",
+      "swap": "Swap",
+      "physical": "Fizik xotira",
+      "virtual": "Virtual xotira"
+    },
+    "disk": {
+      "title": "Disk ma'lumoti",
+      "filesystem": "Fayl tizimi",
+      "size": "Hajmi",
+      "mounted": "O'rnatilgan",
+      "usage": "Ishlatish",
+      "storage": "Saqlash"
+    },
+    "network": {
+      "title": "Tarmoq ma'lumoti",
+      "interface": "Interfeys",
+      "received": "Qabul qilingan",
+      "sent": "Yuborilgan",
+      "bytes": "bayt",
+      "packets": "paket",
+      "errors": "Xatolar",
+      "network_interfaces": "Tarmoq interfeyslari"
+    },
+    "gpu": {
+      "title": "Videokarta ma'lumoti",
+      "model": "Model",
+      "driver": "Drayver",
+      "temperature": "Harorat",
+      "memory": "Xotira",
+      "utilization": "Ishlatish",
+      "power": "Quvvat",
+      "clock_core": "Yadro chastotasi",
+      "clock_memory": "Xotira chastotasi",
+      "fan_speed": "Ventilyator tezligi"
+    },
+    "ai": {
+      "title": "Sun'iy intellekt mashg'uloti",
+      "framework": "Freymvork",
+      "processes": "Jarayonlar",
+      "vram": "Video xotira",
+      "model": "Model",
+      "batch_size": "Partiya hajmi",
+      "throughput": "O'tkazuvchanlik",
+      "epoch": "Epoxa",
+      "loss": "Yo'qotish",
+      "accuracy": "Aniqlik",
+      "training_time": "Mashg'ulot vaqti",
+      "no_training": "SI mashg'uloti topilmadi"
+    },
+    "mining": {
+      "title": "Mining ma'lumoti",
+      "algorithm": "Algoritm",
+      "hashrate": "Xeshrate",
+      "shares": "Aktsiyalar",
+      "temperature": "Harorat",
+      "power": "Quvvat",
+      "efficiency": "Samaradorlik",
+      "uptime": "Ish vaqti",
+      "revenue_24h": "24 soat daromad",
+      "pool": "Hovuz",
+      "not_detected": "Mining faoliyati topilmadi"
+    },
+    "audio": {
+      "title": "Audio oqim ma'lumoti",
+      "streams": "Oqimlar",
+      "sample_rate": "Namuna chastotasi",
+      "channels": "Kanallar",
+      "format": "Format",
+      "state": "Holat",
+      "playing": "Ijro",
+      "paused": "To'xtatilgan",
+      "stopped": "To'xtatilgan",
+      "no_audio": "Audio oqimlar topilmadi"
+    },
+    "video": {
+      "title": "Video oqim ma'lumoti",
+      "streams": "Oqimlar",
+      "resolution": "Razresheniye",
+      "frame_rate": "Kadr chastotasi",
+      "codec": "Kodek",
+      "state": "Holat",
+      "playing": "Ijro",
+      "paused": "To'xtatilgan",
+      "stopped": "To'xtatilgan",
+      "no_video": "Video oqimlar topilmadi"
+    },
+    "ui": {
+      "histogram": "Gistogramma",
+      "vertical": "Vertikal",
+      "horizontal": "Gorizontal",
+      "loading": "Yuklanmoqda...",
+      "no_data": "Ma'lumot yo'q",
+      "percent": "foiz"
+    },
+    "commands": {
+      "help": "Yordam",
+      "version": "Versiya",
+      "all": "Barcha ma'lumot",
+      "disk_only": "Faqat disk",
+      "cpu_only": "Faqat protsessor",
+      "memory_only": "Faqat xotira",
+      "network_only": "Faqat tarmoq",
+      "gpu_only": "Faqat videokarta",
+      "ai_only": "Faqat SI mashg'uloti",
+      "mining_only": "Faqat mining",
+      "audio_only": "Faqat audio",
+      "video_only": "Faqat video",
+      "refresh_rate": "Yangilash chastotasi",
+      "language": "Til",
+      "remote": "Masofaviy rejim",
+      "port": "Port"
+    },
+    "errors": {
+      "command_not_found": "Buyruq topilmadi: %s",
+      "invalid_port": "Noto'g'ri port: %d",
+      "invalid_refresh": "Noto'g'ri yangilash oralig'i: %d",
+      "config_load_failed": "Konfiguratsiyani yuklab bo'lmadi",
+      "module_failed": "%s moduli muvaffaqiyatsiz: %v",
+      "nvidia_smi_not_found": "nvidia-smi topilmadi. GPU monitoringi uchun NVIDIA drayverlari kerak",
+      "rocm_smi_not_found": "rocm-smi topilmadi. AMD GPU monitoringi uchun ROCm kerak"
+    },
+    "status": {
+      "monitoring_started": "Monitoring boshlandi",
+      "updating_every": "Har %d soniyada yangilanadi",
+      "press_ctrl_c": "Chiqish uchun Ctrl+C bosing",
+      "remote_mode": "%d portida masofaviy rejim",
+      "gpu_detected": "Videokarta topildi: %s",
+      "ai_training_detected": "SI mashg'ulot jarayonlari topildi: %d",
+      "mining_detected": "Mining faoliyati topildi: %s",
+      "audio_detected": "Audio oqimlar topildi: %d",
+      "video_detected": "Video oqimlar topildi: %d"
+    }
+  }
+}

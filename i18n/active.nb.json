@@ -1,6 +1,6 @@
 {
-  "language": "Norwegian (Norsk)", 
-  "language_code": "no",
+  "language": "Norsk Bokmål",
+  "language_code": "nb",
   "translations": {
     "common": {
       "title": "kern - Systemovervåker",
@@ -9,12 +9,12 @@
       "error": "Feil",
       "unknown": "Ukjent",
       "total": "Totalt",
-      "used": "Brukt", 
+      "used": "Brukt",
       "free": "Ledig",
       "available": "Tilgjengelig",
       "status": "Status",
-      "up": "OPPE",
-      "down": "NEDE"
+      "up": "AKTIV",
+      "down": "STANSET"
     },
     "cpu": {
       "title": "CPU-informasjon",
@@ -22,7 +22,7 @@
       "cores": "Kjerner",
       "threads": "Tråder",
       "usage": "Bruk",
-      "frequency": "Frekvens", 
+      "frequency": "Frekvens",
       "load": "Belastning",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,7 +30,7 @@
       "load_average": "Gjennomsnittlig belastning"
     },
     "memory": {
-      "title": "Minneinformasjon", 
+      "title": "Minneinformasjon",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysisk minne",
@@ -40,7 +40,7 @@
       "title": "Diskinformasjon",
       "filesystem": "Filsystem",
       "size": "Størrelse",
-      "mounted": "Montert på", 
+      "mounted": "Montert på",
       "usage": "Bruk",
       "storage": "Lagring"
     },
@@ -83,19 +83,43 @@
     "mining": {
       "title": "Mining-informasjon",
       "algorithm": "Algoritme",
-      "hashrate": "Hashhastighet",
-      "shares": "Andeler",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
       "temperature": "Temperatur",
       "power": "Effekt",
       "efficiency": "Effektivitet",
       "uptime": "Oppetid",
-      "revenue_24h": "24h inntekt",
+      "revenue_24h": "24t inntekt",
       "pool": "Pool",
       "not_detected": "Ingen mining-aktivitet oppdaget"
     },
+    "audio": {
+      "title": "Lydstrøm-informasjon",
+      "streams": "Strømmer",
+      "sample_rate": "Samplingsfrekvens",
+      "channels": "Kanaler",
+      "format": "Format",
+      "state": "Tilstand",
+      "playing": "Spiller av",
+      "paused": "Pauset",
+      "stopped": "Stoppet",
+      "no_audio": "Ingen lydstrømmer oppdaget"
+    },
+    "video": {
+      "title": "Videostrøm-informasjon",
+      "streams": "Strømmer",
+      "resolution": "Oppløsning",
+      "frame_rate": "Bildefrekvens",
+      "codec": "Codec",
+      "state": "Tilstand",
+      "playing": "Spiller av",
+      "paused": "Pauset",
+      "stopped": "Stoppet",
+      "no_video": "Ingen videostrømmer oppdaget"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Loddrett", 
+      "vertical": "Loddrett",
       "horizontal": "Vannrett",
       "loading": "Laster...",
       "no_data": "Ingen data",
@@ -107,11 +131,13 @@
       "all": "All informasjon",
       "disk_only": "Kun disk",
       "cpu_only": "Kun CPU",
-      "memory_only": "Kun minne", 
+      "memory_only": "Kun minne",
       "network_only": "Kun nettverk",
       "gpu_only": "Kun GPU",
       "ai_only": "Kun AI-trening",
       "mining_only": "Kun mining",
+      "audio_only": "Kun lyd",
+      "video_only": "Kun video",
       "refresh_rate": "Oppdateringsfrekvens",
       "language": "Språk",
       "remote": "Fjernmodus",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Kommando ikke funnet: %s",
       "invalid_port": "Ugyldig port: %d",
-      "invalid_refresh": "Ugyldig oppdateringsintervall: %d", 
+      "invalid_refresh": "Ugyldig oppdateringsintervall: %d",
       "config_load_failed": "Kunne ikke laste konfigurasjon",
       "module_failed": "Modul %s feilet: %v",
-      "nvidia_smi_not_found": "nvidia-smi ikke funnet. GPU-overvåkning krever NVIDIA-drivere",
-      "rocm_smi_not_found": "rocm-smi ikke funnet. AMD GPU-overvåkning krever ROCm"
+      "nvidia_smi_not_found": "nvidia-smi ikke funnet. GPU-overvåking krever NVIDIA-drivere",
+      "rocm_smi_not_found": "rocm-smi ikke funnet. AMD GPU-overvåking krever ROCm"
     },
     "status": {
-      "monitoring_started": "Overvåkning startet",
-      "updating_every": "Oppdaterer hver %d sekund", 
+      "monitoring_started": "Overvåking startet",
+      "updating_every": "Oppdaterer hvert %d sekund",
       "press_ctrl_c": "Trykk Ctrl+C for å avslutte",
       "remote_mode": "Fjernmodus på port %d",
       "gpu_detected": "GPU oppdaget: %s",
       "ai_training_detected": "AI-treningsprosesser oppdaget: %d",
-      "mining_detected": "Mining-aktivitet oppdaget: %s"
+      "mining_detected": "Mining-aktivitet oppdaget: %s",
+      "audio_detected": "Lydstrømmer oppdaget: %d",
+      "video_detected": "Videostrømmer oppdaget: %d"
     }
   }
 }

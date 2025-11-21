@@ -1,5 +1,5 @@
 {
-  "language": "Gujarati (ગુજરાતી)", 
+  "language": "ગુજરાતી",
   "language_code": "gu",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "ભૂલ",
       "unknown": "અજ્ઞાત",
       "total": "કુલ",
-      "used": "વપરાયેલ", 
+      "used": "વપરાયેલ",
       "free": "મફત",
       "available": "ઉપલબ્ધ",
       "status": "સ્થિતિ",
@@ -22,7 +22,7 @@
       "cores": "કોર",
       "threads": "થ્રેડ",
       "usage": "વપરાશ",
-      "frequency": "ફ્રીક્વન્સી", 
+      "frequency": "ફ્રીક્વન્સી",
       "load": "લોડ",
       "load_1min": "1 મિનિટ",
       "load_5min": "5 મિનિટ",
@@ -30,19 +30,19 @@
       "load_average": "સરેરાશ લોડ"
     },
     "memory": {
-      "title": "મેમરી માહિતી", 
+      "title": "મેમરી માહિતી",
       "ram": "RAM",
       "swap": "સ્વેપ",
       "physical": "ફિઝિકલ મેમરી",
-      "virtual": "વર્ચ્યુઅલ મેમરી"
+      "virtual": "વર્ચ્યુઅલ મેमરી"
     },
     "disk": {
       "title": "ડિસ્ક માહિતી",
       "filesystem": "ફાઇલ સિસ્ટમ",
-      "size": "કદ",
-      "mounted": "માઉન્ટેડ ઓન", 
+      "size": "સાઇઝ",
+      "mounted": "માઉન્ટેડ",
       "usage": "વપરાશ",
-      "storage": "સંગ્રહ"
+      "storage": "સ્ટોરેજ"
     },
     "network": {
       "title": "નેટવર્ક માહિતી",
@@ -74,44 +74,70 @@
       "model": "મોડેલ",
       "batch_size": "બેચ સાઇઝ",
       "throughput": "થ્રુપુટ",
-      "epoch": "યુગ",
+      "epoch": "એપોક",
       "loss": "લોસ",
-      "accuracy": "ચોકસાઈ",
+      "accuracy": "એક્યુરેસી",
       "training_time": "ટ્રેનિંગ સમય",
       "no_training": "AI ટ્રેનિંગ મળી નથી"
     },
     "mining": {
       "title": "માઇનિંગ માહિતી",
-      "algorithm": "એલ્ગોરિધમ",
-      "hashrate": "હેશ રેટ",
+      "algorithm": "અલ્ગોરિધમ",
+      "hashrate": "હેશરેટ",
       "shares": "શેર",
       "temperature": "તાપમાન",
       "power": "પાવર",
-      "efficiency": "કાર્યક્ષમતા",
+      "efficiency": "એફિશિયન્સી",
       "uptime": "અપટાઇમ",
-      "revenue_24h": "24ક કમાણી",
+      "revenue_24h": "24 કલાકની આવક",
       "pool": "પૂલ",
       "not_detected": "માઇનિંગ એક્ટિવિટી મળી નથી"
     },
+    "audio": {
+      "title": "ઓડિયો સ્ટ્રીમ માહિતી",
+      "streams": "સ્ટ્રીમ",
+      "sample_rate": "સેમ્પલ રેટ",
+      "channels": "ચેનલ",
+      "format": "ફોર્મેટ",
+      "state": "સ્ટેટ",
+      "playing": "ચાલુ છે",
+      "paused": "પોઝ",
+      "stopped": "બંધ",
+      "no_audio": "ઓડિયો સ્ટ્રીમ મળી નથી"
+    },
+    "video": {
+      "title": "વીડિયો સ્ટ્રીમ માહિતી",
+      "streams": "સ્ટ્રીમ",
+      "resolution": "રેઝોલ્યુશન",
+      "frame_rate": "ફ્રેમ રેટ",
+      "codec": "કોડેક",
+      "state": "સ્ટેટ",
+      "playing": "ચાલુ છે",
+      "paused": "પોઝ",
+      "stopped": "બંધ",
+      "no_video": "વીડિયો સ્ટ્રીમ મળી નથી"
+    },
     "ui": {
       "histogram": "હિસ્ટોગ્રામ",
-      "vertical": "ઊભી", 
-      "horizontal": "આડી",
-      "loading": "લોડ થાય છે...",
-      "no_data": "કોઈ ડેટા નથી",
+      "vertical": "વર્ટિકલ",
+      "horizontal": "હોરિઝોન્ટલ",
+      "loading": "લોડ થઈ રહ્યું છે...",
+      "no_data": "ડેટા નથી",
       "percent": "ટકા"
     },
     "commands": {
-      "help": "મદદ",
+      "help": "હેલ્પ",
       "version": "વર્ઝન",
       "all": "બધી માહિતી",
       "disk_only": "ફક્ત ડિસ્ક",
       "cpu_only": "ફક્ત CPU",
-      "memory_only": "ફક્ત મેમરી", 
+      "memory_only": "ફક્ત મેમરી",
       "network_only": "ફક્ત નેટવર્ક",
       "gpu_only": "ફક્ત GPU",
       "ai_only": "ફક્ત AI ટ્રેનિંગ",
       "mining_only": "ફક્ત માઇનિંગ",
+      "audio_only": "ફક્ત ઓડિયો",
+      "video_only": "ફક્ત વીડિયો",
       "refresh_rate": "રીફ્રેશ રેટ",
       "language": "ભાષા",
       "remote": "રિમોટ મોડ",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "કમાન્ડ મળી નથી: %s",
       "invalid_port": "અમાન્ય પોર્ટ: %d",
-      "invalid_refresh": "અમાન્ય રીફ્રેશ ઇન્ટરવલ: %d", 
-      "config_load_failed": "કોન્ફિગ લોડ ન થઈ શકી",
-      "module_failed": "મોડ્યુલ %s નિષ્ફળ: %v",
-      "nvidia_smi_not_found": "nvidia-smi મળ્યું નથી. GPU મોનિટરિંગ માટે NVIDIA ડ્રાઇવર જરૂરી",
-      "rocm_smi_not_found": "rocm-smi મળ્યું નથી. AMD GPU મોનિટરિંગ માટે ROCm જરૂરી"
+      "invalid_refresh": "અમાન્ય રીફ્રેશ ઇન્ટરવલ: %d",
+      "config_load_failed": "કોન્ફિગ લોડ થઈ નથી",
+      "module_failed": "મોડ્યુલ %s ફેઈલ: %v",
+      "nvidia_smi_not_found": "nvidia-smi મળી નથી. GPU મોનિટરિંગ માટે NVIDIA ડ્રાઇવર જરૂરી છે",
+      "rocm_smi_not_found": "rocm-smi મળી નથી. AMD GPU મોનિટરિંગ માટે ROCm જરૂરી છે"
     },
     "status": {
       "monitoring_started": "મોનિટરિંગ શરૂ થઈ",
-      "updating_every": "દરેક %d સેકંડે અપડેટ થાય છે", 
+      "updating_every": "દર %d સેકંડે અપડેટ થાય છે",
       "press_ctrl_c": "બહાર નીકળવા Ctrl+C દબાવો",
-      "remote_mode": "પોર્ટ %d પર રિમોટ મોડ",
-      "gpu_detected": "GPU મળ્યું: %s",
-      "ai_training_detected": "AI ટ્રેનિંગ પ્રોસેસ મળ્યા: %d",
-      "mining_detected": "માઇનિંગ એક્ટિવિટી મળી: %s"
+      "remote_mode": "રિમોટ મોડ પોર્ટ %d",
+      "gpu_detected": "GPU મળી: %s",
+      "ai_training_detected": "AI ટ્રેનિંગ પ્રોસેસ મળી: %d",
+      "mining_detected": "માઇનિંગ એક્ટિવિટી મળી: %s",
+      "audio_detected": "ઓડિયો સ્ટ્રીમ મળી: %d",
+      "video_detected": "વીડિયો સ્ટ્રીમ મળી: %d"
     }
   }
 }

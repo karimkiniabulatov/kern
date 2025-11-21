@@ -1,20 +1,20 @@
 {
-  "language": "Vietnamese (Tiếng Việt)", 
+  "language": "Tiếng Việt",
   "language_code": "vi",
   "translations": {
     "common": {
-      "title": "kern - Giám sát Hệ thống",
+      "title": "kern - Màn hình hệ thống",
       "refresh": "Làm mới",
       "seconds": "giây",
       "error": "Lỗi",
       "unknown": "Không xác định",
       "total": "Tổng",
-      "used": "Đã dùng", 
+      "used": "Đã dùng",
       "free": "Trống",
       "available": "Khả dụng",
       "status": "Trạng thái",
       "up": "HOẠT ĐỘNG",
-      "down": "NGỪNG"
+      "down": "DỪNG"
     },
     "cpu": {
       "title": "Thông tin CPU",
@@ -22,7 +22,7 @@
       "cores": "Nhân",
       "threads": "Luồng",
       "usage": "Sử dụng",
-      "frequency": "Tần số", 
+      "frequency": "Tần số",
       "load": "Tải",
       "load_1min": "1 phút",
       "load_5min": "5 phút",
@@ -30,29 +30,29 @@
       "load_average": "Tải trung bình"
     },
     "memory": {
-      "title": "Thông tin Bộ nhớ", 
+      "title": "Thông tin bộ nhớ",
       "ram": "RAM",
       "swap": "Swap",
-      "physical": "Bộ nhớ Vật lý",
-      "virtual": "Bộ nhớ Ảo"
+      "physical": "Bộ nhớ vật lý",
+      "virtual": "Bộ nhớ ảo"
     },
     "disk": {
-      "title": "Thông tin Đĩa",
+      "title": "Thông tin ổ đĩa",
       "filesystem": "Hệ thống tập tin",
       "size": "Kích thước",
-      "mounted": "Được gắn vào", 
+      "mounted": "Được gắn tại",
       "usage": "Sử dụng",
       "storage": "Lưu trữ"
     },
     "network": {
-      "title": "Thông tin Mạng",
+      "title": "Thông tin mạng",
       "interface": "Giao diện",
-      "received": "Đã nhận",
-      "sent": "Đã gửi",
+      "received": "Nhận",
+      "sent": "Gửi",
       "bytes": "byte",
-      "packets": "gói tin",
+      "packets": "gói",
       "errors": "Lỗi",
-      "network_interfaces": "Giao diện Mạng"
+      "network_interfaces": "Giao diện mạng"
     },
     "gpu": {
       "title": "Thông tin GPU",
@@ -64,24 +64,24 @@
       "power": "Công suất",
       "clock_core": "Xung nhân",
       "clock_memory": "Xung bộ nhớ",
-      "fan_speed": "Tốc độ Quạt"
+      "fan_speed": "Tốc độ quạt"
     },
     "ai": {
       "title": "Huấn luyện AI",
       "framework": "Framework",
-      "processes": "Quy trình",
+      "processes": "Tiến trình",
       "vram": "VRAM",
       "model": "Model",
-      "batch_size": "Kích thước Batch",
+      "batch_size": "Kích thước batch",
       "throughput": "Thông lượng",
       "epoch": "Epoch",
       "loss": "Mất mát",
       "accuracy": "Độ chính xác",
-      "training_time": "Thời gian Huấn luyện",
+      "training_time": "Thời gian huấn luyện",
       "no_training": "Không phát hiện huấn luyện AI"
     },
     "mining": {
-      "title": "Thông tin Khai thác",
+      "title": "Thông tin đào coin",
       "algorithm": "Thuật toán",
       "hashrate": "Hashrate",
       "shares": "Cổ phần",
@@ -91,11 +91,35 @@
       "uptime": "Thời gian hoạt động",
       "revenue_24h": "Doanh thu 24h",
       "pool": "Pool",
-      "not_detected": "Không phát hiện hoạt động khai thác"
+      "not_detected": "Không phát hiện hoạt động đào coin"
+    },
+    "audio": {
+      "title": "Thông tin luồng âm thanh",
+      "streams": "Luồng",
+      "sample_rate": "Tần số lấy mẫu",
+      "channels": "Kênh",
+      "format": "Định dạng",
+      "state": "Trạng thái",
+      "playing": "Đang phát",
+      "paused": "Tạm dừng",
+      "stopped": "Dừng",
+      "no_audio": "Không phát hiện luồng âm thanh"
+    },
+    "video": {
+      "title": "Thông tin luồng video",
+      "streams": "Luồng",
+      "resolution": "Độ phân giải",
+      "frame_rate": "Tốc độ khung hình",
+      "codec": "Codec",
+      "state": "Trạng thái",
+      "playing": "Đang phát",
+      "paused": "Tạm dừng",
+      "stopped": "Dừng",
+      "no_video": "Không phát hiện luồng video"
     },
     "ui": {
-      "histogram": "Biểu đồ",
-      "vertical": "Dọc", 
+      "histogram": "Biểu đồ tần suất",
+      "vertical": "Dọc",
       "horizontal": "Ngang",
       "loading": "Đang tải...",
       "no_data": "Không có dữ liệu",
@@ -105,13 +129,15 @@
       "help": "Trợ giúp",
       "version": "Phiên bản",
       "all": "Tất cả thông tin",
-      "disk_only": "Chỉ đĩa",
+      "disk_only": "Chỉ ổ đĩa",
       "cpu_only": "Chỉ CPU",
-      "memory_only": "Chỉ bộ nhớ", 
+      "memory_only": "Chỉ bộ nhớ",
       "network_only": "Chỉ mạng",
       "gpu_only": "Chỉ GPU",
       "ai_only": "Chỉ huấn luyện AI",
-      "mining_only": "Chỉ khai thác",
+      "mining_only": "Chỉ đào coin",
+      "audio_only": "Chỉ âm thanh",
+      "video_only": "Chỉ video",
       "refresh_rate": "Tốc độ làm mới",
       "language": "Ngôn ngữ",
       "remote": "Chế độ từ xa",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Không tìm thấy lệnh: %s",
       "invalid_port": "Cổng không hợp lệ: %d",
-      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d", 
+      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d",
       "config_load_failed": "Không thể tải cấu hình",
       "module_failed": "Mô-đun %s thất bại: %v",
       "nvidia_smi_not_found": "Không tìm thấy nvidia-smi. Giám sát GPU yêu cầu trình điều khiển NVIDIA",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Đã bắt đầu giám sát",
-      "updating_every": "Cập nhật mỗi %d giây", 
+      "updating_every": "Cập nhật mỗi %d giây",
       "press_ctrl_c": "Nhấn Ctrl+C để thoát",
       "remote_mode": "Chế độ từ xa trên cổng %d",
       "gpu_detected": "Đã phát hiện GPU: %s",
-      "ai_training_detected": "Đã phát hiện quy trình huấn luyện AI: %d",
-      "mining_detected": "Đã phát hiện hoạt động khai thác: %s"
+      "ai_training_detected": "Đã phát hiện tiến trình huấn luyện AI: %d",
+      "mining_detected": "Đã phát hiện hoạt động đào coin: %s",
+      "audio_detected": "Đã phát hiện luồng âm thanh: %d",
+      "video_detected": "Đã phát hiện luồng video: %d"
     }
   }
 }

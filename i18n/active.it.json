@@ -1,5 +1,5 @@
 {
-  "language": "Italian (Italiano)", 
+  "language": "Italiano",
   "language_code": "it",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Errore",
       "unknown": "Sconosciuto",
       "total": "Totale",
-      "used": "Utilizzato", 
+      "used": "Utilizzato",
       "free": "Libero",
       "available": "Disponibile",
       "status": "Stato",
-      "up": "SU",
-      "down": "GIÙ"
+      "up": "ATTIVO",
+      "down": "FERMO"
     },
     "cpu": {
       "title": "Informazioni CPU",
@@ -22,15 +22,15 @@
       "cores": "Core",
       "threads": "Thread",
       "usage": "Utilizzo",
-      "frequency": "Frequenza", 
+      "frequency": "Frequenza",
       "load": "Carico",
       "load_1min": "1 min",
       "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Carico Medio"
+      "load_average": "Carico medio"
     },
     "memory": {
-      "title": "Informazioni Memoria", 
+      "title": "Informazioni Memoria",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memoria Fisica",
@@ -38,17 +38,17 @@
     },
     "disk": {
       "title": "Informazioni Disco",
-      "filesystem": "File system",
+      "filesystem": "File System",
       "size": "Dimensione",
-      "mounted": "Montato su", 
+      "mounted": "Montato su",
       "usage": "Utilizzo",
       "storage": "Archiviazione"
     },
     "network": {
       "title": "Informazioni Rete",
       "interface": "Interfaccia",
-      "received": "Ricevuto",
-      "sent": "Inviato",
+      "received": "Ricevuti",
+      "sent": "Inviati",
       "bytes": "byte",
       "packets": "pacchetti",
       "errors": "Errori",
@@ -73,9 +73,9 @@
       "vram": "VRAM",
       "model": "Modello",
       "batch_size": "Dimensione Batch",
-      "throughput": "Velocità",
+      "throughput": "Throughput",
       "epoch": "Epoca",
-      "loss": "Perdita",
+      "loss": "Loss",
       "accuracy": "Accuratezza",
       "training_time": "Tempo Addestramento",
       "no_training": "Nessun addestramento AI rilevato"
@@ -84,7 +84,7 @@
       "title": "Informazioni Mining",
       "algorithm": "Algoritmo",
       "hashrate": "Hashrate",
-      "shares": "Condivisioni",
+      "shares": "Shares",
       "temperature": "Temperatura",
       "power": "Potenza",
       "efficiency": "Efficienza",
@@ -93,9 +93,33 @@
       "pool": "Pool",
       "not_detected": "Nessuna attività di mining rilevata"
     },
+    "audio": {
+      "title": "Informazioni Stream Audio",
+      "streams": "Stream",
+      "sample_rate": "Frequenza di campionamento",
+      "channels": "Canali",
+      "format": "Formato",
+      "state": "Stato",
+      "playing": "In riproduzione",
+      "paused": "In pausa",
+      "stopped": "Fermato",
+      "no_audio": "Nessuno stream audio rilevato"
+    },
+    "video": {
+      "title": "Informazioni Stream Video",
+      "streams": "Stream",
+      "resolution": "Risoluzione",
+      "frame_rate": "Frame Rate",
+      "codec": "Codec",
+      "state": "Stato",
+      "playing": "In riproduzione",
+      "paused": "In pausa",
+      "stopped": "Fermato",
+      "no_video": "Nessuno stream video rilevato"
+    },
     "ui": {
       "histogram": "Istogramma",
-      "vertical": "Verticale", 
+      "vertical": "Verticale",
       "horizontal": "Orizzontale",
       "loading": "Caricamento...",
       "no_data": "Nessun dato",
@@ -107,12 +131,14 @@
       "all": "Tutte le informazioni",
       "disk_only": "Solo disco",
       "cpu_only": "Solo CPU",
-      "memory_only": "Solo memoria", 
+      "memory_only": "Solo memoria",
       "network_only": "Solo rete",
       "gpu_only": "Solo GPU",
       "ai_only": "Solo addestramento AI",
       "mining_only": "Solo mining",
-      "refresh_rate": "Frequenza aggiornamento",
+      "audio_only": "Solo audio",
+      "video_only": "Solo video",
+      "refresh_rate": "Frequenza di aggiornamento",
       "language": "Lingua",
       "remote": "Modalità remota",
       "port": "Porta"
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Comando non trovato: %s",
       "invalid_port": "Porta non valida: %d",
-      "invalid_refresh": "Intervallo di aggiornamento non valido: %d", 
-      "config_load_failed": "Impossibile caricare la configurazione",
+      "invalid_refresh": "Intervallo di aggiornamento non valido: %d",
+      "config_load_failed": "Caricamento configurazione fallito",
       "module_failed": "Modulo %s fallito: %v",
-      "nvidia_smi_not_found": "nvidia-smi non trovato. Il monitoraggio GPU richiede i driver NVIDIA",
+      "nvidia_smi_not_found": "nvidia-smi non trovato. Il monitoraggio GPU richiede driver NVIDIA",
       "rocm_smi_not_found": "rocm-smi non trovato. Il monitoraggio AMD GPU richiede ROCm"
     },
     "status": {
       "monitoring_started": "Monitoraggio avviato",
-      "updating_every": "Aggiornamento ogni %d secondi", 
+      "updating_every": "Aggiornamento ogni %d secondi",
       "press_ctrl_c": "Premi Ctrl+C per uscire",
       "remote_mode": "Modalità remota sulla porta %d",
       "gpu_detected": "GPU rilevata: %s",
       "ai_training_detected": "Processi di addestramento AI rilevati: %d",
-      "mining_detected": "Attività di mining rilevata: %s"
+      "mining_detected": "Attività di mining rilevata: %s",
+      "audio_detected": "Stream audio rilevati: %d",
+      "video_detected": "Stream video rilevati: %d"
     }
   }
 }

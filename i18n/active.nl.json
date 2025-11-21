@@ -1,5 +1,5 @@
 {
-  "language": "Dutch (Nederlands)", 
+  "language": "Nederlands",
   "language_code": "nl",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Fout",
       "unknown": "Onbekend",
       "total": "Totaal",
-      "used": "Gebruikt", 
+      "used": "Gebruikt",
       "free": "Vrij",
       "available": "Beschikbaar",
       "status": "Status",
       "up": "ACTIEF",
-      "down": "INACTIEF"
+      "down": "GESTOPT"
     },
     "cpu": {
       "title": "CPU-informatie",
@@ -22,7 +22,7 @@
       "cores": "Kernen",
       "threads": "Threads",
       "usage": "Gebruik",
-      "frequency": "Frequentie", 
+      "frequency": "Frequentie",
       "load": "Belasting",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,7 +30,7 @@
       "load_average": "Gemiddelde belasting"
     },
     "memory": {
-      "title": "Geheugeninformatie", 
+      "title": "Geheugeninformatie",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysiek geheugen",
@@ -40,7 +40,7 @@
       "title": "Schijfinformatie",
       "filesystem": "Bestandssysteem",
       "size": "Grootte",
-      "mounted": "Gemonteerd op", 
+      "mounted": "Gemonteerd op",
       "usage": "Gebruik",
       "storage": "Opslag"
     },
@@ -74,7 +74,7 @@
       "model": "Model",
       "batch_size": "Batchgrootte",
       "throughput": "Doorvoer",
-      "epoch": "Epoch",
+      "epoch": "Epoche",
       "loss": "Verlies",
       "accuracy": "Nauwkeurigheid",
       "training_time": "Trainingstijd",
@@ -93,9 +93,33 @@
       "pool": "Pool",
       "not_detected": "Geen mining-activiteit gedetecteerd"
     },
+    "audio": {
+      "title": "Audiostream-informatie",
+      "streams": "Streams",
+      "sample_rate": "Samplefrequentie",
+      "channels": "Kanalen",
+      "format": "Formaat",
+      "state": "Status",
+      "playing": "Afspelen",
+      "paused": "Gepauzeerd",
+      "stopped": "Gestopt",
+      "no_audio": "Geen audiostreams gedetecteerd"
+    },
+    "video": {
+      "title": "Videostream-informatie",
+      "streams": "Streams",
+      "resolution": "Resolutie",
+      "frame_rate": "Framerate",
+      "codec": "Codec",
+      "state": "Status",
+      "playing": "Afspelen",
+      "paused": "Gepauzeerd",
+      "stopped": "Gestopt",
+      "no_video": "Geen videostreams gedetecteerd"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Verticaal", 
+      "vertical": "Verticaal",
       "horizontal": "Horizontaal",
       "loading": "Laden...",
       "no_data": "Geen gegevens",
@@ -107,20 +131,22 @@
       "all": "Alle informatie",
       "disk_only": "Alleen schijf",
       "cpu_only": "Alleen CPU",
-      "memory_only": "Alleen geheugen", 
+      "memory_only": "Alleen geheugen",
       "network_only": "Alleen netwerk",
       "gpu_only": "Alleen GPU",
       "ai_only": "Alleen AI-training",
       "mining_only": "Alleen mining",
-      "refresh_rate": "Vernieuwingssnelheid",
+      "audio_only": "Alleen audio",
+      "video_only": "Alleen video",
+      "refresh_rate": "Vernieuwingsfrequentie",
       "language": "Taal",
-      "remote": "Externe modus",
+      "remote": "Afstandsmodus",
       "port": "Poort"
     },
     "errors": {
-      "command_not_found": "Opdracht niet gevonden: %s",
+      "command_not_found": "Commando niet gevonden: %s",
       "invalid_port": "Ongeldige poort: %d",
-      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d", 
+      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d",
       "config_load_failed": "Configuratie laden mislukt",
       "module_failed": "Module %s mislukt: %v",
       "nvidia_smi_not_found": "nvidia-smi niet gevonden. GPU-monitoring vereist NVIDIA-stuurprogramma's",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Monitoring gestart",
-      "updating_every": "Bijwerken elke %d seconden", 
+      "updating_every": "Wordt elke %d seconden bijgewerkt",
       "press_ctrl_c": "Druk op Ctrl+C om af te sluiten",
-      "remote_mode": "Externe modus op poort %d",
+      "remote_mode": "Afstandsmodus op poort %d",
       "gpu_detected": "GPU gedetecteerd: %s",
       "ai_training_detected": "AI-trainingsprocessen gedetecteerd: %d",
-      "mining_detected": "Mining-activiteit gedetecteerd: %s"
+      "mining_detected": "Mining-activiteit gedetecteerd: %s",
+      "audio_detected": "Audiostreams gedetecteerd: %d",
+      "video_detected": "Videostreams gedetecteerd: %d"
     }
   }
 }

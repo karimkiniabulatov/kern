@@ -1,5 +1,5 @@
 {
-  "language": "Lithuanian (Lietuvių)", 
+  "language": "Lietuvių",
   "language_code": "lt",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Klaida",
       "unknown": "Nežinoma",
       "total": "Iš viso",
-      "used": "Naudojama", 
+      "used": "Naudojama",
       "free": "Laisva",
       "available": "Prieinama",
       "status": "Būsena",
-      "up": "ĮJUNGTAS",
-      "down": "IŠJUNGTAS"
+      "up": "VEIKIA",
+      "down": "SUSTABDYTA"
     },
     "cpu": {
-      "title": "CPU informacija",
+      "title": "Procesoriaus informacija",
       "model": "Modelis",
       "cores": "Branduoliai",
-      "threads": "Siūlai",
+      "threads": "Gijos",
       "usage": "Naudojimas",
-      "frequency": "Dažnis", 
+      "frequency": "Dažnis",
       "load": "Apkrova",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,9 +30,9 @@
       "load_average": "Vidutinė apkrova"
     },
     "memory": {
-      "title": "Atminties informacija", 
+      "title": "Atminties informacija",
       "ram": "RAM",
-      "swap": "Mainas",
+      "swap": "Swap",
       "physical": "Fizinė atmintis",
       "virtual": "Virtuali atmintis"
     },
@@ -40,7 +40,7 @@
       "title": "Disko informacija",
       "filesystem": "Failų sistema",
       "size": "Dydis",
-      "mounted": "Prijungtas prie", 
+      "mounted": "Prijungtas prie",
       "usage": "Naudojimas",
       "storage": "Saugykla"
     },
@@ -55,7 +55,7 @@
       "network_interfaces": "Tinklo sąsajos"
     },
     "gpu": {
-      "title": "GPU informacija",
+      "title": "Vaizdo plokštės informacija",
       "model": "Modelis",
       "driver": "Tvarkyklė",
       "temperature": "Temperatūra",
@@ -67,37 +67,61 @@
       "fan_speed": "Ventiliatoriaus greitis"
     },
     "ai": {
-      "title": "AI mokymas",
+      "title": "Dirbtinio intelekto mokymas",
       "framework": "Karkasas",
       "processes": "Procesai",
-      "vram": "VRAM",
+      "vram": "Vaizdo atmintis",
       "model": "Modelis",
       "batch_size": "Partijos dydis",
       "throughput": "Pralaidumas",
       "epoch": "Epocha",
-      "loss": "Nuostoliai",
+      "loss": "Nuostolis",
       "accuracy": "Tikslumas",
       "training_time": "Mokymo laikas",
-      "no_training": "Nerastas AI mokymas"
+      "no_training": "Dirbtinio intelekto mokymas neaptiktas"
     },
     "mining": {
       "title": "Kasimo informacija",
       "algorithm": "Algoritmas",
-      "hashrate": "Hash greitis",
+      "hashrate": "Hashrate",
       "shares": "Akcijos",
       "temperature": "Temperatūra",
       "power": "Galia",
       "efficiency": "Efektyvumas",
       "uptime": "Veikimo laikas",
       "revenue_24h": "24h pajamos",
-      "pool": "Baseinas",
-      "not_detected": "Nerasta kasimo veikla"
+      "pool": "Pool",
+      "not_detected": "Kasimo veikla neaptikta"
+    },
+    "audio": {
+      "title": "Garso srauto informacija",
+      "streams": "Srautai",
+      "sample_rate": "Diskretizavimo dažnis",
+      "channels": "Kanalai",
+      "format": "Formatas",
+      "state": "Būsena",
+      "playing": "Atkūrimas",
+      "paused": "Pristabdytas",
+      "stopped": "Sustabdytas",
+      "no_audio": "Garso srautų neaptikta"
+    },
+    "video": {
+      "title": "Vaizdo srauto informacija",
+      "streams": "Srautai",
+      "resolution": "Raiška",
+      "frame_rate": "Kadrų dažnis",
+      "codec": "Kodekas",
+      "state": "Būsena",
+      "playing": "Atkūrimas",
+      "paused": "Pristabdytas",
+      "stopped": "Sustabdytas",
+      "no_video": "Vaizdo srautų neaptikta"
     },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertikaliai", 
-      "horizontal": "Horizontaliai",
-      "loading": "Kraunama...",
+      "vertical": "Vertikalus",
+      "horizontal": "Horizontalus",
+      "loading": "Įkeliama...",
       "no_data": "Nėra duomenų",
       "percent": "procentų"
     },
@@ -106,12 +130,14 @@
       "version": "Versija",
       "all": "Visa informacija",
       "disk_only": "Tik diskas",
-      "cpu_only": "Tik CPU",
-      "memory_only": "Tik atmintis", 
+      "cpu_only": "Tik procesorius",
+      "memory_only": "Tik atmintis",
       "network_only": "Tik tinklas",
-      "gpu_only": "Tik GPU",
-      "ai_only": "Tik AI mokymas",
+      "gpu_only": "Tik vaizdo plokštė",
+      "ai_only": "Tik DI mokymas",
       "mining_only": "Tik kasimas",
+      "audio_only": "Tik garsas",
+      "video_only": "Tik vaizdas",
       "refresh_rate": "Atnaujinimo dažnis",
       "language": "Kalba",
       "remote": "Nuotolinis režimas",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Komanda nerasta: %s",
       "invalid_port": "Neteisingas prievadas: %d",
-      "invalid_refresh": "Neteisingas atnaujinimo intervalas: %d", 
+      "invalid_refresh": "Neteisingas atnaujinimo intervalas: %d",
       "config_load_failed": "Nepavyko įkelti konfigūracijos",
       "module_failed": "Modulis %s nepavyko: %v",
-      "nvidia_smi_not_found": "nvidia-smi nerastas. GPU stebėjimui reikalingos NVIDIA tvarkyklės",
+      "nvidia_smi_not_found": "nvidia-smi nerastas. GPU stebėjimui reikalingi NVIDIA tvarkyklės",
       "rocm_smi_not_found": "rocm-smi nerastas. AMD GPU stebėjimui reikalingas ROCm"
     },
     "status": {
       "monitoring_started": "Stebėjimas pradėtas",
-      "updating_every": "Atnaujinama kas %d sekundės", 
+      "updating_every": "Atnaujinama kas %d sekundės",
       "press_ctrl_c": "Paspauskite Ctrl+C, kad išeitumėte",
       "remote_mode": "Nuotolinis režimas prievade %d",
-      "gpu_detected": "GPU aptiktas: %s",
-      "ai_training_detected": "AI mokymo procesai aptikti: %d",
-      "mining_detected": "Kasimo veikla aptikta: %s"
+      "gpu_detected": "Vaizdo plokštė aptikta: %s",
+      "ai_training_detected": "DI mokymo procesai aptikti: %d",
+      "mining_detected": "Kasimo veikla aptikta: %s",
+      "audio_detected": "Garso srautai aptikti: %d",
+      "video_detected": "Vaizdo srautai aptikti: %d"
     }
   }
 }

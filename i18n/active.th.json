@@ -1,20 +1,20 @@
 {
-  "language": "Thai (ไทย)", 
+  "language": "ไทย",
   "language_code": "th",
   "translations": {
     "common": {
-      "title": "kern - ระบบตรวจสอบ",
+      "title": "kern - ตัวตรวจสอบระบบ",
       "refresh": "รีเฟรช",
-      "seconds": "วินาที",
+      "seconds": "วิ",
       "error": "ข้อผิดพลาด",
       "unknown": "ไม่ทราบ",
       "total": "ทั้งหมด",
-      "used": "ใช้แล้ว", 
+      "used": "ใช้แล้ว",
       "free": "ว่าง",
       "available": "ใช้งานได้",
       "status": "สถานะ",
       "up": "ทำงาน",
-      "down": "หยุดทำงาน"
+      "down": "หยุดแล้ว"
     },
     "cpu": {
       "title": "ข้อมูล CPU",
@@ -22,7 +22,7 @@
       "cores": "คอร์",
       "threads": "เธรด",
       "usage": "การใช้งาน",
-      "frequency": "ความถี่", 
+      "frequency": "ความถี่",
       "load": "โหลด",
       "load_1min": "1 นาที",
       "load_5min": "5 นาที",
@@ -30,9 +30,9 @@
       "load_average": "โหลดเฉลี่ย"
     },
     "memory": {
-      "title": "ข้อมูลหน่วยความจำ", 
-      "ram": "แรม",
-      "swap": "สว็อป",
+      "title": "ข้อมูลหน่วยความจำ",
+      "ram": "RAM",
+      "swap": "Swap",
       "physical": "หน่วยความจำกายภาพ",
       "virtual": "หน่วยความจำเสมือน"
     },
@@ -40,9 +40,9 @@
       "title": "ข้อมูลดิสก์",
       "filesystem": "ระบบไฟล์",
       "size": "ขนาด",
-      "mounted": "ติดตั้งบน", 
+      "mounted": "ติดตั้งบน",
       "usage": "การใช้งาน",
-      "storage": "พื้นที่เก็บข้อมูล"
+      "storage": "ที่เก็บข้อมูล"
     },
     "network": {
       "title": "ข้อมูลเครือข่าย",
@@ -62,19 +62,19 @@
       "memory": "หน่วยความจำ",
       "utilization": "การใช้งาน",
       "power": "พลังงาน",
-      "clock_core": "ความเร็วคอร์",
-      "clock_memory": "ความเร็วหน่วยความจำ",
+      "clock_core": "ความถี่คอร์",
+      "clock_memory": "ความถี่หน่วยความจำ",
       "fan_speed": "ความเร็วพัดลม"
     },
     "ai": {
       "title": "การฝึก AI",
       "framework": "เฟรมเวิร์ก",
       "processes": "กระบวนการ",
-      "vram": "วีแรม",
-      "model": "โมเดล",
+      "vram": "VRAM",
+      "model": "รุ่น",
       "batch_size": "ขนาดแบตช์",
       "throughput": "ปริมาณงาน",
-      "epoch": "เอพอค",
+      "epoch": "ยุค",
       "loss": "การสูญเสีย",
       "accuracy": "ความแม่นยำ",
       "training_time": "เวลาในการฝึก",
@@ -84,7 +84,7 @@
       "title": "ข้อมูลการขุด",
       "algorithm": "อัลกอริทึม",
       "hashrate": "อัตราแฮช",
-      "shares": "แชร์",
+      "shares": "หุ้น",
       "temperature": "อุณหภูมิ",
       "power": "พลังงาน",
       "efficiency": "ประสิทธิภาพ",
@@ -93,9 +93,33 @@
       "pool": "พูล",
       "not_detected": "ไม่พบกิจกรรมการขุด"
     },
+    "audio": {
+      "title": "ข้อมูลสตรีมเสียง",
+      "streams": "สตรีม",
+      "sample_rate": "อัตราตัวอย่าง",
+      "channels": "ช่องสัญญาณ",
+      "format": "รูปแบบ",
+      "state": "สถานะ",
+      "playing": "กำลังเล่น",
+      "paused": "หยุดชั่วคราว",
+      "stopped": "หยุดแล้ว",
+      "no_audio": "ไม่พบสตรีมเสียง"
+    },
+    "video": {
+      "title": "ข้อมูลสตรีมวิดีโอ",
+      "streams": "สตรีม",
+      "resolution": "ความละเอียด",
+      "frame_rate": "อัตราเฟรม",
+      "codec": "ตัวแปลงสัญญาณ",
+      "state": "สถานะ",
+      "playing": "กำลังเล่น",
+      "paused": "หยุดชั่วคราว",
+      "stopped": "หยุดแล้ว",
+      "no_video": "ไม่พบสตรีมวิดีโอ"
+    },
     "ui": {
       "histogram": "ฮิสโตแกรม",
-      "vertical": "แนวตั้ง", 
+      "vertical": "แนวตั้ง",
       "horizontal": "แนวนอน",
       "loading": "กำลังโหลด...",
       "no_data": "ไม่มีข้อมูล",
@@ -107,33 +131,37 @@
       "all": "ข้อมูลทั้งหมด",
       "disk_only": "ดิสก์เท่านั้น",
       "cpu_only": "CPU เท่านั้น",
-      "memory_only": "หน่วยความจำเท่านั้น", 
+      "memory_only": "หน่วยความจำเท่านั้น",
       "network_only": "เครือข่ายเท่านั้น",
       "gpu_only": "GPU เท่านั้น",
       "ai_only": "การฝึก AI เท่านั้น",
       "mining_only": "การขุดเท่านั้น",
+      "audio_only": "เสียงเท่านั้น",
+      "video_only": "วิดีโอเท่านั้น",
       "refresh_rate": "อัตราการรีเฟรช",
       "language": "ภาษา",
-      "remote": "โหมดรีโมท",
+      "remote": "โหมดรีโมต",
       "port": "พอร์ต"
     },
     "errors": {
       "command_not_found": "ไม่พบคำสั่ง: %s",
       "invalid_port": "พอร์ตไม่ถูกต้อง: %d",
-      "invalid_refresh": "ช่วงเวลาการรีเฟรชไม่ถูกต้อง: %d", 
-      "config_load_failed": "โหลดการตั้งค่าไม่สำเร็จ",
+      "invalid_refresh": "ช่วงเวลาการรีเฟรชไม่ถูกต้อง: %d",
+      "config_load_failed": "โหลดการกำหนดค่าไม่สำเร็จ",
       "module_failed": "โมดูล %s ล้มเหลว: %v",
-      "nvidia_smi_not_found": "ไม่พบ nvidia-smi การตรวจสอบ GPU ต้องใช้ไดรเวอร์ NVIDIA",
-      "rocm_smi_not_found": "ไม่พบ rocm-smi การตรวจสอบ AMD GPU ต้องใช้ ROCm"
+      "nvidia_smi_not_found": "ไม่พบ nvidia-smi การตรวจสอบ GPU ต้องการไดรเวอร์ NVIDIA",
+      "rocm_smi_not_found": "ไม่พบ rocm-smi การตรวจสอบ AMD GPU ต้องการ ROCm"
     },
     "status": {
       "monitoring_started": "เริ่มการตรวจสอบแล้ว",
-      "updating_every": "อัปเดตทุก %d วินาที", 
+      "updating_every": "อัปเดตทุก %d วินาที",
       "press_ctrl_c": "กด Ctrl+C เพื่อออก",
-      "remote_mode": "โหมดรีโมทบนพอร์ต %d",
-      "gpu_detected": "ตรวจพบ GPU: %s",
-      "ai_training_detected": "ตรวจพบกระบวนการฝึก AI: %d",
-      "mining_detected": "ตรวจพบกิจกรรมการขุด: %s"
+      "remote_mode": "โหมดรีโมตบนพอร์ต %d",
+      "gpu_detected": "พบ GPU: %s",
+      "ai_training_detected": "พบกระบวนการฝึก AI: %d",
+      "mining_detected": "พบกิจกรรมการขุด: %s",
+      "audio_detected": "พบสตรีมเสียง: %d",
+      "video_detected": "พบสตรีมวิดีโอ: %d"
     }
   }
 }

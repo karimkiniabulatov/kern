@@ -1,5 +1,5 @@
 {
-  "language": "Spanish (Español)", 
+  "language": "Español",
   "language_code": "es",
   "translations": {
     "common": {
@@ -9,30 +9,30 @@
       "error": "Error",
       "unknown": "Desconocido",
       "total": "Total",
-      "used": "Usado", 
+      "used": "Usado",
       "free": "Libre",
       "available": "Disponible",
       "status": "Estado",
-      "up": "ARRIBA",
-      "down": "ABAJO"
+      "up": "ACTIVO",
+      "down": "DETENIDO"
     },
     "cpu": {
-      "title": "Información de la CPU",
+      "title": "Información del CPU",
       "model": "Modelo",
       "cores": "Núcleos",
       "threads": "Hilos",
       "usage": "Uso",
-      "frequency": "Frecuencia", 
+      "frequency": "Frecuencia",
       "load": "Carga",
       "load_1min": "1 min",
       "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Carga Promedio"
+      "load_average": "Carga promedio"
     },
     "memory": {
-      "title": "Información de la Memoria", 
+      "title": "Información de Memoria",
       "ram": "RAM",
-      "swap": "Intercambio",
+      "swap": "Swap",
       "physical": "Memoria Física",
       "virtual": "Memoria Virtual"
     },
@@ -40,12 +40,12 @@
       "title": "Información del Disco",
       "filesystem": "Sistema de archivos",
       "size": "Tamaño",
-      "mounted": "Montado en", 
+      "mounted": "Montado en",
       "usage": "Uso",
       "storage": "Almacenamiento"
     },
     "network": {
-      "title": "Información de la Red",
+      "title": "Información de Red",
       "interface": "Interfaz",
       "received": "Recibido",
       "sent": "Enviado",
@@ -55,24 +55,24 @@
       "network_interfaces": "Interfaces de Red"
     },
     "gpu": {
-      "title": "Información de la GPU",
+      "title": "Información de GPU",
       "model": "Modelo",
       "driver": "Controlador",
       "temperature": "Temperatura",
       "memory": "Memoria",
       "utilization": "Utilización",
-      "power": "Potencia",
+      "power": "Energía",
       "clock_core": "Reloj del Núcleo",
-      "clock_memory": "Reloj de la Memoria",
+      "clock_memory": "Reloj de Memoria",
       "fan_speed": "Velocidad del Ventilador"
     },
     "ai": {
       "title": "Entrenamiento de IA",
-      "framework": "Marco de trabajo",
+      "framework": "Framework",
       "processes": "Procesos",
       "vram": "VRAM",
       "model": "Modelo",
-      "batch_size": "Tamaño del Lote",
+      "batch_size": "Tamaño de Lote",
       "throughput": "Rendimiento",
       "epoch": "Época",
       "loss": "Pérdida",
@@ -83,23 +83,47 @@
     "mining": {
       "title": "Información de Minería",
       "algorithm": "Algoritmo",
-      "hashrate": "Tasa de Hash",
-      "shares": "Comparticiones",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
       "temperature": "Temperatura",
-      "power": "Potencia",
+      "power": "Energía",
       "efficiency": "Eficiencia",
       "uptime": "Tiempo de Actividad",
       "revenue_24h": "Ingresos 24h",
-      "pool": "Grupo",
+      "pool": "Pool",
       "not_detected": "No se detectó actividad de minería"
+    },
+    "audio": {
+      "title": "Información de Flujo de Audio",
+      "streams": "Flujos",
+      "sample_rate": "Frecuencia de Muestreo",
+      "channels": "Canales",
+      "format": "Formato",
+      "state": "Estado",
+      "playing": "Reproduciendo",
+      "paused": "Pausado",
+      "stopped": "Detenido",
+      "no_audio": "No se detectaron flujos de audio"
+    },
+    "video": {
+      "title": "Información de Flujo de Video",
+      "streams": "Flujos",
+      "resolution": "Resolución",
+      "frame_rate": "Tasa de Cuadros",
+      "codec": "Códec",
+      "state": "Estado",
+      "playing": "Reproduciendo",
+      "paused": "Pausado",
+      "stopped": "Detenido",
+      "no_video": "No se detectaron flujos de video"
     },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Horizontal",
       "loading": "Cargando...",
       "no_data": "Sin datos",
-      "percent": "porcentaje"
+      "percent": "por ciento"
     },
     "commands": {
       "help": "Ayuda",
@@ -107,11 +131,13 @@
       "all": "Toda la información",
       "disk_only": "Solo disco",
       "cpu_only": "Solo CPU",
-      "memory_only": "Solo memoria", 
+      "memory_only": "Solo memoria",
       "network_only": "Solo red",
       "gpu_only": "Solo GPU",
-      "ai_only": "Solo entrenamiento de IA",
+      "ai_only": "Solo entrenamiento IA",
       "mining_only": "Solo minería",
+      "audio_only": "Solo audio",
+      "video_only": "Solo video",
       "refresh_rate": "Tasa de actualización",
       "language": "Idioma",
       "remote": "Modo remoto",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Comando no encontrado: %s",
       "invalid_port": "Puerto inválido: %d",
-      "invalid_refresh": "Intervalo de actualización inválido: %d", 
-      "config_load_failed": "Error al cargar la configuración",
+      "invalid_refresh": "Intervalo de actualización inválido: %d",
+      "config_load_failed": "Error al cargar configuración",
       "module_failed": "Módulo %s falló: %v",
       "nvidia_smi_not_found": "nvidia-smi no encontrado. El monitoreo de GPU requiere controladores NVIDIA",
       "rocm_smi_not_found": "rocm-smi no encontrado. El monitoreo de AMD GPU requiere ROCm"
     },
     "status": {
       "monitoring_started": "Monitoreo iniciado",
-      "updating_every": "Actualizando cada %d segundos", 
+      "updating_every": "Actualizando cada %d segundos",
       "press_ctrl_c": "Presione Ctrl+C para salir",
-      "remote_mode": "Modo remoto en el puerto %d",
+      "remote_mode": "Modo remoto en puerto %d",
       "gpu_detected": "GPU detectada: %s",
       "ai_training_detected": "Procesos de entrenamiento de IA detectados: %d",
-      "mining_detected": "Actividad de minería detectada: %s"
+      "mining_detected": "Actividad de minería detectada: %s",
+      "audio_detected": "Flujos de audio detectados: %d",
+      "video_detected": "Flujos de video detectados: %d"
     }
   }
 }

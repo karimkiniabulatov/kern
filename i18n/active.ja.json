@@ -1,5 +1,5 @@
 {
-  "language": "Japanese (日本語)", 
+  "language": "日本語",
   "language_code": "ja",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "エラー",
       "unknown": "不明",
       "total": "合計",
-      "used": "使用済み", 
+      "used": "使用済み",
       "free": "空き",
       "available": "利用可能",
-      "status": "状態",
-      "up": "オンライン",
-      "down": "オフライン"
+      "status": "ステータス",
+      "up": "稼働中",
+      "down": "停止中"
     },
     "cpu": {
       "title": "CPU情報",
       "model": "モデル",
-      "cores": "コア数",
-      "threads": "スレッド数",
+      "cores": "コア",
+      "threads": "スレッド",
       "usage": "使用率",
-      "frequency": "周波数", 
+      "frequency": "周波数",
       "load": "負荷",
       "load_1min": "1分",
       "load_5min": "5分",
@@ -30,7 +30,7 @@
       "load_average": "平均負荷"
     },
     "memory": {
-      "title": "メモリ情報", 
+      "title": "メモリ情報",
       "ram": "RAM",
       "swap": "スワップ",
       "physical": "物理メモリ",
@@ -40,7 +40,7 @@
       "title": "ディスク情報",
       "filesystem": "ファイルシステム",
       "size": "サイズ",
-      "mounted": "マウント先", 
+      "mounted": "マウント先",
       "usage": "使用率",
       "storage": "ストレージ"
     },
@@ -78,7 +78,7 @@
       "loss": "損失",
       "accuracy": "精度",
       "training_time": "トレーニング時間",
-      "no_training": "AIトレーニングが検出されません"
+      "no_training": "AIトレーニングが検出されませんでした"
     },
     "mining": {
       "title": "マイニング情報",
@@ -91,11 +91,35 @@
       "uptime": "稼働時間",
       "revenue_24h": "24時間収益",
       "pool": "プール",
-      "not_detected": "マイニング活動が検出されません"
+      "not_detected": "マイニング活動が検出されませんでした"
+    },
+    "audio": {
+      "title": "オーディオストリーム情報",
+      "streams": "ストリーム",
+      "sample_rate": "サンプルレート",
+      "channels": "チャンネル",
+      "format": "フォーマット",
+      "state": "状態",
+      "playing": "再生中",
+      "paused": "一時停止",
+      "stopped": "停止",
+      "no_audio": "オーディオストリームが検出されませんでした"
+    },
+    "video": {
+      "title": "ビデオストリーム情報",
+      "streams": "ストリーム",
+      "resolution": "解像度",
+      "frame_rate": "フレームレート",
+      "codec": "コーデック",
+      "state": "状態",
+      "playing": "再生中",
+      "paused": "一時停止",
+      "stopped": "停止",
+      "no_video": "ビデオストリームが検出されませんでした"
     },
     "ui": {
       "histogram": "ヒストグラム",
-      "vertical": "垂直", 
+      "vertical": "垂直",
       "horizontal": "水平",
       "loading": "読み込み中...",
       "no_data": "データなし",
@@ -104,14 +128,16 @@
     "commands": {
       "help": "ヘルプ",
       "version": "バージョン",
-      "all": "全ての情報",
+      "all": "全情報",
       "disk_only": "ディスクのみ",
       "cpu_only": "CPUのみ",
-      "memory_only": "メモリのみ", 
+      "memory_only": "メモリのみ",
       "network_only": "ネットワークのみ",
       "gpu_only": "GPUのみ",
       "ai_only": "AIトレーニングのみ",
       "mining_only": "マイニングのみ",
+      "audio_only": "オーディオのみ",
+      "video_only": "ビデオのみ",
       "refresh_rate": "更新レート",
       "language": "言語",
       "remote": "リモートモード",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "コマンドが見つかりません: %s",
       "invalid_port": "無効なポート: %d",
-      "invalid_refresh": "無効な更新間隔: %d", 
+      "invalid_refresh": "無効な更新間隔: %d",
       "config_load_failed": "設定の読み込みに失敗しました",
       "module_failed": "モジュール %s が失敗しました: %v",
-      "nvidia_smi_not_found": "nvidia-smi が見つかりません。GPU監視にはNVIDIAドライバーが必要です",
-      "rocm_smi_not_found": "rocm-smi が見つかりません。AMD GPU監視にはROCmが必要です"
+      "nvidia_smi_not_found": "nvidia-smi が見つかりません。GPUモニタリングにはNVIDIAドライバーが必要です",
+      "rocm_smi_not_found": "rocm-smi が見つかりません。AMD GPUモニタリングにはROCmが必要です"
     },
     "status": {
-      "monitoring_started": "監視を開始しました",
-      "updating_every": "%d 秒ごとに更新", 
-      "press_ctrl_c": "Ctrl+Cを押して終了",
-      "remote_mode": "リモートモード、ポート %d",
-      "gpu_detected": "GPUを検出: %s",
-      "ai_training_detected": "AIトレーニングプロセスを検出: %d",
-      "mining_detected": "マイニング活動を検出: %s"
+      "monitoring_started": "モニタリングを開始しました",
+      "updating_every": "%d秒ごとに更新中",
+      "press_ctrl_c": "終了するにはCtrl+Cを押してください",
+      "remote_mode": "ポート %d でリモートモード",
+      "gpu_detected": "GPUを検出しました: %s",
+      "ai_training_detected": "AIトレーニングプロセスを検出しました: %d",
+      "mining_detected": "マイニング活動を検出しました: %s",
+      "audio_detected": "オーディオストリームを検出しました: %d",
+      "video_detected": "ビデオストリームを検出しました: %d"
     }
   }
 }

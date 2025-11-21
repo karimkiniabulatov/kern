@@ -1,5 +1,5 @@
 {
-  "language": "Czech (Čeština)", 
+  "language": "Čeština",
   "language_code": "cs",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Chyba",
       "unknown": "Neznámé",
       "total": "Celkem",
-      "used": "Použito", 
+      "used": "Použito",
       "free": "Volné",
       "available": "Dostupné",
       "status": "Stav",
-      "up": "ZAPNUTO",
-      "down": "VYPNUTO"
+      "up": "FUNGUJE",
+      "down": "ZASTAVENO"
     },
     "cpu": {
-      "title": "Informace o CPU",
+      "title": "Informace o procesoru",
       "model": "Model",
       "cores": "Jádra",
       "threads": "Vlákna",
       "usage": "Využití",
-      "frequency": "Frekvence", 
+      "frequency": "Frekvence",
       "load": "Zatížení",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,8 +30,8 @@
       "load_average": "Průměrné zatížení"
     },
     "memory": {
-      "title": "Informace o paměti", 
-      "ram": "RAM",
+      "title": "Informace o paměti",
+      "ram": "Operační paměť",
       "swap": "Swap",
       "physical": "Fyzická paměť",
       "virtual": "Virtuální paměť"
@@ -40,7 +40,7 @@
       "title": "Informace o disku",
       "filesystem": "Souborový systém",
       "size": "Velikost",
-      "mounted": "Připojeno na", 
+      "mounted": "Připojeno na",
       "usage": "Využití",
       "storage": "Úložiště"
     },
@@ -55,22 +55,22 @@
       "network_interfaces": "Síťová rozhraní"
     },
     "gpu": {
-      "title": "Informace o GPU",
+      "title": "Informace o grafické kartě",
       "model": "Model",
       "driver": "Ovladač",
       "temperature": "Teplota",
       "memory": "Paměť",
       "utilization": "Využití",
-      "power": "Výkon",
+      "power": "Energie",
       "clock_core": "Takt jádra",
       "clock_memory": "Takt paměti",
       "fan_speed": "Rychlost ventilátoru"
     },
     "ai": {
-      "title": "AI trénink",
+      "title": "Trénink umělé inteligence",
       "framework": "Framework",
       "processes": "Procesy",
-      "vram": "VRAM",
+      "vram": "Video paměť",
       "model": "Model",
       "batch_size": "Velikost dávky",
       "throughput": "Propustnost",
@@ -78,7 +78,7 @@
       "loss": "Ztráta",
       "accuracy": "Přesnost",
       "training_time": "Doba tréninku",
-      "no_training": "Nebyl detekován AI trénink"
+      "no_training": "Nebyl detekován trénink AI"
     },
     "mining": {
       "title": "Informace o těžbě",
@@ -86,16 +86,40 @@
       "hashrate": "Hashrate",
       "shares": "Podíly",
       "temperature": "Teplota",
-      "power": "Výkon",
+      "power": "Energie",
       "efficiency": "Efektivita",
       "uptime": "Doba provozu",
-      "revenue_24h": "24h výnos",
+      "revenue_24h": "Výnos za 24h",
       "pool": "Pool",
       "not_detected": "Nebyla detekována těžební aktivita"
     },
+    "audio": {
+      "title": "Informace o audio streamu",
+      "streams": "Streamy",
+      "sample_rate": "Vzorkovací frekvence",
+      "channels": "Kanály",
+      "format": "Formát",
+      "state": "Stav",
+      "playing": "Přehrává",
+      "paused": "Pozastaveno",
+      "stopped": "Zastaveno",
+      "no_audio": "Nebyly detekovány audio streamy"
+    },
+    "video": {
+      "title": "Informace o video streamu",
+      "streams": "Streamy",
+      "resolution": "Rozlišení",
+      "frame_rate": "Snímková frekvence",
+      "codec": "Kodek",
+      "state": "Stav",
+      "playing": "Přehrává",
+      "paused": "Pozastaveno",
+      "stopped": "Zastaveno",
+      "no_video": "Nebyly detekovány video streamy"
+    },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Vertikální", 
+      "vertical": "Vertikální",
       "horizontal": "Horizontální",
       "loading": "Načítání...",
       "no_data": "Žádná data",
@@ -106,12 +130,14 @@
       "version": "Verze",
       "all": "Všechny informace",
       "disk_only": "Pouze disk",
-      "cpu_only": "Pouze CPU",
-      "memory_only": "Pouze paměť", 
+      "cpu_only": "Pouze procesor",
+      "memory_only": "Pouze paměť",
       "network_only": "Pouze síť",
-      "gpu_only": "Pouze GPU",
+      "gpu_only": "Pouze grafická karta",
       "ai_only": "Pouze AI trénink",
       "mining_only": "Pouze těžba",
+      "audio_only": "Pouze audio",
+      "video_only": "Pouze video",
       "refresh_rate": "Obnovovací frekvence",
       "language": "Jazyk",
       "remote": "Vzdálený režim",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Příkaz nebyl nalezen: %s",
       "invalid_port": "Neplatný port: %d",
-      "invalid_refresh": "Neplatný interval obnovení: %d", 
+      "invalid_refresh": "Neplatný interval obnovení: %d",
       "config_load_failed": "Nepodařilo se načíst konfiguraci",
       "module_failed": "Modul %s selhal: %v",
-      "nvidia_smi_not_found": "nvidia-smi nebyl nalezen. Sledování GPU vyžaduje ovladače NVIDIA",
-      "rocm_smi_not_found": "rocm-smi nebyl nalezen. Sledování AMD GPU vyžaduje ROCm"
+      "nvidia_smi_not_found": "nvidia-smi nebyl nalezen. Pro monitorování GPU jsou vyžadovány ovladače NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nebyl nalezen. Pro monitorování AMD GPU je vyžadován ROCm"
     },
     "status": {
-      "monitoring_started": "Sledování zahájeno",
-      "updating_every": "Aktualizace každých %d sekund", 
+      "monitoring_started": "Monitorování zahájeno",
+      "updating_every": "Aktualizace každých %d sekund",
       "press_ctrl_c": "Stiskněte Ctrl+C pro ukončení",
       "remote_mode": "Vzdálený režim na portu %d",
-      "gpu_detected": "GPU detekováno: %s",
-      "ai_training_detected": "Detekovány AI tréninkové procesy: %d",
-      "mining_detected": "Detekována těžební aktivita: %s"
+      "gpu_detected": "Grafická karta detekována: %s",
+      "ai_training_detected": "Detekovány procesy tréninku AI: %d",
+      "mining_detected": "Detekována těžební aktivita: %s",
+      "audio_detected": "Detekovány audio streamy: %d",
+      "video_detected": "Detekovány video streamy: %d"
     }
   }
 }

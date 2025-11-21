@@ -1,5 +1,5 @@
 {
-  "language": "Telugu (తెలుగు)", 
+  "language": "తెలుగు",
   "language_code": "te",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "లోపం",
       "unknown": "తెలియదు",
       "total": "మొత్తం",
-      "used": "ఉపయోగించబడినది", 
+      "used": "ఉపయోగించబడిన",
       "free": "ఉచితం",
-      "available": "అందుబాటులో ఉంది",
+      "available": "అందుబాటులో",
       "status": "స్థితి",
-      "up": "చాలూని",
-      "down": "చాలూని"
+      "up": "పనిచేస్తుంది",
+      "down": "ఆపివేయబడింది"
     },
     "cpu": {
       "title": "CPU సమాచారం",
@@ -22,7 +22,7 @@
       "cores": "కోర్లు",
       "threads": "థ్రెడ్లు",
       "usage": "ఉపయోగం",
-      "frequency": "ఫ్రీక్వెన్సీ", 
+      "frequency": "ఫ్రీక్వెన్సీ",
       "load": "లోడ్",
       "load_1min": "1 నిమిషం",
       "load_5min": "5 నిమిషాలు",
@@ -30,25 +30,25 @@
       "load_average": "సగటు లోడ్"
     },
     "memory": {
-      "title": "మెమరీ సమాచారం", 
+      "title": "మెమరీ సమాచారం",
       "ram": "RAM",
       "swap": "స్వాప్",
-      "physical": "భౌతిక మెమరీ",
+      "physical": "ఫిజికల్ మెమరీ",
       "virtual": "వర్చువల్ మెమరీ"
     },
     "disk": {
       "title": "డిస్క్ సమాచారం",
       "filesystem": "ఫైల్ సిస్టమ్",
-      "size": "పరిమాణం",
-      "mounted": "మౌంట్ చేయబడినది", 
+      "size": "సైజు",
+      "mounted": "మౌంట్ చేయబడిన",
       "usage": "ఉపయోగం",
       "storage": "స్టోరేజ్"
     },
     "network": {
       "title": "నెట్వర్క్ సమాచారం",
       "interface": "ఇంటర్ఫేస్",
-      "received": "స్వీకరించబడినది",
-      "sent": "పంపబడినది",
+      "received": "స్వీకరించబడిన",
+      "sent": "పంపబడిన",
       "bytes": "బైట్లు",
       "packets": "ప్యాకెట్లు",
       "errors": "లోపాలు",
@@ -67,37 +67,61 @@
       "fan_speed": "ఫ్యాన్ స్పీడ్"
     },
     "ai": {
-      "title": "AI శిక్షణ",
+      "title": "AI ట్రైనింగ్",
       "framework": "ఫ్రేమ్వర్క్",
       "processes": "ప్రాసెస్లు",
       "vram": "VRAM",
       "model": "మోడల్",
-      "batch_size": "బ్యాచ్ పరిమాణం",
+      "batch_size": "బ్యాచ్ సైజు",
       "throughput": "థ్రూపుట్",
-      "epoch": "యుగం",
+      "epoch": "ఎపోక్",
       "loss": "లాస్",
       "accuracy": "ఖచ్చితత్వం",
-      "training_time": "శిక్షణ సమయం",
-      "no_training": "AI శిక్షణ కనుగొనబడలేదు"
+      "training_time": "ట్రైనింగ్ సమయం",
+      "no_training": "AI ట్రైనింగ్ కనుగొనబడలేదు"
     },
     "mining": {
       "title": "మైనింగ్ సమాచారం",
       "algorithm": "అల్గోరిథం",
-      "hashrate": "హాష్ రేట్",
+      "hashrate": "హ్యాష్రేట్",
       "shares": "షేర్లు",
       "temperature": "ఉష్ణోగ్రత",
       "power": "పవర్",
       "efficiency": "సామర్థ్యం",
       "uptime": "అప్టైమ్",
-      "revenue_24h": "24గంటల ఆదాయం",
+      "revenue_24h": "24 గంటల ఆదాయం",
       "pool": "పూల్",
-      "not_detected": "మైనింగ్ కార్యకలాపాలు కనుగొనబడలేదు"
+      "not_detected": "మైనింగ్ కార్యాచరణ కనుగొనబడలేదు"
+    },
+    "audio": {
+      "title": "ఆడియో స్ట్రీమ్ సమాచారం",
+      "streams": "స్ట్రీమ్లు",
+      "sample_rate": "సాంపుల్ రేట్",
+      "channels": "చానెల్లు",
+      "format": "ఫార్మాట్",
+      "state": "స్టేట్",
+      "playing": "ప్లే అవుతుంది",
+      "paused": "పాజ్ చేయబడిన",
+      "stopped": "ఆపివేయబడిన",
+      "no_audio": "ఆడియో స్ట్రీమ్లు కనుగొనబడలేదు"
+    },
+    "video": {
+      "title": "వీడియో స్ట్రీమ్ సమాచారం",
+      "streams": "స्ट్రీమ్లు",
+      "resolution": "రెజల్యూషన్",
+      "frame_rate": "ఫ్రేమ్ రేట్",
+      "codec": "కోడెక్",
+      "state": "స్టేట్",
+      "playing": "ప్లే అవుతుంది",
+      "paused": "పాజ్ చేయబడిన",
+      "stopped": "ఆపివేయబడిన",
+      "no_video": "వీడియో స్ట్రీమ్లు కనుగొనబడలేదu"
     },
     "ui": {
       "histogram": "హిస్టోగ్రామ్",
-      "vertical": "నిలువు", 
-      "horizontal": "అడ్డం",
-      "loading": "లోడ్ అవుతోంది...",
+      "vertical": "వర్టికల్",
+      "horizontal": "హారిజాంటల్",
+      "loading": "లోడ్ అవుతుంది...",
       "no_data": "డేటా లేదు",
       "percent": "శాతం"
     },
@@ -107,11 +131,13 @@
       "all": "అన్ని సమాచారం",
       "disk_only": "డిస్క్ మాత్రమే",
       "cpu_only": "CPU మాత్రమే",
-      "memory_only": "మెమరీ మాత్రమే", 
+      "memory_only": "మెమరీ మాత్రమే",
       "network_only": "నెట్వర్క్ మాత్రమే",
       "gpu_only": "GPU మాత్రమే",
-      "ai_only": "AI శిక్షణ మాత్రమే",
+      "ai_only": "AI ట్రైనింగ్ మాత్రమే",
       "mining_only": "మైనింగ్ మాత్రమే",
+      "audio_only": "ఆడియో మాత్రమే",
+      "video_only": "వీడియో మాత్రమే",
       "refresh_rate": "రిఫ్రెష్ రేట్",
       "language": "భాష",
       "remote": "రిమోట్ మోడ్",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "కమాండ్ కనుగొనబడలేదు: %s",
       "invalid_port": "చెల్లని పోర్ట్: %d",
-      "invalid_refresh": "చెల్లని రిఫ్రెష్ ఇంటర్వెల్: %d", 
-      "config_load_failed": "కాన్ఫిగరేషన్ లోడ్ చేయడం విఫలమైంది",
-      "module_failed": "మాడ్యూల్ %s విఫలమైంది: %v",
-      "nvidia_smi_not_found": "nvidia-smi కనుగొనబడలేదు. GPU మానిటరింగ్ కు NVIDIA డ్రైవర్లు అవసరం",
-      "rocm_smi_not_found": "rocm-smi కనుగొనబడలేదు. AMD GPU మానిటరింగ్ కు ROCm అవసరం"
+      "invalid_refresh": "చెల్లని రిఫ్రెష్ ఇంటర్వెల్: %d",
+      "config_load_failed": "కాన్ఫిగ్ లోడ్ చేయడం విఫలమైంది",
+      "module_failed": "%s మాడ్యూల్ విఫలమైంది: %v",
+      "nvidia_smi_not_found": "nvidia-smi కనుగొనబడలేదు. GPU మానిటరింగ్ కోసం NVIDIA డ్రైవర్లు అవసరం",
+      "rocm_smi_not_found": "rocm-smi కనుగొనబడలేదు. AMD GPU మానిటరింగ్ కోసం ROCm అవసరం"
     },
     "status": {
       "monitoring_started": "మానిటరింగ్ ప్రారంభించబడింది",
-      "updating_every": "ప్రతి %d సెకన్లకు నవీకరించబడుతోంది", 
+      "updating_every": "ప్రతి %d సెకన్లకు నవీకరించబడుతుంది",
       "press_ctrl_c": "నిష్క్రమించడానికి Ctrl+C నొక్కండి",
-      "remote_mode": "పోర్ట్ %d లో రిమోట్ మోడ్",
+      "remote_mode": "పోర్ట్ %d వద్ద రిమోట్ మోడ్",
       "gpu_detected": "GPU కనుగొనబడింది: %s",
-      "ai_training_detected": "AI శిక్షణ ప్రాసెస్లు కనుగొనబడ్డాయి: %d",
-      "mining_detected": "మైనింగ్ కార్యకలాపాలు కనుగొనబడ్డాయి: %s"
+      "ai_training_detected": "AI ట్రైనింగ్ ప్రాసెస్లు కనుగొనబడ్డాయి: %d",
+      "mining_detected": "మైనింగ్ కార్యాచరణ కనుగొనబడింది: %s",
+      "audio_detected": "ఆడియో స్ట్రీమ్లు కనుగొనబడ్డాయి: %d",
+      "video_detected": "వీడియో స్ట్రీమ్లు కనుగొనబడ్డాయి: %d"
     }
   }
 }

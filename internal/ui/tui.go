@@ -349,7 +349,7 @@ func (t *TUI) renderAI(startRow int, width int, data interface{}) int {
 				row = t.printLine(row, 0, fmt.Sprintf("%s: %d | %s: %.3f | %s: %.1f%%", 
 					t.config.T("ai.epoch"), aiData.Epoch,
 					t.config.T("ai.loss"), aiData.Loss,
-					t.config.T("ai.accuracy"), aiData.Accuracy*100), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
+					t.config.T("ai.accuracy"), aiData.Accuracy*100), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
 
 			if aiData.TrainingTime != "" {

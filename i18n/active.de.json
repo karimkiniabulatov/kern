@@ -1,5 +1,5 @@
 {
-  "language": "German (Deutsch)", 
+  "language": "Deutsch",
   "language_code": "de",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Fehler",
       "unknown": "Unbekannt",
       "total": "Gesamt",
-      "used": "Verwendet", 
+      "used": "Verwendet",
       "free": "Frei",
       "available": "Verfügbar",
       "status": "Status",
       "up": "AKTIV",
-      "down": "INAKTIV"
+      "down": "GESTOPPT"
     },
     "cpu": {
       "title": "CPU-Informationen",
@@ -22,7 +22,7 @@
       "cores": "Kerne",
       "threads": "Threads",
       "usage": "Nutzung",
-      "frequency": "Frequenz", 
+      "frequency": "Frequenz",
       "load": "Last",
       "load_1min": "1 Min",
       "load_5min": "5 Min",
@@ -30,9 +30,9 @@
       "load_average": "Durchschnittslast"
     },
     "memory": {
-      "title": "Speicherinformationen", 
-      "ram": "RAM",
-      "swap": "Swap",
+      "title": "Speicherinformationen",
+      "ram": "Arbeitsspeicher",
+      "swap": "Auslagerungsspeicher",
       "physical": "Physischer Speicher",
       "virtual": "Virtueller Speicher"
     },
@@ -40,7 +40,7 @@
       "title": "Festplatteninformationen",
       "filesystem": "Dateisystem",
       "size": "Größe",
-      "mounted": "Eingehängt auf", 
+      "mounted": "Eingehängt auf",
       "usage": "Nutzung",
       "storage": "Speicher"
     },
@@ -62,15 +62,15 @@
       "memory": "Speicher",
       "utilization": "Auslastung",
       "power": "Leistung",
-      "clock_core": "Takt Kern",
-      "clock_memory": "Takt Speicher",
+      "clock_core": "Kern-Takt",
+      "clock_memory": "Speicher-Takt",
       "fan_speed": "Lüftergeschwindigkeit"
     },
     "ai": {
       "title": "KI-Training",
       "framework": "Framework",
       "processes": "Prozesse",
-      "vram": "VRAM",
+      "vram": "Video-Speicher",
       "model": "Modell",
       "batch_size": "Batch-Größe",
       "throughput": "Durchsatz",
@@ -85,7 +85,7 @@
       "algorithm": "Algorithmus",
       "hashrate": "Hashrate",
       "shares": "Shares",
-      "temperature": "Temperatura",
+      "temperature": "Temperatur",
       "power": "Leistung",
       "efficiency": "Effizienz",
       "uptime": "Betriebszeit",
@@ -93,9 +93,33 @@
       "pool": "Pool",
       "not_detected": "Keine Mining-Aktivität erkannt"
     },
+    "audio": {
+      "title": "Audio-Stream-Informationen",
+      "streams": "Streams",
+      "sample_rate": "Abtastrate",
+      "channels": "Kanäle",
+      "format": "Format",
+      "state": "Status",
+      "playing": "Wiedergabe",
+      "paused": "Pausiert",
+      "stopped": "Gestoppt",
+      "no_audio": "Keine Audio-Streams erkannt"
+    },
+    "video": {
+      "title": "Video-Stream-Informationen",
+      "streams": "Streams",
+      "resolution": "Auflösung",
+      "frame_rate": "Bildrate",
+      "codec": "Codec",
+      "state": "Status",
+      "playing": "Wiedergabe",
+      "paused": "Pausiert",
+      "stopped": "Gestoppt",
+      "no_video": "Keine Video-Streams erkannt"
+    },
     "ui": {
       "histogram": "Histogramm",
-      "vertical": "Vertikal", 
+      "vertical": "Vertikal",
       "horizontal": "Horizontal",
       "loading": "Lädt...",
       "no_data": "Keine Daten",
@@ -107,11 +131,13 @@
       "all": "Alle Informationen",
       "disk_only": "Nur Festplatte",
       "cpu_only": "Nur CPU",
-      "memory_only": "Nur Speicher", 
+      "memory_only": "Nur Speicher",
       "network_only": "Nur Netzwerk",
       "gpu_only": "Nur GPU",
       "ai_only": "Nur KI-Training",
       "mining_only": "Nur Mining",
+      "audio_only": "Nur Audio",
+      "video_only": "Nur Video",
       "refresh_rate": "Aktualisierungsrate",
       "language": "Sprache",
       "remote": "Fernmodus",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Befehl nicht gefunden: %s",
       "invalid_port": "Ungültiger Port: %d",
-      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d", 
+      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d",
       "config_load_failed": "Konfiguration konnte nicht geladen werden",
       "module_failed": "Modul %s fehlgeschlagen: %v",
       "nvidia_smi_not_found": "nvidia-smi nicht gefunden. GPU-Überwachung erfordert NVIDIA-Treiber",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Überwachung gestartet",
-      "updating_every": "Aktualisiere alle %d Sekunden", 
-      "press_ctrl_c": "Drücken Sie Strg+C zum Beenden",
+      "updating_every": "Aktualisiert alle %d Sekunden",
+      "press_ctrl_c": "Drücken Sie Ctrl+C zum Beenden",
       "remote_mode": "Fernmodus auf Port %d",
       "gpu_detected": "GPU erkannt: %s",
       "ai_training_detected": "KI-Trainingsprozesse erkannt: %d",
-      "mining_detected": "Mining-Aktivität erkannt: %s"
+      "mining_detected": "Mining-Aktivität erkannt: %s",
+      "audio_detected": "Audio-Streams erkannt: %d",
+      "video_detected": "Video-Streams erkannt: %d"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Portuguese (Português)", 
+  "language": "Português",
   "language_code": "pt",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Erro",
       "unknown": "Desconhecido",
       "total": "Total",
-      "used": "Usado", 
+      "used": "Usado",
       "free": "Livre",
       "available": "Disponível",
       "status": "Status",
       "up": "ATIVO",
-      "down": "INATIVO"
+      "down": "PARADO"
     },
     "cpu": {
       "title": "Informações da CPU",
@@ -22,15 +22,15 @@
       "cores": "Núcleos",
       "threads": "Threads",
       "usage": "Uso",
-      "frequency": "Frequência", 
+      "frequency": "Frequência",
       "load": "Carga",
       "load_1min": "1 min",
       "load_5min": "5 min",
       "load_15min": "15 min",
-      "load_average": "Carga Média"
+      "load_average": "Carga média"
     },
     "memory": {
-      "title": "Informações de Memória", 
+      "title": "Informações da Memória",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memória Física",
@@ -40,12 +40,12 @@
       "title": "Informações do Disco",
       "filesystem": "Sistema de arquivos",
       "size": "Tamanho",
-      "mounted": "Montado em", 
+      "mounted": "Montado em",
       "usage": "Uso",
       "storage": "Armazenamento"
     },
     "network": {
-      "title": "Informações de Rede",
+      "title": "Informações da Rede",
       "interface": "Interface",
       "received": "Recebido",
       "sent": "Enviado",
@@ -61,7 +61,7 @@
       "temperature": "Temperatura",
       "memory": "Memória",
       "utilization": "Utilização",
-      "power": "Potência",
+      "power": "Energia",
       "clock_core": "Clock do Núcleo",
       "clock_memory": "Clock da Memória",
       "fan_speed": "Velocidade do Ventilador"
@@ -73,33 +73,57 @@
       "vram": "VRAM",
       "model": "Modelo",
       "batch_size": "Tamanho do Lote",
-      "throughput": "Taxa de Transferência",
+      "throughput": "Throughput",
       "epoch": "Época",
-      "loss": "Perda",
-      "accuracy": "Precisão",
+      "loss": "Loss",
+      "accuracy": "Acurácia",
       "training_time": "Tempo de Treinamento",
       "no_training": "Nenhum treinamento de IA detectado"
     },
     "mining": {
       "title": "Informações de Mineração",
       "algorithm": "Algoritmo",
-      "hashrate": "Taxa de Hash",
-      "shares": "Compartilhamentos",
+      "hashrate": "Hashrate",
+      "shares": "Shares",
       "temperature": "Temperatura",
-      "power": "Potência",
+      "power": "Energia",
       "efficiency": "Eficiência",
-      "uptime": "Tempo de Atividade",
+      "uptime": "Tempo de atividade",
       "revenue_24h": "Receita 24h",
       "pool": "Pool",
       "not_detected": "Nenhuma atividade de mineração detectada"
     },
+    "audio": {
+      "title": "Informações do Stream de Áudio",
+      "streams": "Streams",
+      "sample_rate": "Taxa de amostragem",
+      "channels": "Canais",
+      "format": "Formato",
+      "state": "Estado",
+      "playing": "Reproduzindo",
+      "paused": "Pausado",
+      "stopped": "Parado",
+      "no_audio": "Nenhum stream de áudio detectado"
+    },
+    "video": {
+      "title": "Informações do Stream de Vídeo",
+      "streams": "Streams",
+      "resolution": "Resolução",
+      "frame_rate": "Taxa de quadros",
+      "codec": "Codec",
+      "state": "Estado",
+      "playing": "Reproduzindo",
+      "paused": "Pausado",
+      "stopped": "Parado",
+      "no_video": "Nenhum stream de vídeo detectado"
+    },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Horizontal",
       "loading": "Carregando...",
       "no_data": "Sem dados",
-      "percent": "porcentagem"
+      "percent": "por cento"
     },
     "commands": {
       "help": "Ajuda",
@@ -107,11 +131,13 @@
       "all": "Todas as informações",
       "disk_only": "Apenas disco",
       "cpu_only": "Apenas CPU",
-      "memory_only": "Apenas memória", 
+      "memory_only": "Apenas memória",
       "network_only": "Apenas rede",
       "gpu_only": "Apenas GPU",
-      "ai_only": "Apenas treinamento de IA",
+      "ai_only": "Apenas treinamento IA",
       "mining_only": "Apenas mineração",
+      "audio_only": "Apenas áudio",
+      "video_only": "Apenas vídeo",
       "refresh_rate": "Taxa de atualização",
       "language": "Idioma",
       "remote": "Modo remoto",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Comando não encontrado: %s",
       "invalid_port": "Porta inválida: %d",
-      "invalid_refresh": "Intervalo de atualização inválido: %d", 
+      "invalid_refresh": "Intervalo de atualização inválido: %d",
       "config_load_failed": "Falha ao carregar configuração",
       "module_failed": "Módulo %s falhou: %v",
       "nvidia_smi_not_found": "nvidia-smi não encontrado. Monitoramento de GPU requer drivers NVIDIA",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Monitoramento iniciado",
-      "updating_every": "Atualizando a cada %d segundos", 
+      "updating_every": "Atualizando a cada %d segundos",
       "press_ctrl_c": "Pressione Ctrl+C para sair",
       "remote_mode": "Modo remoto na porta %d",
       "gpu_detected": "GPU detectada: %s",
       "ai_training_detected": "Processos de treinamento de IA detectados: %d",
-      "mining_detected": "Atividade de mineração detectada: %s"
+      "mining_detected": "Atividade de mineração detectada: %s",
+      "audio_detected": "Streams de áudio detectados: %d",
+      "video_detected": "Streams de vídeo detectados: %d"
     }
   }
 }

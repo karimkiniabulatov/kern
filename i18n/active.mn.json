@@ -1,5 +1,5 @@
 {
-  "language": "Mongolian (Монгол)", 
+  "language": "Монгол",
   "language_code": "mn",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Алдаа",
       "unknown": "Тодорхойгүй",
       "total": "Нийт",
-      "used": "Ашиглагдсан", 
+      "used": "Ашиглагдсан",
       "free": "Чөлөөт",
       "available": "Боломжтой",
       "status": "Төлөв",
-      "up": "АСААЛТТАЙ",
-      "down": "УНТАЛТТАЙ"
+      "up": "АЖИЛЛАЖ БАЙНА",
+      "down": "ЗОГСООСОН"
     },
     "cpu": {
-      "title": "CPU мэдээлэл",
+      "title": "Процессорын мэдээлэл",
       "model": "Загвар",
       "cores": "Цөм",
       "threads": "Утас",
       "usage": "Хэрэглээ",
-      "frequency": "Давтамж", 
+      "frequency": "Давтамж",
       "load": "Ачаалал",
       "load_1min": "1 мин",
       "load_5min": "5 мин",
@@ -30,9 +30,9 @@
       "load_average": "Дундаж ачаалал"
     },
     "memory": {
-      "title": "Санах ойн мэдээлэл", 
+      "title": "Санах ойн мэдээлэл",
       "ram": "RAM",
-      "swap": "Солилцоо",
+      "swap": "Своп",
       "physical": "Физик санах ой",
       "virtual": "Виртуал санах ой"
     },
@@ -40,7 +40,7 @@
       "title": "Дискийн мэдээлэл",
       "filesystem": "Файлын систем",
       "size": "Хэмжээ",
-      "mounted": "Суулгасан", 
+      "mounted": "Суулгасан",
       "usage": "Хэрэглээ",
       "storage": "Хадгалах"
     },
@@ -55,22 +55,22 @@
       "network_interfaces": "Сүлжээний интерфейсүүд"
     },
     "gpu": {
-      "title": "GPU мэдээлэл",
+      "title": "График картны мэдээлэл",
       "model": "Загвар",
       "driver": "Жолооч",
       "temperature": "Температур",
       "memory": "Санах ой",
       "utilization": "Ашиглалт",
-      "power": "Хүч",
+      "power": "Эрчим хүч",
       "clock_core": "Цөмийн хурд",
       "clock_memory": "Санах ойн хурд",
       "fan_speed": "Сэнсний хурд"
     },
     "ai": {
-      "title": "AI сургалт",
+      "title": "Хиймэл оюун сургалт",
       "framework": "Хүрээ",
       "processes": "Процессууд",
-      "vram": "VRAM",
+      "vram": "Видео санах ой",
       "model": "Загвар",
       "batch_size": "Багцийн хэмжээ",
       "throughput": "Пропуск чадвар",
@@ -78,24 +78,48 @@
       "loss": "Алдагдал",
       "accuracy": "Нарийвчлал",
       "training_time": "Сургалтын хугацаа",
-      "no_training": "AI сургалт илрээгүй"
+      "no_training": "Хиймэл оюун сургалт илрээгүй"
     },
     "mining": {
       "title": "Олборлолтын мэдээлэл",
       "algorithm": "Алгоритм",
-      "hashrate": "Хеш хурд",
+      "hashrate": "Хешрейт",
       "shares": "Хувьцаа",
       "temperature": "Температур",
-      "power": "Хүч",
+      "power": "Эрчим хүч",
       "efficiency": "Үр ашиг",
       "uptime": "Ажиллах хугацаа",
-      "revenue_24h": "24ц орлого",
-      "pool": "Уусмал",
+      "revenue_24h": "24 цагийн орлого",
+      "pool": "Уусгал",
       "not_detected": "Олборлолтын үйл ажиллагаа илрээгүй"
+    },
+    "audio": {
+      "title": "Аудио урсгалын мэдээлэл",
+      "streams": "Урсгал",
+      "sample_rate": "Түүврийн давтамж",
+      "channels": "Суваг",
+      "format": "Формат",
+      "state": "Төлөв",
+      "playing": "Тоглож байна",
+      "paused": "Түр зогссон",
+      "stopped": "Зогссон",
+      "no_audio": "Аудио урсгал илрээгүй"
+    },
+    "video": {
+      "title": "Видео урсгалын мэдээлэл",
+      "streams": "Урсгал",
+      "resolution": "Нарийвчлал",
+      "frame_rate": "Кадрын хурд",
+      "codec": "Кодек",
+      "state": "Төлөв",
+      "playing": "Тоглож байна",
+      "paused": "Түр зогссон",
+      "stopped": "Зогссон",
+      "no_video": "Видео урсгал илрээгүй"
     },
     "ui": {
       "histogram": "Гистограм",
-      "vertical": "Босоо", 
+      "vertical": "Босоо",
       "horizontal": "Хэвтээ",
       "loading": "Уншиж байна...",
       "no_data": "Өгөгдөл байхгүй",
@@ -106,12 +130,14 @@
       "version": "Хувилбар",
       "all": "Бүх мэдээлэл",
       "disk_only": "Зөвхөн диск",
-      "cpu_only": "Зөвхөн CPU",
-      "memory_only": "Зөвхөн санах ой", 
+      "cpu_only": "Зөвхөн процессор",
+      "memory_only": "Зөвхөн санах ой",
       "network_only": "Зөвхөн сүлжээ",
-      "gpu_only": "Зөвхөн GPU",
-      "ai_only": "Зөвхөн AI сургалт",
+      "gpu_only": "Зөвхөн график карт",
+      "ai_only": "Зөвхөн ХО сургалт",
       "mining_only": "Зөвхөн олборлолт",
+      "audio_only": "Зөвхөн аудио",
+      "video_only": "Зөвхөн видео",
       "refresh_rate": "Шинэчлэх хурд",
       "language": "Хэл",
       "remote": "Алсын горим",
@@ -120,20 +146,22 @@
     "errors": {
       "command_not_found": "Комманд олдсонгүй: %s",
       "invalid_port": "Буруу порт: %d",
-      "invalid_refresh": "Буруу шинэчлэх интервал: %d", 
-      "config_load_failed": "Тохиргоог ачаалж чадсангүй",
-      "module_failed": "Модуль %s амжилтгүй: %v",
-      "nvidia_smi_not_found": "nvidia-smi олдсонгүй. GPU хянахын тулд NVIDIA жолооч шаардлагатай",
-      "rocm_smi_not_found": "rocm-smi олдсонгүй. AMD GPU хянахын тулд ROCm шаардлагатай"
+      "invalid_refresh": "Буруу шинэчлэх интервал: %d",
+      "config_load_failed": "Тохиргоог уншиж чадсангүй",
+      "module_failed": "%s модуль амжилтгүй: %v",
+      "nvidia_smi_not_found": "nvidia-smi олдсонгүй. GPU хяналтад NVIDIA жолооч шаардлагатай",
+      "rocm_smi_not_found": "rocm-smi олдсонгүй. AMD GPU хяналтад ROCm шаардлагатай"
     },
     "status": {
       "monitoring_started": "Хяналт эхлэв",
-      "updating_every": "%d секунд тутам шинэчлэгдэнэ", 
+      "updating_every": "%d секунд тутам шинэчлэгдэнэ",
       "press_ctrl_c": "Гарахын тулд Ctrl+C дарна уу",
       "remote_mode": "%d порт дээр алсын горим",
-      "gpu_detected": "GPU илрээ: %s",
-      "ai_training_detected": "AI сургалтын процессууд илрээ: %d",
-      "mining_detected": "Олборлолтын үйл ажиллагаа илрээ: %s"
+      "gpu_detected": "График карт илрээв: %s",
+      "ai_training_detected": "ХО сургалтын процессууд илрээв: %d",
+      "mining_detected": "Олборлолтын үйл ажиллагаа илрээв: %s",
+      "audio_detected": "Аудио урсгал илрээв: %d",
+      "video_detected": "Видео урсгал илрээв: %d"
     }
   }
 }

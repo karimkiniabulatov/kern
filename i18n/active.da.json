@@ -1,5 +1,5 @@
 {
-  "language": "Danish (Dansk)", 
+  "language": "Dansk",
   "language_code": "da",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Fejl",
       "unknown": "Ukendt",
       "total": "Total",
-      "used": "Brugt", 
+      "used": "Brugt",
       "free": "Ledig",
       "available": "Tilgængelig",
       "status": "Status",
-      "up": "OP",
-      "down": "NED"
+      "up": "KØRER",
+      "down": "STOPPET"
     },
     "cpu": {
-      "title": "CPU-information",
+      "title": "CPU Information",
       "model": "Model",
       "cores": "Kerner",
       "threads": "Tråde",
-      "usage": "Brug",
-      "frequency": "Frekvens", 
+      "usage": "Forbrug",
+      "frequency": "Frekvens",
       "load": "Belastning",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,7 +30,7 @@
       "load_average": "Gennemsnitlig belastning"
     },
     "memory": {
-      "title": "Hukommelsesinformation", 
+      "title": "Hukommelsesinformation",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysisk hukommelse",
@@ -40,9 +40,9 @@
       "title": "Diskinformation",
       "filesystem": "Filsystem",
       "size": "Størrelse",
-      "mounted": "Monteret på", 
-      "usage": "Brug",
-      "storage": "Lagring"
+      "mounted": "Monteret på",
+      "usage": "Forbrug",
+      "storage": "Lager"
     },
     "network": {
       "title": "Netværksinformation",
@@ -55,19 +55,19 @@
       "network_interfaces": "Netværksinterfaces"
     },
     "gpu": {
-      "title": "GPU-information",
+      "title": "GPU Information",
       "model": "Model",
       "driver": "Driver",
       "temperature": "Temperatur",
       "memory": "Hukommelse",
-      "utilization": "Udbnyttelse",
+      "utilization": "Unyttelse",
       "power": "Effekt",
-      "clock_core": "Kernehastighed",
-      "clock_memory": "Hukommelseshastighed",
+      "clock_core": "Kernetakt",
+      "clock_memory": "Hukommelsestakt",
       "fan_speed": "Ventilatorhastighed"
     },
     "ai": {
-      "title": "AI-træning",
+      "title": "AI Træning",
       "framework": "Framework",
       "processes": "Processer",
       "vram": "VRAM",
@@ -81,21 +81,45 @@
       "no_training": "Ingen AI-træning registreret"
     },
     "mining": {
-      "title": "Mining-information",
+      "title": "Mining Information",
       "algorithm": "Algoritme",
       "hashrate": "Hashrate",
-      "shares": "Andele",
+      "shares": "Shares",
       "temperature": "Temperatur",
       "power": "Effekt",
       "efficiency": "Effektivitet",
       "uptime": "Oppetid",
-      "revenue_24h": "24h indtægt",
+      "revenue_24h": "24t indtægt",
       "pool": "Pool",
-      "not_detected": "Ingen mining-aktivitet registreret"
+      "not_detected": "Ingen mining aktivitet registreret"
+    },
+    "audio": {
+      "title": "Lydstream Information",
+      "streams": "Streams",
+      "sample_rate": "Samplingsrate",
+      "channels": "Kanaler",
+      "format": "Format",
+      "state": "Tilstand",
+      "playing": "Afspiller",
+      "paused": "Pauset",
+      "stopped": "Stoppet",
+      "no_audio": "Ingen lydstreams registreret"
+    },
+    "video": {
+      "title": "Videostream Information",
+      "streams": "Streams",
+      "resolution": "Opløsning",
+      "frame_rate": "Billedhastighed",
+      "codec": "Codec",
+      "state": "Tilstand",
+      "playing": "Afspiller",
+      "paused": "Pauset",
+      "stopped": "Stoppet",
+      "no_video": "Ingen videostreams registreret"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Lodret", 
+      "vertical": "Lodret",
       "horizontal": "Vandret",
       "loading": "Indlæser...",
       "no_data": "Ingen data",
@@ -107,11 +131,13 @@
       "all": "Al information",
       "disk_only": "Kun disk",
       "cpu_only": "Kun CPU",
-      "memory_only": "Kun hukommelse", 
+      "memory_only": "Kun hukommelse",
       "network_only": "Kun netværk",
       "gpu_only": "Kun GPU",
-      "ai_only": "Kun AI-træning",
+      "ai_only": "Kun AI træning",
       "mining_only": "Kun mining",
+      "audio_only": "Kun lyd",
+      "video_only": "Kun video",
       "refresh_rate": "Opdateringsfrekvens",
       "language": "Sprog",
       "remote": "Fjernmodus",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Kommando ikke fundet: %s",
       "invalid_port": "Ugyldig port: %d",
-      "invalid_refresh": "Ugyldigt opdateringsinterval: %d", 
+      "invalid_refresh": "Ugyldigt opdateringsinterval: %d",
       "config_load_failed": "Kunne ikke indlæse konfiguration",
       "module_failed": "Modul %s fejlede: %v",
       "nvidia_smi_not_found": "nvidia-smi ikke fundet. GPU-overvågning kræver NVIDIA-drivere",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Overvågning startet",
-      "updating_every": "Opdaterer hver %d sekund", 
+      "updating_every": "Opdaterer hver %d sekund",
       "press_ctrl_c": "Tryk Ctrl+C for at afslutte",
       "remote_mode": "Fjernmodus på port %d",
       "gpu_detected": "GPU registreret: %s",
       "ai_training_detected": "AI-træningsprocesser registreret: %d",
-      "mining_detected": "Mining-aktivitet registreret: %s"
+      "mining_detected": "Mining aktivitet registreret: %s",
+      "audio_detected": "Lydstreams registreret: %d",
+      "video_detected": "Videostreams registreret: %d"
     }
   }
 }

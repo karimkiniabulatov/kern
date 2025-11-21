@@ -1,5 +1,5 @@
 {
-  "language": "Hungarian (Magyar)", 
+  "language": "Magyar",
   "language_code": "hu",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Hiba",
       "unknown": "Ismeretlen",
       "total": "Összesen",
-      "used": "Használt", 
+      "used": "Használt",
       "free": "Szabad",
       "available": "Elérhető",
       "status": "Állapot",
-      "up": "BEKAPCSOLVA",
-      "down": "KIKAPCSOLVA"
+      "up": "MŰKÖDIK",
+      "down": "LEÁLLÍTVA"
     },
     "cpu": {
-      "title": "CPU információk",
+      "title": "Processzor információk",
       "model": "Modell",
       "cores": "Magok",
       "threads": "Szálak",
       "usage": "Használat",
-      "frequency": "Frekvencia", 
+      "frequency": "Frekvencia",
       "load": "Terhelés",
       "load_1min": "1 perc",
       "load_5min": "5 perc",
@@ -30,7 +30,7 @@
       "load_average": "Átlagos terhelés"
     },
     "memory": {
-      "title": "Memória információk", 
+      "title": "Memória információk",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fizikai memória",
@@ -40,7 +40,7 @@
       "title": "Lemez információk",
       "filesystem": "Fájlrendszer",
       "size": "Méret",
-      "mounted": "Csatolva", 
+      "mounted": "Csatolva",
       "usage": "Használat",
       "storage": "Tároló"
     },
@@ -64,38 +64,62 @@
       "power": "Teljesítmény",
       "clock_core": "Mag órajel",
       "clock_memory": "Memória órajel",
-      "fan_speed": "Ventilátor sebesség"
+      "fan_speed": "Ventillátor sebesség"
     },
     "ai": {
-      "title": "AI képzés",
+      "title": "MI képzés",
       "framework": "Keretrendszer",
       "processes": "Folyamatok",
-      "vram": "VRAM",
+      "vram": "Videómemória",
       "model": "Modell",
-      "batch_size": "Batch méret",
+      "batch_size": "Köteg méret",
       "throughput": "Átviteli sebesség",
       "epoch": "Epoha",
       "loss": "Veszteség",
       "accuracy": "Pontosság",
       "training_time": "Képzési idő",
-      "no_training": "Nem észlelhető AI képzés"
+      "no_training": "Nem észlelhető MI képzés"
     },
     "mining": {
       "title": "Bányászat információk",
       "algorithm": "Algoritmus",
-      "hashrate": "Hash sebesség",
+      "hashrate": "Hashrate",
       "shares": "Részvények",
       "temperature": "Hőmérséklet",
       "power": "Teljesítmény",
       "efficiency": "Hatékonyság",
-      "uptime": "Üzemidő",
-      "revenue_24h": "24h bevétel",
+      "uptime": "Működési idő",
+      "revenue_24h": "24 órás bevétel",
       "pool": "Pool",
       "not_detected": "Nem észlelhető bányászati tevékenység"
     },
+    "audio": {
+      "title": "Hangstream információk",
+      "streams": "Streamek",
+      "sample_rate": "Mintavételi frekvencia",
+      "channels": "Csatornák",
+      "format": "Formátum",
+      "state": "Állapot",
+      "playing": "Lejátszás",
+      "paused": "Szüneteltetve",
+      "stopped": "Leállítva",
+      "no_audio": "Nem észlelhető hangstream"
+    },
+    "video": {
+      "title": "Videostream információk",
+      "streams": "Streamek",
+      "resolution": "Felbontás",
+      "frame_rate": "Képkocka sebesség",
+      "codec": "Kodek",
+      "state": "Állapot",
+      "playing": "Lejátszás",
+      "paused": "Szüneteltetve",
+      "stopped": "Leállítva",
+      "no_video": "Nem észlelhető videostream"
+    },
     "ui": {
       "histogram": "Hisztogram",
-      "vertical": "Függőleges", 
+      "vertical": "Függőleges",
       "horizontal": "Vízszintes",
       "loading": "Betöltés...",
       "no_data": "Nincs adat",
@@ -104,14 +128,16 @@
     "commands": {
       "help": "Súgó",
       "version": "Verzió",
-      "all": "Összes információ",
+      "all": "Minden információ",
       "disk_only": "Csak lemez",
-      "cpu_only": "Csak CPU",
-      "memory_only": "Csak memória", 
+      "cpu_only": "Csak processzor",
+      "memory_only": "Csak memória",
       "network_only": "Csak hálózat",
       "gpu_only": "Csak GPU",
-      "ai_only": "Csak AI képzés",
+      "ai_only": "Csak MI képzés",
       "mining_only": "Csak bányászat",
+      "audio_only": "Csak hang",
+      "video_only": "Csak video",
       "refresh_rate": "Frissítési gyakoriság",
       "language": "Nyelv",
       "remote": "Távoli mód",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "Parancs nem található: %s",
       "invalid_port": "Érvénytelen port: %d",
-      "invalid_refresh": "Érvénytelen frissítési időköz: %d", 
+      "invalid_refresh": "Érvénytelen frissítési időköz: %d",
       "config_load_failed": "Konfiguráció betöltése sikertelen",
       "module_failed": "%s modul hibás: %v",
       "nvidia_smi_not_found": "nvidia-smi nem található. GPU megfigyeléshez NVIDIA meghajtók szükségesek",
@@ -128,12 +154,14 @@
     },
     "status": {
       "monitoring_started": "Megfigyelés elindítva",
-      "updating_every": "Frissítés %d másodpercenként", 
+      "updating_every": "Frissítés %d másodpercenként",
       "press_ctrl_c": "Nyomja meg a Ctrl+C-t a kilépéshez",
       "remote_mode": "Távoli mód a %d porton",
       "gpu_detected": "GPU észlelve: %s",
-      "ai_training_detected": "AI képzési folyamatok észlelve: %d",
-      "mining_detected": "Bányászati tevékenység észlelve: %s"
+      "ai_training_detected": "MI képzési folyamatok észlelve: %d",
+      "mining_detected": "Bányászati tevékenység észlelve: %s",
+      "audio_detected": "Hangstream-ek észlelve: %d",
+      "video_detected": "Videostream-ek észlelve: %d"
     }
   }
 }
