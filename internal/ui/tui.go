@@ -555,7 +555,7 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 				}
 				status := t.config.T("video.inactive")
 				if encoder.Active {
-					status = tconfig.T("video.active")
+					status = t.config.T("video.active")
 				}
 				row = t.printLine(row, 2, fmt.Sprintf("%s (%s) - %s", encoder.Name, encoder.Type, status), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 			}

@@ -25,8 +25,6 @@ type GPUInfo struct {
 }
 
 func Summary() (*GPUInfo, error) {
-	info := &GPUInfo{}
-
 	// Try to get NVIDIA GPU info using nvidia-smi
 	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,driver_version,temperature.gpu,memory.total,memory.used,memory.free,utilization.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,performance.state", "--format=csv,noheader,nounits").Output(); err == nil {
 		return parseNvidiaSMIOutput(string(output))

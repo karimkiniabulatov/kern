@@ -59,8 +59,6 @@ func removeDuplicateInterfaces(networks []NetworkInfo) []NetworkInfo {
 }
 
 func getNetworkInterfaces() ([]NetworkInfo, error) {
-	var interfaces []NetworkInfo
-
 	switch runtime.GOOS {
 	case "linux":
 		return getLinuxNetworkInterfaces()
