@@ -15,12 +15,15 @@ import (
 	"github.com/karimkiniabulatov/kern/internal/mining"
 	"github.com/karimkiniabulatov/kern/internal/audio"
 	"github.com/karimkiniabulatov/kern/internal/video"
+	"github.com/mattn/go-runewidth"
 )
 
 type TUI struct {
 	screen   tcell.Screen
 	config   *config.Config
 	showLogo bool
+	width    int
+	height   int
 }
 
 func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
@@ -34,86 +37,89 @@ func NewTUI(cfg *config.Config, showLogo bool) (*TUI, error) {
 	}
 
 	screen.Clear()
+	width, height := screen.Size()
 
 	return &TUI{
 		screen:   screen,
 		config:   cfg,
 		showLogo: showLogo,
+		width:    width,
+		height:   height,
 	}, nil
 }
 
 func (t *TUI) Render(data map[string]interface{}) {
 	t.screen.Clear()
-	width, height := t.screen.Size()
+	t.width, t.height = t.screen.Size()
 
 	row := 0
 
 	// Show logo if needed
 	if t.showLogo {
-		row = t.renderLogo(row, width)
+		row = t.renderLogo(row, t.width)
 	}
 
 	// Render only enabled modules
 	if t.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
-			row = t.renderDisk(row, width, diskData)
+			row = t.renderDisk(row, t.width, diskData)
 		}
 	}
 
 	if t.config.ShowMem {
 		if memData, exists := data["mem"]; exists {
-			row = t.renderMemory(row, width, memData)
+			row = t.renderMemory(row, t.width, memData)
 		}
 	}
 
 	if t.config.ShowNet {
 		if netData, exists := data["net"]; exists {
-			row = t.renderNetwork(row, width, netData)
+			row = t.renderNetwork(row, t.width, netData)
 		}
 	}
 
 	if t.config.ShowCPU {
 		if cpuData, exists := data["cpu"]; exists {
-			row = t.renderCPU(row, width, cpuData)
+			row = t.renderCPU(row, t.width, cpuData)
 		}
 	}
 
 	// GPU monitoring
 	if t.config.ShowGPU {
 		if gpuData, exists := data["gpu"]; exists {
-			row = t.renderGPU(row, width, gpuData)
+			row = t.renderGPU(row, t.width, gpuData)
 		}
 	}
 
 	// AI training monitoring  
 	if t.config.ShowAI {
 		if aiData, exists := data["ai"]; exists {
-			row = t.renderAI(row, width, aiData)
+			row = t.renderAI(row, t.width, aiData)
 		}
 	}
 
 	// Mining monitoring
 	if t.config.ShowMining {
 		if miningData, exists := data["mining"]; exists {
-			row = t.renderMining(row, width, miningData)
+			row = t.renderMining(row, t.width, miningData)
 		}
 	}
 
 	// Audio monitoring
 	if t.config.ShowAudio {
 		if audioData, exists := data["audio"]; exists {
-			row = t.renderAudio(row, width, audioData)
+			row = t.renderAudio(row, t.width, audioData)
 		}
 	}
 
 	// Video monitoring
 	if t.config.ShowVideo {
 		if videoData, exists := data["video"]; exists {
-			row = t.renderVideo(row, width, videoData)
+			row = t.renderVideo(row, t.width, videoData)
 		}
 	}
 
-	t.renderFooter(row, width, height)
+	t.renderFooter(row, t.width, t.height)
 	t.screen.Show()
 }
 
@@ -156,7 +162,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 10)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
@@ -429,13 +435,13 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 
 // Audio rendering function
 func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
-	row := t.renderHeader(startRow, "Audio Information", width)
+	row := t.renderHeader(startRow, t.config.T("audio.title"), width)
 
 	switch audioData := data.(type) {
 	case *audio.AudioInfo:
 		// Input devices
 		if len(audioData.InputDevices) > 0 {
-			row = t.printLine(row, 0, "Input Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("audio.input_devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, device := range audioData.InputDevices {
 				if i >= 2 { // Limit to 2 devices for space
 					break
@@ -446,7 +452,7 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 
 		// Output devices
 		if len(audioData.OutputDevices) > 0 {
-			row = t.printLine(row, 0, "Output Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("audio.output_devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, device := range audioData.OutputDevices {
 				if i >= 2 { // Limit to 2 devices for space
 					break
@@ -457,29 +463,31 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 
 		// Audio levels
 		if audioData.InputLevel != 0 || audioData.OutputLevel != 0 {
-			row = t.printLine(row, 0, "Audio Levels:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("audio.levels"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			
 			if audioData.InputLevel != 0 {
 				inputGraph := t.createCompactGraph((audioData.InputLevel+96)/96*100, 10)
-				row = t.printLine(row, 2, fmt.Sprintf("Input: %s %.1f dB", inputGraph, audioData.InputLevel), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+				row = t.printLine(row, 2, fmt.Sprintf("%s: %s %.1f dB", 
+					t.config.T("audio.input"), inputGraph, audioData.InputLevel), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
 			
 			if audioData.OutputLevel != 0 {
 				outputGraph := t.createCompactGraph((audioData.OutputLevel+96)/96*100, 10)
-				row = t.printLine(row, 2, fmt.Sprintf("Output: %s %.1f dB", outputGraph, audioData.OutputLevel), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+				row = t.printLine(row, 2, fmt.Sprintf("%s: %s %.1f dB", 
+					t.config.T("audio.output"), outputGraph, audioData.OutputLevel), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 			}
 		}
 
 		// Active streams
 		if len(audioData.ActiveStreams) > 0 {
-			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("audio.active_streams"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, stream := range audioData.ActiveStreams {
 				if i >= 3 { // Limit to 3 streams for space
 					break
 				}
-				streamType := "Playback"
+				streamType := t.config.T("audio.playback")
 				if stream.Type == "capture" {
-					streamType = "Capture"
+					streamType = t.config.T("audio.capture")
 				}
 				row = t.printLine(row, 2, fmt.Sprintf("%s: %s", streamType, stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen), width)
 			}
@@ -487,38 +495,38 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 
 		// Audio format info
 		if audioData.SampleRate != "" {
-			row = t.printLine(row, 0, fmt.Sprintf("Format: %s, %s, %s", 
-				audioData.SampleRate, audioData.BitDepth, audioData.Latency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s, %s, %s", 
+				t.config.T("audio.format"), audioData.SampleRate, audioData.BitDepth, audioData.Latency), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 
 		// VU Meter simulation
 		if audioData.PeakLevel > 0 {
-			row = t.printLine(row, 0, "VU Meter:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("audio.vu_meter"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			vuGraph := t.createCompactGraph(audioData.PeakLevel, 20)
-			row = t.printLine(row, 2, fmt.Sprintf("Peak: %s", vuGraph), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			row = t.printLine(row, 2, fmt.Sprintf("%s: %s", t.config.T("audio.peak"), vuGraph), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 		}
 
 	case map[string]interface{}:
 		if errorMsg, exists := audioData["error"]; exists {
 			if errorStr, ok := errorMsg.(string); ok {
-				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("common.error"), errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 			}
 		}
 	default:
-		row = t.printLine(row, 0, "No audio data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+		row = t.printLine(row, 0, t.config.T("audio.no_audio"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 	}
 	return row + 1
 }
 
 // Video rendering function
 func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
-	row := t.renderHeader(startRow, "Video Information", width)
+	row := t.renderHeader(startRow, t.config.T("video.title"), width)
 
 	switch videoData := data.(type) {
 	case *video.VideoInfo:
 		// Video devices
 		if len(videoData.VideoDevices) > 0 {
-			row = t.printLine(row, 0, "Video Devices:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("video.devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, device := range videoData.VideoDevices {
 				if i >= 2 { // Limit to 2 devices for space
 					break
@@ -529,7 +537,7 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 
 		// Active streams
 		if len(videoData.ActiveStreams) > 0 {
-			row = t.printLine(row, 0, "Active Streams:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("video.active_streams"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, stream := range videoData.ActiveStreams {
 				if i >= 3 { // Limit to 3 streams for space
 					break
@@ -540,15 +548,14 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 
 		// GPU encoders
 		if len(videoData.GPUEncoders) > 0 {
-			row = t.printLine(row, 0, "GPU Encoders:", tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
+			row = t.printLine(row, 0, t.config.T("video.encoders"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true), width)
 			for i, encoder := range videoData.GPUEncoders {
 				if i >= 2 { // Limit to 2 encoders for space
 					break
 				}
-				// Исправление: используем поле Active вместо Status
-				status := "inactive"
+				status := t.config.T("video.inactive")
 				if encoder.Active {
-					status = "active"
+					status = t.config.T("video.active")
 				}
 				row = t.printLine(row, 2, fmt.Sprintf("%s (%s) - %s", encoder.Name, encoder.Type, status), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 			}
@@ -560,32 +567,36 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
 				statusColor = tcell.ColorGreen
 			}
-			row = t.printLine(row, 0, fmt.Sprintf("Encoding Status: %s", videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+				t.config.T("video.encoding_status"), videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor), width)
 		}
 
 		// Video metrics
 		if videoData.Bitrate != "" {
-			row = t.printLine(row, 0, fmt.Sprintf("Bitrate: %s", videoData.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+				t.config.T("video.bitrate"), videoData.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 
 		if videoData.Resolution != "" {
-			row = t.printLine(row, 0, fmt.Sprintf("Resolution: %s", videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s", 
+				t.config.T("video.resolution"), videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 
 		// GPU utilization for video
 		if videoData.GPUUtilization > 0 {
 			gpuGraph := t.createCompactGraph(videoData.GPUUtilization, 10)
-			row = t.printLine(row, 0, fmt.Sprintf("GPU Usage: %s %.1f%%", gpuGraph, videoData.GPUUtilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
+			row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%", 
+				t.config.T("video.gpu_usage"), gpuGraph, videoData.GPUUtilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 		}
 
 	case map[string]interface{}:
 		if errorMsg, exists := videoData["error"]; exists {
 			if errorStr, ok := errorMsg.(string); ok {
-				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+				row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("common.error"), errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 			}
 		}
 	default:
-		row = t.printLine(row, 0, "No video data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
+		row = t.printLine(row, 0, t.config.T("video.no_video"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 	}
 	return row + 1
 }
@@ -605,7 +616,7 @@ func (t *TUI) renderFooter(startRow int, width int, height int) {
 		return
 	}
 
-	footerText := "Press 'q' or Ctrl+C to exit | kern v1.2.1"
+	footerText := fmt.Sprintf("Press 'q' or Ctrl+C to exit | Refresh: %ds | kern v1.2.1", t.config.RefreshRate)
 	style := tcell.StyleDefault.Foreground(tcell.ColorGray)
 	
 	// Ensure footer is at the bottom
@@ -693,4 +704,15 @@ func (t *TUI) getDeviceType(filesystem string, mountPoint string) string {
 		return "BOOT"
 	}
 	return "STORAGE"
+}
+
+// drawText правильно обрабатывает символы разной ширины
+func (t *TUI) drawText(x, y int, style tcell.Style, text string) {
+	for _, r := range text {
+		if x >= t.width {
+			break
+		}
+		t.screen.SetContent(x, y, r, nil, style)
+		x += runewidth.RuneWidth(r)
+	}
 }

@@ -25,10 +25,10 @@ type Config struct {
 	ShowVideo   bool   `json:"show_video"`
 	
 	// NEW: User preferences for default view
-	LastUsedModules *ModulePreferences `json:"last_used_modules,omitempty"`
+	LastUsedModules *LastUsedModules `json:"last_used_modules,omitempty"`
 }
 
-type ModulePreferences struct {
+type LastUsedModules struct {
 	ShowDisk   bool `json:"show_disk"`
 	ShowCPU    bool `json:"show_cpu"`
 	ShowMem    bool `json:"show_mem"`
@@ -47,7 +47,7 @@ func (c *Config) T(key string) string {
 // UpdateLastUsedModules updates the last used module preferences
 func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining, showAudio, showVideo bool) {
 	if c.LastUsedModules == nil {
-		c.LastUsedModules = &ModulePreferences{}
+		c.LastUsedModules = &LastUsedModules{}
 	}
 	
 	c.LastUsedModules.ShowDisk = showDisk
