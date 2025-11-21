@@ -45,6 +45,7 @@ type VideoEncoder struct {
 	Codecs       []string
 	Active       bool
 	Utilization  float64
+	// Убрано поле Status, так как используется Active для отслеживания состояния
 }
 
 func Summary() (*VideoInfo, error) {
@@ -222,7 +223,7 @@ func (v *VideoInfo) detectGPUEncoders() {
 					Name:   "NVIDIA NVENC",
 					Type:   "hardware",
 					Codecs: []string{"H.264", "H.265", "AV1"},
-					Status: "available",
+					Active: false, // Используем Active вместо Status
 				})
 			}
 		}
@@ -237,7 +238,7 @@ func (v *VideoInfo) detectGPUEncoders() {
 				Name:   "AMD AMF/VCE",
 				Type:   "hardware", 
 				Codecs: []string{"H.264", "H.265"},
-				Status: "available",
+				Active: false, // Используем Active вместо Status
 			})
 		}
 	}
@@ -250,13 +251,13 @@ func (v *VideoInfo) detectGPUEncoders() {
 		Name:   "CPU x264",
 		Type:   "software",
 		Codecs: []string{"H.264"},
-		Status: "available",
+		Active: false, // Используем Active вместо Status
 	})
 	v.GPUEncoders = append(v.GPUEncoders, VideoEncoder{
 		Name:   "CPU x265",
 		Type:   "software",
 		Codecs: []string{"H.265"},
-		Status: "available",
+		Active: false, // Используем Active вместо Status
 	})
 }
 
@@ -308,6 +309,7 @@ func (v *VideoInfo) detectIntelEncoders() {
 				Name:   "Intel Quick Sync",
 				Type:   "hardware",
 				Codecs: []string{"H.264", "H.265", "VP9"},
+				Active: false,
 			}
 			v.GPUEncoders = append(v.GPUEncoders, encoder)
 		}
