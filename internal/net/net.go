@@ -3,7 +3,6 @@ package net
 import (
 	"fmt"
 	"os/exec"
-	//"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -198,6 +197,11 @@ func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, s
 	}{currentRX, currentTX, now}
 
 	return "0B/s", "0B/s", 0
+}
+
+// FormatSpeed is exported for testing
+func FormatSpeed(bytesPerSec float64) string {
+	return formatSpeed(bytesPerSec)
 }
 
 func formatSpeed(bytesPerSec float64) string {

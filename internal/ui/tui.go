@@ -299,10 +299,12 @@ func (t *TUI) renderGPU(startRow int, width int, data interface{}) int {
 				t.config.T("gpu.clock_memory"), gpuData.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		}
 		
-	case map[string]string:
+	case map[string]interface{}:
 		// Handle error case
 		if errorMsg, exists := gpuData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			if errorStr, ok := errorMsg.(string); ok {
+				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			}
 		}
 	default:
 		row = t.printLine(row, 0, "No GPU data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
@@ -350,9 +352,11 @@ func (t *TUI) renderAI(startRow int, width int, data interface{}) int {
 		} else {
 			row = t.printLine(row, 0, t.config.T("ai.no_training"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 		}
-	case map[string]string:
+	case map[string]interface{}:
 		if errorMsg, exists := aiData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			if errorStr, ok := errorMsg.(string); ok {
+				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			}
 		}
 	default:
 		row = t.printLine(row, 0, t.config.T("ai.no_training"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
@@ -411,9 +415,11 @@ func (t *TUI) renderMining(startRow int, width int, data interface{}) int {
 		} else {
 			row = t.printLine(row, 0, t.config.T("mining.not_detected"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
 		}
-	case map[string]string:
+	case map[string]interface{}:
 		if errorMsg, exists := miningData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			if errorStr, ok := errorMsg.(string); ok {
+				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			}
 		}
 	default:
 		row = t.printLine(row, 0, t.config.T("mining.not_detected"), tcell.StyleDefault.Foreground(tcell.ColorGray), width)
@@ -492,9 +498,11 @@ func (t *TUI) renderAudio(startRow int, width int, data interface{}) int {
 			row = t.printLine(row, 2, fmt.Sprintf("Peak: %s", vuGraph), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
 		}
 
-	case map[string]string:
+	case map[string]interface{}:
 		if errorMsg, exists := audioData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			if errorStr, ok := errorMsg.(string); ok {
+				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			}
 		}
 	default:
 		row = t.printLine(row, 0, "No audio data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
@@ -565,9 +573,11 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 			row = t.printLine(row, 0, fmt.Sprintf("GPU Usage: %s %.1f%%", gpuGraph, videoData.GPUUtilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral), width)
 		}
 
-	case map[string]string:
+	case map[string]interface{}:
 		if errorMsg, exists := videoData["error"]; exists {
-			row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorMsg), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			if errorStr, ok := errorMsg.(string); ok {
+				row = t.printLine(row, 0, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed), width)
+			}
 		}
 	default:
 		row = t.printLine(row, 0, "No video data available", tcell.StyleDefault.Foreground(tcell.ColorGray), width)
@@ -599,7 +609,12 @@ func (t *TUI) renderFooter(startRow int, width int, height int) {
 }
 
 func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) {
-	if row < 0 || row >= t.screen.Size().Y {
+	if row < 0 {
+		return
+	}
+
+	screenWidth, screenHeight := t.screen.Size()
+	if row >= screenHeight {
 		return
 	}
 
@@ -609,12 +624,20 @@ func (t *TUI) printCentered(row int, text string, style tcell.Style, width int) 
 	}
 
 	for i, ch := range text {
+		if x+i >= screenWidth {
+			break
+		}
 		t.screen.SetContent(x+i, row, ch, nil, style)
 	}
 }
 
 func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, width int) int {
-	if row < 0 || row >= t.screen.Size().Y {
+	if row < 0 {
+		return row
+	}
+
+	screenWidth, screenHeight := t.screen.Size()
+	if row >= screenHeight {
 		return row
 	}
 
@@ -624,7 +647,7 @@ func (t *TUI) printLine(row int, indent int, text string, style tcell.Style, wid
 	}
 
 	for i, ch := range text {
-		if indent+i >= width {
+		if indent+i >= screenWidth {
 			break
 		}
 		t.screen.SetContent(indent+i, row, ch, nil, style)

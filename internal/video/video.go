@@ -90,6 +90,28 @@ func (v *VideoInfo) detectVideoDevices() {
 			v.parseVideoFormats(i, string(output))
 		}
 	}
+
+	// Try to detect displays
+	if output, err := exec.Command("xrandr", "--listmonitors").Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "Monitors:") {
+				continue
+			}
+			if strings.Contains(line, "+") {
+				parts := strings.Fields(line)
+				if len(parts) >= 4 {
+					v.VideoDevices = append(v.VideoDevices, VideoDevice{
+						Name:   parts[3],
+						ID:     parts[3],
+						Type:   "display",
+						Status: "active",
+						Driver: "X11",
+					})
+				}
+			}
+		}
+	}
 	
 	// Fallback for systems without cameras
 	if len(v.VideoDevices) == 0 {
@@ -127,7 +149,7 @@ func (v *VideoInfo) detectActiveStreams() {
 	// Check for common video applications
 	videoProcesses := []string{
 		"ffmpeg", "vlc", "mpv", "obs", "gstreamer", 
-		"chrome", "firefox", "zoom", "teams",
+		"chrome", "firefox", "zoom", "teams", "gst", "chromium", "skype",
 	}
 	
 	for _, proc := range videoProcesses {
@@ -144,11 +166,15 @@ func (v *VideoInfo) parseVideoProcesses(output string) {
 			fields := strings.Fields(line)
 			if len(fields) >= 2 {
 				pid, _ := strconv.Atoi(fields[1])
+				device := ""
+				if len(fields) > 8 {
+					device = fields[8]
+				}
 				stream := VideoStream{
 					Process: fields[0],
 					PID:     pid,
 					Type:    "capture",
-					Device:  fields[8],
+					Device:  device,
 				}
 				v.ActiveStreams = append(v.ActiveStreams, stream)
 			}
@@ -165,14 +191,17 @@ func (v *VideoInfo) parseVideoApps(output string) {
 			
 			// Determine stream type based on application
 			streamType := "playback"
-			if fields[1] == "ffmpeg" || fields[1] == "obs" {
+			processName := fields[1]
+			if processName == "ffmpeg" || processName == "obs" {
 				streamType = "encode"
-			} else if strings.Contains(fields[1], "chrome") || strings.Contains(fields[1], "firefox") {
+			} else if strings.Contains(processName, "chrome") || strings.Contains(processName, "firefox") {
 				streamType = "decode"
+			} else if strings.Contains(processName, "zoom") || strings.Contains(processName, "teams") || strings.Contains(processName, "skype") {
+				streamType = "capture"
 			}
 			
 			stream := VideoStream{
-				Process: fields[1],
+				Process: processName,
 				PID:     pid,
 				Type:    streamType,
 			}
@@ -185,15 +214,50 @@ func (v *VideoInfo) detectGPUEncoders() {
 	// Check NVIDIA NVENC
 	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,utilization.enc", "--format=csv,noheader,nounits").Output(); err == nil {
 		v.parseNVIDIAEncoders(string(output))
+	} else {
+		// Fallback: try basic nvidia-smi query
+		if output, err := exec.Command("nvidia-smi", "--query-gpu=name", "--format=csv,noheader").Output(); err == nil {
+			if strings.TrimSpace(string(output)) != "" {
+				v.GPUEncoders = append(v.GPUEncoders, VideoEncoder{
+					Name:   "NVIDIA NVENC",
+					Type:   "hardware",
+					Codecs: []string{"H.264", "H.265", "AV1"},
+					Status: "available",
+				})
+			}
+		}
 	}
 	
-	// Check AMD VCE
+	// Check AMD VCE / AMF
 	if output, err := exec.Command("rocm-smi", "--showuse").Output(); err == nil {
 		v.parseAMDEncoders(string(output))
+	} else if output, err := exec.Command("rocminfo").Output(); err == nil {
+		if strings.Contains(string(output), "gfx") {
+			v.GPUEncoders = append(v.GPUEncoders, VideoEncoder{
+				Name:   "AMD AMF/VCE",
+				Type:   "hardware", 
+				Codecs: []string{"H.264", "H.265"},
+				Status: "available",
+			})
+		}
 	}
 	
 	// Check Intel Quick Sync
 	v.detectIntelEncoders()
+	
+	// Add software encoders as fallback
+	v.GPUEncoders = append(v.GPUEncoders, VideoEncoder{
+		Name:   "CPU x264",
+		Type:   "software",
+		Codecs: []string{"H.264"},
+		Status: "available",
+	})
+	v.GPUEncoders = append(v.GPUEncoders, VideoEncoder{
+		Name:   "CPU x265",
+		Type:   "software",
+		Codecs: []string{"H.265"},
+		Status: "available",
+	})
 }
 
 func (v *VideoInfo) parseNVIDIAEncoders(output string) {
@@ -210,15 +274,24 @@ func (v *VideoInfo) parseNVIDIAEncoders(output string) {
 				Utilization:  util,
 			}
 			v.GPUEncoders = append(v.GPUEncoders, encoder)
+		} else if len(fields) == 1 {
+			// Handle case when only GPU name is available
+			encoder := VideoEncoder{
+				Name:   fmt.Sprintf("NVIDIA NVENC (%s)", strings.TrimSpace(fields[0])),
+				Type:   "hardware",
+				Codecs: []string{"H.264", "H.265", "AV1"},
+				Active: false,
+			}
+			v.GPUEncoders = append(v.GPUEncoders, encoder)
 		}
 	}
 }
 
 func (v *VideoInfo) parseAMDEncoders(output string) {
 	// Simplified AMD encoder detection
-	if strings.Contains(output, "Video Codec") {
+	if strings.Contains(output, "Video Codec") || strings.Contains(output, "encode") {
 		encoder := VideoEncoder{
-			Name:    "AMD VCE",
+			Name:    "AMD VCE/AMF",
 			Type:    "hardware", 
 			Codecs:  []string{"H.264", "H.265"},
 			Active:  strings.Contains(output, "active"),
@@ -251,15 +324,26 @@ func (v *VideoInfo) getVideoMetrics() {
 		
 		// Determine encoding status
 		encoding := false
+		decoding := false
+		capture := false
+		
 		for _, stream := range v.ActiveStreams {
-			if stream.Type == "encode" {
+			switch stream.Type {
+			case "encode":
 				encoding = true
-				break
+			case "decode":
+				decoding = true
+			case "capture":
+				capture = true
 			}
 		}
 		
 		if encoding {
 			v.EncodingStatus = "encoding"
+		} else if decoding {
+			v.EncodingStatus = "decoding"
+		} else if capture {
+			v.EncodingStatus = "capturing"
 		} else {
 			v.EncodingStatus = "active"
 		}
@@ -273,7 +357,15 @@ func (v *VideoInfo) getVideoMetrics() {
 				activeEncoders++
 			}
 		}
-		if activeEncoders > 0 {
+		
+		// If no encoder utilization data, try to get general GPU utilization
+		if activeEncoders == 0 {
+			if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits").Output(); err == nil {
+				if util, err := strconv.ParseFloat(strings.TrimSpace(string(output)), 64); err == nil {
+					v.GPUUtilization = util
+				}
+			}
+		} else {
 			v.GPUUtilization = totalUtil / float64(activeEncoders)
 		}
 	} else {
