@@ -156,7 +156,7 @@ func (t *TUI) renderCPU(startRow int, width int, data interface{}) int {
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
+			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua), width)
 
 		graph := t.createCompactGraph(cpuInfo.Usage, 10)
 		row = t.printLine(row, 0, fmt.Sprintf("%s: %s %.1f%%",
@@ -545,7 +545,12 @@ func (t *TUI) renderVideo(startRow int, width int, data interface{}) int {
 				if i >= 2 { // Limit to 2 encoders for space
 					break
 				}
-				row = t.printLine(row, 2, fmt.Sprintf("%s (%s)", encoder.Name, encoder.Type), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
+				// Исправление: используем поле Active вместо Status
+				status := "inactive"
+				if encoder.Active {
+					status = "active"
+				}
+				row = t.printLine(row, 2, fmt.Sprintf("%s (%s) - %s", encoder.Name, encoder.Type, status), tcell.StyleDefault.Foreground(tcell.ColorYellow), width)
 			}
 		}
 
