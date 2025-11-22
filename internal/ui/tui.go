@@ -162,7 +162,7 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		// Usage with graph on new line
 		usageGraph := t.createSolidGraph(cpuInfo.Usage)
