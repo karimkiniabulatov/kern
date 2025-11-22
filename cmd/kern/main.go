@@ -79,21 +79,7 @@ func init() {
 	if runtime.GOOS == "windows" {
 		colorable.EnableColorsStdout(nil)
 	}
-}
 
-func main() {
-	
-	// РЕГИСТРАЦИЯ ДЛИННЫХ ВЕРСИЙ ФЛАГОВ МОНИТОРИНГА
-    flag.BoolVar(flagDisk, "disk", false, "Show disk information")
-    flag.BoolVar(flagCPU, "cpu", false, "Show CPU information") 
-    flag.BoolVar(flagMem, "mem", false, "Show memory information")
-    flag.BoolVar(flagNet, "net", false, "Show network information")
-    flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
-    flag.BoolVar(flagAI, "ai", false, "Show AI training information")
-    flag.BoolVar(flagMining, "mining", false, "Show mining information")
-    flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
-    flag.BoolVar(flagVideo, "video", false, "Show video stream information")
-	
 	// Регистрируем только альтернативные имена для общих флагов
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
@@ -104,7 +90,9 @@ func main() {
 	flag.BoolVar(flagStop, "stop", false, "Stop the kern daemon")
 	flag.BoolVar(flagRestart, "restart", false, "Restart the kern daemon")
 	flag.BoolVar(flagStatus, "status", false, "Show daemon status")
+}
 
+func main() {
 	flag.Usage = func() {
 		showLogo()
 		fmt.Printf("kern v%s - System Monitoring Tool\n\n", version)
