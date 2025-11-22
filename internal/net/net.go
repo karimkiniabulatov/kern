@@ -144,7 +144,7 @@ func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
 	cmd := exec.Command("ip", "-o", "addr", "show")
 	output, err := cmd.Output()
 	if err != nil {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -185,7 +185,7 @@ func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
 
 	// Если не найдено интерфейсов, возвращаем fallback
 	if len(interfaces) == 0 {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	return interfaces, nil
@@ -197,7 +197,7 @@ func getWindowsNetworkInterfaces() ([]NetworkInfo, error) {
 	// Используем net.Interfaces для получения информации об интерфейсах
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	for _, netIface := range netInterfaces {
@@ -237,7 +237,7 @@ func getWindowsNetworkInterfaces() ([]NetworkInfo, error) {
 
 	// Если не найдено интерфейсов, возвращаем fallback
 	if len(interfaces) == 0 {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	return interfaces, nil
@@ -249,7 +249,7 @@ func getMacOSNetworkInterfaces() ([]NetworkInfo, error) {
 	// Используем net.Interfaces для macOS
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	for _, netIface := range netInterfaces {
@@ -289,7 +289,7 @@ func getMacOSNetworkInterfaces() ([]NetworkInfo, error) {
 
 	// Если не найдено интерфейсов, возвращаем fallback
 	if len(interfaces) == 0 {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	return interfaces, nil
@@ -301,7 +301,7 @@ func getFallbackNetworkInterfaces() ([]NetworkInfo, error) {
 	// Fallback реализация используя только net package
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	for _, netIface := range netInterfaces {
@@ -337,7 +337,7 @@ func getFallbackNetworkInterfaces() ([]NetworkInfo, error) {
 
 	// Если не найдено интерфейсов, возвращаем fallback
 	if len(interfaces) == 0 {
-		return getFallbackNetworkInterfacesWithDefaults(), nil
+		return getFallbackNetworkInterfacesWithDefaults()
 	}
 
 	return interfaces, nil
