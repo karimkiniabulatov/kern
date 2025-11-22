@@ -162,7 +162,7 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		// Usage with graph on new line
 		usageGraph := t.createSolidGraph(cpuInfo.Usage)
@@ -174,11 +174,21 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 
 		if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			for i, usage := range cpuInfo.CoreUsage {
-				coreNumber := fmt.Sprintf("%02d", i+1)
-				coreGraph := t.createSolidGraph(usage)
-				row = t.printSimple(row, fmt.Sprintf("  %s %s: %.1f%% %s",
-					t.config.T("cpu.core"), coreNumber, usage, coreGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+			
+			// Группируем ядра для компактного отображения (по 4 в строку)
+			coresPerLine := 4
+			for i := 0; i < len(cpuInfo.CoreUsage); i += coresPerLine {
+				line := "  "
+				for j := 0; j < coresPerLine && i+j < len(cpuInfo.CoreUsage); j++ {
+					coreIdx := i + j
+					usage := cpuInfo.CoreUsage[coreIdx]
+					coreGraph := t.createSolidGraph(usage)
+					line += fmt.Sprintf(" %02d:%.1f%%%s", coreIdx+1, usage, coreGraph)
+					if j < coresPerLine-1 && i+j+1 < len(cpuInfo.CoreUsage) {
+						line += " |"
+					}
+				}
+				row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 		}
 	}
@@ -189,18 +199,22 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("memory.title"))
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		// RAM usage with graph
+		// RAM usage with detailed information
 		ramGraph := t.createSolidGraph(memInfo.UsagePercent)
-		row = t.printSimple(row, fmt.Sprintf("%s: %s / %s %.1f%% %s",
-			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, memInfo.UsagePercent, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+		row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
+			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, 
+			memInfo.UsagePercent, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
 
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("common.available"), memInfo.Available), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
+			t.config.T("common.available"), memInfo.Available,
+			t.config.T("common.free"), memInfo.Free), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
-		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" {
+		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" && memInfo.SwapTotal != "0" {
 			// Swap usage with graph
 			swapGraph := t.createSolidGraph(memInfo.SwapUsagePercent)
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s %.1f%% %s",
-				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
+				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, 
+				memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 		}
 	}
 	return row + 1
@@ -629,9 +643,16 @@ func (t *TUI) renderFooter(startRow int) {
 	footerText := fmt.Sprintf("Press 'q' or Ctrl+C to exit | Refresh: %ds | kern v1.2.1", t.config.RefreshRate)
 	style := tcell.StyleDefault.Foreground(tcell.ColorGray)
 	
-	// Ensure footer is at the bottom
+	// Обеспечиваем что футер внизу и выровнен по левому краю
 	footerRow := t.height - 1
-	t.printCentered(footerRow, footerText, style)
+	
+	// Обрезаем текст если он слишком длинный
+	if len(footerText) > t.width {
+		footerText = footerText[:t.width-3] + "..."
+	}
+	
+	// Выводим с левого края
+	t.printSimple(footerRow, footerText, style)
 }
 
 // Упрощенная функция вывода - всегда с начала строки
@@ -640,16 +661,14 @@ func (t *TUI) printSimple(row int, text string, style tcell.Style) int {
 		return row
 	}
 
-	// Handle text that might be longer than screen width
-	if len(text) > t.width {
-		text = text[:t.width-3] + "..."
-	}
-
-	for i, ch := range text {
-		if i >= t.width {
+	// Обрабатываем текст с учетом ширины символов
+	x := 0
+	for _, ch := range text {
+		if x >= t.width {
 			break
 		}
-		t.screen.SetContent(i, row, ch, nil, style)
+		t.screen.SetContent(x, row, ch, nil, style)
+		x++
 	}
 	return row + 1
 }
@@ -692,10 +711,19 @@ func (t *TUI) createSolidGraph(percent float64) string {
 		filled = segments
 	}
 
-	// Всегда возвращаем гистограмму, даже если заполнена на 0%
-	graph := strings.Repeat("█", filled)
-	empty := strings.Repeat("░", segments-filled)
+	// Используем более совместимые символы для гистограммы
+	// █ и ░ могут иметь проблемы с отображением, используем блоки
+	graph := strings.Repeat("█", filled)  // Полный блок
+	empty := strings.Repeat("░", segments-filled) // Светлый блок
 	
+	// Альтернатива если есть проблемы с юникодом:
+	// graph := strings.Repeat("■", filled)
+	// empty := strings.Repeat("□", segments-filled)
+	
+	// Или ASCII версия:
+	// graph := strings.Repeat("#", filled)
+	// empty := strings.Repeat(".", segments-filled)
+
 	return graph + empty
 }
 

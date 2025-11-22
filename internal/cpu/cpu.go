@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type CPUInfo struct {
@@ -23,12 +24,16 @@ type CPUInfo struct {
 	CoreUsage    []float64
 }
 
-var lastCPUStats []CPUStats
-
 type CPUStats struct {
 	Total uint64
 	Idle  uint64
 }
+
+var (
+	lastCPUStats   []CPUStats
+	lastCoreStats  [][]CPUStats
+	statsMutex     sync.RWMutex
+)
 
 func Summary() (*CPUInfo, error) {
 	info := &CPUInfo{}
@@ -76,10 +81,10 @@ func Summary() (*CPUInfo, error) {
 	}
 
 	// Получаем загрузку по ядрам
-	if coreUsage := getPerCoreUsage(); len(coreUsage) > 0 {
+	if coreUsage, err := getPerCoreUsage(); err == nil && len(coreUsage) > 0 {
 		info.CoreUsage = coreUsage
 	} else {
-		// Создаем массив с нулевыми значениями по количеству ядер
+		// Фолбэк: создаем массив с общим значением
 		info.CoreUsage = make([]float64, info.Cores)
 		for i := range info.CoreUsage {
 			info.CoreUsage[i] = info.Usage
@@ -87,6 +92,111 @@ func Summary() (*CPUInfo, error) {
 	}
 
 	return info, nil
+}
+
+// НОВАЯ ФУНКЦИЯ: правильное получение загрузки по ядрам
+func getPerCoreUsage() ([]float64, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxPerCoreUsage()
+	case "windows":
+		return getWindowsPerCoreUsage()
+	case "darwin":
+		return getDarwinPerCoreUsage()
+	default:
+		return nil, fmt.Errorf("per-core usage not supported on %s", runtime.GOOS)
+	}
+}
+
+func getLinuxPerCoreUsage() ([]float64, error) {
+	data, err := os.ReadFile("/proc/stat")
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(data), "\n")
+	var currentStats []CPUStats
+	var coreUsage []float64
+
+	// Собираем статистику для всех CPU (включая общий и ядра)
+	for _, line := range lines {
+		if strings.HasPrefix(line, "cpu") {
+			fields := strings.Fields(line)
+			if len(fields) < 8 {
+				continue
+			}
+
+			var total, idle uint64
+			for i := 1; i < len(fields); i++ {
+				val, _ := strconv.ParseUint(fields[i], 10, 64)
+				total += val
+				if i == 4 { // Поле idle
+					idle = val
+				}
+			}
+
+			currentStats = append(currentStats, CPUStats{Total: total, Idle: idle})
+		}
+	}
+
+	// Пропускаем общую статистику (cpu), начинаем с ядер (cpu0, cpu1, ...)
+	if len(currentStats) <= 1 {
+		return nil, fmt.Errorf("no core statistics found")
+	}
+
+	statsMutex.RLock()
+	hasPrevious := len(lastCoreStats) > 0 && len(lastCoreStats[0]) == len(currentStats)
+	statsMutex.RUnlock()
+
+	if hasPrevious {
+		statsMutex.RLock()
+		last := lastCoreStats[0]
+		statsMutex.RUnlock()
+
+		// Обрабатываем каждое ядро, начиная с cpu1 (индекс 1)
+		for i := 1; i < len(currentStats); i++ {
+			if i < len(last) {
+				totalDiff := currentStats[i].Total - last[i].Total
+				idleDiff := currentStats[i].Idle - last[i].Idle
+
+				if totalDiff > 0 {
+					usage := 100.0 * float64(totalDiff-idleDiff) / float64(totalDiff)
+					coreUsage = append(coreUsage, usage)
+				} else {
+					coreUsage = append(coreUsage, 0.0)
+				}
+			} else {
+				coreUsage = append(coreUsage, 0.0)
+			}
+		}
+	} else {
+		// Первый запуск - заполняем нулями
+		for i := 1; i < len(currentStats); i++ {
+			coreUsage = append(coreUsage, 0.0)
+		}
+	}
+
+	// Сохраняем текущую статистику
+	statsMutex.Lock()
+	if len(lastCoreStats) == 0 {
+		lastCoreStats = make([][]CPUStats, 1)
+	}
+	lastCoreStats[0] = currentStats
+	statsMutex.Unlock()
+
+	return coreUsage, nil
+}
+
+// Заглушки для других платформ
+func getWindowsPerCoreUsage() ([]float64, error) {
+	// На Windows сложно получить загрузку по ядрам без WMI
+	// Возвращаем nil чтобы использовать фолбэк
+	return nil, fmt.Errorf("per-core usage not implemented for Windows")
+}
+
+func getDarwinPerCoreUsage() ([]float64, error) {
+	// На macOS можно использовать sysctl или top
+	return nil, fmt.Errorf("per-core usage not implemented for macOS")
 }
 
 func getCPUInfo() (string, string, string, int, int, error) {
@@ -404,14 +514,4 @@ func getDarwinCPUFrequency() (string, error) {
 	}
 
 	return "Unknown", nil
-}
-
-func getPerCoreUsage() []float64 {
-	usage, _ := getCPUUsage()
-	coreCount := runtime.NumCPU()
-	usagePerCore := make([]float64, coreCount)
-	for i := range usagePerCore {
-		usagePerCore[i] = usage
-	}
-	return usagePerCore
 }

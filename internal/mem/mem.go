@@ -3,6 +3,8 @@ package mem
 import (
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -19,51 +21,86 @@ type MemoryInfo struct {
 	SwapUsagePercent float64
 }
 
+var (
+	lastMemUpdate time.Time
+	memCache      *MemoryInfo
+	memMutex      sync.RWMutex
+	cacheDuration = 500 * time.Millisecond // Кэшируем на 500ms
+)
+
 func Summary() (*MemoryInfo, error) {
-	return getMemoryInfo()
-}
-
-func getMemoryInfo() (*MemoryInfo, error) {
-	// Создаем структуру с значениями по умолчанию
-	info := &MemoryInfo{
-		Total:            "0",
-		Used:             "0",
-		Free:             "0",
-		Available:        "0",
-		SwapTotal:        "0",
-		SwapUsed:         "0",
-		SwapFree:         "0",
-		UsagePercent:     0.0,
-		SwapUsagePercent: 0.0,
+	// Используем кэширование чтобы избежать слишком частых вызовов
+	memMutex.RLock()
+	now := time.Now()
+	if memCache != nil && now.Sub(lastMemUpdate) < cacheDuration {
+		defer memMutex.RUnlock()
+		return memCache, nil
 	}
+	memMutex.RUnlock()
 
-	virtMem, err := mem.VirtualMemory()
+	// Получаем актуальные данные
+	info, err := getMemoryInfo()
 	if err != nil {
-		// В случае ошибки возвращаем структуру с значениями по умолчанию
-		// вместо nil, чтобы гистограммы всегда имели данные для работы
-		return info, nil
+		return &MemoryInfo{
+			Total:            "0",
+			Used:             "0", 
+			Free:             "0",
+			Available:        "0",
+			SwapTotal:        "0",
+			SwapUsed:         "0",
+			SwapFree:         "0",
+			UsagePercent:     0.0,
+			SwapUsagePercent: 0.0,
+		}, nil
 	}
 
-	swapMem, err := mem.SwapMemory()
-	if err != nil {
-		// Аналогично для swap memory - возвращаем то, что смогли собрать
-		return info, nil
-	}
-
-	// Обновляем поля только если данные успешно получены
-	info.Total = formatBytes(virtMem.Total)
-	info.Used = formatBytes(virtMem.Used)
-	info.Free = formatBytes(virtMem.Free)
-	info.Available = formatBytes(virtMem.Available)
-	info.SwapTotal = formatBytes(swapMem.Total)
-	info.SwapUsed = formatBytes(swapMem.Used)
-	info.SwapFree = formatBytes(swapMem.Free)
-	info.UsagePercent = virtMem.UsedPercent
-	info.SwapUsagePercent = swapMem.UsedPercent
+	// Обновляем кэш
+	memMutex.Lock()
+	memCache = info
+	lastMemUpdate = now
+	memMutex.Unlock()
 
 	return info, nil
 }
 
+func getMemoryInfo() (*MemoryInfo, error) {
+	virtMem, err := mem.VirtualMemory()
+	if err != nil {
+		return nil, err
+	}
+
+	swapMem, err := mem.SwapMemory()
+	if err != nil {
+		return nil, err
+	}
+
+	// Более точное вычисление использованной памяти
+	usedMemory := virtMem.Total - virtMem.Available
+
+	info := &MemoryInfo{
+		Total:            formatBytes(virtMem.Total),
+		Used:             formatBytes(usedMemory),
+		Free:             formatBytes(virtMem.Free),
+		Available:        formatBytes(virtMem.Available),
+		SwapTotal:        formatBytes(swapMem.Total),
+		SwapUsed:         formatBytes(swapMem.Used),
+		SwapFree:         formatBytes(swapMem.Free),
+		UsagePercent:     virtMem.UsedPercent,
+		SwapUsagePercent: swapMem.UsedPercent,
+	}
+
+	// Гарантируем корректные проценты
+	if info.UsagePercent < 0 {
+		info.UsagePercent = 0.0
+	}
+	if info.SwapUsagePercent < 0 {
+		info.SwapUsagePercent = 0.0
+	}
+
+	return info, nil
+}
+
+// Остальной код без изменений...
 func formatBytes(bytes uint64) string {
 	const (
 		KB = 1024
