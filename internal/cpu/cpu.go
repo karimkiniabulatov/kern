@@ -43,7 +43,7 @@ func Summary() (*CPUInfo, error) {
 	info.Load1 = 0.0
 	info.Load5 = 0.0
 	info.Load15 = 0.0
-	info.CoreUsage = make([]float64, 0)
+	info.CoreUsage = make([]float64, 0) // Гарантируем не-nil массив
 
 	// Получаем базовую информацию
 	if model, vendor, arch, cores, threads, err := getCPUInfo(); err == nil {
@@ -88,6 +88,15 @@ func Summary() (*CPUInfo, error) {
 		info.CoreUsage = make([]float64, info.Cores)
 		for i := range info.CoreUsage {
 			info.CoreUsage[i] = info.Usage
+		}
+	}
+
+	// Гарантируем, что все значения в пределах 0-100%
+	for i := range info.CoreUsage {
+		if info.CoreUsage[i] < 0 {
+			info.CoreUsage[i] = 0
+		} else if info.CoreUsage[i] > 100 {
+			info.CoreUsage[i] = 100
 		}
 	}
 

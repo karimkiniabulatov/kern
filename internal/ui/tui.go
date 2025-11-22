@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -162,7 +163,7 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		// Usage with graph on new line
 		usageGraph := t.createSolidGraph(cpuInfo.Usage)
@@ -175,15 +176,18 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 		if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 			
-			// Группируем ядра для компактного отображения (по 4 в строку)
-			coresPerLine := 4
+			// Группируем ядра для компактного отображения (по 3 в строку)
+			coresPerLine := 3
 			for i := 0; i < len(cpuInfo.CoreUsage); i += coresPerLine {
 				line := "  "
 				for j := 0; j < coresPerLine && i+j < len(cpuInfo.CoreUsage); j++ {
 					coreIdx := i + j
 					usage := cpuInfo.CoreUsage[coreIdx]
+					
+					// Новый формат: "01: 000.1%" с фиксированной шириной
 					coreGraph := t.createSolidGraph(usage)
-					line += fmt.Sprintf(" %02d:%.1f%%%s", coreIdx+1, usage, coreGraph)
+					line += fmt.Sprintf(" %02d: %05.1f%%%s", coreIdx+1, usage, coreGraph)
+					
 					if j < coresPerLine-1 && i+j+1 < len(cpuInfo.CoreUsage) {
 						line += " |"
 					}
@@ -306,8 +310,19 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 		}
 
 		if gpuData.MemoryUsed != "" && gpuData.MemoryTotal != "" {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-				t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			// Добавляем гистограмму для использования памяти
+			usedMB := extractMemoryMB(gpuData.MemoryUsed)
+			totalMB := extractMemoryMB(gpuData.MemoryTotal)
+			if usedMB > 0 && totalMB > 0 {
+				memoryPercent := float64(usedMB) / float64(totalMB) * 100
+				memoryGraph := t.createSolidGraph(memoryPercent)
+				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+					t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal, 
+					memoryPercent, memoryGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			} else {
+				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+					t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			}
 		}
 		
 		if gpuData.PowerDraw != "" {
@@ -613,6 +628,19 @@ func (t *TUI) renderVideo(startRow int, data interface{}) int {
 				t.config.T("video.gpu_usage"), videoData.GPUUtilization, gpuGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 		}
 
+		// ГИСТОГРАММА ЧАСТОТЫ КАДРОВ (если есть активные потоки)
+		if videoData.Framerate > 0 {
+			// Нормализуем частоту кадров для гистограммы (предполагаем макс 60 fps)
+			fpsPercent := (videoData.Framerate / 60.0) * 100
+			if fpsPercent > 100 {
+				fpsPercent = 100
+			}
+			fpsGraph := t.createSolidGraph(fpsPercent)
+			row = t.printSimple(row, fmt.Sprintf("%s: %.1f fps %s", 
+				t.config.T("video.frame_rate"), videoData.Framerate, fpsGraph), 
+				tcell.StyleDefault.Foreground(tcell.ColorGreen))
+		}
+
 	case map[string]interface{}:
 		if errorMsg, exists := videoData["error"]; exists {
 			if errorStr, ok := errorMsg.(string); ok {
@@ -745,6 +773,18 @@ func (t *TUI) getDeviceType(filesystem string, mountPoint string) string {
 		return "BOOT"
 	}
 	return "STORAGE"
+}
+
+// Вспомогательная функция для извлечения числового значения памяти из строки
+func extractMemoryMB(memoryStr string) int {
+	// Пример: "8192 MB" -> 8192
+	parts := strings.Fields(memoryStr)
+	if len(parts) >= 2 {
+		if value, err := strconv.Atoi(parts[0]); err == nil {
+			return value
+		}
+	}
+	return 0
 }
 
 // drawText правильно обрабатывает символы разной ширины
