@@ -52,7 +52,14 @@ func Summary() (*AudioInfo, error) {
 		InputDevices:   []AudioDevice{},
 		OutputDevices:  []AudioDevice{},
 		ActiveStreams:  []AudioStream{},
+		InputLevel:     -96.0,
+		OutputLevel:    -96.0,
+		SampleRate:     "Unknown",
+		BitDepth:       "Unknown",
+		Latency:        "Unknown",
 		FrequencyBands: make([]float64, 8), // 8 частотных полос
+		PeakLevel:      0.0,
+		RMSLevel:       0.0,
 	}
 
 	// Detect audio devices
@@ -471,10 +478,19 @@ func (a *AudioInfo) getDefaultAudioMetrics() {
 }
 
 func (a *AudioInfo) setDefaultAudioMetrics() {
-	if a.InputLevel == 0 && len(a.ActiveStreams) > 0 {
+    // Гарантируем, что всегда есть данные для гистограмм
+    if a.InputLevel == 0 {
+        a.InputLevel = -96.0 // Минимальное значение
+    }
+    if a.OutputLevel == 0 {
+        a.OutputLevel = -96.0 // Минимальное значение
+    }
+    
+    // Остальной код без изменений...
+	if a.InputLevel == -96.0 && len(a.ActiveStreams) > 0 {
 		a.InputLevel = -12.5 // Simulated input level
 	}
-	if a.OutputLevel == 0 && len(a.ActiveStreams) > 0 {
+	if a.OutputLevel == -96.0 && len(a.ActiveStreams) > 0 {
 		a.OutputLevel = -8.3 // Simulated output level
 	}
 	

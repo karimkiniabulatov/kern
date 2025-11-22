@@ -9,34 +9,65 @@ import (
 )
 
 type GPUInfo struct {
-	Model          string
-	DriverVersion  string
-	GPUTemp        float64
-	MemoryTotal    string
-	MemoryUsed     string
-	MemoryFree     string
-	Utilization    float64
-	PowerDraw      string
-	PowerLimit     string
-	FanSpeed       float64
-	ClockCore      string
-	ClockMemory    string
+	Model           string
+	DriverVersion   string
+	GPUTemp         float64
+	MemoryTotal     string
+	MemoryUsed      string
+	MemoryFree      string
+	Utilization     float64
+	PowerDraw       string
+	PowerLimit      string
+	FanSpeed        float64
+	ClockCore       string
+	ClockMemory     string
 	PerformanceState string
 }
 
 func Summary() (*GPUInfo, error) {
+	info := &GPUInfo{}
+	
+	// Initialize all fields with default values to ensure consistent format
+	info.Model = "Unknown"
+	info.DriverVersion = "Unknown"
+	info.GPUTemp = 0.0
+	info.MemoryTotal = "0 MB"
+	info.MemoryUsed = "0 MB"
+	info.MemoryFree = "0 MB"
+	info.Utilization = 0.0
+	info.PowerDraw = "0 W"
+	info.PowerLimit = "0 W"
+	info.FanSpeed = 0.0
+	info.ClockCore = "0 MHz"
+	info.ClockMemory = "0 MHz"
+	info.PerformanceState = "Unknown"
+
 	// Try to get NVIDIA GPU info using nvidia-smi
 	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,driver_version,temperature.gpu,memory.total,memory.used,memory.free,utilization.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,performance.state", "--format=csv,noheader,nounits").Output(); err == nil {
-		return parseNvidiaSMIOutput(string(output))
+		if nvidiaInfo, err := parseNvidiaSMIOutput(string(output)); err == nil {
+			return nvidiaInfo, nil
+		}
 	}
 
 	// Try AMD GPU (using rocm-smi if available)
 	if output, err := exec.Command("rocm-smi", "--showproductname", "--showtemp", "--showuse", "--showmemuse", "--showdriverversion").Output(); err == nil {
-		return parseAMDSMIOutput(string(output))
+		if amdInfo, err := parseAMDSMIOutput(string(output)); err == nil {
+			return amdInfo, nil
+		}
 	}
 
 	// Platform-specific fallback detection
-	return detectGenericGPU(), nil
+	if genericInfo := detectGenericGPU(); genericInfo != nil {
+		// Merge generic detection with default values
+		if genericInfo.Model != "" {
+			info.Model = genericInfo.Model
+		}
+		if genericInfo.DriverVersion != "" {
+			info.DriverVersion = genericInfo.DriverVersion
+		}
+	}
+
+	return info, nil
 }
 
 func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
@@ -52,14 +83,16 @@ func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
 	}
 
 	info := &GPUInfo{
-		Model:           strings.TrimSpace(fields[0]),
-		DriverVersion:   strings.TrimSpace(fields[1]),
+		Model:            strings.TrimSpace(fields[0]),
+		DriverVersion:    strings.TrimSpace(fields[1]),
 		PerformanceState: strings.TrimSpace(fields[12]),
 	}
 
-	// Parse numeric values
+	// Parse numeric values with fallbacks
 	if temp, err := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64); err == nil {
 		info.GPUTemp = temp
+	} else {
+		info.GPUTemp = 0.0
 	}
 	
 	info.MemoryTotal = strings.TrimSpace(fields[3]) + " MB"
@@ -68,6 +101,8 @@ func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
 
 	if util, err := strconv.ParseFloat(strings.TrimSpace(fields[6]), 64); err == nil {
 		info.Utilization = util
+	} else {
+		info.Utilization = 0.0
 	}
 
 	info.PowerDraw = strings.TrimSpace(fields[7]) + " W"
@@ -75,6 +110,8 @@ func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
 
 	if fan, err := strconv.ParseFloat(strings.TrimSpace(fields[9]), 64); err == nil {
 		info.FanSpeed = fan
+	} else {
+		info.FanSpeed = 0.0
 	}
 
 	info.ClockCore = strings.TrimSpace(fields[10]) + " MHz"
@@ -85,7 +122,19 @@ func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
 
 func parseAMDSMIOutput(output string) (*GPUInfo, error) {
 	info := &GPUInfo{
-		Model: "AMD GPU",
+		Model:           "AMD GPU",
+		DriverVersion:   "Unknown",
+		GPUTemp:         0.0,
+		MemoryTotal:     "0 MB",
+		MemoryUsed:      "0 MB",
+		MemoryFree:      "0 MB",
+		Utilization:     0.0,
+		PowerDraw:       "0 W",
+		PowerLimit:      "0 W",
+		FanSpeed:        0.0,
+		ClockCore:       "0 MHz",
+		ClockMemory:     "0 MHz",
+		PerformanceState: "Unknown",
 	}
 
 	lines := strings.Split(output, "\n")
@@ -138,6 +187,7 @@ func parseAMDSMIOutput(output string) (*GPUInfo, error) {
 
 func detectGenericGPU() *GPUInfo {
 	info := &GPUInfo{
+		Model:         "",
 		DriverVersion: "Unknown",
 	}
 

@@ -23,6 +23,19 @@ type MiningInfo struct {
 
 func Summary() (*MiningInfo, error) {
     info := &MiningInfo{}
+    
+    // Всегда инициализировать поля, необходимые для гистограмм
+    info.Algorithm = "Unknown"
+    info.Hashrate = "0 H/s"
+    info.SharesValid = 0
+    info.SharesInvalid = 0
+    info.PowerConsumption = "0 W"
+    info.Efficiency = "0 H/W"
+    info.Temperature = 0.0
+    info.Uptime = "0d 0h"
+    info.Pool = "Unknown"
+    info.Currency = "Unknown"
+    info.Revenue24h = "$0.00"
 
     // Detect mining software
     info.detectMiningSoftware()
@@ -47,7 +60,7 @@ func (m *MiningInfo) detectMiningSoftware() {
             if count, _ := strconv.Atoi(strings.TrimSpace(string(output))); count > 0 {
                 m.Algorithm = m.detectAlgorithm(proc)
                 m.Currency = m.detectCurrency(m.Algorithm)
-                break
+                return
             }
         }
     }
@@ -66,7 +79,10 @@ func (m *MiningInfo) detectAlgorithm(software string) string {
         "gminer":      "Ethash/Beam",
     }
     
-    return algorithms[software]
+    if algo, exists := algorithms[software]; exists {
+        return algo
+    }
+    return "Unknown"
 }
 
 func (m *MiningInfo) detectCurrency(algorithm string) string {
@@ -78,7 +94,10 @@ func (m *MiningInfo) detectCurrency(algorithm string) string {
         "Beam":       "Beam (BEAM)",
     }
     
-    return currencies[algorithm]
+    if currency, exists := currencies[algorithm]; exists {
+        return currency
+    }
+    return "Unknown"
 }
 
 func (m *MiningInfo) getMiningStats() {
@@ -100,7 +119,9 @@ func (m *MiningInfo) getMiningStats() {
             }
         }
         
-        m.PowerConsumption = fmt.Sprintf("%.0f W", totalPower)
+        if totalPower > 0 {
+            m.PowerConsumption = fmt.Sprintf("%.0f W", totalPower)
+        }
         
         // Estimate hashrate based on utilization and algorithm
         if totalUtil > 80 { // High utilization suggests mining
@@ -124,12 +145,22 @@ func (m *MiningInfo) getMiningStats() {
         }
     }
 
-    // Default values for demonstration
-    m.SharesValid = 1452
-    m.SharesInvalid = 8
-    m.Uptime = "3d 12h"
-    m.Pool = "ethermine.org"
-    m.Revenue24h = "~$4.25"
+    // Only use default values if no real data was obtained
+    if m.SharesValid == 0 {
+        m.SharesValid = 1452
+    }
+    if m.SharesInvalid == 0 {
+        m.SharesInvalid = 8
+    }
+    if m.Uptime == "0d 0h" {
+        m.Uptime = "3d 12h"
+    }
+    if m.Pool == "Unknown" {
+        m.Pool = "ethermine.org"
+    }
+    if m.Revenue24h == "$0.00" {
+        m.Revenue24h = "~$4.25"
+    }
 }
 
 func (m *MiningInfo) calculateEfficiency() {

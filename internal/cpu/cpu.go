@@ -32,6 +32,13 @@ type CPUStats struct {
 
 func Summary() (*CPUInfo, error) {
 	info := &CPUInfo{}
+	
+	// Всегда инициализировать поля, необходимые для гистограмм
+	info.Usage = 0.0
+	info.Load1 = 0.0
+	info.Load5 = 0.0
+	info.Load15 = 0.0
+	info.CoreUsage = make([]float64, 0)
 
 	// Получаем базовую информацию
 	if model, vendor, arch, cores, threads, err := getCPUInfo(); err == nil {
@@ -40,6 +47,13 @@ func Summary() (*CPUInfo, error) {
 		info.Architecture = arch
 		info.Cores = cores
 		info.Threads = threads
+	} else {
+		// Гарантируем значения по умолчанию, если реальные данные недоступны
+		info.Model = "Unknown"
+		info.Vendor = "Unknown"
+		info.Architecture = runtime.GOARCH
+		info.Cores = runtime.NumCPU()
+		info.Threads = runtime.NumCPU()
 	}
 
 	// Получаем загрузку
@@ -57,10 +71,20 @@ func Summary() (*CPUInfo, error) {
 	// Получаем частоту
 	if freq, err := getCPUFrequency(); err == nil {
 		info.Frequency = freq
+	} else {
+		info.Frequency = "Unknown"
 	}
 
 	// Получаем загрузку по ядрам
-	info.CoreUsage = getPerCoreUsage()
+	if coreUsage := getPerCoreUsage(); len(coreUsage) > 0 {
+		info.CoreUsage = coreUsage
+	} else {
+		// Создаем массив с нулевыми значениями по количеству ядер
+		info.CoreUsage = make([]float64, info.Cores)
+		for i := range info.CoreUsage {
+			info.CoreUsage[i] = info.Usage
+		}
+	}
 
 	return info, nil
 }

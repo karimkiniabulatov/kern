@@ -61,3 +61,56 @@ func TestModulePreferences(t *testing.T) {
 		t.Error("ShowCPU should be false")
 	}
 }
+
+// Добавить тест для новых полей конфигурации
+func TestConfigNewFields(t *testing.T) {
+    cfg := config.GetDefaultConfig("en")
+    
+    // Проверить новые поля гистограмм
+    if !cfg.ShowHistograms {
+        t.Error("ShowHistograms should be true by default")
+    }
+    if cfg.HistogramSegments != 20 {
+        t.Errorf("Expected HistogramSegments 20, got %d", cfg.HistogramSegments)
+    }
+    
+    // Проверить новые модули
+    if cfg.ShowGPU {
+        t.Error("ShowGPU should be false by default")
+    }
+    if cfg.ShowAI {
+        t.Error("ShowAI should be false by default")
+    }
+    if cfg.ShowMining {
+        t.Error("ShowMining should be false by default")
+    }
+    if cfg.ShowAudio {
+        t.Error("ShowAudio should be false by default")
+    }
+    if cfg.ShowVideo {
+        t.Error("ShowVideo should be false by default")
+    }
+}
+
+// Добавить тест для LastUsedModules
+func TestLastUsedModules(t *testing.T) {
+    cfg := config.GetDefaultConfig("en")
+    
+    // Обновить последние использованные модули
+    cfg.UpdateLastUsedModules(true, false, true, false, true, false, true, false, true)
+    
+    if cfg.LastUsedModules == nil {
+        t.Error("LastUsedModules should not be nil after update")
+    }
+    
+    // Проверить сохраненные значения
+    if !cfg.LastUsedModules.ShowDisk {
+        t.Error("ShowDisk should be true in LastUsedModules")
+    }
+    if cfg.LastUsedModules.ShowCPU {
+        t.Error("ShowCPU should be false in LastUsedModules")
+    }
+    if !cfg.LastUsedModules.ShowMem {
+        t.Error("ShowMem should be true in LastUsedModules")
+    }
+}

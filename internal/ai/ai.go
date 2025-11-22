@@ -23,7 +23,19 @@ type AIInfo struct {
 }
 
 func Summary() (*AIInfo, error) {
-    info := &AIInfo{}
+    info := &AIInfo{
+        Framework:    "Unknown",
+        ProcessCount: 0,
+        VRAMUsage:    "0 MB",
+        VRAMTotal:    "0 MB",
+        ModelName:    "None",
+        BatchSize:    0,
+        Throughput:   0.0,
+        Epoch:        0,
+        Loss:         0.0,
+        Accuracy:     0.0,
+        TrainingTime: "0s",
+    }
 
     // Detect AI training processes
     info.detectAIProcesses()

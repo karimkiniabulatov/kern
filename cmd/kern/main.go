@@ -496,6 +496,14 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		}
 	}
 
+	// Гарантируем, что все запрошенные модули возвращают данные
+	for _, module := range []string{"disk", "cpu", "mem", "net", "gpu", "ai", "mining", "audio", "video"} {
+		if _, exists := results[module]; !exists {
+			// Создаем пустые данные для отображения гистограмм
+			results[module] = map[string]string{"status": "no data"}
+		}
+	}
+	
 	return results
 }
 

@@ -57,9 +57,15 @@ type VideoEncoder struct {
 
 func Summary() (*VideoInfo, error) {
 	info := &VideoInfo{
-		VideoDevices:  []VideoDevice{},
-		ActiveStreams: []VideoStream{},
-		GPUEncoders:   []VideoEncoder{},
+		VideoDevices:    []VideoDevice{},
+		ActiveStreams:   []VideoStream{},
+		GPUEncoders:     []VideoEncoder{},
+		EncodingStatus:  "idle",
+		Framerate:       0.0,
+		GPUUtilization:  0.0,
+		Bitrate:         "N/A",
+		Resolution:      "N/A",
+		Codec:           "N/A",
 	}
 
 	// Detect video devices
@@ -74,6 +80,39 @@ func Summary() (*VideoInfo, error) {
 	// Get video metrics
 	info.getVideoMetrics()
 
+	// Гарантируем, что все числовые поля инициализированы
+	if info.Framerate < 0 {
+		info.Framerate = 0.0
+	}
+	if info.GPUUtilization < 0 {
+		info.GPUUtilization = 0.0
+	}
+
+	// Гарантируем, что массивы не nil
+	if info.VideoDevices == nil {
+		info.VideoDevices = []VideoDevice{}
+	}
+	if info.ActiveStreams == nil {
+		info.ActiveStreams = []VideoStream{}
+	}
+	if info.GPUEncoders == nil {
+		info.GPUEncoders = []VideoEncoder{}
+	}
+
+	// Гарантируем, что строковые поля не пустые
+	if info.EncodingStatus == "" {
+		info.EncodingStatus = "idle"
+	}
+	if info.Bitrate == "" {
+		info.Bitrate = "N/A"
+	}
+	if info.Resolution == "" {
+		info.Resolution = "N/A"
+	}
+	if info.Codec == "" {
+		info.Codec = "N/A"
+	}
+
 	return info, nil
 }
 
@@ -86,6 +125,11 @@ func (v *VideoInfo) detectVideoDevices() {
 	case OSDarwin:
 		v.detectVideoDevicesMacOS()
 	default:
+		v.addDefaultDevice()
+	}
+
+	// Гарантируем, что есть хотя бы одно устройство
+	if len(v.VideoDevices) == 0 {
 		v.addDefaultDevice()
 	}
 }
@@ -260,6 +304,11 @@ func (v *VideoInfo) detectActiveStreams() {
 		v.detectActiveStreamsWindows()
 	case OSDarwin:
 		v.detectActiveStreamsMacOS()
+	}
+
+	// Гарантируем, что массив не nil
+	if v.ActiveStreams == nil {
+		v.ActiveStreams = []VideoStream{}
 	}
 }
 
@@ -469,6 +518,11 @@ func (v *VideoInfo) detectGPUEncoders() {
 		Codecs: []string{"H.265"},
 		Active: false,
 	})
+
+	// Гарантируем, что массив не nil
+	if v.GPUEncoders == nil {
+		v.GPUEncoders = []VideoEncoder{}
+	}
 }
 
 func (v *VideoInfo) detectGPUEncodersLinux() {
@@ -711,6 +765,17 @@ func (v *VideoInfo) getVideoMetrics() {
 		v.Bitrate = "N/A"
 		v.Codec = "N/A"
 		v.GPUUtilization = 0
+	}
+
+	// Гарантируем корректные значения для гистограмм
+	if v.Framerate < 0 {
+		v.Framerate = 0.0
+	}
+	if v.GPUUtilization < 0 {
+		v.GPUUtilization = 0.0
+	}
+	if v.GPUUtilization > 100 {
+		v.GPUUtilization = 100.0
 	}
 }
 

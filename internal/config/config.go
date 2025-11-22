@@ -26,6 +26,10 @@ type Config struct {
 	
 	// NEW: User preferences for default view
 	LastUsedModules *LastUsedModules `json:"last_used_modules,omitempty"`
+	
+	// NEW: Гистограмма настроек
+	ShowHistograms    bool `json:"show_histograms"`
+	HistogramSegments int  `json:"histogram_segments"` // Количество сегментов в гистограмме
 }
 
 type LastUsedModules struct {
@@ -152,6 +156,8 @@ func getDefaultConfig(language string) *Config {
 		ShowMining:  false,
 		ShowAudio:   false,
 		ShowVideo:   false,
+		ShowHistograms: true,
+		HistogramSegments: 20, // 20 сегментов = 5% на элемент
 	}
 }
 

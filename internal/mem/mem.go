@@ -24,27 +24,42 @@ func Summary() (*MemoryInfo, error) {
 }
 
 func getMemoryInfo() (*MemoryInfo, error) {
+	// Создаем структуру с значениями по умолчанию
+	info := &MemoryInfo{
+		Total:            "0",
+		Used:             "0",
+		Free:             "0",
+		Available:        "0",
+		SwapTotal:        "0",
+		SwapUsed:         "0",
+		SwapFree:         "0",
+		UsagePercent:     0.0,
+		SwapUsagePercent: 0.0,
+	}
+
 	virtMem, err := mem.VirtualMemory()
 	if err != nil {
-		return nil, err
+		// В случае ошибки возвращаем структуру с значениями по умолчанию
+		// вместо nil, чтобы гистограммы всегда имели данные для работы
+		return info, nil
 	}
 
 	swapMem, err := mem.SwapMemory()
 	if err != nil {
-		return nil, err
+		// Аналогично для swap memory - возвращаем то, что смогли собрать
+		return info, nil
 	}
 
-	info := &MemoryInfo{
-		Total:            formatBytes(virtMem.Total),
-		Used:             formatBytes(virtMem.Used),
-		Free:             formatBytes(virtMem.Free),
-		Available:        formatBytes(virtMem.Available),
-		SwapTotal:        formatBytes(swapMem.Total),
-		SwapUsed:         formatBytes(swapMem.Used),
-		SwapFree:         formatBytes(swapMem.Free),
-		UsagePercent:     virtMem.UsedPercent,
-		SwapUsagePercent: swapMem.UsedPercent,
-	}
+	// Обновляем поля только если данные успешно получены
+	info.Total = formatBytes(virtMem.Total)
+	info.Used = formatBytes(virtMem.Used)
+	info.Free = formatBytes(virtMem.Free)
+	info.Available = formatBytes(virtMem.Available)
+	info.SwapTotal = formatBytes(swapMem.Total)
+	info.SwapUsed = formatBytes(swapMem.Used)
+	info.SwapFree = formatBytes(swapMem.Free)
+	info.UsagePercent = virtMem.UsedPercent
+	info.SwapUsagePercent = swapMem.UsedPercent
 
 	return info, nil
 }
