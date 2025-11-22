@@ -163,7 +163,7 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
 			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, tconfig.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		// Usage with graph on new line
 		usageGraph := t.createSolidGraph(cpuInfo.Usage)
@@ -296,33 +296,26 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 		}
 		
 		if gpuData.GPUTemp > 0 {
-			// Temperature with graph
-			tempGraph := t.createSolidGraph(gpuData.GPUTemp)
-			row = t.printSimple(row, fmt.Sprintf("%s: %.1fC %s", 
+			// ГИСТОГРАММА ТЕМПЕРАТУРЫ (нормализуем к 100°C)
+			tempPercent := gpuData.GPUTemp
+			if tempPercent > 100 {
+				tempPercent = 100
+			}
+			tempGraph := t.createSolidGraph(tempPercent)
+			row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
 				t.config.T("gpu.temperature"), gpuData.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
 		}
 
 		if gpuData.Utilization > 0 {
-			// Utilization with graph
+			// ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ
 			utilGraph := t.createSolidGraph(gpuData.Utilization)
 			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
 				t.config.T("gpu.utilization"), gpuData.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 		}
 
 		if gpuData.MemoryUsed != "" && gpuData.MemoryTotal != "" {
-			// Добавляем гистограмму для использования памяти
-			usedMB := extractMemoryMB(gpuData.MemoryUsed)
-			totalMB := extractMemoryMB(gpuData.MemoryTotal)
-			if usedMB > 0 && totalMB > 0 {
-				memoryPercent := float64(usedMB) / float64(totalMB) * 100
-				memoryGraph := t.createSolidGraph(memoryPercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
-					t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal, 
-					memoryPercent, memoryGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			} else {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-					t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			}
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+				t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		}
 		
 		if gpuData.PowerDraw != "" {
@@ -620,16 +613,16 @@ func (t *TUI) renderVideo(startRow int, data interface{}) int {
 				t.config.T("video.resolution"), videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		}
 
-		// GPU utilization for video
+		// ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ GPU ДЛЯ ВИДЕО
 		if videoData.GPUUtilization > 0 {
-			// GPU usage with graph
 			gpuGraph := t.createSolidGraph(videoData.GPUUtilization)
 			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-				t.config.T("video.gpu_usage"), videoData.GPUUtilization, gpuGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				t.config.T("video.gpu_usage"), videoData.GPUUtilization, gpuGraph), 
+				tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 		}
 
 		// ГИСТОГРАММА ЧАСТОТЫ КАДРОВ (если есть активные потоки)
-		if videoData.Framerate > 0 {
+		if videoData.Framerate > 0 && len(videoData.ActiveStreams) > 0 {
 			// Нормализуем частоту кадров для гистограммы (предполагаем макс 60 fps)
 			fpsPercent := (videoData.Framerate / 60.0) * 100
 			if fpsPercent > 100 {
@@ -679,7 +672,7 @@ func (t *TUI) renderFooter(startRow int) {
 		footerText = footerText[:t.width-3] + "..."
 	}
 	
-	// Выводим с левого края
+	// Выводим с левого краю
 	t.printSimple(footerRow, footerText, style)
 }
 
