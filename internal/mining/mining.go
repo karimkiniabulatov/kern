@@ -5,6 +5,10 @@ import (
     "os/exec"
     "strconv"
     "strings"
+    "path/filepath"
+    "os"
+    "io/ioutil"
+    "regexp"
 )
 
 type MiningInfo struct {
@@ -55,6 +59,7 @@ func (m *MiningInfo) detectMiningSoftware() {
         "lolminer", "nbminer", "phoenixminer", "gminer",
     }
 
+    // Проверка процессов
     for _, proc := range miningProcesses {
         if output, err := exec.Command("pgrep", "-c", proc).Output(); err == nil {
             if count, _ := strconv.Atoi(strings.TrimSpace(string(output))); count > 0 {
@@ -64,6 +69,72 @@ func (m *MiningInfo) detectMiningSoftware() {
             }
         }
     }
+    
+    // Проверка сетевых соединений к пулам
+    m.checkNetworkConnections()
+    
+    // Мониторинг использования GPU для обнаружения майнинга
+    m.detectGPUMiningActivity()
+}
+
+// Улучшенное обнаружение майнинга через сетевые соединения
+func (m *MiningInfo) checkNetworkConnections() {
+    // Известные порты майнинговых пулов
+    miningPorts := []string{"3333", "4444", "5555", "8888", "14444", "9999", "25", "80", "443"}
+    
+    cmd := exec.Command("netstat", "-tulpn")
+    if output, err := cmd.Output(); err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            for _, port := range miningPorts {
+                if strings.Contains(line, ":"+port) {
+                    // Обнаружено соединение с майнинговым пулом
+                    if m.Algorithm == "Unknown" {
+                        m.Algorithm = "Detected (Network)"
+                        m.Pool = m.extractPoolFromConnection(line)
+                    }
+                    break
+                }
+            }
+        }
+    }
+}
+
+// Мониторинг использования GPU для обнаружения майнинга
+func (m *MiningInfo) detectGPUMiningActivity() {
+    if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.gpu,power.draw", "--format=csv,noheader,nounits").Output(); err == nil {
+        lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+        totalUtil := 0.0
+        gpuCount := 0
+        
+        for _, line := range lines {
+            fields := strings.Split(line, ", ")
+            if len(fields) >= 1 {
+                if util, err := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64); err == nil {
+                    totalUtil += util
+                    gpuCount++
+                }
+            }
+        }
+        
+        // Высокая утилизация GPU может указывать на майнинг
+        if gpuCount > 0 && totalUtil/float64(gpuCount) > 70.0 {
+            if m.Algorithm == "Unknown" {
+                m.Algorithm = "GPU Mining (High Utilization)"
+            }
+        }
+    }
+}
+
+// Извлечение информации о пуле из сетевого соединения
+func (m *MiningInfo) extractPoolFromConnection(line string) string {
+    // Упрощенное извлечение адреса пула
+    re := regexp.MustCompile(`(\d+\.\d+\.\d+\.\d+):\d+`)
+    matches := re.FindStringSubmatch(line)
+    if len(matches) > 1 {
+        return matches[1]
+    }
+    return "Mining Pool"
 }
 
 func (m *MiningInfo) detectAlgorithm(software string) string {
@@ -101,6 +172,9 @@ func (m *MiningInfo) detectCurrency(algorithm string) string {
 }
 
 func (m *MiningInfo) getMiningStats() {
+    // Парсинг логов майнеров для получения реальных данных
+    m.parseMinerLogs()
+    
     // Try to get hashrate from common mining log locations
     if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.gpu,power.draw", "--format=csv,noheader,nounits").Output(); err == nil {
         lines := strings.Split(strings.TrimSpace(string(output)), "\n")
@@ -160,6 +234,120 @@ func (m *MiningInfo) getMiningStats() {
     }
     if m.Revenue24h == "$0.00" {
         m.Revenue24h = "~$4.25"
+    }
+}
+
+// Парсинг логов майнеров
+func (m *MiningInfo) parseMinerLogs() {
+    logPatterns := []string{
+        "*.log", "*.txt", "miner*", "xmrig*", "ethminer*", "trex*", 
+        "lolminer*", "nbminer*", "phoenixminer*", "gminer*",
+    }
+    
+    searchPaths := []string{
+        "/var/log/",
+        os.Getenv("HOME"),
+        "/home/*/",
+        "/tmp/",
+    }
+    
+    for _, path := range searchPaths {
+        for _, pattern := range logPatterns {
+            files, _ := filepath.Glob(filepath.Join(path, pattern))
+            for _, file := range files {
+                m.parseLogFile(file)
+            }
+        }
+    }
+}
+
+// Анализ конкретного файла лога
+func (m *MiningInfo) parseLogFile(filename string) {
+    content, err := ioutil.ReadFile(filename)
+    if err != nil {
+        return
+    }
+    
+    logContent := string(content)
+    
+    // Поиск хешрейта в различных форматах
+    m.extractHashrateFromLog(logContent)
+    
+    // Поиск информации о шарах
+    m.extractSharesFromLog(logContent)
+    
+    // Поиск информации о пуле
+    m.extractPoolFromLog(logContent)
+    
+    // Поиск информации о алгоритме
+    m.extractAlgorithmFromLog(logContent)
+}
+
+// Извлечение хешрейта из логов
+func (m *MiningInfo) extractHashrateFromLog(logContent string) {
+    patterns := []string{
+        `hashrate.*?(\d+\.?\d*)\s*([kKMGT]?H/s)`,
+        `speed.*?(\d+\.?\d*)\s*([kKMGT]?H/s)`,
+        `(\d+\.?\d*)\s*([kKMGT]?H/s)`,
+    }
+    
+    for _, pattern := range patterns {
+        re := regexp.MustCompile(pattern)
+        matches := re.FindStringSubmatch(logContent)
+        if len(matches) > 2 {
+            m.Hashrate = matches[1] + " " + matches[2]
+            break
+        }
+    }
+}
+
+// Извлечение информации о шарах из логов
+func (m *MiningInfo) extractSharesFromLog(logContent string) {
+    // Поиск принятых акций
+    acceptedRe := regexp.MustCompile(`accepted.*?(\d+)`)
+    if matches := acceptedRe.FindStringSubmatch(logContent); len(matches) > 1 {
+        if val, err := strconv.Atoi(matches[1]); err == nil {
+            m.SharesValid = val
+        }
+    }
+    
+    // Поиск отклоненных акций
+    rejectedRe := regexp.MustCompile(`rejected.*?(\d+)`)
+    if matches := rejectedRe.FindStringSubmatch(logContent); len(matches) > 1 {
+        if val, err := strconv.Atoi(matches[1]); err == nil {
+            m.SharesInvalid = val
+        }
+    }
+}
+
+// Извлечение информации о пуле из логов
+func (m *MiningInfo) extractPoolFromLog(logContent string) {
+    poolPatterns := []string{
+        `pool.*?(\w+\.\w+\.\w+)`,
+        `stratum.*?(\w+\.\w+\.\w+)`,
+        `(\w+\.\w+\.\w+).*?pool`,
+    }
+    
+    for _, pattern := range poolPatterns {
+        re := regexp.MustCompile(pattern)
+        matches := re.FindStringSubmatch(logContent)
+        if len(matches) > 1 {
+            m.Pool = matches[1]
+            break
+        }
+    }
+}
+
+// Извлечение информации о алгоритме из логов
+func (m *MiningInfo) extractAlgorithmFromLog(logContent string) {
+    algorithms := []string{"RandomX", "SHA-256", "Ethash", "KAWPOW", "Beam"}
+    
+    for _, algo := range algorithms {
+        if strings.Contains(strings.ToLower(logContent), strings.ToLower(algo)) {
+            m.Algorithm = algo
+            m.Currency = m.detectCurrency(algo)
+            break
+        }
     }
 }
 

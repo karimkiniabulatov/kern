@@ -26,29 +26,200 @@ type GPUInfo struct {
 
 // Summary возвращает информацию о всех GPU в системе
 func Summary() ([]*GPUInfo, error) {
+	return detectAllGPUs()
+}
+
+// Универсальное обнаружение GPU
+func detectAllGPUs() ([]*GPUInfo, error) {
 	var gpus []*GPUInfo
-	
-	// Try to get NVIDIA GPU info using nvidia-smi
-	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,driver_version,temperature.gpu,memory.total,memory.used,memory.free,utilization.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,performance.state", "--format=csv,noheader,nounits").Output(); err == nil {
-		if nvidiaGPUs, err := parseNvidiaSMIOutput(string(output)); err == nil && len(nvidiaGPUs) > 0 {
-			return nvidiaGPUs, nil
-		}
+    
+	// NVIDIA
+	if nvidiaGPUs, err := detectNVIDIA(); err == nil {
+		gpus = append(gpus, nvidiaGPUs...)
 	}
-
-	// Try AMD GPU (using rocm-smi if available)
-	if output, err := exec.Command("rocm-smi", "--showproductname", "--showtemp", "--showuse", "--showmemuse", "--showdriverversion").Output(); err == nil {
-		if amdGPUs, err := parseAMDSMIOutput(string(output)); err == nil && len(amdGPUs) > 0 {
-			return amdGPUs, nil
-		}
+    
+	// AMD 
+	if amdGPUs, err := detectAMD(); err == nil {
+		gpus = append(gpus, amdGPUs...)
 	}
-
+    
+	// Intel
+	if intelGPUs, err := detectIntel(); err == nil {
+		gpus = append(gpus, intelGPUs...)
+	}
+    
+	if len(gpus) > 0 {
+		return gpus, nil
+	}
+    
 	// Platform-specific fallback detection
 	if genericGPUs := detectGenericGPUs(); len(genericGPUs) > 0 {
 		return genericGPUs, nil
 	}
-
+    
 	// Return empty slice if no GPUs found
 	return gpus, fmt.Errorf("no GPU devices detected")
+}
+
+// detectNVIDIA обнаруживает NVIDIA GPU через nvidia-smi
+func detectNVIDIA() ([]*GPUInfo, error) {
+	output, err := exec.Command("nvidia-smi", "--query-gpu=name,driver_version,temperature.gpu,memory.total,memory.used,memory.free,utilization.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,performance.state", "--format=csv,noheader,nounits").Output()
+	if err != nil {
+		return nil, err
+	}
+	return parseNvidiaSMIOutput(string(output))
+}
+
+// detectAMD обнаруживает AMD GPU через rocm-smi
+func detectAMD() ([]*GPUInfo, error) {
+	output, err := exec.Command("rocm-smi", "--showproductname", "--showtemp", "--showuse", "--showmemuse", "--showdriverversion").Output()
+	if err != nil {
+		return nil, err
+	}
+	return parseAMDSMIOutput(string(output))
+}
+
+// detectIntel обнаруживает Intel GPU через intel_gpu_top или sysfs
+func detectIntel() ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+	
+	// Попробуем использовать intel_gpu_top если доступен
+	if output, err := exec.Command("intel_gpu_top", "-J").Output(); err == nil {
+		if intelGPUs, err := parseIntelGPUOutput(string(output)); err == nil && len(intelGPUs) > 0 {
+			return intelGPUs, nil
+		}
+	}
+	
+	// Fallback: проверка через sysfs (Linux)
+	if runtime.GOOS == "linux" {
+		if intelGPUs, err := detectIntelViaSysfs(); err == nil && len(intelGPUs) > 0 {
+			return intelGPUs, nil
+		}
+	}
+	
+	// Fallback: универсальное обнаружение Intel
+	if genericIntel := detectGenericIntel(); len(genericIntel) > 0 {
+		return genericIntel, nil
+	}
+	
+	return gpus, fmt.Errorf("Intel GPU not detected")
+}
+
+// parseIntelGPUOutput парсит вывод intel_gpu_top
+func parseIntelGPUOutput(output string) ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+	
+	// Базовая реализация парсинга вывода intel_gpu_top
+	// В реальной реализации здесь должен быть парсинг JSON вывода
+	info := &GPUInfo{
+		Model:           "Intel GPU",
+		DriverVersion:   "Unknown",
+		GPUTemp:         0.0,
+		MemoryTotal:     "0 MB",
+		MemoryUsed:      "0 MB",
+		MemoryFree:      "0 MB",
+		Utilization:     0.0,
+		PowerDraw:       "0 W",
+		PowerLimit:      "0 W",
+		FanSpeed:        0.0,
+		ClockCore:       "0 MHz",
+		ClockMemory:     "0 MHz",
+		PerformanceState: "Unknown",
+	}
+	
+	gpus = append(gpus, info)
+	return gpus, nil
+}
+
+// detectIntelViaSysfs обнаруживает Intel GPU через sysfs на Linux
+func detectIntelViaSysfs() ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+	
+	// Проверяем наличие Intel GPU в sysfs
+	if _, err := exec.Command("test", "-d", "/sys/class/drm/card0/device").Output(); err != nil {
+		return nil, err
+	}
+	
+	// Читаем информацию о GPU
+	if vendor, err := exec.Command("cat", "/sys/class/drm/card0/device/vendor").Output(); err == nil {
+		if strings.Contains(string(vendor), "8086") { // Intel vendor ID
+			info := &GPUInfo{
+				Model:           "Intel Integrated Graphics",
+				DriverVersion:   "Unknown",
+				PerformanceState: "Active",
+			}
+			
+			// Пытаемся получить дополнительную информацию
+			if model, err := exec.Command("cat", "/sys/class/drm/card0/device/name").Output(); err == nil {
+				info.Model = strings.TrimSpace(string(model))
+			}
+			
+			gpus = append(gpus, info)
+		}
+	}
+	
+	if len(gpus) > 0 {
+		return gpus, nil
+	}
+	
+	return nil, fmt.Errorf("Intel GPU not found in sysfs")
+}
+
+// detectGenericIntel универсальное обнаружение Intel GPU
+func detectGenericIntel() []*GPUInfo {
+	var gpus []*GPUInfo
+	
+	switch runtime.GOOS {
+	case "darwin": // macOS
+		if output, err := exec.Command("system_profiler", "SPDisplaysDataType").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			for i, line := range lines {
+				line = strings.TrimSpace(line)
+				if strings.Contains(line, "Chipset Model:") {
+					parts := strings.Split(line, ":")
+					if len(parts) > 1 {
+						model := strings.TrimSpace(parts[1])
+						if strings.Contains(model, "Intel") {
+							gpus = append(gpus, &GPUInfo{
+								Model: "Intel " + model,
+								DriverVersion: "Unknown",
+							})
+						}
+					}
+				}
+			}
+		}
+	case "windows":
+		if output, err := exec.Command("wmic", "path", "win32_VideoController", "get", "name", "/value").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines {
+				if strings.HasPrefix(line, "Name=") {
+					gpuName := strings.TrimPrefix(line, "Name=")
+					gpuName = strings.TrimSpace(gpuName)
+					if strings.Contains(strings.ToLower(gpuName), "intel") {
+						gpus = append(gpus, &GPUInfo{
+							Model: gpuName,
+							DriverVersion: "Unknown",
+						})
+					}
+				}
+			}
+		}
+	case "linux":
+		if output, err := exec.Command("lspci").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines {
+				if strings.Contains(line, "VGA compatible controller") && strings.Contains(line, "Intel") {
+					gpus = append(gpus, &GPUInfo{
+						Model: strings.TrimSpace(line),
+						DriverVersion: "Unknown",
+					})
+				}
+			}
+		}
+	}
+	
+	return gpus
 }
 
 // parseNvidiaSMIOutput парсит вывод nvidia-smi для нескольких GPU

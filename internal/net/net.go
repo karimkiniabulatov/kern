@@ -20,13 +20,17 @@ type NetworkInfo struct {
 	RXSpeed        string
 	TXSpeed        string
 	ActivityPercent float64
-	ConnectionType string // "Ethernet", "Wi-Fi", "Bluetooth", "Cellular", "VPN", "Bridge", "Virtual", "Loopback"
+	ConnectionType string // "Ethernet", "Wi-Fi", "Bluetooth", "Cellular", "VPN", "Bridge", "Virtual", "Loopback", "VLAN"
 	MaxSpeed      string // "1 Gbps", "600 Mbps", "54 Mbps"
 	Technology    string // "802.11ac", "5G", "Bluetooth 5.0", "LTE"
 	SignalStrength float64 // Для беспроводных сетей (%)
 	IsPhysical    bool   // Физический или виртуальный интерфейс
 	Driver        string // Драйвер устройства
 	MTU           int    // Maximum Transmission Unit
+	MACVendor     string // Производитель по OUI MAC-адреса
+	VLANID        int    // ID VLAN (если применимо)
+	IsBridged     bool   // Является ли bridge интерфейсом
+	ParentInterface string // Родительский интерфейс для VLAN
 }
 
 var lastNetworkStats = make(map[string]struct {
@@ -78,6 +82,10 @@ func getFallbackEmptyInterfaces() []NetworkInfo {
 			IsPhysical:    false,
 			Driver:        "N/A",
 			MTU:           1500,
+			MACVendor:     "N/A",
+			VLANID:        0,
+			IsBridged:     false,
+			ParentInterface: "",
 		},
 	}
 }
@@ -175,6 +183,9 @@ func ensureNetworkInfoDefaults(info NetworkInfo) NetworkInfo {
 	if info.Technology == "" {
 		info.Technology = determineTechnology(info.Interface, info.ConnectionType)
 	}
+	if info.MACVendor == "" {
+		info.MACVendor = getMACVendor(info.MACAddress)
+	}
 	// Гарантируем, что ActivityPercent и SignalStrength всегда числовые значения
 	if info.ActivityPercent < 0 {
 		info.ActivityPercent = 0.0
@@ -193,6 +204,16 @@ func ensureNetworkInfoDefaults(info NetworkInfo) NetworkInfo {
 	}
 	if info.MTU == 0 {
 		info.MTU = getInterfaceMTU(info.Interface)
+	}
+	// Определяем VLAN и bridge информацию
+	if info.VLANID == 0 {
+		info.VLANID = getVLANID(info.Interface)
+	}
+	if !info.IsBridged {
+		info.IsBridged = isBridgeInterface(info.Interface)
+	}
+	if info.ParentInterface == "" && info.VLANID > 0 {
+		info.ParentInterface = getVLANParent(info.Interface)
 	}
 	
 	return info
@@ -218,6 +239,8 @@ func determinePhysicalStatus(interfaceName, connectionType, macAddress string) b
 		return false
 	case strings.Contains(name, "flannel") || strings.Contains(name, "cni"):
 		return false
+	case strings.Contains(name, "vlan") || strings.Contains(name, "."):
+		return false
 	}
 	
 	// Проверяем по MAC-адресу
@@ -227,7 +250,7 @@ func determinePhysicalStatus(interfaceName, connectionType, macAddress string) b
 	
 	// Проверяем по типу соединения
 	switch connectionType {
-	case "Virtual", "Bridge", "VPN", "Loopback":
+	case "Virtual", "Bridge", "VPN", "Loopback", "VLAN":
 		return false
 	}
 	
@@ -266,6 +289,8 @@ func determineConnectionType(interfaceName, macAddress string) string {
 		return "Virtual"
 	case strings.Contains(name, "ppp") || strings.Contains(name, "pppoe"):
 		return "PPP"
+	case strings.Contains(name, "vlan") || strings.Contains(name, "."):
+		return "VLAN"
 	}
 	
 	// Проверяем по MAC-адресу (первые 3 байта - OUI)
@@ -303,6 +328,12 @@ func determineMaxSpeed(interfaceName, connectionType string) string {
 		return "∞ (Loopback)"
 	case "PPP":
 		return "56 Kbps"
+	case "VLAN":
+		// VLAN наследует скорость от родительского интерфейса
+		if parent := getVLANParent(interfaceName); parent != "" {
+			return determineMaxSpeed(parent, "Ethernet")
+		}
+		return "1 Gbps"
 	default:
 		return "Unknown"
 	}
@@ -332,9 +363,127 @@ func determineTechnology(interfaceName, connectionType string) string {
 		return "Loopback Device"
 	case "PPP":
 		return "Point-to-Point Protocol"
+	case "VLAN":
+		return "Virtual LAN"
 	default:
 		return "Unknown"
 	}
+}
+
+// getMACVendor определяет производителя по OUI MAC-адреса
+func getMACVendor(mac string) string {
+	if mac == "N/A" || len(mac) < 8 {
+		return "Unknown"
+	}
+	
+	// Берем первые 3 байта MAC-адреса (OUI)
+	oui := strings.ToUpper(mac[:8])
+	
+	// Распространенные OUI производителей
+	vendors := map[string]string{
+		"00:15:17": "Apple",
+		"00:1B:63": "Apple",
+		"00:1D:4F": "Apple",
+		"00:23:DF": "Apple",
+		"00:25:BC": "Apple",
+		"00:26:BB": "Apple",
+		"00:30:65": "Apple",
+		"00:3E:E1": "Apple",
+		"00:50:F2": "Microsoft",
+		"00:1D:60": "Dell",
+		"00:14:22": "Dell",
+		"00:18:8B": "Dell",
+		"00:1A:A0": "Dell",
+		"00:0C:29": "VMware",
+		"00:05:69": "VMware",
+		"00:1C:14": "VMware",
+		"00:50:56": "VMware",
+		"08:00:27": "VirtualBox",
+		"00:1C:42": "Parallels",
+		"00:1C:C4": "Cisco",
+		"00:24:14": "Cisco",
+		"00:26:0B": "Cisco",
+		"00:1B:21": "Intel",
+		"00:13:CE": "Intel",
+		"00:16:EA": "Intel",
+		"00:19:D1": "Intel",
+		"00:1C:C0": "Fujitsu",
+		"00:0F:FE": "Samsung",
+		"00:12:47": "Samsung",
+		"00:15:99": "Samsung",
+		"00:1E:7D": "Samsung",
+		"00:21:19": "Samsung",
+		"00:23:39": "Samsung",
+		"00:24:54": "Samsung",
+		"00:26:37": "Samsung",
+	}
+	
+	if vendor, exists := vendors[oui]; exists {
+		return vendor
+	}
+	
+	return "Unknown"
+}
+
+// getVLANID получает ID VLAN для интерфейса
+func getVLANID(interfaceName string) int {
+	switch runtime.GOOS {
+	case "linux":
+		// Проверяем, является ли интерфейс VLAN
+		if strings.Contains(interfaceName, ".") {
+			parts := strings.Split(interfaceName, ".")
+			if len(parts) > 1 {
+				if vlanID, err := strconv.Atoi(parts[1]); err == nil {
+					return vlanID
+				}
+			}
+		}
+		// Проверяем через sysfs
+		vlanPath := fmt.Sprintf("/sys/class/net/%s/vlan", interfaceName)
+		if _, err := exec.Command("ls", vlanPath).Output(); err == nil {
+			// Это VLAN интерфейс
+			return 1 // По умолчанию
+		}
+	}
+	return 0
+}
+
+// isBridgeInterface проверяет, является ли интерфейс bridge
+func isBridgeInterface(interfaceName string) bool {
+	switch runtime.GOOS {
+	case "linux":
+		bridgePath := fmt.Sprintf("/sys/class/net/%s/bridge", interfaceName)
+		_, err := exec.Command("ls", bridgePath).Output()
+		return err == nil
+	}
+	return strings.Contains(strings.ToLower(interfaceName), "br-") || 
+		   strings.Contains(strings.ToLower(interfaceName), "bridge")
+}
+
+// getVLANParent получает родительский интерфейс для VLAN
+func getVLANParent(interfaceName string) string {
+	switch runtime.GOOS {
+	case "linux":
+		if strings.Contains(interfaceName, ".") {
+			parts := strings.Split(interfaceName, ".")
+			if len(parts) > 0 {
+				return parts[0]
+			}
+		}
+		// Пытаемся получить через sysfs
+		parentPath := fmt.Sprintf("/sys/class/net/%s/device", interfaceName)
+		output, err := exec.Command("readlink", "-f", parentPath).Output()
+		if err == nil {
+			path := strings.TrimSpace(string(output))
+			if strings.Contains(path, "/net/") {
+				parts := strings.Split(path, "/net/")
+				if len(parts) > 1 {
+					return parts[1]
+				}
+			}
+		}
+	}
+	return ""
 }
 
 // getInterfaceDriver получает информацию о драйвере интерфейса
@@ -533,10 +682,18 @@ func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
 			iface.ConnectionType = determineConnectionType(ifaceName, iface.MACAddress)
 			iface.MaxSpeed = determineMaxSpeed(ifaceName, iface.ConnectionType)
 			iface.Technology = determineTechnology(ifaceName, iface.ConnectionType)
+			iface.MACVendor = getMACVendor(iface.MACAddress)
 			
 			// Для беспроводных интерфейсов получаем силу сигнала
 			if iface.ConnectionType == "Wi-Fi" {
 				iface.SignalStrength = getWifiSignalStrength(ifaceName)
+			}
+
+			// Определяем VLAN и bridge информацию
+			iface.VLANID = getVLANID(ifaceName)
+			iface.IsBridged = isBridgeInterface(ifaceName)
+			if iface.VLANID > 0 {
+				iface.ParentInterface = getVLANParent(ifaceName)
 			}
 
 			// Определяем физический статус и получаем драйвер/MTU
@@ -651,6 +808,7 @@ func getWindowsNetworkInterfaces() ([]NetworkInfo, error) {
 		iface.ConnectionType = determineConnectionType(iface.Interface, iface.MACAddress)
 		iface.MaxSpeed = determineMaxSpeed(iface.Interface, iface.ConnectionType)
 		iface.Technology = determineTechnology(iface.Interface, iface.ConnectionType)
+		iface.MACVendor = getMACVendor(iface.MACAddress)
 		iface.IsPhysical = determinePhysicalStatus(iface.Interface, iface.ConnectionType, iface.MACAddress)
 
 		interfaces = append(interfaces, ensureNetworkInfoDefaults(iface))
@@ -709,6 +867,7 @@ func getMacOSNetworkInterfaces() ([]NetworkInfo, error) {
 		iface.ConnectionType = determineConnectionType(iface.Interface, iface.MACAddress)
 		iface.MaxSpeed = determineMaxSpeed(iface.Interface, iface.ConnectionType)
 		iface.Technology = determineTechnology(iface.Interface, iface.ConnectionType)
+		iface.MACVendor = getMACVendor(iface.MACAddress)
 		iface.IsPhysical = determinePhysicalStatus(iface.Interface, iface.ConnectionType, iface.MACAddress)
 
 		interfaces = append(interfaces, ensureNetworkInfoDefaults(iface))
@@ -761,6 +920,7 @@ func getFallbackNetworkInterfaces() ([]NetworkInfo, error) {
 		iface.ConnectionType = determineConnectionType(iface.Interface, iface.MACAddress)
 		iface.MaxSpeed = "Unknown"
 		iface.Technology = "Unknown"
+		iface.MACVendor = getMACVendor(iface.MACAddress)
 		iface.IsPhysical = determinePhysicalStatus(iface.Interface, iface.ConnectionType, iface.MACAddress)
 
 		interfaces = append(interfaces, ensureNetworkInfoDefaults(iface))
@@ -794,6 +954,10 @@ func getFallbackNetworkInterfacesWithDefaults() ([]NetworkInfo, error) {
 			IsPhysical:    true,
 			Driver:        "unknown",
 			MTU:           1500,
+			MACVendor:     "Unknown",
+			VLANID:        0,
+			IsBridged:     false,
+			ParentInterface: "",
 		},
 	}, nil
 }

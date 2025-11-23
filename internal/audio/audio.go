@@ -118,22 +118,93 @@ func (a *AudioInfo) detectLinuxAudioDevices() {
 }
 
 func (a *AudioInfo) detectMacAudioDevices() {
-	// macOS использует Core Audio
-	// Можно использовать system_profiler для получения информации об аудиоустройствах
-	if output, err := exec.Command("system_profiler", "SPAudioDataType").Output(); err == nil {
+	// Используем system_profiler для получения информации об аудиоустройствах
+	cmd := exec.Command("system_profiler", "SPAudioDataType")
+	if output, err := cmd.Output(); err == nil {
 		a.parseMacAudioDevices(string(output))
 	} else {
 		a.detectDefaultAudioDevices()
 	}
+	
+	// Дополнительно получаем уровни громкости
+	a.getMacVolumeLevels()
 }
 
 func (a *AudioInfo) detectWindowsAudioDevices() {
-	// Windows - используем PowerShell для получения информации об аудиоустройствах
+	// Используем PowerShell для получения информации об аудиоустройствах
 	psCmd := `Get-WmiObject -Class Win32_SoundDevice | Select-Object Name, Status | Format-Table -HideTableHeaders`
-	if output, err := exec.Command("powershell", "-Command", psCmd).Output(); err == nil {
+	cmd := exec.Command("powershell", "-Command", psCmd)
+	if output, err := cmd.Output(); err == nil {
 		a.parseWindowsAudioDevices(string(output))
 	} else {
 		a.detectDefaultAudioDevices()
+	}
+	
+	// Дополнительная информация через AudioSessionManager
+	a.getWindowsAudioDetails()
+}
+
+func (a *AudioInfo) getMacVolumeLevels() {
+	// Получаем уровень выходной громкости через osascript
+	volumeCmd := "osascript -e 'output volume of (get volume settings)'"
+	cmd := exec.Command("bash", "-c", volumeCmd)
+	if output, err := cmd.Output(); err == nil {
+		volumeStr := strings.TrimSpace(string(output))
+		if volume, err := strconv.Atoi(volumeStr); err == nil {
+			// Конвертируем проценты в dB: 100% = 0dB, 0% = -96dB
+			a.OutputLevel = float64(volume)/100*96 - 96
+		}
+	}
+	
+	// Получаем уровень входной громкости
+	inputVolumeCmd := "osascript -e 'input volume of (get volume settings)'"
+	cmd = exec.Command("bash", "-c", inputVolumeCmd)
+	if output, err := cmd.Output(); err == nil {
+		volumeStr := strings.TrimSpace(string(output))
+		if volume, err := strconv.Atoi(volumeStr); err == nil {
+			a.InputLevel = float64(volume)/100*96 - 96
+		}
+	}
+}
+
+func (a *AudioInfo) getWindowsAudioDetails() {
+	// Получаем уровни громкости через Windows Media Player COM object
+	volumeCmd := `$wmp = New-Object -ComObject WMPlayer.OCX; $wmp.settings.volume`
+	cmd := exec.Command("powershell", "-Command", volumeCmd)
+	if output, err := cmd.Output(); err == nil {
+		volumeStr := strings.TrimSpace(string(output))
+		if volume, err := strconv.Atoi(volumeStr); err == nil {
+			a.OutputLevel = float64(volume)/100*96 - 96
+		}
+	}
+	
+	// Дополнительная информация о аудиоустройствах
+	audioDeviceCmd := `Get-CimInstance -Namespace "Root\Cimv2" -ClassName Win32_SoundDevice | Select-Object Name, Status, Manufacturer`
+	cmd = exec.Command("powershell", "-Command", audioDeviceCmd)
+	if output, err := cmd.Output(); err == nil {
+		a.parseWindowsAudioDetails(string(output))
+	}
+}
+
+func (a *AudioInfo) parseWindowsAudioDetails(output string) {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "Name") || strings.HasPrefix(line, "-") {
+			continue
+		}
+		
+		// Обновляем информацию о существующих устройствах
+		for i, device := range a.OutputDevices {
+			if strings.Contains(line, device.Name) {
+				if strings.Contains(line, "Manufacturer") {
+					parts := strings.Split(line, "Manufacturer")
+					if len(parts) > 1 {
+						a.OutputDevices[i].Format = strings.TrimSpace(parts[1])
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -180,6 +251,10 @@ func (a *AudioInfo) parseMacAudioDevices(output string) {
 			if ch, err := strconv.Atoi(strings.TrimSpace(strings.Split(line, ":")[1])); err == nil {
 				currentDevice.Channels = ch
 			}
+		} else if inDeviceSection && strings.Contains(line, "Sample Rate:") {
+			a.SampleRate = strings.TrimSpace(strings.Split(line, ":")[1])
+		} else if inDeviceSection && strings.Contains(line, "Bit Depth:") {
+			a.BitDepth = strings.TrimSpace(strings.Split(line, ":")[1])
 		}
 	}
 }
@@ -320,23 +395,120 @@ func (a *AudioInfo) detectLinuxActiveStreams() {
 }
 
 func (a *AudioInfo) detectMacActiveStreams() {
-	// На macOS используем lsof для поиска аудиопроцессов
+	// На macOS используем lsof для поиска аудиопроцессов и osascript для дополнительной информации
 	if _, err := exec.LookPath("lsof"); err == nil {
+		// Ищем процессы, использующие аудиоустройства
 		if output, err := exec.Command("lsof", "-c", "CoreAudio").Output(); err == nil {
 			a.parseMacAudioProcesses(string(output))
 		}
-	} else {
-		a.detectDefaultActiveStreams()
+		
+		// Дополнительно ищем процессы, использующие аудио устройства
+		if output, err := exec.Command("lsof", "/dev/audio*").Output(); err == nil {
+			a.parseMacAudioDeviceProcesses(string(output))
+		}
 	}
+	
+	// Используем osascript для получения информации о аудиопотоках
+	a.getMacAudioStreamsInfo()
 }
 
 func (a *AudioInfo) detectWindowsActiveStreams() {
-	// На Windows сложно получить информацию об аудиопотоках без WinAPI
-	// Используем tasklist для получения списка процессов
-	if output, err := exec.Command("tasklist").Output(); err == nil {
-		a.parseWindowsProcesses(string(output))
+	// На Windows используем PowerShell для получения информации о аудиопотоках
+	psCmd := `Get-Process | Where-Object {$_.MainWindowTitle -ne ""} | Select-Object Name, Id, MainWindowTitle`
+	cmd := exec.Command("powershell", "-Command", psCmd)
+	if output, err := cmd.Output(); err == nil {
+		a.parseWindowsActiveStreams(string(output))
 	} else {
-		a.detectDefaultActiveStreams()
+		// Fallback на tasklist
+		if output, err := exec.Command("tasklist").Output(); err == nil {
+			a.parseWindowsProcesses(string(output))
+		} else {
+			a.detectDefaultActiveStreams()
+		}
+	}
+	
+	// Дополнительная информация через AudioSessionManager
+	a.getWindowsAudioSessions()
+}
+
+func (a *AudioInfo) getMacAudioStreamsInfo() {
+	// Получаем информацию о текущих аудиопотоках через system_profiler
+	cmd := exec.Command("system_profiler", "SPAudioDataType")
+	if output, err := cmd.Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "Process:") {
+				processName := strings.TrimSpace(strings.Split(line, ":")[1])
+				stream := AudioStream{
+					Process: processName,
+					Type:    "playback",
+					Format:  "Core Audio",
+				}
+				a.ActiveStreams = append(a.ActiveStreams, stream)
+			}
+		}
+	}
+}
+
+func (a *AudioInfo) getWindowsAudioSessions() {
+	// Получаем информацию о аудиосессиях через PowerShell
+	psCmd := `
+	Add-Type -TypeDefinition @"
+	using System;
+	using System.Runtime.InteropServices;
+	
+	namespace AudioTools {
+		public class AudioSession {
+			[DllImport("winmm.dll")]
+			public static extern int waveInGetNumDevs();
+			
+			[DllImport("winmm.dll")] 
+			public static extern int waveOutGetNumDevs();
+		}
+	}
+"@
+	[AudioTools.AudioSession]::waveOutGetNumDevs()
+	`
+	cmd := exec.Command("powershell", "-Command", psCmd)
+	if _, err := cmd.Output(); err == nil {
+		// Если команда выполнилась успешно, добавляем системные потоки
+		a.ActiveStreams = append(a.ActiveStreams, AudioStream{
+			Process: "Windows Audio Session",
+			Type:    "playback",
+			Format:  "Windows Audio",
+		})
+	}
+}
+
+func (a *AudioInfo) parseWindowsActiveStreams(output string) {
+	lines := strings.Split(output, "\n")
+	for i, line := range lines {
+		if i < 3 { // Пропускаем заголовки
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) >= 2 {
+			processName := fields[0]
+			pid, _ := strconv.Atoi(fields[1])
+			
+			// Фильтруем процессы, которые могут использовать аудио
+			if strings.Contains(strings.ToLower(processName), "audio") ||
+			   strings.Contains(strings.ToLower(processName), "sound") ||
+			   strings.Contains(strings.ToLower(processName), "music") ||
+			   strings.Contains(strings.ToLower(processName), "media") ||
+			   strings.Contains(strings.ToLower(processName), "player") ||
+			   strings.Contains(strings.ToLower(processName), "chrome") ||
+			   strings.Contains(strings.ToLower(processName), "firefox") {
+				
+				stream := AudioStream{
+					Process: processName,
+					PID:     pid,
+					Type:    "playback",
+					Format:  "Windows Audio",
+				}
+				a.ActiveStreams = append(a.ActiveStreams, stream)
+			}
+		}
 	}
 }
 
@@ -361,6 +533,30 @@ func (a *AudioInfo) parseMacAudioProcesses(output string) {
 					PID:     pid,
 					Type:    "playback", // предполагаем playback для простоты
 					Format:  "Core Audio",
+				}
+				a.ActiveStreams = append(a.ActiveStreams, stream)
+			}
+		}
+	}
+}
+
+func (a *AudioInfo) parseMacAudioDeviceProcesses(output string) {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "/dev/audio") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 {
+				pid, _ := strconv.Atoi(fields[1])
+				streamType := "playback"
+				if strings.Contains(line, "input") {
+					streamType = "capture"
+				}
+				
+				stream := AudioStream{
+					Process: fields[0],
+					PID:     pid,
+					Type:    streamType,
+					Format:  "PCM",
 				}
 				a.ActiveStreams = append(a.ActiveStreams, stream)
 			}
@@ -450,8 +646,10 @@ func (a *AudioInfo) getAudioMetrics() {
 	switch runtime.GOOS {
 	case "linux":
 		a.getLinuxAudioMetrics()
-	case "darwin", "windows":
-		a.getDefaultAudioMetrics()
+	case "darwin":
+		a.getMacAudioMetrics()
+	case "windows":
+		a.getWindowsAudioMetrics()
 	default:
 		a.getDefaultAudioMetrics()
 	}
@@ -470,6 +668,18 @@ func (a *AudioInfo) getLinuxAudioMetrics() {
 	}
 	
 	// Default values if no specific metrics found
+	a.setDefaultAudioMetrics()
+}
+
+func (a *AudioInfo) getMacAudioMetrics() {
+	// Уже получили уровни громкости в detectMacAudioDevices
+	// Устанавливаем остальные метрики по умолчанию
+	a.setDefaultAudioMetrics()
+}
+
+func (a *AudioInfo) getWindowsAudioMetrics() {
+	// Уже получили уровни громкости в detectWindowsAudioDevices
+	// Устанавливаем остальные метрики по умолчанию
 	a.setDefaultAudioMetrics()
 }
 
@@ -494,8 +704,12 @@ func (a *AudioInfo) setDefaultAudioMetrics() {
 		a.OutputLevel = -8.3 // Simulated output level
 	}
 	
-	a.SampleRate = "48 kHz"
-	a.BitDepth = "16-bit"
+	if a.SampleRate == "Unknown" {
+		a.SampleRate = "48 kHz"
+	}
+	if a.BitDepth == "Unknown" {
+		a.BitDepth = "16-bit"
+	}
 	a.Latency = "23.4 ms"
 	
 	// Calculate peak and RMS levels for VU meters

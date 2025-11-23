@@ -1,6 +1,7 @@
 package disk
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -20,6 +21,7 @@ type DiskInfo struct {
 	DiskType   string // "SSD", "HDD", "NVMe", "RAID", "Network", "Unknown"
 	Model      string // Модель диска
 	Serial     string // Серийный номер
+	SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
 }
 
 func Summary() ([]DiskInfo, error) {
@@ -49,6 +51,7 @@ func Summary() ([]DiskInfo, error) {
 			DiskType:   "Unknown",
 			Model:      "Unknown",
 			Serial:     "Unknown",
+			SMARTStatus: "UNKNOWN",
 		}
 		return []DiskInfo{defaultDisk}, nil
 	}
@@ -116,7 +119,7 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 			}
 
 			// Определяем тип устройства и физические характеристики
-			physical, diskType, model, serial := detectDiskProperties(fields[0])
+			physical, diskType, model, serial, smartStatus := detectDiskProperties(fields[0])
 
 			disk := DiskInfo{
 				Filesystem: fields[0],
@@ -129,6 +132,7 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 				DiskType:   diskType,
 				Model:      model,
 				Serial:     serial,
+				SMARTStatus: smartStatus,
 			}
 			disks = append(disks, disk)
 		}
@@ -167,7 +171,7 @@ func parseWMICOutput(output string) ([]DiskInfo, error) {
 			}
 
 			// Для Windows определяем тип устройства
-			physical, diskType, model, serial := detectWindowsDiskProperties(fields[0])
+			physical, diskType, model, serial, smartStatus := detectWindowsDiskProperties(fields[0])
 
 			disk := DiskInfo{
 				Filesystem: fields[0],
@@ -180,6 +184,7 @@ func parseWMICOutput(output string) ([]DiskInfo, error) {
 				DiskType:   diskType,
 				Model:      model,
 				Serial:     serial,
+				SMARTStatus: smartStatus,
 			}
 			disks = append(disks, disk)
 		}
@@ -189,12 +194,22 @@ func parseWMICOutput(output string) ([]DiskInfo, error) {
 }
 
 // detectDiskProperties определяет свойства диска для Linux/Unix систем
-func detectDiskProperties(filesystem string) (bool, string, string, string) {
+func detectDiskProperties(filesystem string) (bool, string, string, string, string) {
 	physical := true
 	diskType := "Unknown"
 	model := "Unknown"
 	serial := "Unknown"
+	smartStatus := "UNKNOWN"
 
+	// Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
+	device := strings.TrimPrefix(filesystem, "/dev/")
+	if device == "" {
+		return physical, diskType, model, serial, smartStatus
+	}
+
+	// Получаем базовое устройство (без номера раздела)
+	baseDevice := getBaseDevice(device)
+	
 	// Определяем базовый тип по имени устройства
 	if strings.Contains(filesystem, "nvme") {
 		diskType = "NVMe"
@@ -218,10 +233,21 @@ func detectDiskProperties(filesystem string) (bool, string, string, string) {
 		physical = false
 	}
 
-	// Пытаемся получить дополнительную информацию через lsblk (для Linux)
-	if runtime.GOOS != "windows" && diskType != "Network" && diskType != "Temporary" {
+	// Пытаемся получить дополнительную информацию через lsblk и smartctl (для Linux)
+	if runtime.GOOS != "windows" && diskType != "Network" && diskType != "Temporary" && physical {
+		// Уточняем тип диска через rotational флаг
+		rotationalPath := fmt.Sprintf("/sys/block/%s/queue/rotational", baseDevice)
+		if data, err := os.ReadFile(rotationalPath); err == nil {
+			if strings.TrimSpace(string(data)) == "0" {
+				diskType = "SSD"
+			} else if strings.TrimSpace(string(data)) == "1" {
+				diskType = "HDD"
+			}
+		}
+
+		// Получаем информацию через lsblk
 		if info, err := getDiskInfoWithLsblk(filesystem); err == nil {
-			if info.diskType != "" {
+			if info.diskType != "" && info.diskType != "Partition" {
 				diskType = info.diskType
 			}
 			if info.model != "" {
@@ -230,14 +256,60 @@ func detectDiskProperties(filesystem string) (bool, string, string, string) {
 			if info.serial != "" {
 				serial = info.serial
 			}
-			// Если это LVM, RAID или другие виртуальные устройства, помечаем как логические
-			if diskType == "LVM" || strings.Contains(diskType, "RAID") {
-				physical = false
-			}
+		}
+
+		// Получаем SMART-статус
+		smartStatus = getSMARTStatus(baseDevice)
+
+		// Если это LVM, RAID или другие виртуальные устройства, помечаем как логические
+		if diskType == "LVM" || strings.Contains(diskType, "RAID") {
+			physical = false
 		}
 	}
 
-	return physical, diskType, model, serial
+	return physical, diskType, model, serial, smartStatus
+}
+
+// getBaseDevice возвращает базовое имя устройства без номера раздела
+func getBaseDevice(device string) string {
+	// Убираем цифры в конце для SATA/SCSI устройств (sda1 -> sda)
+	re := regexp.MustCompile(`^([a-z]+)(\d+)$`)
+	if matches := re.FindStringSubmatch(device); matches != nil {
+		return matches[1]
+	}
+	
+	// Убираем часть после 'p' для NVMe устройств (nvme0n1p1 -> nvme0n1)
+	re = regexp.MustCompile(`^(nvme\d+n\d+)p\d+$`)
+	if matches := re.FindStringSubmatch(device); matches != nil {
+		return matches[1]
+	}
+	
+	// Убираем часть после 'p' для MMC устройств (mmcblk0p1 -> mmcblk0)
+	re = regexp.MustCompile(`^(mmcblk\d+)p\d+$`)
+	if matches := re.FindStringSubmatch(device); matches != nil {
+		return matches[1]
+	}
+	
+	return device
+}
+
+// getSMARTStatus получает SMART-статус диска
+func getSMARTStatus(device string) string {
+	// Пытаемся использовать smartctl для получения SMART-статуса
+	cmd := exec.Command("smartctl", "-H", "/dev/"+device)
+	output, err := cmd.Output()
+	if err != nil {
+		return "Unavailable"
+	}
+	
+	outputStr := string(output)
+	if strings.Contains(outputStr, "PASSED") || strings.Contains(outputStr, "OK") {
+		return "PASSED"
+	} else if strings.Contains(outputStr, "FAILED") {
+		return "FAILED"
+	}
+	
+	return "UNKNOWN"
 }
 
 // Структура для хранения информации из lsblk
@@ -271,7 +343,7 @@ func getDiskInfoWithLsblk(filesystem string) (lsblkInfo, error) {
 			// Определяем тип устройства
 			switch fields[0] {
 			case "disk":
-				info.diskType = "HDD" // Будет уточнено ниже
+				info.diskType = "HDD" // Будет уточнено через rotational флаг
 			case "part":
 				info.diskType = "Partition"
 				return info, nil // Для разделов не получаем модель/серийник
@@ -279,6 +351,8 @@ func getDiskInfoWithLsblk(filesystem string) (lsblkInfo, error) {
 				info.diskType = "ROM"
 			case "lvm":
 				info.diskType = "LVM"
+			case "raid":
+				info.diskType = "RAID"
 			}
 
 			// Получаем модель и серийный номер
@@ -291,25 +365,16 @@ func getDiskInfoWithLsblk(filesystem string) (lsblkInfo, error) {
 		}
 	}
 
-	// Пытаемся определить SSD/HDD через rotational флаг
-	rotationalPath := "/sys/block/" + strings.TrimSuffix(device, "0123456789") + "/queue/rotational"
-	if data, err := os.ReadFile(rotationalPath); err == nil {
-		if strings.TrimSpace(string(data)) == "0" {
-			info.diskType = "SSD"
-		} else if strings.TrimSpace(string(data)) == "1" {
-			info.diskType = "HDD"
-		}
-	}
-
 	return info, nil
 }
 
 // detectWindowsDiskProperties определяет свойства диска для Windows
-func detectWindowsDiskProperties(drive string) (bool, string, string, string) {
+func detectWindowsDiskProperties(drive string) (bool, string, string, string, string) {
 	physical := true
 	diskType := "Unknown"
 	model := "Unknown"
 	serial := "Unknown"
+	smartStatus := "UNKNOWN"
 
 	// Для Windows пытаемся определить тип через wmic
 	cmd := exec.Command("wmic", "diskdrive", "get", "model,serialnumber,mediatype")
@@ -317,11 +382,20 @@ func detectWindowsDiskProperties(drive string) (bool, string, string, string) {
 	if err == nil {
 		lines := strings.Split(string(output), "\n")
 		for _, line := range lines {
-			if strings.Contains(line, "Fixed hard disk media") {
-				diskType = "HDD"
-				break
-			} else if strings.Contains(line, "SSD") {
-				diskType = "SSD"
+			fields := strings.Fields(line)
+			if len(fields) >= 3 {
+				model = fields[0]
+				serial = fields[1]
+				mediaType := fields[2]
+				
+				switch mediaType {
+				case "Fixed hard disk media":
+					diskType = "HDD"
+				case "SSD":
+					diskType = "SSD"
+				case "NVMe":
+					diskType = "NVMe"
+				}
 				break
 			}
 		}
@@ -336,7 +410,7 @@ func detectWindowsDiskProperties(drive string) (bool, string, string, string) {
 		physical = false
 	}
 
-	return physical, diskType, model, serial
+	return physical, diskType, model, serial, smartStatus
 }
 
 func formatBytes(bytes uint64) string {

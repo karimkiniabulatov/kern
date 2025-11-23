@@ -188,7 +188,56 @@ func (v *VideoInfo) detectVideoDevicesLinux() {
 }
 
 func (v *VideoInfo) detectVideoDevicesWindows() {
-	// Detect cameras using WMIC
+	// WMI для видео контроллеров (GPU)
+	cmd := exec.Command("wmic", "path", "win32_VideoController", "get", "Name,DriverVersion,AdapterRAM", "/format:csv")
+	if output, err := cmd.Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for i, line := range lines {
+			if i == 0 || strings.TrimSpace(line) == "" {
+				continue
+			}
+			fields := strings.Split(line, ",")
+			if len(fields) >= 4 {
+				name := strings.TrimSpace(fields[1])
+				driver := strings.TrimSpace(fields[2])
+				ram := strings.TrimSpace(fields[3])
+				
+				v.VideoDevices = append(v.VideoDevices, VideoDevice{
+					Name:   fmt.Sprintf("%s (%s)", name, ram),
+					ID:     name,
+					Type:   "gpu",
+					Status: "available",
+					Driver: driver,
+				})
+			}
+		}
+	}
+
+	// DirectShow устройства через PowerShell
+	psCmd := `Get-WmiObject -Query "SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')"`
+	cmd = exec.Command("powershell", "-Command", psCmd)
+	if output, err := cmd.Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "Name") && strings.Contains(line, "=") {
+				parts := strings.Split(line, "=")
+				if len(parts) >= 2 {
+					name := strings.TrimSpace(parts[1])
+					if name != "" {
+						v.VideoDevices = append(v.VideoDevices, VideoDevice{
+							Name:   name,
+							ID:     "unknown",
+							Type:   "camera",
+							Status: "available",
+							Driver: "DirectShow/WMF",
+						})
+					}
+				}
+			}
+		}
+	}
+
+	// Detect cameras using WMIC (оригинальный метод как fallback)
 	if output, err := exec.Command("wmic", "path", "win32_pnpentity", "get", "name").Output(); err == nil {
 		lines := strings.Split(string(output), "\n")
 		for _, line := range lines {
@@ -197,13 +246,23 @@ func (v *VideoInfo) detectVideoDevicesWindows() {
 				strings.Contains(lineLower, "video") && strings.Contains(lineLower, "device") {
 				name := strings.TrimSpace(line)
 				if name != "" && name != "Name" {
-					v.VideoDevices = append(v.VideoDevices, VideoDevice{
-						Name:   name,
-						ID:     "unknown",
-						Type:   "camera",
-						Status: "available",
-						Driver: "DirectShow/WMF",
-					})
+					// Проверяем, нет ли уже такого устройства
+					exists := false
+					for _, device := range v.VideoDevices {
+						if device.Name == name {
+							exists = true
+							break
+						}
+					}
+					if !exists {
+						v.VideoDevices = append(v.VideoDevices, VideoDevice{
+							Name:   name,
+							ID:     "unknown",
+							Type:   "camera",
+							Status: "available",
+							Driver: "DirectShow/WMF",
+						})
+					}
 				}
 			}
 		}
@@ -238,41 +297,73 @@ func (v *VideoInfo) detectVideoDevicesWindows() {
 }
 
 func (v *VideoInfo) detectVideoDevicesMacOS() {
-	// Detect cameras using system_profiler
-	if output, err := exec.Command("system_profiler", "SPCameraDataType").Output(); err == nil {
+	// Detect cameras using system_profiler SPCameraDataType
+	cmd := exec.Command("system_profiler", "SPCameraDataType")
+	if output, err := cmd.Output(); err == nil {
 		lines := strings.Split(string(output), "\n")
 		var currentCamera string
+		var cameraDetails []string
+		
 		for _, line := range lines {
 			line = strings.TrimSpace(line)
 			if strings.HasSuffix(line, ":") && !strings.Contains(line, "Cameras") {
+				if currentCamera != "" {
+					// Сохраняем предыдущую камеру
+					v.VideoDevices = append(v.VideoDevices, VideoDevice{
+						Name:    currentCamera,
+						ID:      "unknown",
+						Type:    "camera",
+						Status:  "available",
+						Driver:  "AVFoundation",
+						Formats: cameraDetails,
+					})
+				}
 				currentCamera = strings.TrimSuffix(line, ":")
-			} else if currentCamera != "" && strings.Contains(line, "Unique ID") {
-				v.VideoDevices = append(v.VideoDevices, VideoDevice{
-					Name:   currentCamera,
-					ID:     "unknown",
-					Type:   "camera",
-					Status: "available",
-					Driver: "AVFoundation",
-				})
-				currentCamera = ""
+				cameraDetails = []string{}
+			} else if currentCamera != "" && strings.Contains(line, ":") {
+				cameraDetails = append(cameraDetails, line)
 			}
+		}
+		// Добавляем последнюю камеру
+		if currentCamera != "" {
+			v.VideoDevices = append(v.VideoDevices, VideoDevice{
+				Name:    currentCamera,
+				ID:      "unknown",
+				Type:    "camera",
+				Status:  "available",
+				Driver:  "AVFoundation",
+				Formats: cameraDetails,
+			})
 		}
 	}
 
-	// Detect displays using system_profiler
-	if output, err := exec.Command("system_profiler", "SPDisplaysDataType").Output(); err == nil {
+	// Detect displays using system_profiler SPDisplaysDataType
+	cmd = exec.Command("system_profiler", "SPDisplaysDataType")
+	if output, err := cmd.Output(); err == nil {
 		lines := strings.Split(string(output), "\n")
+		var currentDisplay string
+		var displayDetails []string
+		
 		for _, line := range lines {
-			if strings.Contains(line, "Resolution:") {
+			line = strings.TrimSpace(line)
+			if strings.Contains(line, "Display Type:") || strings.Contains(line, "Chipset Model:") {
 				parts := strings.Split(line, ":")
 				if len(parts) >= 2 {
-					displayName := fmt.Sprintf("Display %s", strings.TrimSpace(parts[1]))
+					currentDisplay = strings.TrimSpace(parts[1])
+					displayDetails = []string{}
+				}
+			} else if currentDisplay != "" && strings.Contains(line, "Resolution:") {
+				parts := strings.Split(line, ":")
+				if len(parts) >= 2 {
+					resolution := strings.TrimSpace(parts[1])
+					displayName := fmt.Sprintf("%s - %s", currentDisplay, resolution)
 					v.VideoDevices = append(v.VideoDevices, VideoDevice{
-						Name:   displayName,
-						ID:     displayName,
-						Type:   "display",
-						Status: "active",
-						Driver: "Quartz/Display",
+						Name:    displayName,
+						ID:      displayName,
+						Type:    "display",
+						Status:  "active",
+						Driver:  "Quartz/Display",
+						Formats: []string{resolution},
 					})
 				}
 			}
@@ -431,10 +522,16 @@ func (v *VideoInfo) detectActiveStreamsLinux() {
 			v.parseVideoApps(string(output))
 		}
 	}
+
+	// Enhanced stream detection with process details
+	v.detectVideoStreamsLinux()
 }
 
 func (v *VideoInfo) detectActiveStreamsWindows() {
-	// Check for common video applications using tasklist
+	// Enhanced video stream detection for Windows
+	v.detectVideoStreamsWindows()
+
+	// Check for common video applications using tasklist (оригинальный метод как fallback)
 	videoProcesses := []string{
 		"ffmpeg.exe", "vlc.exe", "obs64.exe", "obs.exe", "chrome.exe",
 		"firefox.exe", "msedge.exe", "zoom.exe", "teams.exe", "skype.exe",
@@ -452,13 +549,23 @@ func (v *VideoInfo) detectActiveStreamsWindows() {
 							pidStr := strings.Trim(fields[1], "\" ")
 							pid, err := strconv.Atoi(pidStr)
 							if err == nil {
-								streamType := v.determineStreamTypeWindows(proc)
-								stream := VideoStream{
-									Process: proc,
-									PID:     pid,
-									Type:    streamType,
+								// Avoid duplicates
+								exists := false
+								for _, stream := range v.ActiveStreams {
+									if stream.PID == pid {
+										exists = true
+										break
+									}
 								}
-								v.ActiveStreams = append(v.ActiveStreams, stream)
+								if !exists {
+									streamType := v.determineStreamTypeWindows(proc)
+									stream := VideoStream{
+										Process: proc,
+										PID:     pid,
+										Type:    streamType,
+									}
+									v.ActiveStreams = append(v.ActiveStreams, stream)
+								}
 							}
 						}
 					}
@@ -469,7 +576,10 @@ func (v *VideoInfo) detectActiveStreamsWindows() {
 }
 
 func (v *VideoInfo) detectActiveStreamsMacOS() {
-	// Check for common video applications using ps
+	// Enhanced video stream detection for macOS
+	v.detectVideoStreamsMacOS()
+
+	// Check for common video applications using ps (оригинальный метод как fallback)
 	videoProcesses := []string{
 		"ffmpeg", "vlc", "obs", "QuickTime Player", "FaceTime",
 		"Google Chrome", "Firefox", "zoom.us", "Skype",
@@ -508,6 +618,178 @@ func (v *VideoInfo) detectActiveStreamsMacOS() {
 							if !found {
 								v.ActiveStreams = append(v.ActiveStreams, stream)
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// Новый метод для расширенного обнаружения видео потоков на Linux
+func (v *VideoInfo) detectVideoStreamsLinux() {
+	// Мониторинг использования GPU видео кодеков через nvidia-smi
+	if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.enc,utilization.dec", "--format=csv,noheader,nounits").Output(); err == nil {
+		lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+		for _, line := range lines {
+			fields := strings.Split(line, ", ")
+			if len(fields) >= 2 {
+				encUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64)
+				decUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64)
+				
+				if encUtil > 0 {
+					v.ActiveStreams = append(v.ActiveStreams, VideoStream{
+						Process: "NVIDIA Encoder",
+						Type:    "encode",
+						Bitrate: fmt.Sprintf("GPU Util: %.1f%%", encUtil),
+					})
+				}
+				if decUtil > 0 {
+					v.ActiveStreams = append(v.ActiveStreams, VideoStream{
+						Process: "NVIDIA Decoder", 
+						Type:    "decode",
+						Bitrate: fmt.Sprintf("GPU Util: %.1f%%", decUtil),
+					})
+				}
+			}
+		}
+	}
+
+	// Проверка активных FFmpeg процессов с деталями
+	if output, err := exec.Command("ps", "aux").Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "ffmpeg") && strings.Contains(line, "-i") {
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					pid, _ := strconv.Atoi(fields[1])
+					
+					// Анализ командной строки для получения деталей
+					stream := VideoStream{
+						Process: "ffmpeg",
+						PID:     pid,
+						Type:    "encode",
+					}
+					
+					// Попытка извлечь информацию о разрешении и битрейте
+					for i, field := range fields {
+						if field == "-s" && i+1 < len(fields) {
+							stream.Resolution = fields[i+1]
+						}
+						if field == "-b:v" && i+1 < len(fields) {
+							stream.Bitrate = fields[i+1]
+						}
+						if field == "-r" && i+1 < len(fields) {
+							if fps, err := strconv.ParseFloat(fields[i+1], 64); err == nil {
+								stream.Framerate = fps
+							}
+						}
+						if (field == "-c:v" || field == "-vcodec") && i+1 < len(fields) {
+							stream.Codec = fields[i+1]
+						}
+					}
+					
+					v.ActiveStreams = append(v.ActiveStreams, stream)
+				}
+			}
+		}
+	}
+}
+
+// Новый метод для расширенного обнаружения видео потоков на Windows
+func (v *VideoInfo) detectVideoStreamsWindows() {
+	// Мониторинг использования GPU видео кодеков через nvidia-smi
+	if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.enc,utilization.dec", "--format=csv,noheader,nounits").Output(); err == nil {
+		lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+		for _, line := range lines {
+			fields := strings.Split(line, ", ")
+			if len(fields) >= 2 {
+				encUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64)
+				decUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64)
+				
+				if encUtil > 0 {
+					v.ActiveStreams = append(v.ActiveStreams, VideoStream{
+						Process: "NVIDIA Encoder",
+						Type:    "encode",
+						Bitrate: fmt.Sprintf("GPU Util: %.1f%%", encUtil),
+					})
+				}
+				if decUtil > 0 {
+					v.ActiveStreams = append(v.ActiveStreams, VideoStream{
+						Process: "NVIDIA Decoder",
+						Type:    "decode", 
+						Bitrate: fmt.Sprintf("GPU Util: %.1f%%", decUtil),
+					})
+				}
+			}
+		}
+	}
+
+	// Поиск процессов с видео контентом через PowerShell
+	psCmd := `Get-Process | Where-Object { $_.ProcessName -like "*ffmpeg*" -or $_.ProcessName -like "*obs*" -or $_.ProcessName -like "*vlc*" } | Select-Object Id, ProcessName`
+	cmd := exec.Command("powershell", "-Command", psCmd)
+	if output, err := cmd.Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "ffmpeg") || strings.Contains(line, "obs") || strings.Contains(line, "vlc") {
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					pid, err := strconv.Atoi(fields[0])
+					if err == nil {
+						processName := fields[1]
+						streamType := v.determineStreamTypeWindows(processName)
+						
+						stream := VideoStream{
+							Process: processName,
+							PID:     pid,
+							Type:    streamType,
+						}
+						v.ActiveStreams = append(v.ActiveStreams, stream)
+					}
+				}
+			}
+		}
+	}
+}
+
+// Новый метод для расширенного обнаружения видео потоков на macOS
+func (v *VideoInfo) detectVideoStreamsMacOS() {
+	// Поиск процессов с видео контентом
+	cmd := exec.Command("ps", "aux")
+	if output, err := cmd.Output(); err == nil {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			lowerLine := strings.ToLower(line)
+			if strings.Contains(lowerLine, "ffmpeg") || strings.Contains(lowerLine, "obs") || 
+			   strings.Contains(lowerLine, "vlc") || strings.Contains(lowerLine, "quicktime") ||
+			   strings.Contains(lowerLine, "facetime") {
+				fields := strings.Fields(line)
+				if len(fields) >= 2 {
+					pid, err := strconv.Atoi(fields[1])
+					if err == nil {
+						processName := fields[10] // typically the command name in ps aux
+						if len(processName) > 20 {
+							processName = processName[:20] + "..."
+						}
+						
+						streamType := v.determineStreamTypeMacOS(processName)
+						
+						// Avoid duplicates
+						exists := false
+						for _, stream := range v.ActiveStreams {
+							if stream.PID == pid {
+								exists = true
+								break
+							}
+						}
+						
+						if !exists {
+							stream := VideoStream{
+								Process: processName,
+								PID:     pid,
+								Type:    streamType,
+							}
+							v.ActiveStreams = append(v.ActiveStreams, stream)
 						}
 					}
 				}
@@ -628,8 +910,8 @@ func (v *VideoInfo) detectGPUEncoders() {
 }
 
 func (v *VideoInfo) detectGPUEncodersLinux() {
-	// Check NVIDIA NVENC
-	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,utilization.enc", "--format=csv,noheader,nounits").Output(); err == nil {
+	// Check NVIDIA NVENC with enhanced monitoring
+	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,utilization.enc,utilization.dec", "--format=csv,noheader,nounits").Output(); err == nil {
 		v.parseNVIDIAEncoders(string(output))
 	} else {
 		// Fallback: try basic nvidia-smi query
@@ -664,8 +946,8 @@ func (v *VideoInfo) detectGPUEncodersLinux() {
 }
 
 func (v *VideoInfo) detectGPUEncodersWindows() {
-	// Check NVIDIA NVENC
-	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,utilization.enc", "--format=csv,noheader,nounits").Output(); err == nil {
+	// Check NVIDIA NVENC with enhanced monitoring
+	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,utilization.enc,utilization.dec", "--format=csv,noheader,nounits").Output(); err == nil {
 		v.parseNVIDIAEncoders(string(output))
 	} else {
 		// Fallback: check if NVIDIA GPU exists
@@ -764,8 +1046,11 @@ func (v *VideoInfo) parseNVIDIAEncoders(output string) {
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	for _, line := range lines {
 		fields := strings.Split(line, ", ")
-		if len(fields) >= 2 {
-			util, _ := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64)
+		if len(fields) >= 3 {
+			encUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64)
+			decUtil, _ := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64)
+			util := (encUtil + decUtil) / 2.0
+			
 			encoder := VideoEncoder{
 				Name:         fmt.Sprintf("NVIDIA NVENC (%s)", strings.TrimSpace(fields[0])),
 				Type:         "hardware",
@@ -801,6 +1086,9 @@ func (v *VideoInfo) parseAMDEncoders(output string) {
 }
 
 func (v *VideoInfo) getVideoMetrics() {
+	// Enhanced metrics collection with GPU monitoring
+	v.monitorGPUUsage()
+	
 	// Set default metrics based on detected streams
 	if len(v.ActiveStreams) > 0 {
 		v.Resolution = "1920x1080"
@@ -817,6 +1105,19 @@ func (v *VideoInfo) getVideoMetrics() {
 			switch stream.Type {
 			case "encode":
 				encoding = true
+				// Use stream-specific metrics if available
+				if stream.Resolution != "" {
+					v.Resolution = stream.Resolution
+				}
+				if stream.Bitrate != "" {
+					v.Bitrate = stream.Bitrate
+				}
+				if stream.Framerate > 0 {
+					v.Framerate = stream.Framerate
+				}
+				if stream.Codec != "" {
+					v.Codec = stream.Codec
+				}
 			case "decode":
 				decoding = true
 			case "capture":
@@ -834,32 +1135,6 @@ func (v *VideoInfo) getVideoMetrics() {
 			v.EncodingStatus = "active"
 		}
 
-		// Calculate GPU utilization
-		totalUtil := 0.0
-		activeEncoders := 0
-		for _, encoder := range v.GPUEncoders {
-			if encoder.Active {
-				totalUtil += encoder.Utilization
-				activeEncoders++
-			}
-		}
-
-		// If no encoder utilization data, try to get general GPU utilization
-		if activeEncoders == 0 {
-			switch runtime.GOOS {
-			case OSLinux, OSWindows:
-				if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits").Output(); err == nil {
-					if util, err := strconv.ParseFloat(strings.TrimSpace(string(output)), 64); err == nil {
-						v.GPUUtilization = util
-					}
-				}
-			case OSDarwin:
-				// macOS doesn't have nvidia-smi by default, use alternative methods if needed
-				v.GPUUtilization = 0
-			}
-		} else {
-			v.GPUUtilization = totalUtil / float64(activeEncoders)
-		}
 	} else {
 		v.EncodingStatus = "idle"
 		v.Resolution = "N/A"
@@ -878,6 +1153,49 @@ func (v *VideoInfo) getVideoMetrics() {
 	}
 	if v.GPUUtilization > 100 {
 		v.GPUUtilization = 100.0
+	}
+}
+
+// Новый метод для мониторинга использования GPU
+func (v *VideoInfo) monitorGPUUsage() {
+	switch runtime.GOOS {
+	case OSLinux, OSWindows:
+		// NVIDIA GPU monitoring
+		if output, err := exec.Command("nvidia-smi", "--query-gpu=utilization.gpu,memory.used,memory.total", "--format=csv,noheader,nounits").Output(); err == nil {
+			lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+			for _, line := range lines {
+				fields := strings.Split(line, ", ")
+				if len(fields) >= 1 {
+					if util, err := strconv.ParseFloat(strings.TrimSpace(fields[0]), 64); err == nil {
+						v.GPUUtilization = util
+						break
+					}
+				}
+			}
+		}
+	case OSDarwin:
+		// macOS GPU monitoring - используем системные утилиты
+		if output, err := exec.Command("ioreg", "-l").Output(); err == nil {
+			// Простой анализ вывода ioreg для определения активности GPU
+			if strings.Contains(string(output), "GPU") {
+				v.GPUUtilization = 10.0 // базовое значение для macOS
+			}
+		}
+	}
+
+	// Если не удалось получить данные через специфичные команды, используем данные энкодеров
+	if v.GPUUtilization == 0 {
+		totalUtil := 0.0
+		activeEncoders := 0
+		for _, encoder := range v.GPUEncoders {
+			if encoder.Active {
+				totalUtil += encoder.Utilization
+				activeEncoders++
+			}
+		}
+		if activeEncoders > 0 {
+			v.GPUUtilization = totalUtil / float64(activeEncoders)
+		}
 	}
 }
 

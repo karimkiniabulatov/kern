@@ -243,135 +243,226 @@ func getLinuxNUMANodes() []int {
 func getWindowsAllCPUInfo() ([]*CPUInfo, error) {
 	var cpus []*CPUInfo
 
-	// На Windows сложно получить информацию о нескольких физических процессорах
-	// Создаем один процессор с доступной информацией
-	cpu := &CPUInfo{
-		SocketID:     0,
-		NUMANode:     0,
-		Physical:     true,
-	}
-
-	// Получаем модель процессора
-	cmdModel := exec.Command("wmic", "cpu", "get", "Name")
-	outputModel, err := cmdModel.Output()
+	// Использование WMI для получения информации о всех процессорах
+	cmd := exec.Command("wmic", "cpu", "get", "Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed", "/format:csv")
+	output, err := cmd.Output()
 	if err == nil {
-		lines := strings.Split(string(outputModel), "\n")
-		if len(lines) >= 2 {
-			cpu.Model = strings.TrimSpace(lines[1])
-			cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
-			cpu.Model = strings.Split(cpu.Model, "@")[0]
-			cpu.Model = strings.TrimSpace(cpu.Model)
+		lines := strings.Split(string(output), "\n")
+		for i, line := range lines {
+			if i == 0 || strings.TrimSpace(line) == "" {
+				continue // Пропускаем заголовок и пустые строки
+			}
+			
+			fields := strings.Split(line, ",")
+			if len(fields) >= 5 {
+				cpu := &CPUInfo{
+					SocketID:     i - 1, // начинаем с 0
+					Physical:     true,
+					NUMANode:     0, // По умолчанию для Windows
+					Architecture: runtime.GOARCH,
+				}
+				
+				// Имя процессора
+				if len(fields) >= 2 {
+					cpu.Model = strings.TrimSpace(fields[1])
+					cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
+					cpu.Model = strings.Split(cpu.Model, "@")[0]
+					cpu.Model = strings.TrimSpace(cpu.Model)
+				}
+				
+				// Количество ядер
+				if len(fields) >= 3 {
+					cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(fields[2]))
+				}
+				
+				// Количество логических процессоров
+				if len(fields) >= 4 {
+					cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(fields[3]))
+				}
+				
+				// Максимальная частота
+				if len(fields) >= 5 {
+					if freqMHz, err := strconv.ParseFloat(strings.TrimSpace(fields[4]), 64); err == nil {
+						cpu.Frequency = fmt.Sprintf("%.0f MHz", freqMHz)
+					}
+				}
+				
+				// Получаем производителя отдельно
+				cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
+				if outputVendor, err := cmdVendor.Output(); err == nil {
+					vendorLines := strings.Split(string(outputVendor), "\n")
+					if len(vendorLines) >= 2+i {
+						cpu.Vendor = strings.TrimSpace(vendorLines[1+i])
+					}
+				}
+				
+				cpus = append(cpus, cpu)
+			}
 		}
 	}
 
-	// Получаем производителя
-	cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
-	outputVendor, err := cmdVendor.Output()
-	if err == nil {
-		lines := strings.Split(string(outputVendor), "\n")
-		if len(lines) >= 2 {
-			cpu.Vendor = strings.TrimSpace(lines[1])
+	// Если через WMI не получилось, используем старый метод как фолбэк
+	if len(cpus) == 0 {
+		cpu := &CPUInfo{
+			SocketID:     0,
+			NUMANode:     0,
+			Physical:     true,
+			Architecture: runtime.GOARCH,
 		}
-	}
 
-	// Получаем количество ядер и потоков
-	cmdCores := exec.Command("wmic", "cpu", "get", "NumberOfCores")
-	outputCores, err := cmdCores.Output()
-	if err == nil {
-		lines := strings.Split(string(outputCores), "\n")
-		if len(lines) >= 2 {
-			cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		// Получаем модель процессора
+		cmdModel := exec.Command("wmic", "cpu", "get", "Name")
+		outputModel, err := cmdModel.Output()
+		if err == nil {
+			lines := strings.Split(string(outputModel), "\n")
+			if len(lines) >= 2 {
+				cpu.Model = strings.TrimSpace(lines[1])
+				cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
+				cpu.Model = strings.Split(cpu.Model, "@")[0]
+				cpu.Model = strings.TrimSpace(cpu.Model)
+			}
 		}
-	} else {
-		cpu.Cores = runtime.NumCPU()
-	}
 
-	cmdThreads := exec.Command("wmic", "cpu", "get", "NumberOfLogicalProcessors")
-	outputThreads, err := cmdThreads.Output()
-	if err == nil {
-		lines := strings.Split(string(outputThreads), "\n")
-		if len(lines) >= 2 {
-			cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		// Получаем производителя
+		cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
+		outputVendor, err := cmdVendor.Output()
+		if err == nil {
+			lines := strings.Split(string(outputVendor), "\n")
+			if len(lines) >= 2 {
+				cpu.Vendor = strings.TrimSpace(lines[1])
+			}
 		}
-	} else {
-		cpu.Threads = runtime.NumCPU()
+
+		// Получаем количество ядер и потоков
+		cmdCores := exec.Command("wmic", "cpu", "get", "NumberOfCores")
+		outputCores, err := cmdCores.Output()
+		if err == nil {
+			lines := strings.Split(string(outputCores), "\n")
+			if len(lines) >= 2 {
+				cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+			}
+		} else {
+			cpu.Cores = runtime.NumCPU()
+		}
+
+		cmdThreads := exec.Command("wmic", "cpu", "get", "NumberOfLogicalProcessors")
+		outputThreads, err := cmdThreads.Output()
+		if err == nil {
+			lines := strings.Split(string(outputThreads), "\n")
+			if len(lines) >= 2 {
+				cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+			}
+		} else {
+			cpu.Threads = runtime.NumCPU()
+		}
+
+		// Получаем частоту
+		if freq, err := getCPUFrequency(); err == nil {
+			cpu.Frequency = freq
+		} else {
+			cpu.Frequency = "Unknown"
+		}
+
+		cpus = append(cpus, cpu)
 	}
-
-	cpu.Architecture = runtime.GOARCH
-
-	// Получаем частоту
-	if freq, err := getCPUFrequency(); err == nil {
-		cpu.Frequency = freq
-	} else {
-		cpu.Frequency = "Unknown"
-	}
-
-	cpus = append(cpus, cpu)
+	
 	return cpus, nil
 }
 
 func getDarwinAllCPUInfo() ([]*CPUInfo, error) {
 	var cpus []*CPUInfo
 
-	// На macOS обычно один процессор
-	cpu := &CPUInfo{
-		SocketID: 0,
-		NUMANode: 0,
-		Physical: true,
-	}
-
-	// Получаем модель процессора
-	cmdModel := exec.Command("sysctl", "-n", "machdep.cpu.brand_string")
-	outputModel, err := cmdModel.Output()
+	// Использование sysctl для получения детальной информации
+	cmd := exec.Command("sysctl", "-n", "hw.physicalcpu_max", "hw.logicalcpu_max", "hw.cpufrequency_max")
+	output, err := cmd.Output()
 	if err == nil {
-		cpu.Model = strings.TrimSpace(string(outputModel))
-		cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
-		cpu.Model = strings.Split(cpu.Model, "@")[0]
-		cpu.Model = strings.TrimSpace(cpu.Model)
+		fields := strings.Fields(string(output))
+		if len(fields) >= 3 {
+			physicalCPU, _ := strconv.Atoi(fields[0])
+			logicalCPU, _ := strconv.Atoi(fields[1])
+			cpufrequency, _ := strconv.ParseFloat(fields[2], 64)
+			
+			// На macOS обычно один физический процессор
+			cpu := &CPUInfo{
+				SocketID:     0,
+				NUMANode:     0,
+				Physical:     true,
+				Cores:        physicalCPU,
+				Threads:      logicalCPU,
+			}
+			
+			// Преобразуем частоту из Гц в МГц
+			if cpufrequency > 0 {
+				freqMHz := cpufrequency / 1000000
+				cpu.Frequency = fmt.Sprintf("%.0f MHz", freqMHz)
+			}
+
+			cpus = append(cpus, cpu)
+		}
 	}
 
-	// Получаем производителя
-	cmdVendor := exec.Command("sysctl", "-n", "machdep.cpu.vendor")
-	outputVendor, err := cmdVendor.Output()
-	if err == nil {
-		cpu.Vendor = strings.TrimSpace(string(outputVendor))
-	}
+	// Если через sysctl не получилось, используем старый метод как фолбэк
+	if len(cpus) == 0 {
+		cpu := &CPUInfo{
+			SocketID: 0,
+			NUMANode: 0,
+			Physical: true,
+		}
 
-	// Получаем архитектуру
-	cmdArch := exec.Command("uname", "-m")
-	outputArch, err := cmdArch.Output()
-	if err == nil {
-		cpu.Architecture = strings.TrimSpace(string(outputArch))
-	} else {
-		cpu.Architecture = runtime.GOARCH
-	}
+		// Получаем модель процессора
+		cmdModel := exec.Command("sysctl", "-n", "machdep.cpu.brand_string")
+		outputModel, err := cmdModel.Output()
+		if err == nil {
+			cpu.Model = strings.TrimSpace(string(outputModel))
+			cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
+			cpu.Model = strings.Split(cpu.Model, "@")[0]
+			cpu.Model = strings.TrimSpace(cpu.Model)
+		}
 
-	// Получаем количество ядер
-	cmdCores := exec.Command("sysctl", "-n", "hw.physicalcpu")
-	outputCores, err := cmdCores.Output()
-	if err == nil {
-		cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(string(outputCores)))
-	} else {
-		cpu.Cores = runtime.NumCPU()
-	}
+		// Получаем производителя
+		cmdVendor := exec.Command("sysctl", "-n", "machdep.cpu.vendor")
+		outputVendor, err := cmdVendor.Output()
+		if err == nil {
+			cpu.Vendor = strings.TrimSpace(string(outputVendor))
+		}
 
-	// Получаем количество потоков
-	cmdThreads := exec.Command("sysctl", "-n", "hw.logicalcpu")
-	outputThreads, err := cmdThreads.Output()
-	if err == nil {
-		cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(string(outputThreads)))
-	} else {
-		cpu.Threads = runtime.NumCPU()
-	}
+		// Получаем архитектуру
+		cmdArch := exec.Command("uname", "-m")
+		outputArch, err := cmdArch.Output()
+		if err == nil {
+			cpu.Architecture = strings.TrimSpace(string(outputArch))
+		} else {
+			cpu.Architecture = runtime.GOARCH
+		}
 
-	// Получаем частоту
-	if freq, err := getCPUFrequency(); err == nil {
-		cpu.Frequency = freq
-	} else {
-		cpu.Frequency = "Unknown"
-	}
+		// Получаем количество ядер
+		cmdCores := exec.Command("sysctl", "-n", "hw.physicalcpu")
+		outputCores, err := cmdCores.Output()
+		if err == nil {
+			cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(string(outputCores)))
+		} else {
+			cpu.Cores = runtime.NumCPU()
+		}
 
-	cpus = append(cpus, cpu)
+		// Получаем количество потоков
+		cmdThreads := exec.Command("sysctl", "-n", "hw.logicalcpu")
+		outputThreads, err := cmdThreads.Output()
+		if err == nil {
+			cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(string(outputThreads)))
+		} else {
+			cpu.Threads = runtime.NumCPU()
+		}
+
+		// Получаем частоту
+		if freq, err := getCPUFrequency(); err == nil {
+			cpu.Frequency = freq
+		} else {
+			cpu.Frequency = "Unknown"
+		}
+
+		cpus = append(cpus, cpu)
+	}
+	
 	return cpus, nil
 }
 

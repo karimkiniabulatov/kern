@@ -6,6 +6,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"runtime"
+	"os/exec"
+	"bytes"
 
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -20,28 +23,27 @@ type MemoryInfo struct {
 	SwapFree         string
 	UsagePercent     float64
 	SwapUsagePercent float64
-	Modules          []MemoryModule // Добавлено: информация о модулях памяти
+	Modules          []MemoryModule
 }
 
-// Новая структура для модулей памяти
 type MemoryModule struct {
-	Slot         string  // Слот памяти
-	Size         string  // Размер
-	Type         string  // Тип (DDR4, DDR5, etc.)
-	Speed        string  // Скорость
-	Manufacturer string  // Производитель
-	UsagePercent float64 // Загрузка
+	Slot         string
+	Size         string
+	Type         string
+	Speed        string
+	Manufacturer string
+	PartNumber   string
+	Timings      string
 }
 
 var (
 	lastMemUpdate time.Time
 	memCache      *MemoryInfo
 	memMutex      sync.RWMutex
-	cacheDuration = 500 * time.Millisecond // Кэшируем на 500ms
+	cacheDuration = 500 * time.Millisecond
 )
 
 func Summary() (*MemoryInfo, error) {
-	// Используем кэширование чтобы избежать слишком частых вызовов
 	memMutex.RLock()
 	now := time.Now()
 	if memCache != nil && now.Sub(lastMemUpdate) < cacheDuration {
@@ -50,12 +52,11 @@ func Summary() (*MemoryInfo, error) {
 	}
 	memMutex.RUnlock()
 
-	// Получаем актуальные данные
 	info, err := getMemoryInfo()
 	if err != nil {
 		return &MemoryInfo{
 			Total:            "0",
-			Used:             "0", 
+			Used:             "0",
 			Free:             "0",
 			Available:        "0",
 			SwapTotal:        "0",
@@ -63,11 +64,10 @@ func Summary() (*MemoryInfo, error) {
 			SwapFree:         "0",
 			UsagePercent:     0.0,
 			SwapUsagePercent: 0.0,
-			Modules:          []MemoryModule{}, // Инициализируем пустой срез модулей
+			Modules:          []MemoryModule{},
 		}, nil
 	}
 
-	// Обновляем кэш
 	memMutex.Lock()
 	memCache = info
 	lastMemUpdate = now
@@ -87,8 +87,12 @@ func getMemoryInfo() (*MemoryInfo, error) {
 		return nil, err
 	}
 
-	// Более точное вычисление использованной памяти
 	usedMemory := virtMem.Total - virtMem.Available
+
+	modules, err := getMemoryModules()
+	if err != nil {
+		modules = []MemoryModule{}
+	}
 
 	info := &MemoryInfo{
 		Total:            formatBytes(virtMem.Total),
@@ -100,10 +104,9 @@ func getMemoryInfo() (*MemoryInfo, error) {
 		SwapFree:         formatBytes(swapMem.Free),
 		UsagePercent:     virtMem.UsedPercent,
 		SwapUsagePercent: swapMem.UsedPercent,
-		Modules:          getMemoryModules(), // Добавлено: получаем информацию о модулях
+		Modules:          modules,
 	}
 
-	// Гарантируем корректные проценты
 	if info.UsagePercent < 0 {
 		info.UsagePercent = 0.0
 	}
@@ -114,86 +117,178 @@ func getMemoryInfo() (*MemoryInfo, error) {
 	return info, nil
 }
 
-// Новая функция для получения информации о модулях памяти
-func getMemoryModules() []MemoryModule {
-	modules := []MemoryModule{}
-    
-	// Временная реализация - определяем общее количество модулей
-	// на основе общего объема памяти
-	totalBytes, _ := mem.VirtualMemory()
-	totalGB := totalBytes.Total / (1024 * 1024 * 1024)
-    
-	// Предполагаем стандартные конфигурации
-	if totalGB <= 16 {
-		// 1-2 модуля
-		moduleSize := "8GB"
-		if totalGB <= 8 {
-			moduleSize = "4GB"
-		}
-		modules = append(modules, MemoryModule{
-			Slot:         "A1",
-			Size:         moduleSize,
-			Type:         "DDR4",
-			Speed:        "3200MHz",
-			Manufacturer: "Unknown",
-			UsagePercent: 0.0,
-		})
-	} else if totalGB <= 32 {
-		// 2-4 модуля
-		moduleSize := "8GB"
-		if totalGB > 16 {
-			moduleCount := 4
-			moduleSizeGB := totalGB / uint64(moduleCount)
-			moduleSize = fmt.Sprintf("%dGB", moduleSizeGB)
-            
-			for i := 0; i < moduleCount; i++ {
-				modules = append(modules, MemoryModule{
-					Slot:         fmt.Sprintf("A%d", i+1),
-					Size:         moduleSize,
-					Type:         "DDR4",
-					Speed:        "3200MHz",
-					Manufacturer: "Unknown",
-					UsagePercent: 0.0,
-				})
+func getMemoryModules() ([]MemoryModule, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return parseDMIDecode()
+	case "windows":
+		return parseWMICMemory()
+	case "darwin":
+		return parseMacMemory()
+	default:
+		return []MemoryModule{}, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+}
+
+func parseDMIDecode() ([]MemoryModule, error) {
+	cmd := exec.Command("dmidecode", "--type", "memory")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return []MemoryModule{}, err
+	}
+
+	output := out.String()
+	return parseDMIDecodeOutput(output), nil
+}
+
+func parseDMIDecodeOutput(output string) []MemoryModule {
+	var modules []MemoryModule
+	blocks := strings.Split(output, "Memory Device")
+	
+	for _, block := range blocks[1:] {
+		module := MemoryModule{}
+		
+		lines := strings.Split(block, "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			
+			switch {
+			case strings.HasPrefix(line, "Size:"):
+				module.Size = strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+			case strings.HasPrefix(line, "Type:"):
+				module.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
+			case strings.HasPrefix(line, "Speed:"):
+				module.Speed = strings.TrimSpace(strings.TrimPrefix(line, "Speed:"))
+			case strings.HasPrefix(line, "Manufacturer:"):
+				module.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
+			case strings.HasPrefix(line, "Part Number:"):
+				module.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+			case strings.HasPrefix(line, "Locator:"):
+				module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
 			}
 		}
-	} else {
-		// 4+ модулей
-		moduleCount := 4
-		if totalGB > 64 {
-			moduleCount = 8
-		}
-		moduleSizeGB := totalGB / uint64(moduleCount)
-		moduleSize := fmt.Sprintf("%dGB", moduleSizeGB)
-        
-		for i := 0; i < moduleCount; i++ {
-			modules = append(modules, MemoryModule{
-				Slot:         fmt.Sprintf("A%d", i+1),
-				Size:         moduleSize,
-				Type:         "DDR4",
-				Speed:        "3200MHz", 
-				Manufacturer: "Unknown",
-				UsagePercent: 0.0,
-			})
+		
+		if module.Size != "" && module.Size != "No Module Installed" {
+			modules = append(modules, module)
 		}
 	}
-    
-	// Если не удалось определить модули, создаем один общий
-	if len(modules) == 0 {
-		modules = append(modules, MemoryModule{
-			Slot:         "A1",
-			Size:         fmt.Sprintf("%dGB", totalGB),
-			Type:         "DDR4",
-			Speed:        "Unknown",
-			Manufacturer: "Unknown",
-			UsagePercent: 0.0,
-		})
-	}
-    
+	
 	return modules
 }
 
-// Остальной код без изменений...
+func parseWMICMemory() ([]MemoryModule, error) {
+	cmd := exec.Command("wmic", "memorychip", "get", 
+		"BankLabel,Capacity,MemoryType,Speed,Manufacturer,PartNumber", "/format:csv")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return []MemoryModule{}, err
+	}
+
+	output := out.String()
+	return parseWMICOutput(output), nil
+}
+
+func parseWMICOutput(output string) []MemoryModule {
+	var modules []MemoryModule
+	lines := strings.Split(output, "\n")
+	
+	for _, line := range lines[1:] {
+		fields := strings.Split(line, ",")
+		if len(fields) < 6 {
+			continue
+		}
+		
+		module := MemoryModule{
+			Slot:         strings.TrimSpace(fields[1]),
+			Manufacturer: strings.TrimSpace(fields[4]),
+			PartNumber:   strings.TrimSpace(fields[5]),
+		}
+		
+		// Parse capacity
+		if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
+			module.Size = formatBytes(capacity)
+		}
+		
+		// Parse memory type
+		if memType, err := strconv.Atoi(strings.TrimSpace(fields[3])); err == nil {
+			module.Type = memoryTypeToString(memType)
+		}
+		
+		// Parse speed
+		if speed, err := strconv.Atoi(strings.TrimSpace(fields[4])); err == nil {
+			module.Speed = fmt.Sprintf("%d MHz", speed)
+		}
+		
+		modules = append(modules, module)
+	}
+	
+	return modules
+}
+
+func memoryTypeToString(memType int) string {
+	switch memType {
+	case 20: return "DDR"
+	case 21: return "DDR2"
+	case 24: return "DDR3"
+	case 26: return "DDR4"
+	case 34: return "DDR5"
+	default: return fmt.Sprintf("Unknown (%d)", memType)
+	}
+}
+
+func parseMacMemory() ([]MemoryModule, error) {
+	cmd := exec.Command("system_profiler", "SPMemoryDataType")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return []MemoryModule{}, err
+	}
+
+	output := out.String()
+	return parseMacMemoryOutput(output), nil
+}
+
+func parseMacMemoryOutput(output string) []MemoryModule {
+	var modules []MemoryModule
+	
+	lines := strings.Split(output, "\n")
+	var currentModule MemoryModule
+	
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		
+		switch {
+		case strings.HasPrefix(line, "BANK"):
+			if currentModule.Slot != "" {
+				modules = append(modules, currentModule)
+			}
+			currentModule = MemoryModule{Slot: strings.TrimSpace(line)}
+			
+		case strings.HasPrefix(line, "Size:"):
+			currentModule.Size = strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+		case strings.HasPrefix(line, "Type:"):
+			currentModule.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
+		case strings.HasPrefix(line, "Speed:"):
+			currentModule.Speed = strings.TrimSpace(strings.TrimPrefix(line, "Speed:"))
+		case strings.HasPrefix(line, "Manufacturer:"):
+			currentModule.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
+		case strings.HasPrefix(line, "Part Number:"):
+			currentModule.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+		}
+	}
+	
+	if currentModule.Slot != "" {
+		modules = append(modules, currentModule)
+	}
+	
+	return modules
+}
+
 func formatBytes(bytes uint64) string {
 	const (
 		KB = 1024

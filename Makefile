@@ -3,6 +3,11 @@
 BINARY_NAME=kern
 VERSION=1.2.1
 
+# Добавить платформо-специфичные флаги
+BUILD_FLAGS_LINUX = -tags linux
+BUILD_FLAGS_WINDOWS = -tags windows
+BUILD_FLAGS_DARWIN = -tags darwin
+
 all: build
 
 build:
@@ -21,6 +26,16 @@ windows:
 macos:
 	@echo "Building for MacOS..."
 	GOOS=darwin GOARCH=amd64 go build -o bin/$(BINARY_NAME)-macos ./cmd/kern
+
+# Целевые платформы
+build-linux:
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS_LINUX) -o bin/kern-linux ./cmd/kern
+
+build-windows:
+	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS_WINDOWS) -o bin/kern.exe ./cmd/kern
+
+build-darwin:
+	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-macos ./cmd/kern
 
 release: linux windows macos
 	@echo "Creating release packages..."
