@@ -80,7 +80,19 @@ func init() {
 		colorable.EnableColorsStdout(nil)
 	}
 
-	// Регистрируем только альтернативные имена для общих флагов
+	// Регистрируем альтернативные имена для ВСЕХ флагов
+	flag.BoolVar(flagDisk, "disk", false, "Show disk information")
+	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
+	flag.BoolVar(flagMem, "mem", false, "Show memory information")
+	flag.BoolVar(flagNet, "net", false, "Show network information")
+	flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
+	flag.BoolVar(flagAI, "ai", false, "Show AI training information")
+	flag.BoolVar(flagMining, "mining", false, "Show mining information")
+	flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
+	flag.BoolVar(flagVideo, "video", false, "Show video stream information")
+	flag.BoolVar(flagDetailed, "detailed", false, "Show detailed CPU core information")
+	
+	// Уже существующие регистрации
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
@@ -97,41 +109,59 @@ func main() {
 		showLogo()
 		fmt.Printf("kern v%s - System Monitoring Tool\n\n", version)
 		fmt.Println("Usage: kern [OPTIONS]")
-		fmt.Println("\nOptions:")
-		flag.PrintDefaults()
+		fmt.Println("\nMonitoring Options:")
+		fmt.Println("  -d, --disk           Show disk information")
+		fmt.Println("  -c, --cpu            Show CPU information") 
+		fmt.Println("  -m, --mem            Show memory information")
+		fmt.Println("  -n, --net            Show network information")
+		fmt.Println("  -g, --gpu            Show GPU information")
+		fmt.Println("  --ai                 Show AI training information")
+		fmt.Println("  --mining             Show mining information")
+		fmt.Println("  --audio, -au         Show audio stream information")
+		fmt.Println("  --video, -vi         Show video stream information")
+		fmt.Println("  -a, --all            Show all information")
+		fmt.Println("  --detailed           Show detailed CPU core information")
+		fmt.Println("  --refresh SECONDS    Refresh interval in seconds (default: 2)")
+		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
+		
+		fmt.Println("\nLanguage Options:")
+		fmt.Println("  -l LANG              Language code (e.g., 'ru' for Russian)")
+		fmt.Println("  --download-lang LANG Download language pack")
+		fmt.Println("  --list-languages     List all supported languages")
+		
 		fmt.Println("\nRemote Monitoring:")
-		fmt.Println("  --api URL          Monitor remote server via HTTP/HTTPS API")
-		fmt.Println("  --ssh HOST         Monitor remote server via SSH")
-		fmt.Println("  -r, --remote       Start API server on default port 28126")
-		fmt.Println("  --remote-port PORT Start API server on custom port")
+		fmt.Println("  --api URL            Monitor remote server via HTTP/HTTPS API")
+		fmt.Println("  --ssh HOST           Monitor remote server via SSH")
+		fmt.Println("  -r, --remote         Start API server on default port 28126")
+		fmt.Println("  --remote-port PORT   Start API server on custom port")
+		
 		fmt.Println("\nService Management:")
-		fmt.Println("  --daemon           Start kern as a daemon service")
-		fmt.Println("  --start-service    Start the kern daemon")
-		fmt.Println("  --stop-service     Stop the kern daemon")
-		fmt.Println("  --restart-service  Restart the kern daemon")
-		fmt.Println("  --service-status   Show daemon status")
-		fmt.Println("  --enable-service   Enable auto-start on boot")
-		fmt.Println("  --disable-service  Disable auto-start on boot")
-		fmt.Println("  --ensure-running   Ensure daemon is running")
+		fmt.Println("  --daemon, --dmn      Start kern as a daemon service")
+		fmt.Println("  --start-service, --start Start the kern daemon")
+		fmt.Println("  --stop-service, --stop Stop the kern daemon")
+		fmt.Println("  --restart-service, --restart Restart the kern daemon")
+		fmt.Println("  --service-status, --status Show daemon status")
+		fmt.Println("  --enable-service     Enable auto-start on boot")
+		fmt.Println("  --disable-service    Disable auto-start on boot")
+		fmt.Println("  --ensure-running     Ensure daemon is running")
+		
+		fmt.Println("\nOther Options:")
+		fmt.Println("  -v, --version        Show version")
+		fmt.Println("  -h, --help           Show this help message")
+		
 		fmt.Println("\nExamples:")
-		fmt.Println("  kern                       # Show all system information")
-		fmt.Println("  kern --cpu --mem           # Show only CPU and memory")
-		fmt.Println("  kern --gpu --ai           # Show GPU and AI training info")
-		fmt.Println("  kern --mining             # Show mining information")
-		fmt.Println("  kern -au -vi              # Show audio and video streams")
-		fmt.Println("  kern --audio --video      # Show audio and video streams")
-		fmt.Println("  kern -d -l ru              # Disk info with Russian interface")
-		fmt.Println("  kern --refresh=5           # Update every 5 seconds")
-		fmt.Println("  kern --detailed            # Show detailed CPU core info")
-		fmt.Println("  kern -r                    # Start API server on port 28126")
-		fmt.Println("  kern --remote-port 26001   # Start API server on custom port")
+		fmt.Println("  kern --cpu --mem              # Show only CPU and memory")
+		fmt.Println("  kern --gpu --ai               # Show GPU and AI training info")
+		fmt.Println("  kern --mining                 # Show mining information")
+		fmt.Println("  kern --audio --video          # Show audio and video streams")
+		fmt.Println("  kern --disk -l ru             # Disk info with Russian interface")
+		fmt.Println("  kern --refresh=5 --detailed   # Update every 5 sec with detailed CPU")
+		fmt.Println("  kern --remote                 # Start API server on port 28126")
 		fmt.Println("  kern --api http://192.168.1.100:28126 # Monitor remote via HTTP")
-		fmt.Println("  kern --api https://example.com:28126 # Monitor remote via HTTPS")
-		fmt.Println("  kern --ssh user@host       # Monitor remote via SSH")
-		fmt.Println("  kern --download-lang fr    # Download French language pack")
-		fmt.Println("  kern --logo                # Show logo during monitoring")
-		fmt.Println("  kern --start-service       # Start kern daemon")
-		fmt.Println("  kern --service-status      # Check daemon status")
+		fmt.Println("  kern --ssh user@host          # Monitor remote via SSH")
+		fmt.Println("  kern --download-lang fr       # Download French language pack")
+		fmt.Println("  kern --start-service          # Start kern daemon")
+		fmt.Println("  kern --status                 # Check daemon status")
 	}
 
 	flag.Parse()
@@ -232,6 +262,11 @@ func main() {
 	showAudio := *flagAudio || *flagAudioShort || *flagAll
 	showVideo := *flagVideo || *flagVideoShort || *flagAll
 
+	// Добавляем поддержку длинных флагов для CPU детализации
+	if *flagDetailed {
+		cfg.DetailedCPU = true
+	}
+
 	// NEW: Smart default behavior - use last used modules if no flags provided
 	noFlagsProvided := !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && 
 	                  !*flagGPU && !*flagAI && !*flagMining && !*flagAudio && 
@@ -280,7 +315,8 @@ func main() {
 	cfg.ShowMining = showMining
 	cfg.ShowAudio = showAudio
 	cfg.ShowVideo = showVideo
-	cfg.DetailedCPU = *flagDetailed
+
+	// DetailedCPU уже установлен выше при обработке флага --detailed
 	if *flagRefresh > 0 {
 		cfg.RefreshRate = *flagRefresh
 	}

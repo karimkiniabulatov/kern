@@ -1,6 +1,7 @@
 package mem
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -116,27 +117,79 @@ func getMemoryInfo() (*MemoryInfo, error) {
 // Новая функция для получения информации о модулях памяти
 func getMemoryModules() []MemoryModule {
 	modules := []MemoryModule{}
-	
-	// Здесь будет реализация сбора данных о модулях памяти
-	// Временная заглушка с примерными данными
-	modules = append(modules, MemoryModule{
-		Slot:         "A1",
-		Size:         "8GB",
-		Type:         "DDR4",
-		Speed:        "3200MHz",
-		Manufacturer: "Samsung",
-		UsagePercent: 45.5,
-	})
-	
-	modules = append(modules, MemoryModule{
-		Slot:         "A2", 
-		Size:         "8GB",
-		Type:         "DDR4",
-		Speed:        "3200MHz",
-		Manufacturer: "Samsung",
-		UsagePercent: 42.1,
-	})
-	
+    
+	// Временная реализация - определяем общее количество модулей
+	// на основе общего объема памяти
+	totalBytes, _ := mem.VirtualMemory()
+	totalGB := totalBytes.Total / (1024 * 1024 * 1024)
+    
+	// Предполагаем стандартные конфигурации
+	if totalGB <= 16 {
+		// 1-2 модуля
+		moduleSize := "8GB"
+		if totalGB <= 8 {
+			moduleSize = "4GB"
+		}
+		modules = append(modules, MemoryModule{
+			Slot:         "A1",
+			Size:         moduleSize,
+			Type:         "DDR4",
+			Speed:        "3200MHz",
+			Manufacturer: "Unknown",
+			UsagePercent: 0.0,
+		})
+	} else if totalGB <= 32 {
+		// 2-4 модуля
+		moduleSize := "8GB"
+		if totalGB > 16 {
+			moduleCount := 4
+			moduleSizeGB := totalGB / uint64(moduleCount)
+			moduleSize = fmt.Sprintf("%dGB", moduleSizeGB)
+            
+			for i := 0; i < moduleCount; i++ {
+				modules = append(modules, MemoryModule{
+					Slot:         fmt.Sprintf("A%d", i+1),
+					Size:         moduleSize,
+					Type:         "DDR4",
+					Speed:        "3200MHz",
+					Manufacturer: "Unknown",
+					UsagePercent: 0.0,
+				})
+			}
+		}
+	} else {
+		// 4+ модулей
+		moduleCount := 4
+		if totalGB > 64 {
+			moduleCount = 8
+		}
+		moduleSizeGB := totalGB / uint64(moduleCount)
+		moduleSize := fmt.Sprintf("%dGB", moduleSizeGB)
+        
+		for i := 0; i < moduleCount; i++ {
+			modules = append(modules, MemoryModule{
+				Slot:         fmt.Sprintf("A%d", i+1),
+				Size:         moduleSize,
+				Type:         "DDR4",
+				Speed:        "3200MHz", 
+				Manufacturer: "Unknown",
+				UsagePercent: 0.0,
+			})
+		}
+	}
+    
+	// Если не удалось определить модули, создаем один общий
+	if len(modules) == 0 {
+		modules = append(modules, MemoryModule{
+			Slot:         "A1",
+			Size:         fmt.Sprintf("%dGB", totalGB),
+			Type:         "DDR4",
+			Speed:        "Unknown",
+			Manufacturer: "Unknown",
+			UsagePercent: 0.0,
+		})
+	}
+    
 	return modules
 }
 

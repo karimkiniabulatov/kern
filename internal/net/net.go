@@ -97,31 +97,53 @@ func removeDuplicateInterfaces(networks []NetworkInfo) []NetworkInfo {
 }
 
 func getNetworkInterfaces() ([]NetworkInfo, error) {
-	var interfaces []NetworkInfo
-	var err error
+    var interfaces []NetworkInfo
+    var err error
 
-	switch runtime.GOOS {
-	case "linux":
-		interfaces, err = getLinuxNetworkInterfaces()
-	case "windows":
-		interfaces, err = getWindowsNetworkInterfaces()
-	case "darwin":
-		interfaces, err = getMacOSNetworkInterfaces()
-	default:
-		interfaces, err = getFallbackNetworkInterfaces()
-	}
+    switch runtime.GOOS {
+    case "linux":
+        interfaces, err = getLinuxNetworkInterfaces()
+    case "windows":
+        interfaces, err = getWindowsNetworkInterfaces()  
+    case "darwin":
+        interfaces, err = getMacOSNetworkInterfaces()
+    default:
+        interfaces, err = getFallbackNetworkInterfaces()
+    }
 
-	// Если произошла ошибка, возвращаем fallback данные
-	if err != nil {
-		return getFallbackNetworkInterfacesWithDefaults()
-	}
+    if err != nil {
+        return getFallbackNetworkInterfacesWithDefaults()
+    }
 
-	// Гарантируем, что все поля заполнены корректными значениями
-	for i := range interfaces {
-		interfaces[i] = ensureNetworkInfoDefaults(interfaces[i])
-	}
+    // Гарантируем, что все поля заполнены корректными значениями
+    for i := range interfaces {
+        interfaces[i] = ensureNetworkInfoDefaults(interfaces[i])
+    }
 
-	return interfaces, nil
+    // ВОТ ИСПРАВЛЕНИЕ - показываем ВСЕ интерфейсы кроме полностью нерабочих
+    var filteredInterfaces []NetworkInfo
+    for _, iface := range interfaces {
+        // Включаем все интерфейсы кроме loopback и полностью нерабочих
+        if iface.ConnectionType != "Loopback" && iface.Status != "DOWN" {
+            filteredInterfaces = append(filteredInterfaces, iface)
+        }
+    }
+
+    // Если после фильтрации нет интерфейсов, показываем все кроме loopback
+    if len(filteredInterfaces) == 0 {
+        for _, iface := range interfaces {
+            if iface.ConnectionType != "Loopback" {
+                filteredInterfaces = append(filteredInterfaces, iface)
+            }
+        }
+    }
+
+    // Если все еще нет интерфейсов, возвращаем fallback
+    if len(filteredInterfaces) == 0 {
+        return getFallbackNetworkInterfacesWithDefaults()
+    }
+
+    return removeDuplicateInterfaces(filteredInterfaces), nil
 }
 
 // ensureNetworkInfoDefaults гарантирует, что все поля NetworkInfo имеют валидные значения
