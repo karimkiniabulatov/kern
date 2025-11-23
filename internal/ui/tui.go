@@ -157,46 +157,108 @@ func (t *TUI) renderLogo(startRow int) int {
 }
 
 func (t *TUI) renderCPU(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("cpu.title"))
+	row := startRow
 
-	if cpuInfo, ok := data.(*cpu.CPUInfo); ok {
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
-			t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
-			cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	if systemInfo, ok := data.(*cpu.SystemCPUInfo); ok {
+		// Общая информация о системе
+		if systemInfo.TotalSockets > 1 {
+			row = t.renderHeader(row, fmt.Sprintf("%s (%d sockets, %d cores, %d threads)", 
+				t.config.T("cpu.title"), systemInfo.TotalSockets, systemInfo.TotalCores, systemInfo.TotalThreads))
+		} else {
+			row = t.renderHeader(row, t.config.T("cpu.title"))
+		}
 
-		// Usage with graph on new line
-		usageGraph := t.createSolidGraph(cpuInfo.Usage)
-		row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", t.config.T("cpu.usage"), cpuInfo.Usage, usageGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.frequency"), cpuInfo.Frequency), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		row = t.printSimple(row, fmt.Sprintf("%s: %.2f, %.2f, %.2f",
-			t.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-
-		if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
-			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			
-			// Группируем ядра для компактного отображения (по 3 в строку)
-			coresPerLine := 3
-			for i := 0; i < len(cpuInfo.CoreUsage); i += coresPerLine {
-				line := "  "
-				for j := 0; j < coresPerLine && i+j < len(cpuInfo.CoreUsage); j++ {
-					coreIdx := i + j
-					usage := cpuInfo.CoreUsage[coreIdx]
-					
-					// Новый формат: "01: 000.1%" с фиксированной шириной
-					coreGraph := t.createSolidGraph(usage)
-					line += fmt.Sprintf(" %02d: %05.1f%%%s", coreIdx+1, usage, coreGraph)
-					
-					if j < coresPerLine-1 && i+j+1 < len(cpuInfo.CoreUsage) {
-						line += " |"
-					}
+		// Отображаем каждый процессор
+		for i, cpuInfo := range systemInfo.CPUs {
+			// Заголовок для каждого процессора, если их несколько
+			if systemInfo.TotalSockets > 1 {
+				header := fmt.Sprintf("CPU #%d", i+1)
+				if cpuInfo.NUMANode >= 0 {
+					header += fmt.Sprintf(" (NUMA node %d)", cpuInfo.NUMANode)
 				}
-				row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				row = t.renderSubHeader(row, header)
+			}
+
+			// Основная информация о процессоре
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.model"), cpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.vendor"), cpuInfo.Vendor), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			
+			if systemInfo.TotalSockets > 1 {
+				// Для многопроцессорных систем показываем детали по каждому процессору
+				row = t.printSimple(row, fmt.Sprintf("%s: %d %s, %d %s",
+					t.config.T("cpu.cores"), cpuInfo.Cores, t.config.T("cpu.cores"),
+					cpuInfo.Threads, t.config.T("cpu.threads")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			}
+
+			// Usage with graph
+			usageGraph := t.createSolidGraph(cpuInfo.Usage)
+			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", t.config.T("cpu.usage"), cpuInfo.Usage, usageGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("cpu.frequency"), cpuInfo.Frequency), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+			// Средняя загрузка показываем только для первого процессора (она системная)
+			if i == 0 {
+				row = t.printSimple(row, fmt.Sprintf("%s: %.2f, %.2f, %.2f",
+					t.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			}
+
+			// Детальная информация по ядрам
+			if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
+				if systemInfo.TotalSockets > 1 {
+					row = t.printSimple(row, fmt.Sprintf("%s (Socket %d):", t.config.T("cpu.core_usage"), i+1), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				} else {
+					row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("cpu.core_usage")), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
+				// Группируем ядра для компактного отображения (по 3 в строку)
+				coresPerLine := 3
+				for i := 0; i < len(cpuInfo.CoreUsage); i += coresPerLine {
+					line := "  "
+					for j := 0; j < coresPerLine && i+j < len(cpuInfo.CoreUsage); j++ {
+						coreIdx := i + j
+						usage := cpuInfo.CoreUsage[coreIdx]
+						
+						// Глобальный номер ядра или локальный для процессора
+						coreNumber := coreIdx
+						if systemInfo.TotalSockets > 1 {
+							// Показываем локальный номер ядра в пределах процессора
+							coreNumber = j
+						}
+						
+						coreGraph := t.createSolidGraph(usage)
+						line += fmt.Sprintf(" %02d: %05.1f%%%s", coreNumber+1, usage, coreGraph)
+						
+						if j < coresPerLine-1 && i+j+1 < len(cpuInfo.CoreUsage) {
+							line += " |"
+						}
+					}
+					row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				}
+			}
+
+			// Добавляем отступ между процессорами, если их несколько
+			if i < len(systemInfo.CPUs)-1 {
+				row++
 			}
 		}
+	} else {
+		// Фолбэк для старого формата данных
+		row = t.renderHeader(row, t.config.T("cpu.title"))
+		row = t.printSimple(row, "No CPU data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
 	}
+
 	return row + 1
+}
+
+// Новая функция для подзаголовков процессоров
+func (t *TUI) renderSubHeader(startRow int, title string) int {
+	style := tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true)
+	
+	// Create sub-header line with padding
+	header := fmt.Sprintf(" %s ", title)
+	t.printSimple(startRow, header, style)
+	
+	return startRow + 1
 }
 
 func (t *TUI) renderMemory(startRow int, data interface{}) int {
@@ -220,6 +282,19 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
 				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, 
 				memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 		}
+
+		// Добавлено: отображение информации о модулях памяти
+		if len(memInfo.Modules) > 0 {
+			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("memory.modules")), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
+			for _, module := range memInfo.Modules {
+				moduleGraph := t.createSolidGraph(module.UsagePercent)
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s %s @ %s (%s) %.1f%% %s",
+					module.Slot, module.Size, module.Type, module.Speed, 
+					module.Manufacturer, module.UsagePercent, moduleGraph), 
+					tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+			}
+		}
 	}
 	return row + 1
 }
@@ -231,14 +306,39 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 		count := 0
 		for _, d := range disks {
 			if strings.HasPrefix(d.Filesystem, "/dev/") && count < 3 {
+				// Определяем тип устройства для отображения
 				devType := t.getDeviceType(d.Filesystem, d.MountedOn)
+				
+				// Добавляем информацию о физическом/логическом типе и модели
+				deviceInfo := devType
+				if d.DiskType != "Unknown" && d.DiskType != "" {
+					deviceInfo = d.DiskType
+				}
+				
+				// Показываем физический/логический статус
+				physStatus := "Logical"
+				if d.Physical {
+					physStatus = "Physical"
+				}
+				deviceInfo = fmt.Sprintf("%s (%s)", deviceInfo, physStatus)
+
 				mountPoint := d.MountedOn
 				if mountPoint == "/" {
 					mountPoint = "ROOT"
 				}
 
-				row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", t.config.T("disk.filesystem"), d.Filesystem, devType), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				// Основная информация о файловой системе
+				row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", t.config.T("disk.filesystem"), d.Filesystem, deviceInfo), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+				// Информация о модели и серийном номере, если доступна
+				if d.Model != "Unknown" && d.Model != "" {
+					modelInfo := fmt.Sprintf("Model: %s", d.Model)
+					if d.Serial != "Unknown" && d.Serial != "" {
+						modelInfo += fmt.Sprintf(" [%s]", d.Serial)
+					}
+					row = t.printSimple(row, modelInfo, tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
 
 				// Disk usage with graph
 				diskGraph := t.createSolidGraph(d.UsePercent)
@@ -256,90 +356,294 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 }
 
 func (t *TUI) renderNetwork(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("network.title"))
+	row := startRow
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
-		count := 0
-		for _, netInfo := range networks {
-			if netInfo.Status == "UP" && netInfo.Interface != "lo" && count < 2 {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		// Main header with device count
+		deviceLabel := t.config.T("network.title")
+		if len(networks) > 1 {
+			deviceLabel = fmt.Sprintf("%s (%d interfaces)", deviceLabel, len(networks))
+		}
+		row = t.renderHeader(row, deviceLabel)
 
-				// Activity with graph
-				activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+		// Render each network interface with numbering
+		for i, netInfo := range networks {
+			// Add sub-header for each interface if multiple devices
+			if len(networks) > 1 {
+				interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
+				row = t.renderSubHeader(row, interfaceHeader)
+			}
 
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s↑", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			// Основная информация об интерфейсе
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			
+			// Физический/виртуальный статус
+			physStatus := "Virtual"
+			if netInfo.IsPhysical {
+				physStatus = "Physical"
+			}
+			row = t.printSimple(row, fmt.Sprintf("Type: %s (%s)", physStatus, netInfo.Driver), tcell.StyleDefault.Foreground(tcell.ColorGray))
 
-				count++
-				if count < 2 {
-					row++
-				}
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+			// Статус интерфейса
+			statusColor := tcell.ColorRed
+			if netInfo.Status == "UP" {
+				statusColor = tcell.ColorGreen
+			} else if netInfo.Status == "UNKNOWN" {
+				statusColor = tcell.ColorYellow
+			}
+			row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
+
+			// MTU information
+			if netInfo.MTU > 0 {
+				row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
+			}
+
+			// Тип соединения с ASCII обозначением
+			connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+				t.config.T("network.connection_type"), connectionLabel), 
+				tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
+
+			// Технология и максимальная скорость
+			row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
+				t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+			// Сила сигнала для беспроводных соединений
+			if netInfo.ConnectionType == "Wi-Fi" && netInfo.SignalStrength > 0 {
+				signalGraph := t.createSolidGraph(netInfo.SignalStrength)
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+					t.config.T("network.signal_strength"), netInfo.SignalStrength, signalGraph), 
+					tcell.StyleDefault.Foreground(tcell.ColorGreen))
+			}
+
+			// Активность сети с графиком
+			activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
+			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+
+			// Скорость передачи данных
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+			// Добавляем отступ между интерфейсами, если их несколько
+			if i < len(networks)-1 {
+				row++
 			}
 		}
+	} else {
+		// Fallback если данные не соответствуют ожидаемому формату
+		row = t.renderHeader(row, t.config.T("network.title"))
+		row = t.printSimple(row, "No network data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
 	}
 	return row + 1
 }
 
-// GPU rendering function
+// getConnectionLabel возвращает ASCII обозначение для типа соединения
+func (t *TUI) getConnectionLabel(connectionType string) string {
+	switch connectionType {
+	case "Ethernet":
+		return "[ETH] Ethernet"
+	case "Wi-Fi":
+		return "[WLAN] Wi-Fi" 
+	case "Bluetooth":
+		return "[BT] Bluetooth"
+	case "Cellular":
+		return "[MOB] Cellular"
+	case "VPN":
+		return "[VPN] VPN"
+	case "Bridge":
+		return "[BRG] Bridge"
+	case "Virtual":
+		return "[VIRT] Virtual"
+	case "Loopback":
+		return "[LO] Loopback"
+	default:
+		return "[NET] " + connectionType
+	}
+}
+
+// getConnectionColor возвращает цвет для типа соединения
+func (t *TUI) getConnectionColor(connectionType string) tcell.Color {
+	switch connectionType {
+	case "Ethernet":
+		return tcell.ColorBlue
+	case "Wi-Fi":
+		return tcell.ColorGreen
+	case "Bluetooth":
+		return tcell.ColorLightBlue
+	case "Cellular":
+		return tcell.ColorYellow
+	case "VPN":
+		return tcell.ColorPurple
+	case "Bridge", "Virtual":
+		return tcell.ColorGray
+	default:
+		return tcell.ColorWhite
+	}
+}
+
+// GPU rendering function with multiple GPU support
 func (t *TUI) renderGPU(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("gpu.title"))
+	row := startRow
 
-	// Handle both *gpu.GPUInfo and error cases
+	// Handle both []*gpu.GPUInfo and *gpu.GPUInfo cases
 	switch gpuData := data.(type) {
-	case *gpu.GPUInfo:
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuData.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		
-		if gpuData.DriverVersion != "" {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuData.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	case []*gpu.GPUInfo:
+		if len(gpuData) == 0 {
+			row = t.renderHeader(row, t.config.T("gpu.title"))
+			row = t.printSimple(row, "No GPU devices found", tcell.StyleDefault.Foreground(tcell.ColorGray))
+			return row + 1
 		}
-		
-		if gpuData.GPUTemp > 0 {
-			// ГИСТОГРАММА ТЕМПЕРАТУРЫ (нормализуем к 100°C)
-			tempPercent := gpuData.GPUTemp
-			if tempPercent > 100 {
-				tempPercent = 100
+
+		// Main header with device count
+		deviceLabel := "GPU"
+		if len(gpuData) > 1 {
+			deviceLabel = fmt.Sprintf("GPU (%d devices)", len(gpuData))
+		}
+		row = t.renderHeader(row, deviceLabel)
+
+		// Render each GPU
+		for i, gpuInfo := range gpuData {
+			// Sub-header for each GPU if multiple devices
+			if len(gpuData) > 1 {
+				gpuHeader := fmt.Sprintf("GPU #%d", i+1)
+				row = t.renderSubHeader(row, gpuHeader)
 			}
-			tempGraph := t.createSolidGraph(tempPercent)
-			row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
-				t.config.T("gpu.temperature"), gpuData.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
-		}
 
-		if gpuData.Utilization > 0 {
-			// ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ
-			utilGraph := t.createSolidGraph(gpuData.Utilization)
-			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-				t.config.T("gpu.utilization"), gpuData.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-		}
-
-		if gpuData.MemoryUsed != "" && gpuData.MemoryTotal != "" {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-				t.config.T("gpu.memory"), gpuData.MemoryUsed, gpuData.MemoryTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		}
-		
-		if gpuData.PowerDraw != "" {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-				t.config.T("gpu.power"), gpuData.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
-		}
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 			
-		if gpuData.ClockCore != "" && gpuData.ClockMemory != "" {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
-				t.config.T("gpu.clock_core"), gpuData.ClockCore, 
-				t.config.T("gpu.clock_memory"), gpuData.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			if gpuInfo.DriverVersion != "" && gpuInfo.DriverVersion != "Unknown" {
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			}
+			
+			if gpuInfo.GPUTemp > 0 {
+				// Temperature histogram (normalized to 100°C)
+				tempPercent := gpuInfo.GPUTemp
+				if tempPercent > 100 {
+					tempPercent = 100
+				}
+				tempGraph := t.createSolidGraph(tempPercent)
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
+					t.config.T("gpu.temperature"), gpuInfo.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
+			}
+
+			if gpuInfo.Utilization > 0 {
+				// Utilization histogram
+				utilGraph := t.createSolidGraph(gpuInfo.Utilization)
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+					t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+			}
+
+			if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
+				// Calculate memory usage percentage for histogram
+				memUsedMB := extractMemoryMB(gpuInfo.MemoryUsed)
+				memTotalMB := extractMemoryMB(gpuInfo.MemoryTotal)
+				if memTotalMB > 0 {
+					memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
+					memGraph := t.createSolidGraph(memUsagePercent)
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
+						memUsagePercent, memGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				} else {
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+			}
+			
+			if gpuInfo.PowerDraw != "" && gpuInfo.PowerDraw != "0 W" {
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+					t.config.T("gpu.power"), gpuInfo.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+			}
+				
+			if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
+				row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
+					t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
+					t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			}
+
+			// Add spacing between GPUs if multiple devices
+			if i < len(gpuData)-1 {
+				row++
+			}
 		}
+
+	case *gpu.GPUInfo:
+		// Fallback for single GPU (legacy format)
+		row = t.renderHeader(row, t.config.T("gpu.title"))
+		row = t.renderSingleGPUInfo(row, gpuInfo)
 		
 	case map[string]interface{}:
 		// Handle error case
+		row = t.renderHeader(row, t.config.T("gpu.title"))
 		if errorMsg, exists := gpuData["error"]; exists {
 			if errorStr, ok := errorMsg.(string); ok {
 				row = t.printSimple(row, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed))
 			}
 		}
 	default:
+		row = t.renderHeader(row, t.config.T("gpu.title"))
 		row = t.printSimple(row, "No GPU data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
 	}
 	return row + 1
+}
+
+// Helper function to render single GPU info (for legacy format)
+func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
+	row := startRow
+	
+	row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	
+	if gpuInfo.DriverVersion != "" && gpuInfo.DriverVersion != "Unknown" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	}
+	
+	if gpuInfo.GPUTemp > 0 {
+		tempPercent := gpuInfo.GPUTemp
+		if tempPercent > 100 {
+			tempPercent = 100
+		}
+		tempGraph := t.createSolidGraph(tempPercent)
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
+			t.config.T("gpu.temperature"), gpuInfo.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
+	}
+
+	if gpuInfo.Utilization > 0 {
+		utilGraph := t.createSolidGraph(gpuInfo.Utilization)
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+			t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+	}
+
+	if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
+		memUsedMB := extractMemoryMB(gpuInfo.MemoryUsed)
+		memTotalMB := extractMemoryMB(gpuInfo.MemoryTotal)
+		if memTotalMB > 0 {
+			memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
+			memGraph := t.createSolidGraph(memUsagePercent)
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
+				memUsagePercent, memGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		} else {
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		}
+	}
+	
+	if gpuInfo.PowerDraw != "" && gpuInfo.PowerDraw != "0 W" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+			t.config.T("gpu.power"), gpuInfo.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+	}
+		
+	if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
+			t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
+			t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	}
+	
+	return row
 }
 
 // AI training rendering function
@@ -458,36 +762,62 @@ func (t *TUI) renderMining(startRow int, data interface{}) int {
 	return row + 1
 }
 
-// Audio rendering function
+// Audio rendering function with multiple device support
 func (t *TUI) renderAudio(startRow int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("audio.title"))
 
 	switch audioData := data.(type) {
 	case *audio.AudioInfo:
-		// Input devices
+		// Input devices with numbering
 		if len(audioData.InputDevices) > 0 {
-			row = t.printSimple(row, t.config.T("audio.input_devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			deviceLabel := t.config.T("audio.input_devices")
+			if len(audioData.InputDevices) > 1 {
+				deviceLabel = fmt.Sprintf("%s (%d devices)", deviceLabel, len(audioData.InputDevices))
+			}
+			row = t.printSimple(row, deviceLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
 			for i, device := range audioData.InputDevices {
-				if i >= 2 { // Limit to 2 devices for space
-					break
+				// Add device numbering if multiple devices
+				if len(audioData.InputDevices) > 1 {
+					deviceHeader := fmt.Sprintf("Input Device #%d", i+1)
+					row = t.renderSubHeader(row, deviceHeader)
 				}
 				row = t.printSimple(row, fmt.Sprintf("  %s (%s)", device.Name, device.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				// Show additional device info if available
+				if device.Channels > 0 {
+					row = t.printSimple(row, fmt.Sprintf("    Channels: %d, Format: %s", device.Channels, device.Format), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
 			}
 		}
 
-		// Output devices
+		// Output devices with numbering
 		if len(audioData.OutputDevices) > 0 {
-			row = t.printSimple(row, t.config.T("audio.output_devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			row++ // Add spacing between sections
+			deviceLabel := t.config.T("audio.output_devices")
+			if len(audioData.OutputDevices) > 1 {
+				deviceLabel = fmt.Sprintf("%s (%d devices)", deviceLabel, len(audioData.OutputDevices))
+			}
+			row = t.printSimple(row, deviceLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
 			for i, device := range audioData.OutputDevices {
-				if i >= 2 { // Limit to 2 devices for space
-					break
+				// Add device numbering if multiple devices
+				if len(audioData.OutputDevices) > 1 {
+					deviceHeader := fmt.Sprintf("Output Device #%d", i+1)
+					row = t.renderSubHeader(row, deviceHeader)
 				}
 				row = t.printSimple(row, fmt.Sprintf("  %s (%s)", device.Name, device.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				// Show additional device info if available
+				if device.Channels > 0 {
+					row = t.printSimple(row, fmt.Sprintf("    Channels: %d, Format: %s", device.Channels, device.Format), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
 			}
 		}
 
 		// Audio levels
 		if audioData.InputLevel != 0 || audioData.OutputLevel != 0 {
+			row++ // Add spacing
 			row = t.printSimple(row, t.config.T("audio.levels"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
 			
 			if audioData.InputLevel != 0 {
@@ -509,27 +839,36 @@ func (t *TUI) renderAudio(startRow int, data interface{}) int {
 
 		// Active streams
 		if len(audioData.ActiveStreams) > 0 {
-			row = t.printSimple(row, t.config.T("audio.active_streams"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			row++ // Add spacing
+			streamLabel := t.config.T("audio.active_streams")
+			if len(audioData.ActiveStreams) > 1 {
+				streamLabel = fmt.Sprintf("%s (%d streams)", streamLabel, len(audioData.ActiveStreams))
+			}
+			row = t.printSimple(row, streamLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
 			for i, stream := range audioData.ActiveStreams {
-				if i >= 3 { // Limit to 3 streams for space
-					break
-				}
 				streamType := t.config.T("audio.playback")
 				if stream.Type == "capture" {
 					streamType = t.config.T("audio.capture")
 				}
-				row = t.printSimple(row, fmt.Sprintf("  %s: %s", streamType, stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				// Add stream numbering if multiple streams
+				if len(audioData.ActiveStreams) > 1 {
+					row = t.printSimple(row, fmt.Sprintf("  Stream #%d: %s - %s", i+1, streamType, stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				} else {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", streamType, stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				}
 			}
 		}
 
 		// Audio format info
 		if audioData.SampleRate != "" {
+			row++ // Add spacing
 			row = t.printSimple(row, fmt.Sprintf("%s: %s, %s, %s", 
 				t.config.T("audio.format"), audioData.SampleRate, audioData.BitDepth, audioData.Latency), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		}
 
 		// VU Meter simulation
 		if audioData.PeakLevel > 0 {
+			row++ // Add spacing
 			row = t.printSimple(row, t.config.T("audio.vu_meter"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
 			// Peak level with graph
 			vuGraph := t.createSolidGraph(audioData.PeakLevel)
@@ -549,68 +888,165 @@ func (t *TUI) renderAudio(startRow int, data interface{}) int {
 	return row + 1
 }
 
-// Video rendering function
+// Video rendering function with multiple device support
 func (t *TUI) renderVideo(startRow int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("video.title"))
 
 	switch videoData := data.(type) {
 	case *video.VideoInfo:
-		// Video devices
+		// Video devices with numbering
 		if len(videoData.VideoDevices) > 0 {
-			row = t.printSimple(row, t.config.T("video.devices"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			deviceLabel := t.config.T("video.devices")
+			if len(videoData.VideoDevices) > 1 {
+				deviceLabel = fmt.Sprintf("%s (%d devices)", deviceLabel, len(videoData.VideoDevices))
+			}
+			row = t.printSimple(row, deviceLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
 			for i, device := range videoData.VideoDevices {
-				if i >= 2 { // Limit to 2 devices for space
-					break
+				// Add device numbering if multiple devices
+				if len(videoData.VideoDevices) > 1 {
+					deviceHeader := fmt.Sprintf("Video Device #%d", i+1)
+					row = t.renderSubHeader(row, deviceHeader)
 				}
-				row = t.printSimple(row, fmt.Sprintf("  %s (%s)", device.Name, device.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.name"), device.Name), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.type"), device.Type), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.status"), device.Status), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				if device.Driver != "" && device.Driver != "Unknown" {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.driver"), device.Driver), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
+				
+				if len(device.Formats) > 0 {
+					formats := strings.Join(device.Formats, ", ")
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.formats"), formats), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
+				
+				// Add spacing between devices if multiple
+				if i < len(videoData.VideoDevices)-1 {
+					row++
+				}
 			}
 		}
 
-		// Active streams
+		// Active streams with numbering
 		if len(videoData.ActiveStreams) > 0 {
-			row = t.printSimple(row, t.config.T("video.active_streams"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			row++ // Add spacing between sections
+			streamLabel := t.config.T("video.active_streams")
+			if len(videoData.ActiveStreams) > 1 {
+				streamLabel = fmt.Sprintf("%s (%d streams)", streamLabel, len(videoData.ActiveStreams))
+			}
+			row = t.printSimple(row, streamLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
 			for i, stream := range videoData.ActiveStreams {
-				if i >= 3 { // Limit to 3 streams for space
-					break
+				// Add stream numbering if multiple streams
+				if len(videoData.ActiveStreams) > 1 {
+					streamHeader := fmt.Sprintf("Video Stream #%d", i+1)
+					row = t.renderSubHeader(row, streamHeader)
 				}
-				row = t.printSimple(row, fmt.Sprintf("  %s: %s", stream.Type, stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.process"), stream.Process), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.stream_type"), stream.Type), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				if stream.PID > 0 {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %d", t.config.T("video.pid"), stream.PID), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
+				
+				if stream.Device != "" {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.device"), stream.Device), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
+				
+				if stream.Resolution != "" && stream.Resolution != "N/A" {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.resolution"), stream.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
+				if stream.Framerate > 0 {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %.1f fps", t.config.T("video.frame_rate"), stream.Framerate), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
+				if stream.Bitrate != "" && stream.Bitrate != "N/A" {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.bitrate"), stream.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
+				if stream.Codec != "" && stream.Codec != "N/A" {
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.codec"), stream.Codec), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
+				// Add spacing between streams if multiple
+				if i < len(videoData.ActiveStreams)-1 {
+					row++
+				}
 			}
 		}
 
-		// GPU encoders
+		// GPU encoders with numbering
 		if len(videoData.GPUEncoders) > 0 {
-			row = t.printSimple(row, t.config.T("video.encoders"), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			row++ // Add spacing between sections
+			encoderLabel := t.config.T("video.encoders")
+			if len(videoData.GPUEncoders) > 1 {
+				encoderLabel = fmt.Sprintf("%s (%d encoders)", encoderLabel, len(videoData.GPUEncoders))
+			}
+			row = t.printSimple(row, encoderLabel, tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			
 			for i, encoder := range videoData.GPUEncoders {
-				if i >= 2 { // Limit to 2 encoders for space
-					break
+				// Add encoder numbering if multiple encoders
+				if len(videoData.GPUEncoders) > 1 {
+					encoderHeader := fmt.Sprintf("Video Encoder #%d", i+1)
+					row = t.renderSubHeader(row, encoderHeader)
 				}
+				
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.name"), encoder.Name), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.encoder_type"), encoder.Type), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				if len(encoder.Codecs) > 0 {
+					codecs := strings.Join(encoder.Codecs, ", ")
+					row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.codecs"), codecs), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+				
 				status := t.config.T("video.inactive")
 				if encoder.Active {
 					status = t.config.T("video.active")
 				}
-				row = t.printSimple(row, fmt.Sprintf("  %s (%s) - %s", encoder.Name, encoder.Type, status), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+				row = t.printSimple(row, fmt.Sprintf("  %s: %s", t.config.T("video.status"), status), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				if encoder.Utilization > 0 {
+					// Utilization histogram
+					utilGraph := t.createSolidGraph(encoder.Utilization)
+					row = t.printSimple(row, fmt.Sprintf("  %s: %.1f%% %s", 
+						t.config.T("video.utilization"), encoder.Utilization, utilGraph), 
+						tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				}
+				
+				// Add spacing between encoders if multiple
+				if i < len(videoData.GPUEncoders)-1 {
+					row++
+				}
 			}
 		}
 
-		// Encoding status
-		if videoData.EncodingStatus != "" {
-			statusColor := tcell.ColorGray
-			if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
-				statusColor = tcell.ColorGreen
-			}
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-				t.config.T("video.encoding_status"), videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor))
+		// Encoding status and metrics
+		row++ // Add spacing
+		statusColor := tcell.ColorGray
+		if videoData.EncodingStatus == "active" || videoData.EncodingStatus == "encoding" {
+			statusColor = tcell.ColorGreen
 		}
+		row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+			t.config.T("video.encoding_status"), videoData.EncodingStatus), tcell.StyleDefault.Foreground(statusColor))
 
 		// Video metrics
-		if videoData.Bitrate != "" {
+		if videoData.Bitrate != "" && videoData.Bitrate != "N/A" {
 			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
 				t.config.T("video.bitrate"), videoData.Bitrate), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		}
 
-		if videoData.Resolution != "" {
+		if videoData.Resolution != "" && videoData.Resolution != "N/A" {
 			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
 				t.config.T("video.resolution"), videoData.Resolution), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		}
+
+		if videoData.Codec != "" && videoData.Codec != "N/A" {
+			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+				t.config.T("video.codec"), videoData.Codec), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		}
 
 		// ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ GPU ДЛЯ ВИДЕО

@@ -19,6 +19,17 @@ type MemoryInfo struct {
 	SwapFree         string
 	UsagePercent     float64
 	SwapUsagePercent float64
+	Modules          []MemoryModule // Добавлено: информация о модулях памяти
+}
+
+// Новая структура для модулей памяти
+type MemoryModule struct {
+	Slot         string  // Слот памяти
+	Size         string  // Размер
+	Type         string  // Тип (DDR4, DDR5, etc.)
+	Speed        string  // Скорость
+	Manufacturer string  // Производитель
+	UsagePercent float64 // Загрузка
 }
 
 var (
@@ -51,6 +62,7 @@ func Summary() (*MemoryInfo, error) {
 			SwapFree:         "0",
 			UsagePercent:     0.0,
 			SwapUsagePercent: 0.0,
+			Modules:          []MemoryModule{}, // Инициализируем пустой срез модулей
 		}, nil
 	}
 
@@ -87,6 +99,7 @@ func getMemoryInfo() (*MemoryInfo, error) {
 		SwapFree:         formatBytes(swapMem.Free),
 		UsagePercent:     virtMem.UsedPercent,
 		SwapUsagePercent: swapMem.UsedPercent,
+		Modules:          getMemoryModules(), // Добавлено: получаем информацию о модулях
 	}
 
 	// Гарантируем корректные проценты
@@ -98,6 +111,33 @@ func getMemoryInfo() (*MemoryInfo, error) {
 	}
 
 	return info, nil
+}
+
+// Новая функция для получения информации о модулях памяти
+func getMemoryModules() []MemoryModule {
+	modules := []MemoryModule{}
+	
+	// Здесь будет реализация сбора данных о модулях памяти
+	// Временная заглушка с примерными данными
+	modules = append(modules, MemoryModule{
+		Slot:         "A1",
+		Size:         "8GB",
+		Type:         "DDR4",
+		Speed:        "3200MHz",
+		Manufacturer: "Samsung",
+		UsagePercent: 45.5,
+	})
+	
+	modules = append(modules, MemoryModule{
+		Slot:         "A2", 
+		Size:         "8GB",
+		Type:         "DDR4",
+		Speed:        "3200MHz",
+		Manufacturer: "Samsung",
+		UsagePercent: 42.1,
+	})
+	
+	return modules
 }
 
 // Остальной код без изменений...

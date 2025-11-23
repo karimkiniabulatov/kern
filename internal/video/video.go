@@ -30,7 +30,7 @@ type VideoInfo struct {
 type VideoDevice struct {
 	Name    string
 	ID      string
-	Type    string // camera/encoder/decoder
+	Type    string // camera/encoder/decoder/display/virtual
 	Formats []string
 	Status  string
 	Driver  string
@@ -178,6 +178,9 @@ func (v *VideoInfo) detectVideoDevicesLinux() {
 		}
 	}
 
+	// Detect virtual devices and encoders
+	v.detectVirtualDevicesLinux()
+
 	// Fallback for systems without cameras
 	if len(v.VideoDevices) == 0 {
 		v.addDefaultDevice()
@@ -224,6 +227,9 @@ func (v *VideoInfo) detectVideoDevicesWindows() {
 			}
 		}
 	}
+
+	// Detect virtual devices and encoders
+	v.detectVirtualDevicesWindows()
 
 	// Fallback for systems without detected devices
 	if len(v.VideoDevices) == 0 {
@@ -273,10 +279,106 @@ func (v *VideoInfo) detectVideoDevicesMacOS() {
 		}
 	}
 
+	// Detect virtual devices and encoders
+	v.detectVirtualDevicesMacOS()
+
 	// Fallback for systems without detected devices
 	if len(v.VideoDevices) == 0 {
 		v.addDefaultDevice()
 	}
+}
+
+func (v *VideoInfo) detectVirtualDevicesLinux() {
+	// Detect DRM devices
+	if output, err := exec.Command("ls", "/dev/dri/card*").Output(); err == nil {
+		cards := strings.Fields(string(output))
+		for _, card := range cards {
+			v.VideoDevices = append(v.VideoDevices, VideoDevice{
+				Name:   fmt.Sprintf("DRM Device %s", card),
+				ID:     card,
+				Type:   "drm",
+				Status: "available",
+				Driver: "DRM",
+			})
+		}
+	}
+
+	// Detect render devices
+	if output, err := exec.Command("ls", "/dev/dri/renderD*").Output(); err == nil {
+		renders := strings.Fields(string(output))
+		for _, render := range renders {
+			v.VideoDevices = append(v.VideoDevices, VideoDevice{
+				Name:   fmt.Sprintf("Render Device %s", render),
+				ID:     render,
+				Type:   "render",
+				Status: "available",
+				Driver: "DRM",
+			})
+		}
+	}
+
+	// Add virtual encoder/decoder devices
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "CPU Software Encoder",
+		Type:   "encoder",
+		Status: "available",
+		Driver: "CPU",
+	})
+	
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "CPU Software Decoder", 
+		Type:   "decoder",
+		Status: "available",
+		Driver: "CPU",
+	})
+}
+
+func (v *VideoInfo) detectVirtualDevicesWindows() {
+	// Add virtual encoder/decoder devices for Windows
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "Microsoft Media Foundation Encoder",
+		Type:   "encoder",
+		Status: "available",
+		Driver: "MF",
+	})
+	
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "Microsoft Media Foundation Decoder",
+		Type:   "decoder", 
+		Status: "available",
+		Driver: "MF",
+	})
+	
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "DirectShow Filter",
+		Type:   "filter",
+		Status: "available",
+		Driver: "DirectShow",
+	})
+}
+
+func (v *VideoInfo) detectVirtualDevicesMacOS() {
+	// Add virtual encoder/decoder devices for macOS
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "Apple VideoToolbox Encoder",
+		Type:   "encoder",
+		Status: "available",
+		Driver: "VideoToolbox",
+	})
+	
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "Apple VideoToolbox Decoder",
+		Type:   "decoder",
+		Status: "available", 
+		Driver: "VideoToolbox",
+	})
+	
+	v.VideoDevices = append(v.VideoDevices, VideoDevice{
+		Name:   "Core Media I/O Device",
+		Type:   "io",
+		Status: "available",
+		Driver: "CoreMedia",
+	})
 }
 
 func (v *VideoInfo) parseVideoFormats(deviceIndex int, output string) {

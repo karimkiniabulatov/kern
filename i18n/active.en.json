@@ -34,7 +34,12 @@
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Physical Memory",
-      "virtual": "Virtual Memory"
+      "virtual": "Virtual Memory",
+      "modules": "Memory Modules",
+      "slot": "Slot",
+      "module_type": "Type",
+      "manufacturer": "Manufacturer",
+      "memory_speed": "Speed"
     },
     "disk": {
       "title": "Disk Information",
@@ -42,7 +47,12 @@
       "size": "Size",
       "mounted": "Mounted on", 
       "usage": "Usage",
-      "storage": "Storage"
+      "storage": "Storage",
+      "physical": "Physical Disk",
+      "logical": "Logical Disk",
+      "disk_type": "Disk Type",
+      "model": "Model",
+      "serial": "Serial"
     },
     "network": {
       "title": "Network Information",
@@ -52,7 +62,16 @@
       "bytes": "bytes",
       "packets": "packets",
       "errors": "Errors",
-      "network_interfaces": "Network Interfaces"
+      "network_interfaces": "Network Interfaces",
+      "connection_type": "Connection Type",
+      "max_speed": "Max Speed",
+      "technology": "Technology",
+      "signal_strength": "Signal Strength",
+      "wired": "Wired",
+      "wireless": "Wireless",
+      "bluetooth": "Bluetooth",
+      "cellular": "Cellular",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU Information",
@@ -162,6 +181,13 @@
       "mining_detected": "Mining activity detected: %s",
       "audio_detected": "Audio streams detected: %d",
       "video_detected": "Video streams detected: %d"
+    },
+    "devices": {
+      "multiple_gpus": "GPU Devices",
+      "multiple_cpus": "CPU Processors", 
+      "multiple_audio": "Audio Devices",
+      "multiple_video": "Video Devices",
+      "device_number": "Device #%d"
     }
   }
 }

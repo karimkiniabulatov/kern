@@ -24,132 +24,136 @@ type GPUInfo struct {
 	PerformanceState string
 }
 
-func Summary() (*GPUInfo, error) {
-	info := &GPUInfo{}
+// Summary возвращает информацию о всех GPU в системе
+func Summary() ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
 	
-	// Initialize all fields with default values to ensure consistent format
-	info.Model = "Unknown"
-	info.DriverVersion = "Unknown"
-	info.GPUTemp = 0.0
-	info.MemoryTotal = "0 MB"
-	info.MemoryUsed = "0 MB"
-	info.MemoryFree = "0 MB"
-	info.Utilization = 0.0
-	info.PowerDraw = "0 W"
-	info.PowerLimit = "0 W"
-	info.FanSpeed = 0.0
-	info.ClockCore = "0 MHz"
-	info.ClockMemory = "0 MHz"
-	info.PerformanceState = "Unknown"
-
 	// Try to get NVIDIA GPU info using nvidia-smi
 	if output, err := exec.Command("nvidia-smi", "--query-gpu=name,driver_version,temperature.gpu,memory.total,memory.used,memory.free,utilization.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,performance.state", "--format=csv,noheader,nounits").Output(); err == nil {
-		if nvidiaInfo, err := parseNvidiaSMIOutput(string(output)); err == nil {
-			return nvidiaInfo, nil
+		if nvidiaGPUs, err := parseNvidiaSMIOutput(string(output)); err == nil && len(nvidiaGPUs) > 0 {
+			return nvidiaGPUs, nil
 		}
 	}
 
 	// Try AMD GPU (using rocm-smi if available)
 	if output, err := exec.Command("rocm-smi", "--showproductname", "--showtemp", "--showuse", "--showmemuse", "--showdriverversion").Output(); err == nil {
-		if amdInfo, err := parseAMDSMIOutput(string(output)); err == nil {
-			return amdInfo, nil
+		if amdGPUs, err := parseAMDSMIOutput(string(output)); err == nil && len(amdGPUs) > 0 {
+			return amdGPUs, nil
 		}
 	}
 
 	// Platform-specific fallback detection
-	if genericInfo := detectGenericGPU(); genericInfo != nil {
-		// Merge generic detection with default values
-		if genericInfo.Model != "" {
-			info.Model = genericInfo.Model
-		}
-		if genericInfo.DriverVersion != "" {
-			info.DriverVersion = genericInfo.DriverVersion
-		}
+	if genericGPUs := detectGenericGPUs(); len(genericGPUs) > 0 {
+		return genericGPUs, nil
 	}
 
-	return info, nil
+	// Return empty slice if no GPUs found
+	return gpus, fmt.Errorf("no GPU devices detected")
 }
 
-func parseNvidiaSMIOutput(output string) (*GPUInfo, error) {
+// parseNvidiaSMIOutput парсит вывод nvidia-smi для нескольких GPU
+func parseNvidiaSMIOutput(output string) ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+	
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	if len(lines) == 0 {
 		return nil, fmt.Errorf("no GPU data available")
 	}
 
-	// Take first GPU
-	fields := strings.Split(lines[0], ", ")
-	if len(fields) < 13 {
-		return nil, fmt.Errorf("insufficient GPU data")
+	for _, line := range lines {
+		fields := strings.Split(line, ", ")
+		if len(fields) < 13 {
+			continue // Пропускаем некорректные строки
+		}
+
+		info := &GPUInfo{
+			Model:            strings.TrimSpace(fields[0]),
+			DriverVersion:    strings.TrimSpace(fields[1]),
+			PerformanceState: strings.TrimSpace(fields[12]),
+		}
+
+		// Parse numeric values with fallbacks
+		if temp, err := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64); err == nil {
+			info.GPUTemp = temp
+		} else {
+			info.GPUTemp = 0.0
+		}
+		
+		info.MemoryTotal = strings.TrimSpace(fields[3]) + " MB"
+		info.MemoryUsed = strings.TrimSpace(fields[4]) + " MB" 
+		info.MemoryFree = strings.TrimSpace(fields[5]) + " MB"
+
+		if util, err := strconv.ParseFloat(strings.TrimSpace(fields[6]), 64); err == nil {
+			info.Utilization = util
+		} else {
+			info.Utilization = 0.0
+		}
+
+		info.PowerDraw = strings.TrimSpace(fields[7]) + " W"
+		info.PowerLimit = strings.TrimSpace(fields[8]) + " W"
+
+		if fan, err := strconv.ParseFloat(strings.TrimSpace(fields[9]), 64); err == nil {
+			info.FanSpeed = fan
+		} else {
+			info.FanSpeed = 0.0
+		}
+
+		info.ClockCore = strings.TrimSpace(fields[10]) + " MHz"
+		info.ClockMemory = strings.TrimSpace(fields[11]) + " MHz"
+
+		gpus = append(gpus, info)
 	}
 
-	info := &GPUInfo{
-		Model:            strings.TrimSpace(fields[0]),
-		DriverVersion:    strings.TrimSpace(fields[1]),
-		PerformanceState: strings.TrimSpace(fields[12]),
-	}
-
-	// Parse numeric values with fallbacks
-	if temp, err := strconv.ParseFloat(strings.TrimSpace(fields[2]), 64); err == nil {
-		info.GPUTemp = temp
-	} else {
-		info.GPUTemp = 0.0
-	}
-	
-	info.MemoryTotal = strings.TrimSpace(fields[3]) + " MB"
-	info.MemoryUsed = strings.TrimSpace(fields[4]) + " MB" 
-	info.MemoryFree = strings.TrimSpace(fields[5]) + " MB"
-
-	if util, err := strconv.ParseFloat(strings.TrimSpace(fields[6]), 64); err == nil {
-		info.Utilization = util
-	} else {
-		info.Utilization = 0.0
-	}
-
-	info.PowerDraw = strings.TrimSpace(fields[7]) + " W"
-	info.PowerLimit = strings.TrimSpace(fields[8]) + " W"
-
-	if fan, err := strconv.ParseFloat(strings.TrimSpace(fields[9]), 64); err == nil {
-		info.FanSpeed = fan
-	} else {
-		info.FanSpeed = 0.0
-	}
-
-	info.ClockCore = strings.TrimSpace(fields[10]) + " MHz"
-	info.ClockMemory = strings.TrimSpace(fields[11]) + " MHz"
-
-	return info, nil
+	return gpus, nil
 }
 
-func parseAMDSMIOutput(output string) (*GPUInfo, error) {
-	info := &GPUInfo{
-		Model:           "AMD GPU",
-		DriverVersion:   "Unknown",
-		GPUTemp:         0.0,
-		MemoryTotal:     "0 MB",
-		MemoryUsed:      "0 MB",
-		MemoryFree:      "0 MB",
-		Utilization:     0.0,
-		PowerDraw:       "0 W",
-		PowerLimit:      "0 W",
-		FanSpeed:        0.0,
-		ClockCore:       "0 MHz",
-		ClockMemory:     "0 MHz",
-		PerformanceState: "Unknown",
-	}
-
+// parseAMDSMIOutput парсит вывод rocm-smi для нескольких GPU
+func parseAMDSMIOutput(output string) ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+	
 	lines := strings.Split(output, "\n")
+	var currentGPU *GPUInfo
+	
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
+		
+		// Новый GPU начинается с "card"
+		if strings.HasPrefix(line, "card") {
+			if currentGPU != nil {
+				gpus = append(gpus, currentGPU)
+			}
+			currentGPU = &GPUInfo{
+				Model:           "AMD GPU",
+				DriverVersion:   "Unknown",
+				GPUTemp:         0.0,
+				MemoryTotal:     "0 MB",
+				MemoryUsed:      "0 MB",
+				MemoryFree:      "0 MB",
+				Utilization:     0.0,
+				PowerDraw:       "0 W",
+				PowerLimit:      "0 W",
+				FanSpeed:        0.0,
+				ClockCore:       "0 MHz",
+				ClockMemory:     "0 MHz",
+				PerformanceState: "Unknown",
+			}
+			continue
+		}
+
+		if currentGPU == nil {
+			continue
+		}
+
 		switch {
 		case strings.Contains(line, "Product Name"):
 			parts := strings.Split(line, ":")
 			if len(parts) > 1 {
-				info.Model = strings.TrimSpace(parts[1])
+				currentGPU.Model = strings.TrimSpace(parts[1])
 			}
 		case strings.Contains(line, "Driver version"):
 			parts := strings.Split(line, ":")
 			if len(parts) > 1 {
-				info.DriverVersion = strings.TrimSpace(parts[1])
+				currentGPU.DriverVersion = strings.TrimSpace(parts[1])
 			}
 		case strings.Contains(line, "Temperature"):
 			parts := strings.Split(line, ":")
@@ -158,7 +162,7 @@ func parseAMDSMIOutput(output string) (*GPUInfo, error) {
 				tempStr = strings.TrimSuffix(tempStr, "c")
 				tempStr = strings.TrimSuffix(tempStr, "C")
 				if temp, err := strconv.ParseFloat(strings.TrimSpace(tempStr), 64); err == nil {
-					info.GPUTemp = temp
+					currentGPU.GPUTemp = temp
 				}
 			}
 		case strings.Contains(line, "GPU use"):
@@ -166,7 +170,7 @@ func parseAMDSMIOutput(output string) (*GPUInfo, error) {
 			if len(parts) > 1 {
 				utilStr := strings.TrimSpace(strings.TrimSuffix(parts[1], "%"))
 				if util, err := strconv.ParseFloat(utilStr, 64); err == nil {
-					info.Utilization = util
+					currentGPU.Utilization = util
 				}
 			}
 		case strings.Contains(line, "Memory use"):
@@ -175,17 +179,24 @@ func parseAMDSMIOutput(output string) (*GPUInfo, error) {
 				memInfo := strings.TrimSpace(parts[1])
 				// Parse memory information like "1234 MB / 5678 MB"
 				if memParts := strings.Split(memInfo, "/"); len(memParts) == 2 {
-					info.MemoryUsed = strings.TrimSpace(memParts[0])
-					info.MemoryTotal = strings.TrimSpace(memParts[1])
+					currentGPU.MemoryUsed = strings.TrimSpace(memParts[0])
+					currentGPU.MemoryTotal = strings.TrimSpace(memParts[1])
 				}
 			}
 		}
 	}
 
-	return info, nil
+	// Добавляем последний GPU
+	if currentGPU != nil {
+		gpus = append(gpus, currentGPU)
+	}
+
+	return gpus, nil
 }
 
-func detectGenericGPU() *GPUInfo {
+// detectGenericGPUs возвращает информацию о GPU для универсального обнаружения
+func detectGenericGPUs() []*GPUInfo {
+	var gpus []*GPUInfo
 	info := &GPUInfo{
 		Model:         "",
 		DriverVersion: "Unknown",
@@ -206,7 +217,9 @@ func detectGenericGPU() *GPUInfo {
 		info.Model = "Generic GPU (No specific GPU detected)"
 	}
 
-	return info
+	// Для универсального обнаружения предполагаем одну GPU
+	gpus = append(gpus, info)
+	return gpus
 }
 
 func detectMacGPU() string {

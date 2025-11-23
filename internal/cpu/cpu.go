@@ -11,6 +11,7 @@ import (
 )
 
 type CPUInfo struct {
+	SocketID     int      // Номер сокета/процессора
 	Model        string
 	Vendor       string
 	Architecture string
@@ -22,11 +23,20 @@ type CPUInfo struct {
 	Load5        float64
 	Load15       float64
 	CoreUsage    []float64
+	NUMANode     int     // Нод NUMA
+	Physical     bool    // Физический процессор
 }
 
 type CPUStats struct {
 	Total uint64
 	Idle  uint64
+}
+
+type SystemCPUInfo struct {
+	TotalSockets int        // Общее количество сокетов
+	TotalCores   int        // Общее количество ядер
+	TotalThreads int        // Общее количество потоков
+	CPUs         []*CPUInfo // Информация по каждому процессору
 }
 
 var (
@@ -35,75 +45,357 @@ var (
 	statsMutex     sync.RWMutex
 )
 
-func Summary() (*CPUInfo, error) {
-	info := &CPUInfo{}
+func Summary() (*SystemCPUInfo, error) {
+	systemInfo := &SystemCPUInfo{
+		CPUs: make([]*CPUInfo, 0),
+	}
 	
-	// Всегда инициализировать поля, необходимые для гистограмм
-	info.Usage = 0.0
-	info.Load1 = 0.0
-	info.Load5 = 0.0
-	info.Load15 = 0.0
-	info.CoreUsage = make([]float64, 0) // Гарантируем не-nil массив
+	// Получаем информацию о всех процессорах
+	cpus, err := getAllCPUInfo()
+	if err != nil {
+		// Фолбэк: создаем один процессор с базовой информацией
+		basicCPU := &CPUInfo{
+			SocketID:     0,
+			Model:        "Unknown",
+			Vendor:       "Unknown",
+			Architecture: runtime.GOARCH,
+			Cores:        runtime.NumCPU(),
+			Threads:      runtime.NumCPU(),
+			Usage:        0.0,
+			Frequency:    "Unknown",
+			Load1:        0.0,
+			Load5:        0.0,
+			Load15:       0.0,
+			CoreUsage:    make([]float64, 0),
+			NUMANode:     0,
+			Physical:     true,
+		}
+		systemInfo.CPUs = append(systemInfo.CPUs, basicCPU)
+		systemInfo.TotalSockets = 1
+		systemInfo.TotalCores = basicCPU.Cores
+		systemInfo.TotalThreads = basicCPU.Threads
+		return systemInfo, nil
+	}
 
-	// Получаем базовую информацию
-	if model, vendor, arch, cores, threads, err := getCPUInfo(); err == nil {
-		info.Model = model
-		info.Vendor = vendor
-		info.Architecture = arch
-		info.Cores = cores
-		info.Threads = threads
+	systemInfo.CPUs = cpus
+	
+	// Считаем общую статистику
+	for _, cpu := range cpus {
+		systemInfo.TotalSockets++
+		systemInfo.TotalCores += cpu.Cores
+		systemInfo.TotalThreads += cpu.Threads
+	}
+
+	return systemInfo, nil
+}
+
+// Новая функция для получения информации о всех процессорах
+func getAllCPUInfo() ([]*CPUInfo, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return getLinuxAllCPUInfo()
+	case "windows":
+		return getWindowsAllCPUInfo()
+	case "darwin":
+		return getDarwinAllCPUInfo()
+	default:
+		return getDefaultCPUInfo()
+	}
+}
+
+func getLinuxAllCPUInfo() ([]*CPUInfo, error) {
+	var cpus []*CPUInfo
+
+	// Получаем информацию о количестве сокетов через lscpu
+	cmd := exec.Command("lscpu")
+	output, err := cmd.Output()
+	if err != nil {
+		return getDefaultCPUInfo(), nil
+	}
+
+	lines := strings.Split(string(output), "\n")
+	var sockets, coresPerSocket, threadsPerCore int
+	var model, vendor, arch string
+
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Socket(s):") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				sockets, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
+			}
+		} else if strings.HasPrefix(line, "Core(s) per socket:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				coresPerSocket, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
+			}
+		} else if strings.HasPrefix(line, "Thread(s) per core:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				threadsPerCore, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
+			}
+		} else if strings.HasPrefix(line, "Model name:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				model = strings.TrimSpace(parts[1])
+				model = strings.ReplaceAll(model, "CPU", "")
+				model = strings.Split(model, "@")[0]
+				model = strings.TrimSpace(model)
+			}
+		} else if strings.HasPrefix(line, "Vendor ID:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				vendor = strings.TrimSpace(parts[1])
+			}
+		} else if strings.HasPrefix(line, "Architecture:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				arch = strings.TrimSpace(parts[1])
+			}
+		}
+	}
+
+	// Если не удалось определить количество сокетов, используем значение по умолчанию
+	if sockets == 0 {
+		sockets = 1
+	}
+	if coresPerSocket == 0 {
+		coresPerSocket = runtime.NumCPU()
+	}
+	if threadsPerCore == 0 {
+		threadsPerCore = 1
+	}
+
+	// Получаем информацию о NUMA нодах
+	numaNodes := getLinuxNUMANodes()
+
+	// Создаем информацию для каждого сокета
+	for i := 0; i < sockets; i++ {
+		cpu := &CPUInfo{
+			SocketID:     i,
+			Model:        model,
+			Vendor:       vendor,
+			Architecture: arch,
+			Cores:        coresPerSocket,
+			Threads:      coresPerSocket * threadsPerCore,
+			Usage:        0.0,
+			NUMANode:     i % len(numaNodes), // Распределяем по нодам циклически
+			Physical:     true,
+		}
+
+		// Получаем частоту для процессора
+		if freq, err := getCPUFrequency(); err == nil {
+			cpu.Frequency = freq
+		} else {
+			cpu.Frequency = "Unknown"
+		}
+
+		// Получаем загрузку для процессора
+		if usage, err := getCPUUsage(); err == nil {
+			cpu.Usage = usage
+		}
+
+		// Получаем загрузку по ядрам для этого процессора
+		if coreUsage, err := getPerCoreUsage(); err == nil && len(coreUsage) > 0 {
+			// Распределяем ядра между процессорами
+			coresPerCPU := len(coreUsage) / sockets
+			startCore := i * coresPerCPU
+			endCore := startCore + coresPerCPU
+			if i == sockets-1 { // Последний процессор получает все оставшиеся ядра
+				endCore = len(coreUsage)
+			}
+			if startCore < len(coreUsage) {
+				cpu.CoreUsage = coreUsage[startCore:endCore]
+			}
+		}
+
+		cpus = append(cpus, cpu)
+	}
+
+	return cpus, nil
+}
+
+func getLinuxNUMANodes() []int {
+	// Проверяем наличие NUMA нод
+	nodes := []int{0} // По умолчанию одна нода
+	
+	// Пытаемся прочитать информацию о NUMA из sysfs
+	files, err := os.ReadDir("/sys/devices/system/node")
+	if err != nil {
+		return nodes
+	}
+
+	nodes = []int{}
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), "node") {
+			if nodeID, err := strconv.Atoi(strings.TrimPrefix(file.Name(), "node")); err == nil {
+				nodes = append(nodes, nodeID)
+			}
+		}
+	}
+
+	if len(nodes) == 0 {
+		return []int{0}
+	}
+
+	return nodes
+}
+
+func getWindowsAllCPUInfo() ([]*CPUInfo, error) {
+	var cpus []*CPUInfo
+
+	// На Windows сложно получить информацию о нескольких физических процессорах
+	// Создаем один процессор с доступной информацией
+	cpu := &CPUInfo{
+		SocketID:     0,
+		NUMANode:     0,
+		Physical:     true,
+	}
+
+	// Получаем модель процессора
+	cmdModel := exec.Command("wmic", "cpu", "get", "Name")
+	outputModel, err := cmdModel.Output()
+	if err == nil {
+		lines := strings.Split(string(outputModel), "\n")
+		if len(lines) >= 2 {
+			cpu.Model = strings.TrimSpace(lines[1])
+			cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
+			cpu.Model = strings.Split(cpu.Model, "@")[0]
+			cpu.Model = strings.TrimSpace(cpu.Model)
+		}
+	}
+
+	// Получаем производителя
+	cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
+	outputVendor, err := cmdVendor.Output()
+	if err == nil {
+		lines := strings.Split(string(outputVendor), "\n")
+		if len(lines) >= 2 {
+			cpu.Vendor = strings.TrimSpace(lines[1])
+		}
+	}
+
+	// Получаем количество ядер и потоков
+	cmdCores := exec.Command("wmic", "cpu", "get", "NumberOfCores")
+	outputCores, err := cmdCores.Output()
+	if err == nil {
+		lines := strings.Split(string(outputCores), "\n")
+		if len(lines) >= 2 {
+			cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		}
 	} else {
-		// Гарантируем значения по умолчанию, если реальные данные недоступны
-		info.Model = "Unknown"
-		info.Vendor = "Unknown"
-		info.Architecture = runtime.GOARCH
-		info.Cores = runtime.NumCPU()
-		info.Threads = runtime.NumCPU()
+		cpu.Cores = runtime.NumCPU()
 	}
 
-	// Получаем загрузку
-	if usage, err := getCPUUsage(); err == nil {
-		info.Usage = usage
+	cmdThreads := exec.Command("wmic", "cpu", "get", "NumberOfLogicalProcessors")
+	outputThreads, err := cmdThreads.Output()
+	if err == nil {
+		lines := strings.Split(string(outputThreads), "\n")
+		if len(lines) >= 2 {
+			cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
+		}
+	} else {
+		cpu.Threads = runtime.NumCPU()
 	}
 
-	// Получаем среднюю загрузку
-	if load1, load5, load15, err := getLoadAverage(); err == nil {
-		info.Load1 = load1
-		info.Load5 = load5
-		info.Load15 = load15
+	cpu.Architecture = runtime.GOARCH
+
+	// Получаем частоту
+	if freq, err := getCPUFrequency(); err == nil {
+		cpu.Frequency = freq
+	} else {
+		cpu.Frequency = "Unknown"
+	}
+
+	cpus = append(cpus, cpu)
+	return cpus, nil
+}
+
+func getDarwinAllCPUInfo() ([]*CPUInfo, error) {
+	var cpus []*CPUInfo
+
+	// На macOS обычно один процессор
+	cpu := &CPUInfo{
+		SocketID: 0,
+		NUMANode: 0,
+		Physical: true,
+	}
+
+	// Получаем модель процессора
+	cmdModel := exec.Command("sysctl", "-n", "machdep.cpu.brand_string")
+	outputModel, err := cmdModel.Output()
+	if err == nil {
+		cpu.Model = strings.TrimSpace(string(outputModel))
+		cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
+		cpu.Model = strings.Split(cpu.Model, "@")[0]
+		cpu.Model = strings.TrimSpace(model)
+	}
+
+	// Получаем производителя
+	cmdVendor := exec.Command("sysctl", "-n", "machdep.cpu.vendor")
+	outputVendor, err := cmdVendor.Output()
+	if err == nil {
+		cpu.Vendor = strings.TrimSpace(string(outputVendor))
+	}
+
+	// Получаем архитектуру
+	cmdArch := exec.Command("uname", "-m")
+	outputArch, err := cmdArch.Output()
+	if err == nil {
+		cpu.Architecture = strings.TrimSpace(string(outputArch))
+	} else {
+		cpu.Architecture = runtime.GOARCH
+	}
+
+	// Получаем количество ядер
+	cmdCores := exec.Command("sysctl", "-n", "hw.physicalcpu")
+	outputCores, err := cmdCores.Output()
+	if err == nil {
+		cpu.Cores, _ = strconv.Atoi(strings.TrimSpace(string(outputCores)))
+	} else {
+		cpu.Cores = runtime.NumCPU()
+	}
+
+	// Получаем количество потоков
+	cmdThreads := exec.Command("sysctl", "-n", "hw.logicalcpu")
+	outputThreads, err := cmdThreads.Output()
+	if err == nil {
+		cpu.Threads, _ = strconv.Atoi(strings.TrimSpace(string(outputThreads)))
+	} else {
+		cpu.Threads = runtime.NumCPU()
 	}
 
 	// Получаем частоту
 	if freq, err := getCPUFrequency(); err == nil {
-		info.Frequency = freq
+		cpu.Frequency = freq
 	} else {
-		info.Frequency = "Unknown"
+		cpu.Frequency = "Unknown"
 	}
 
-	// Получаем загрузку по ядрам
-	if coreUsage, err := getPerCoreUsage(); err == nil && len(coreUsage) > 0 {
-		info.CoreUsage = coreUsage
-	} else {
-		// Фолбэк: создаем массив с общим значением
-		info.CoreUsage = make([]float64, info.Cores)
-		for i := range info.CoreUsage {
-			info.CoreUsage[i] = info.Usage
-		}
-	}
-
-	// Гарантируем, что все значения в пределах 0-100%
-	for i := range info.CoreUsage {
-		if info.CoreUsage[i] < 0 {
-			info.CoreUsage[i] = 0
-		} else if info.CoreUsage[i] > 100 {
-			info.CoreUsage[i] = 100
-		}
-	}
-
-	return info, nil
+	cpus = append(cpus, cpu)
+	return cpus, nil
 }
 
-// НОВАЯ ФУНКЦИЯ: правильное получение загрузки по ядрам
+func getDefaultCPUInfo() ([]*CPUInfo, error) {
+	cpu := &CPUInfo{
+		SocketID:     0,
+		Model:        "Unknown",
+		Vendor:       "Unknown",
+		Architecture: runtime.GOARCH,
+		Cores:        runtime.NumCPU(),
+		Threads:      runtime.NumCPU(),
+		Usage:        0.0,
+		Frequency:    "Unknown",
+		Load1:        0.0,
+		Load5:        0.0,
+		Load15:       0.0,
+		CoreUsage:    make([]float64, 0),
+		NUMANode:     0,
+		Physical:     true,
+	}
+	return []*CPUInfo{cpu}, nil
+}
+
+// Остальные функции остаются без изменений...
 func getPerCoreUsage() ([]float64, error) {
 	switch runtime.GOOS {
 	case "linux":
@@ -198,177 +490,11 @@ func getLinuxPerCoreUsage() ([]float64, error) {
 
 // Заглушки для других платформ
 func getWindowsPerCoreUsage() ([]float64, error) {
-	// На Windows сложно получить загрузку по ядрам без WMI
-	// Возвращаем nil чтобы использовать фолбэк
 	return nil, fmt.Errorf("per-core usage not implemented for Windows")
 }
 
 func getDarwinPerCoreUsage() ([]float64, error) {
-	// На macOS можно использовать sysctl или top
 	return nil, fmt.Errorf("per-core usage not implemented for macOS")
-}
-
-func getCPUInfo() (string, string, string, int, int, error) {
-	switch runtime.GOOS {
-	case "linux":
-		return getLinuxCPUInfo()
-	case "windows":
-		return getWindowsCPUInfo()
-	case "darwin":
-		return getDarwinCPUInfo()
-	default:
-		return "Unknown", "Unknown", runtime.GOARCH, runtime.NumCPU(), runtime.NumCPU(), nil
-	}
-}
-
-func getLinuxCPUInfo() (string, string, string, int, int, error) {
-	cmd := exec.Command("lscpu")
-	output, err := cmd.Output()
-	if err != nil {
-		return "Unknown", "Unknown", "Unknown", runtime.NumCPU(), runtime.NumCPU(), nil
-	}
-
-	lines := strings.Split(string(output), "\n")
-	var model, vendor, arch string
-	var cores, threads int
-
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Model name:") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				model = strings.TrimSpace(parts[1])
-				model = strings.ReplaceAll(model, "CPU", "")
-				model = strings.Split(model, "@")[0]
-				model = strings.TrimSpace(model)
-			}
-		} else if strings.HasPrefix(line, "Vendor ID:") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				vendor = strings.TrimSpace(parts[1])
-			}
-		} else if strings.HasPrefix(line, "Architecture:") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				arch = strings.TrimSpace(parts[1])
-			}
-		} else if strings.HasPrefix(line, "Core(s) per socket:") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				cores, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
-			}
-		} else if strings.HasPrefix(line, "CPU(s):") {
-			parts := strings.SplitN(line, ":", 2)
-			if len(parts) == 2 {
-				threads, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
-			}
-		}
-	}
-
-	if cores == 0 {
-		cores = runtime.NumCPU()
-	}
-	if threads == 0 {
-		threads = runtime.NumCPU()
-	}
-
-	return model, vendor, arch, cores, threads, nil
-}
-
-func getWindowsCPUInfo() (string, string, string, int, int, error) {
-	// Получаем модель процессора
-	cmdModel := exec.Command("wmic", "cpu", "get", "Name")
-	outputModel, err := cmdModel.Output()
-	model := "Unknown"
-	if err == nil {
-		lines := strings.Split(string(outputModel), "\n")
-		if len(lines) >= 2 {
-			model = strings.TrimSpace(lines[1])
-			model = strings.ReplaceAll(model, "CPU", "")
-			model = strings.Split(model, "@")[0]
-			model = strings.TrimSpace(model)
-		}
-	}
-
-	// Получаем производителя
-	cmdVendor := exec.Command("wmic", "cpu", "get", "Manufacturer")
-	outputVendor, err := cmdVendor.Output()
-	vendor := "Unknown"
-	if err == nil {
-		lines := strings.Split(string(outputVendor), "\n")
-		if len(lines) >= 2 {
-			vendor = strings.TrimSpace(lines[1])
-		}
-	}
-
-	// Получаем количество ядер и потоков
-	cmdCores := exec.Command("wmic", "cpu", "get", "NumberOfCores")
-	outputCores, err := cmdCores.Output()
-	cores := runtime.NumCPU()
-	if err == nil {
-		lines := strings.Split(string(outputCores), "\n")
-		if len(lines) >= 2 {
-			cores, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
-		}
-	}
-
-	cmdThreads := exec.Command("wmic", "cpu", "get", "NumberOfLogicalProcessors")
-	outputThreads, err := cmdThreads.Output()
-	threads := runtime.NumCPU()
-	if err == nil {
-		lines := strings.Split(string(outputThreads), "\n")
-		if len(lines) >= 2 {
-			threads, _ = strconv.Atoi(strings.TrimSpace(lines[1]))
-		}
-	}
-
-	return model, vendor, runtime.GOARCH, cores, threads, nil
-}
-
-func getDarwinCPUInfo() (string, string, string, int, int, error) {
-	// Получаем модель процессора
-	cmdModel := exec.Command("sysctl", "-n", "machdep.cpu.brand_string")
-	outputModel, err := cmdModel.Output()
-	model := "Unknown"
-	if err == nil {
-		model = strings.TrimSpace(string(outputModel))
-		model = strings.ReplaceAll(model, "CPU", "")
-		model = strings.Split(model, "@")[0]
-		model = strings.TrimSpace(model)
-	}
-
-	// Получаем производителя
-	cmdVendor := exec.Command("sysctl", "-n", "machdep.cpu.vendor")
-	outputVendor, err := cmdVendor.Output()
-	vendor := "Unknown"
-	if err == nil {
-		vendor = strings.TrimSpace(string(outputVendor))
-	}
-
-	// Получаем архитектуру
-	cmdArch := exec.Command("uname", "-m")
-	outputArch, err := cmdArch.Output()
-	arch := runtime.GOARCH
-	if err == nil {
-		arch = strings.TrimSpace(string(outputArch))
-	}
-
-	// Получаем количество ядер
-	cmdCores := exec.Command("sysctl", "-n", "hw.physicalcpu")
-	outputCores, err := cmdCores.Output()
-	cores := runtime.NumCPU()
-	if err == nil {
-		cores, _ = strconv.Atoi(strings.TrimSpace(string(outputCores)))
-	}
-
-	// Получаем количество потоков
-	cmdThreads := exec.Command("sysctl", "-n", "hw.logicalcpu")
-	outputThreads, err := cmdThreads.Output()
-	threads := runtime.NumCPU()
-	if err == nil {
-		threads, _ = strconv.Atoi(strings.TrimSpace(string(outputThreads)))
-	}
-
-	return model, vendor, arch, cores, threads, nil
 }
 
 func getCPUUsage() (float64, error) {
