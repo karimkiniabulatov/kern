@@ -342,7 +342,6 @@ func (v *VideoInfo) detectVideoDevicesMacOS() {
 	if output, err := cmd.Output(); err == nil {
 		lines := strings.Split(string(output), "\n")
 		var currentDisplay string
-		var displayDetails []string
 		
 		for _, line := range lines {
 			line = strings.TrimSpace(line)

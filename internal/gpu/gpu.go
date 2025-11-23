@@ -173,7 +173,7 @@ func detectGenericIntel() []*GPUInfo {
 	case "darwin": // macOS
 		if output, err := exec.Command("system_profiler", "SPDisplaysDataType").Output(); err == nil {
 			lines := strings.Split(string(output), "\n")
-			for i, line := range lines {
+			for _, line := range lines {
 				line = strings.TrimSpace(line)
 				if strings.Contains(line, "Chipset Model:") {
 					parts := strings.Split(line, ":")
