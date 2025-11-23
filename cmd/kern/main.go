@@ -70,6 +70,9 @@ var (
 	flagEnable    = flag.Bool("enable-service", false, "Enable auto-start on boot")
 	flagDisable   = flag.Bool("disable-service", false, "Disable auto-start on boot")
 	flagEnsureRunning = flag.Bool("ensure-running", false, "Ensure daemon is running")
+	
+	// Короткая версия для detailed
+	flagDetailedShort = flag.Bool("de", false, "Show detailed CPU core information (short)")
 )
 
 const version = "1.2.1"
@@ -80,28 +83,26 @@ func init() {
 		colorable.EnableColorsStdout(nil)
 	}
 
-	// Регистрируем альтернативные имена для ВСЕХ флагов
+	// Регистрируем альтернативные имена только для тех флагов, у которых их еще нет
 	flag.BoolVar(flagDisk, "disk", false, "Show disk information")
 	flag.BoolVar(flagCPU, "cpu", false, "Show CPU information")
 	flag.BoolVar(flagMem, "mem", false, "Show memory information")
 	flag.BoolVar(flagNet, "net", false, "Show network information")
 	flag.BoolVar(flagGPU, "gpu", false, "Show GPU information")
-	flag.BoolVar(flagAI, "ai", false, "Show AI training information")
-	flag.BoolVar(flagMining, "mining", false, "Show mining information")
-	flag.BoolVar(flagAudio, "audio", false, "Show audio stream information")
-	flag.BoolVar(flagVideo, "video", false, "Show video stream information")
-	flag.BoolVar(flagDetailed, "detailed", false, "Show detailed CPU core information")
 	
-	// Уже существующие регистрации
+	// Общие флаги с альтернативными именами
 	flag.BoolVar(flagAll, "all", false, "Show all information")
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
 	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
+	
+	// Сервисные флаги с альтернативными именами
 	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
 	flag.BoolVar(flagStart, "start", false, "Start the kern daemon")
 	flag.BoolVar(flagStop, "stop", false, "Stop the kern daemon")
 	flag.BoolVar(flagRestart, "restart", false, "Restart the kern daemon")
 	flag.BoolVar(flagStatus, "status", false, "Show daemon status")
+	flag.BoolVar(flagVersion, "version", false, "Show version")
 }
 
 func main() {
@@ -120,7 +121,7 @@ func main() {
 		fmt.Println("  --audio, -au         Show audio stream information")
 		fmt.Println("  --video, -vi         Show video stream information")
 		fmt.Println("  -a, --all            Show all information")
-		fmt.Println("  --detailed           Show detailed CPU core information")
+		fmt.Println("  --detailed, -de      Show detailed CPU core information")
 		fmt.Println("  --refresh SECONDS    Refresh interval in seconds (default: 2)")
 		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
 		
@@ -165,6 +166,11 @@ func main() {
 	}
 
 	flag.Parse()
+
+	// Обрабатываем короткую версию флага detailed
+	if *flagDetailedShort {
+		*flagDetailed = true
+	}
 
 	if *flagHelp {
 		flag.Usage()
@@ -261,6 +267,7 @@ func main() {
 	showMining := *flagMining || *flagAll
 	showAudio := *flagAudio || *flagAudioShort || *flagAll
 	showVideo := *flagVideo || *flagVideoShort || *flagAll
+	showDetailed := *flagDetailed || *flagDetailedShort
 
 	// Добавляем поддержку длинных флагов для CPU детализации
 	if *flagDetailed {
@@ -330,7 +337,7 @@ func showLogo() {
  ██╗  ██╗███████╗██████╗ ███╗   ██╗
  ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║
  █████╔╝ █████╗  ██████╔╝██╔██╗ ██║
- ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║
+ ██╔═██╗ ██╔══╗  ██╔══██╗██║╚██╗██║
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
  kern v` + version + " - System Monitoring Tool\n"
