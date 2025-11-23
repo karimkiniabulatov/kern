@@ -99,7 +99,6 @@ func getAllCPUInfo() ([]*CPUInfo, error) {
     case "darwin":
         return getDarwinAllCPUInfo()
     default:
-        // ИСПРАВЛЕНИЕ: Явно возвращаем оба значения
         return getDefaultCPUInfo()
     }
 }
@@ -111,7 +110,7 @@ func getLinuxAllCPUInfo() ([]*CPUInfo, error) {
 	cmd := exec.Command("lscpu")
 	output, err := cmd.Output()
 	if err != nil {
-		return getDefaultCPUInfo(), nil
+		return getDefaultCPUInfo()
 	}
 
 	lines := strings.Split(string(output), "\n")
