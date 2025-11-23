@@ -135,56 +135,56 @@ func (v *VideoInfo) detectVideoDevices() {
 }
 
 func (v *VideoInfo) detectVideoDevicesLinux() {
-	// Try V4L2 for Linux cameras
-	if output, err := exec.Command("ls", "/dev/video*").Output(); err == nil {
-		devices := strings.Fields(string(output))
-		for _, device := range devices {
-			v.VideoDevices = append(v.VideoDevices, VideoDevice{
-				Name:   fmt.Sprintf("Camera %s", device),
-				ID:     device,
-				Type:   "camera",
-				Status: "available",
-				Driver: "V4L2",
-			})
-		}
-	}
+    // Try V4L2 for Linux cameras
+    if output, err := exec.Command("ls", "/dev/video*").Output(); err == nil {
+        devices := strings.Fields(string(output))
+        for _, device := range devices {
+            v.VideoDevices = append(v.VideoDevices, VideoDevice{
+                Name:   fmt.Sprintf("Camera %s", device),
+                ID:     device,
+                Type:   "camera",
+                Status: "available",
+                Driver: "V4L2",
+            })
+        }
+    }
 
-	// Try to get more details with v4l2-ctl
-	for i := range v.VideoDevices {
-		if output, err := exec.Command("v4l2-ctl", "--device", v.VideoDevices[i].ID, "--list-formats").Output(); err == nil {
-			v.parseVideoFormats(i, string(output))
-		}
-	}
+    // Try to get more details with v4l2-ctl
+    for i := range v.VideoDevices {
+        if output, err := exec.Command("v4l2-ctl", "--device", v.VideoDevices[i].ID, "--list-formats").Output(); err == nil {
+            v.parseVideoFormats(i, string(output))
+        }
+    }
 
-	// Try to detect displays
-	if output, err := exec.Command("xrandr", "--listmonitors").Output(); err == nil {
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
-			if strings.Contains(line, "Monitors:") {
-				continue
-			}
-			if strings.Contains(line, "+") {
-				parts := strings.Fields(line)
-				if len(parts) >= 4 {
-					v.VideoDevices = append(v.VideoDevices, VideoDevice{
-						Name:   parts[3],
-						ID:     parts[3],
-						Type:   "display",
-						Status: "active",
-						Driver: "X11",
-					})
-				}
-			}
-		}
-	}
+    // Try to detect displays
+    if output, err := exec.Command("xrandr", "--listmonitors").Output(); err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.Contains(line, "Monitors:") {
+                continue
+            }
+            if strings.Contains(line, "+") {
+                parts := strings.Fields(line)
+                if len(parts) >= 4 {
+                    v.VideoDevices = append(v.VideoDevices, VideoDevice{
+                        Name:   parts[3],
+                        ID:     parts[3],
+                        Type:   "display",
+                        Status: "active",
+                        Driver: "X11",
+                    })
+                }
+            }
+        }
+    }
 
-	// Detect virtual devices and encoders
-	v.detectVirtualDevicesLinux()
+    // Detect virtual devices and encoders
+    v.detectVirtualDevicesLinux()
 
-	// Fallback for systems without cameras
-	if len(v.VideoDevices) == 0 {
-		v.addDefaultDevice()
-	}
+    // Fallback for systems without cameras
+    if len(v.VideoDevices) == 0 {
+        v.addDefaultDevice()
+    }
 }
 
 func (v *VideoInfo) detectVideoDevicesWindows() {
