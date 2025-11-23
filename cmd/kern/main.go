@@ -267,7 +267,6 @@ func main() {
 	showMining := *flagMining || *flagAll
 	showAudio := *flagAudio || *flagAudioShort || *flagAll
 	showVideo := *flagVideo || *flagVideoShort || *flagAll
-	showDetailed := *flagDetailed || *flagDetailedShort
 
 	// Добавляем поддержку длинных флагов для CPU детализации
 	if *flagDetailed {
