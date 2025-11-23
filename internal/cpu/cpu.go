@@ -91,16 +91,17 @@ func Summary() (*SystemCPUInfo, error) {
 
 // Новая функция для получения информации о всех процессорах
 func getAllCPUInfo() ([]*CPUInfo, error) {
-	switch runtime.GOOS {
-	case "linux":
-		return getLinuxAllCPUInfo()
-	case "windows":
-		return getWindowsAllCPUInfo()
-	case "darwin":
-		return getDarwinAllCPUInfo()
-	default:
-		return getDefaultCPUInfo()
-	}
+    switch runtime.GOOS {
+    case "linux":
+        return getLinuxAllCPUInfo()
+    case "windows":
+        return getWindowsAllCPUInfo()
+    case "darwin":
+        return getDarwinAllCPUInfo()
+    default:
+        // ИСПРАВЛЕНИЕ: Явно возвращаем оба значения
+        return getDefaultCPUInfo()
+    }
 }
 
 func getLinuxAllCPUInfo() ([]*CPUInfo, error) {
