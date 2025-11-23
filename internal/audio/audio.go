@@ -567,3 +567,8 @@ func (a *AudioInfo) calculateVUMetrics() {
 		a.RMSLevel = 0
 	}
 }
+
+// ShouldSkipFilesystem - временная реализация заглушка
+func ShouldSkipFilesystem(filesystem, mountPoint string) bool {
+    return false
+}

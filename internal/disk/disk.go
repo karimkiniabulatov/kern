@@ -1,6 +1,7 @@
 package disk
 
 import (
+	"os"
 	"os/exec"
 	"regexp"
 	"runtime"

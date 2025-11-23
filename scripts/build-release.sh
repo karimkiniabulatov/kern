@@ -9,10 +9,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "Project root: $PROJECT_ROOT"
 
+# Переходим в корневую директорию проекта
+cd "$PROJECT_ROOT"
+
 # Проверяем существование main.go
-MAIN_GO="$PROJECT_ROOT/cmd/kern/main.go"
+MAIN_GO="./cmd/kern/main.go"
 if [ ! -f "$MAIN_GO" ]; then
-    echo "❌ Error: main.go not found at $MAIN_GO"
+    echo "Error: main.go not found at $MAIN_GO"
     echo "Project structure should be:"
     echo "  kern/"
     echo "  ├── cmd/"
@@ -24,7 +27,7 @@ if [ ! -f "$MAIN_GO" ]; then
     exit 1
 fi
 
-echo "✅ Found main.go at: $MAIN_GO"
+echo "Found main.go at: $MAIN_GO"
 
 # Функция для настройки Android NDK
 setup_android_ndk() {
@@ -57,7 +60,7 @@ setup_android_ndk() {
             NDK_FILE="android-ndk-${NDK_VERSION}-darwin.zip"
             ;;
         *)
-            echo "❌ Unsupported operating system: $(uname -s)"
+            echo "Unsupported operating system: $(uname -s)"
             echo "Please download Android NDK manually from:"
             echo "https://developer.android.com/ndk/downloads"
             echo "Then set ANDROID_NDK_HOME environment variable"
@@ -72,12 +75,12 @@ setup_android_ndk() {
     elif command -v curl &> /dev/null; then
         curl -L -o "$NDK_FILE" "$NDK_URL"
     else
-        echo "❌ Neither wget nor curl available. Please install one of them."
+        echo "Neither wget nor curl available. Please install one of them."
         return 1
     fi
     
     if [ ! -f "$NDK_FILE" ]; then
-        echo "❌ Failed to download Android NDK"
+        echo "Failed to download Android NDK"
         return 1
     fi
     
@@ -86,7 +89,7 @@ setup_android_ndk() {
     rm "$NDK_FILE"
     
     export ANDROID_NDK_HOME="$(pwd)/$NDK_DIR"
-    echo "✅ Android NDK setup complete: $ANDROID_NDK_HOME"
+    echo "Android NDK setup complete: $ANDROID_NDK_HOME"
 }
 
 # Функция сборки для целевой платформы
@@ -221,9 +224,6 @@ EOF
     fi
 }
 
-# Переходим в корневую директорию проекта
-cd "$PROJECT_ROOT"
-
 # Создаем директории для сборки
 echo "Creating build directories..."
 mkdir -p dist/{linux,linux-arm64,macos,windows}
@@ -238,7 +238,7 @@ build_target linux arm64 dist/linux-arm64 kern
 build_target darwin amd64 dist/macos kern
 build_target windows amd64 dist/windows kern
 
-echo "✅ Desktop builds complete!"
+echo "Desktop builds complete!"
 
 # Android сборка
 echo ""
@@ -248,7 +248,7 @@ echo "=== Building for Android ==="
 setup_android_ndk
 
 if [ $? -ne 0 ] || [ -z "$ANDROID_NDK_HOME" ]; then
-    echo "⚠️  Android NDK not available, skipping Android builds"
+    echo "Android NDK not available, skipping Android builds"
     echo "You can build Android later with:"
     echo "export ANDROID_NDK_HOME=/path/to/android-ndk"
     echo "cd scripts && ./build-release.sh"
@@ -259,7 +259,7 @@ else
     
     # Проверяем существование компиляторов
     if [ ! -f "$NDK_BIN/aarch64-linux-android21-clang" ]; then
-        echo "❌ Android compiler not found at $NDK_BIN/aarch64-linux-android21-clang"
+        echo "Android compiler not found at $NDK_BIN/aarch64-linux-android21-clang"
         echo "Please check your Android NDK installation"
         ANDROID_BUILD_SUCCESS=false
     else
@@ -293,7 +293,7 @@ else
         export CC="$NDK_BIN/i686-linux-android21-clang"
         go build -ldflags="-s -w" -o dist/kern-android-386 ./cmd/kern
         
-        echo "✅ Android builds complete!"
+        echo "Android builds complete!"
         
         # Создаем структуру пакета для Android
         echo "Creating Android package structure..."
@@ -501,26 +501,26 @@ fi
 cd "$PROJECT_ROOT"
 
 echo ""
-echo "🎉 Build complete!"
-echo "📁 Files are in: dist/"
+echo "Build complete!"
+echo "Files are in: dist/"
 
 if [ "$ANDROID_BUILD_SUCCESS" = true ]; then
     echo ""
-    echo "📱 Android builds successful:"
-    echo "  ✅ kern-android-arm64    (ARM64 devices)"
-    echo "  ✅ kern-android-arm      (ARM devices)" 
-    echo "  ✅ kern-android-amd64    (x86_64 devices)"
-    echo "  ✅ kern-android-386      (x86 devices)"
+    echo "Android builds successful:"
+    echo "  kern-android-arm64    (ARM64 devices)"
+    echo "  kern-android-arm      (ARM devices)" 
+    echo "  kern-android-amd64    (x86_64 devices)"
+    echo "  kern-android-386      (x86 devices)"
     echo ""
     echo "See dist/ANDROID-README.md for Android installation instructions"
 else
     echo ""
-    echo "⚠️  Android builds were skipped"
+    echo "Android builds were skipped"
     echo "To build for Android, ensure ANDROID_NDK_HOME is set and run again"
 fi
 
 echo ""
-echo "📦 Distribution archives created:"
+echo "Distribution archives created:"
 echo "  dist/kern-$VERSION-linux-amd64.tar.gz"
 echo "  dist/kern-$VERSION-linux-arm64.tar.gz" 
 echo "  dist/kern-$VERSION-macos-amd64.tar.gz"
@@ -528,4 +528,4 @@ echo "  dist/kern-$VERSION-windows-amd64.zip"
 [ "$ANDROID_BUILD_SUCCESS" = true ] && echo "  dist/kern-$VERSION-android-binaries.tar.gz"
 
 echo ""
-echo "🚀 Release ready for distribution!"
+echo "Release ready for distribution!"

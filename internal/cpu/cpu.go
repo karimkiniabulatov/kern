@@ -327,7 +327,7 @@ func getDarwinAllCPUInfo() ([]*CPUInfo, error) {
 		cpu.Model = strings.TrimSpace(string(outputModel))
 		cpu.Model = strings.ReplaceAll(cpu.Model, "CPU", "")
 		cpu.Model = strings.Split(cpu.Model, "@")[0]
-		cpu.Model = strings.TrimSpace(model)
+		cpu.Model = strings.TrimSpace(cpu.Model)
 	}
 
 	// Получаем производителя

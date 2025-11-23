@@ -573,7 +573,7 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 	case *gpu.GPUInfo:
 		// Fallback for single GPU (legacy format)
 		row = t.renderHeader(row, t.config.T("gpu.title"))
-		row = t.renderSingleGPUInfo(row, gpuInfo)
+		row = t.renderSingleGPUInfo(row, gpuData) // ИСПРАВЛЕНО: было gpuInfo
 		
 	case map[string]interface{}:
 		// Handle error case
