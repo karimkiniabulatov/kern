@@ -2,7 +2,7 @@
 
 ![kern Logo](https://img.shields.io/badge/kern-v1.2.1-blue)
 ![Go Version](https://img.shields.io/badge/Go-1.21+-green)
-![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%20%7C%20macOS-lightgrey)
 
 **kern** is a comprehensive, real-time system monitoring tool with a professional Terminal User Interface (TUI) and REST API. Designed for servers, desktops, and development environments.
 
@@ -236,7 +236,7 @@ Submit a pull request
 This project is licensed under the GNU GPLv3 License - see the LICENSE file for details.
 
 -----------------------------------------------------------------------------------------
-```
+
 💖 Support the Project
 
 kern is developed with ❤️ as an open-source project. 
@@ -245,8 +245,6 @@ If you find it useful and want to support its development, consider making a don
 Your support helps:
 
 🚀 Accelerate new feature development
-
-📱 Improve Android and mobile support
 
 🐛 Faster bug fixes and stability improvements
 
@@ -260,13 +258,10 @@ Bitcoin (BTC):
 
 ```text
 1GymM3w4fmbWj6K6dHydgGWYwMckCpHVAn
-```
 Ethereum (ERC20):
 
-```text
-0x78509af08ce7f9c4a34dd87612d47aceef9b534c
-```
-
+text
+0x78509af08ce7f9c4a34d87612d47aceef9b534c
 🙌 Other Ways to Support
 ⭐ Star the repository on GitHub
 
@@ -281,8 +276,6 @@ Ethereum (ERC20):
 🙏 Thank You!
 Thank you to all the contributors and users who make kern better every day! Your support, whether through code, donations, or simply using the tool, is greatly appreciated.
 
--------------------------------------------------------------------------------------------
-
 🆘 Support
 
 📖 Documentation: man kern
@@ -292,7 +285,5 @@ Thank you to all the contributors and users who make kern better every day! Your
 🌐 API Documentation: See above sections
 
 ⭐ If you find kern useful, please consider giving it a star on GitHub!
-
--------------------------------------------------------------------------------------------
 
 Enjoy monitoring your system with kern! 🎯

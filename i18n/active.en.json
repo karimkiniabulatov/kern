@@ -112,30 +112,6 @@
       "pool": "Pool",
       "not_detected": "No mining activity detected"
     },
-    "audio": {
-      "title": "Audio Stream Information",
-      "streams": "Streams",
-      "sample_rate": "Sample Rate",
-      "channels": "Channels",
-      "format": "Format",
-      "state": "State",
-      "playing": "Playing",
-      "paused": "Paused",
-      "stopped": "Stopped",
-      "no_audio": "No audio streams detected"
-    },
-    "video": {
-      "title": "Video Stream Information",
-      "streams": "Streams",
-      "resolution": "Resolution",
-      "frame_rate": "Frame Rate",
-      "codec": "Codec",
-      "state": "State",
-      "playing": "Playing",
-      "paused": "Paused",
-      "stopped": "Stopped",
-      "no_video": "No video streams detected"
-    },
     "ui": {
       "histogram": "Histogram",
       "vertical": "Vertical", 
@@ -155,8 +131,6 @@
       "gpu_only": "GPU only",
       "ai_only": "AI training only",
       "mining_only": "Mining only",
-      "audio_only": "Audio only",
-      "video_only": "Video only",
       "refresh_rate": "Refresh rate",
       "language": "Language",
       "remote": "Remote mode",
@@ -178,15 +152,11 @@
       "remote_mode": "Remote mode on port %d",
       "gpu_detected": "GPU detected: %s",
       "ai_training_detected": "AI training processes detected: %d",
-      "mining_detected": "Mining activity detected: %s",
-      "audio_detected": "Audio streams detected: %d",
-      "video_detected": "Video streams detected: %d"
+      "mining_detected": "Mining activity detected: %s"
     },
     "devices": {
       "multiple_gpus": "GPU Devices",
       "multiple_cpus": "CPU Processors", 
-      "multiple_audio": "Audio Devices",
-      "multiple_video": "Video Devices",
       "device_number": "Device #%d"
     }
   }
