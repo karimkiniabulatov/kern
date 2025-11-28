@@ -1,14 +1,14 @@
 package mem
 
 import (
+	"bytes"
 	"fmt"
+	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"runtime"
-	"os/exec"
-	"bytes"
 
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -29,11 +29,13 @@ type MemoryInfo struct {
 type MemoryModule struct {
 	Slot         string
 	Size         string
+	SizeBytes    uint64  // НОВОЕ: размер в байтах для вычислений
 	Type         string
 	Speed        string
 	Manufacturer string
 	PartNumber   string
 	Timings      string
+	UsagePercent float64 // НОВОЕ: процент использования модуля
 }
 
 var (
@@ -92,6 +94,16 @@ func getMemoryInfo() (*MemoryInfo, error) {
 	modules, err := getMemoryModules()
 	if err != nil {
 		modules = []MemoryModule{}
+	}
+
+	// НОВОЕ: Вычисляем проценты использования для каждого модуля памяти
+	totalMemoryBytes := virtMem.Total
+	for i := range modules {
+		if totalMemoryBytes > 0 && modules[i].SizeBytes > 0 {
+			modules[i].UsagePercent = float64(modules[i].SizeBytes) / float64(totalMemoryBytes) * 100
+		} else {
+			modules[i].UsagePercent = 0.0
+		}
 	}
 
 	info := &MemoryInfo{
@@ -156,7 +168,9 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
 			
 			switch {
 			case strings.HasPrefix(line, "Size:"):
-				module.Size = strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+				sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+				module.Size = sizeStr
+				module.SizeBytes = parseMemorySize(sizeStr) // НОВОЕ: парсим размер в байтах
 			case strings.HasPrefix(line, "Type:"):
 				module.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
 			case strings.HasPrefix(line, "Speed:"):
@@ -210,6 +224,7 @@ func parseWMICOutput(output string) []MemoryModule {
 		
 		// Parse capacity
 		if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
+			module.SizeBytes = capacity
 			module.Size = formatBytes(capacity)
 		}
 		
@@ -227,17 +242,6 @@ func parseWMICOutput(output string) []MemoryModule {
 	}
 	
 	return modules
-}
-
-func memoryTypeToString(memType int) string {
-	switch memType {
-	case 20: return "DDR"
-	case 21: return "DDR2"
-	case 24: return "DDR3"
-	case 26: return "DDR4"
-	case 34: return "DDR5"
-	default: return fmt.Sprintf("Unknown (%d)", memType)
-	}
 }
 
 func parseMacMemory() ([]MemoryModule, error) {
@@ -270,7 +274,9 @@ func parseMacMemoryOutput(output string) []MemoryModule {
 			currentModule = MemoryModule{Slot: strings.TrimSpace(line)}
 			
 		case strings.HasPrefix(line, "Size:"):
-			currentModule.Size = strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+			sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+			currentModule.Size = sizeStr
+			currentModule.SizeBytes = parseMemorySize(sizeStr) // НОВОЕ: парсим размер в байтах
 		case strings.HasPrefix(line, "Type:"):
 			currentModule.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
 		case strings.HasPrefix(line, "Speed:"):
@@ -287,6 +293,63 @@ func parseMacMemoryOutput(output string) []MemoryModule {
 	}
 	
 	return modules
+}
+
+// НОВАЯ ФУНКЦИЯ: Парсинг размера памяти из строки в байты
+func parseMemorySize(sizeStr string) uint64 {
+	if sizeStr == "" || sizeStr == "No Module Installed" {
+		return 0
+	}
+
+	// Удаляем пробелы и приводим к нижнему регистру
+	sizeStr = strings.ToLower(strings.TrimSpace(sizeStr))
+	
+	// Парсим числовое значение и единицу измерения
+	var value float64
+	var unit string
+	
+	// Разбираем строку типа "16 GB", "8 gb", "8192 mb" и т.д.
+	_, err := fmt.Sscanf(sizeStr, "%f %s", &value, &unit)
+	if err != nil {
+		// Пробуем парсить без пробела: "16gb", "8gb"
+		for i, char := range sizeStr {
+			if char < '0' || char > '9' {
+				if char == '.' {
+					continue
+				}
+				valueStr := sizeStr[:i]
+				unit = sizeStr[i:]
+				value, _ = strconv.ParseFloat(valueStr, 64)
+				break
+			}
+		}
+	}
+
+	// Конвертируем в байты в зависимости от единицы измерения
+	switch unit {
+	case "tb", "t":
+		return uint64(value * 1024 * 1024 * 1024 * 1024)
+	case "gb", "g":
+		return uint64(value * 1024 * 1024 * 1024)
+	case "mb", "m":
+		return uint64(value * 1024 * 1024)
+	case "kb", "k":
+		return uint64(value * 1024)
+	default:
+		// Если единица не распознана, предполагаем что это байты
+		return uint64(value)
+	}
+}
+
+func memoryTypeToString(memType int) string {
+	switch memType {
+	case 20: return "DDR"
+	case 21: return "DDR2"
+	case 24: return "DDR3"
+	case 26: return "DDR4"
+	case 34: return "DDR5"
+	default: return fmt.Sprintf("Unknown (%d)", memType)
+	}
 }
 
 func formatBytes(bytes uint64) string {

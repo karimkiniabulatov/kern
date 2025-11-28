@@ -267,11 +267,12 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
 				memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 		}
 
-		// Добавлено: отображение информации о модулях памяти
+		// ИСПРАВЛЕНО: Отображение информации о модулях памяти с процентами использования
 		if len(memInfo.Modules) > 0 {
 			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("memory.modules")), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
 			
 			for _, module := range memInfo.Modules {
+				// Используем реальное поле UsagePercent из структуры MemoryModule
 				moduleGraph := t.createSolidGraph(module.UsagePercent)
 				row = t.printSimple(row, fmt.Sprintf("  %s: %s %s @ %s (%s) %.1f%% %s",
 					module.Slot, module.Size, module.Type, module.Speed, 
