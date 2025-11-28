@@ -186,7 +186,7 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 					t.config.T("cpu.load_average"), cpuInfo.Load1, cpuInfo.Load5, cpuInfo.Load15), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 			}
 
-			// Детальная информация по ядрам
+			// Детальная информация по ядрам - ТОЛЬКО ЕСЛИ ВКЛЮЧЕН ФЛАГ
 			if t.config.DetailedCPU && len(cpuInfo.CoreUsage) > 0 {
 				if systemInfo.TotalSockets > 1 {
 					row = t.printSimple(row, fmt.Sprintf("%s (Socket %d):", t.config.T("cpu.core_usage"), i+1), tcell.StyleDefault.Foreground(tcell.ColorAqua))
@@ -644,8 +644,20 @@ func (t *TUI) renderAI(startRow int, data interface{}) int {
 			row = t.printSimple(row, fmt.Sprintf("%s: %d", t.config.T("ai.processes"), aiData.ProcessCount), tcell.StyleDefault.Foreground(tcell.ColorGreen))
 			
 			if aiData.VRAMUsage != "" && aiData.VRAMTotal != "" {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-					t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				// Вычисляем процент использования VRAM для гистограммы
+				usedMB := extractMemoryMB(aiData.VRAMUsage)
+				totalMB := extractMemoryMB(aiData.VRAMTotal)
+				if totalMB > 0 {
+					vramPercent := float64(usedMB) / float64(totalMB) * 100
+					vramGraph := t.createSolidGraph(vramPercent)
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+						t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal, 
+						vramPercent, vramGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				} else {
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+						t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
 			}
 
 			if aiData.ModelName != "" {
@@ -653,16 +665,20 @@ func (t *TUI) renderAI(startRow int, data interface{}) int {
 			}
 
 			if aiData.BatchSize > 0 {
-				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.1f samples/sec", 
+				// Гистограмма для throughput
+				throughputGraph := t.createSolidGraph(aiData.Throughput / 100.0) // Нормализуем для отображения
+				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.1f samples/sec %s", 
 					t.config.T("ai.batch_size"), aiData.BatchSize,
-					t.config.T("ai.throughput"), aiData.Throughput), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+					t.config.T("ai.throughput"), aiData.Throughput, throughputGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 
 			if aiData.Epoch > 0 {
-				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.3f | %s: %.1f%%", 
+				// Гистограмма для точности
+				accuracyGraph := t.createSolidGraph(aiData.Accuracy * 100)
+				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.3f | %s: %.1f%% %s", 
 					t.config.T("ai.epoch"), aiData.Epoch,
 					t.config.T("ai.loss"), aiData.Loss,
-					t.config.T("ai.accuracy"), aiData.Accuracy*100), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+					t.config.T("ai.accuracy"), aiData.Accuracy*100, accuracyGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 
 			if aiData.TrainingTime != "" {
@@ -829,12 +845,16 @@ func (t *TUI) createSolidGraph(percent float64) string {
 
 	segments := 20
 	filled := int((percent / 100) * float64(segments))
+	
+	// Гарантируем, что при ненулевом проценте показывается хотя бы один сегмент
+	if percent > 0 && filled == 0 {
+		filled = 1
+	}
 	if filled > segments {
 		filled = segments
 	}
 
 	// Используем более совместимые символы для гистограммы
-	// █ и ░ могут иметь проблемы с отображением, используем блоки
 	graph := strings.Repeat("█", filled)  // Полный блок
 	empty := strings.Repeat("░", segments-filled) // Светлый блок
 	
