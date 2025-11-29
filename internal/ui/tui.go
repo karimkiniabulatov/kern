@@ -288,11 +288,14 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 // Форматируем информацию о модуле
                 moduleInfo := fmt.Sprintf("  %s: %s %s @ %s", module.Slot, module.Size, module.Type, module.Speed)
                 
-                // Добавляем производителя и серийный номер если доступно
+                // Добавляем производителя, номер детали и серийный номер если доступно
                 if module.Manufacturer != "" && module.Manufacturer != "Unknown" {
                     moduleInfo += fmt.Sprintf(" (%s", module.Manufacturer)
                     if module.PartNumber != "" && module.PartNumber != "Unknown" {
                         moduleInfo += fmt.Sprintf(" - %s", module.PartNumber)
+                    }
+                    if module.SerialNumber != "" && module.SerialNumber != "Unknown" {
+                        moduleInfo += fmt.Sprintf(" [%s]", module.SerialNumber)
                     }
                     moduleInfo += ")"
                 }

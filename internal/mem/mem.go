@@ -45,6 +45,7 @@ type MemoryModule struct {
 	Speed        string
 	Manufacturer string
 	PartNumber   string
+	SerialNumber string // ДОБАВЛЕНО: серийный номер
 	Timings      string
 	UsagePercent float64
 }
@@ -138,6 +139,11 @@ func getMemoryInfo() (*MemoryInfo, error) {
     }
     if usagePercent > 100 {
         usagePercent = 100.0
+    }
+
+    // Обновляем процент использования для каждого модуля памяти
+    for i := range modules {
+        modules[i].UsagePercent = calculateModuleUsage(modules[i].SizeBytes, virtMem.Total, usedMemory)
     }
 
     info := &MemoryInfo{
@@ -335,21 +341,22 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
             case strings.HasPrefix(line, "Locator:"):
                 module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
             case strings.HasPrefix(line, "Serial Number:"):
-                // Сохраняем серийный номер в отдельное поле
+                // ИСПРАВЛЕНИЕ: Правильное сохранение серийного номера
                 serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
-                if serial != "" && serial != "Unknown" && serial != "Not Specified" {
-                    module.PartNumber = serial // Используем PartNumber для серийника
+                if serial != "" && serial != "Unknown" && serial != "Not Specified" && 
+                   serial != "None" && !strings.Contains(serial, "OEM") {
+                    module.SerialNumber = serial
                 }
             }
         }
         
-        // Фильтруем только установленные модули с корректными размерами
+        // ИСПРАВЛЕНИЕ: Улучшенная фильтрация модулей памяти
         if module.Size != "" && module.Size != "No Module Installed" && 
-           module.SizeBytes > 0 && !strings.Contains(strings.ToLower(module.Size), "no") {
-            // Убедимся, что слот уникален
-            if isUniqueSlot(modules, module.Slot) {
-                // Вычисляем процент использования для модуля (на основе общего использования системы)
-                module.UsagePercent = calculateModuleUsage(module.SizeBytes)
+           !strings.Contains(strings.ToLower(module.Size), "no") &&
+           module.SizeBytes > 0 {
+            
+            // Проверяем уникальность по комбинации слот + серийный номер
+            if isUniqueModule(modules, module.Slot, module.SerialNumber) {
                 modules = append(modules, module)
             }
         }
@@ -363,41 +370,47 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
     return modules
 }
 
-// Вспомогательная функция для проверки уникальности слота
-func isUniqueSlot(modules []MemoryModule, slot string) bool {
+// НОВАЯ ФУНКЦИЯ: Проверка уникальности модуля по слоту и серийному номеру
+func isUniqueModule(modules []MemoryModule, slot string, serial string) bool {
     if slot == "" {
         return false
     }
     for _, m := range modules {
-        if m.Slot == slot {
+        if m.Slot == slot && m.SerialNumber == serial {
             return false
         }
     }
     return true
 }
 
-// Функция для расчета использования модуля (на основе общего использования системы)
-func calculateModuleUsage(moduleSize uint64) float64 {
-    // Получаем общее использование памяти системы
-    virtMem, err := mem.VirtualMemory()
-    if err != nil {
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля памяти
+func calculateModuleUsage(moduleSize uint64, totalSystemMemory uint64, usedSystemMemory uint64) float64 {
+    if totalSystemMemory == 0 || moduleSize == 0 {
         return 0.0
     }
     
-    // Если общая память системы равна сумме модулей, распределяем использование пропорционально
-    // Это упрощенная логика - в реальности нужно учитывать архитектуру памяти
-    if virtMem.Total > 0 && moduleSize > 0 {
-        // Предполагаем равномерное распределение использования по модулям
-        return virtMem.UsedPercent
-    }
-    
-    return 0.0
+    // Распределяем использование пропорционально размеру модуля
+    moduleRatio := float64(moduleSize) / float64(totalSystemMemory)
+    return (float64(usedSystemMemory) / float64(totalSystemMemory)) * 100 * moduleRatio
 }
 
 // Улучшенная функция для альтернативного получения информации о памяти
 func parseAlternativeMemoryInfo() []MemoryModule {
     var modules []MemoryModule
     
+    // ИСПРАВЛЕНИЕ: Сначала пробуем dmidecode без sudo
+    cmd := exec.Command("dmidecode", "--type", "memory")
+    if output, err := cmd.Output(); err == nil {
+        return parseDMIDecodeOutput(string(output))
+    }
+    
+    // Затем пробуем с sudo
+    cmd = exec.Command("sudo", "dmidecode", "--type", "memory")
+    if output, err := cmd.Output(); err == nil {
+        return parseDMIDecodeOutput(string(output))
+    }
+    
+    // Остальная существующая логика...
     switch runtime.GOOS {
     case "linux":
         // Пробуем получить информацию из /proc/meminfo и lshw
@@ -415,7 +428,6 @@ func parseAlternativeMemoryInfo() []MemoryModule {
                             Speed: "Unknown",
                         }
                         module.SizeBytes = parseMemorySize(module.Size)
-                        module.UsagePercent = 0.0 // Будет вычислено позже
                         modules = append(modules, module)
                         moduleCount++
                     }
@@ -449,7 +461,6 @@ func parseAlternativeMemoryInfo() []MemoryModule {
                             SizeBytes: moduleSize,
                             Type:      "DDR4",
                             Speed:     "Unknown",
-                            UsagePercent: 0.0,
                         }
                         modules = append(modules, module)
                     }
@@ -483,7 +494,6 @@ func parseAlternativeMemoryInfo() []MemoryModule {
                         module.Type = memoryTypeToString(memType)
                     }
                     
-                    module.UsagePercent = 0.0
                     modules = append(modules, module)
                 }
             }
@@ -522,11 +532,7 @@ func parseWMICOutput(output string) []MemoryModule {
 			Slot:         strings.TrimSpace(fields[1]),
 			Manufacturer: strings.TrimSpace(fields[4]),
 			PartNumber:   strings.TrimSpace(fields[5]),
-		}
-		
-		// Добавляем серийный номер если есть
-		if len(fields) >= 7 && strings.TrimSpace(fields[6]) != "" {
-			module.PartNumber += " [" + strings.TrimSpace(fields[6]) + "]"
+			SerialNumber: strings.TrimSpace(fields[6]), // Добавляем серийный номер
 		}
 		
 		// Parse capacity
@@ -592,6 +598,8 @@ func parseMacMemoryOutput(output string) []MemoryModule {
 			currentModule.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
 		case strings.HasPrefix(line, "Part Number:"):
 			currentModule.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+		case strings.HasPrefix(line, "Serial Number:"):
+			currentModule.SerialNumber = strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
 		}
 	}
 	
