@@ -249,36 +249,78 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
 	row := t.renderHeader(startRow, t.config.T("memory.title"))
 
 	if memInfo, ok := data.(*mem.MemoryInfo); ok {
-		// RAM usage with detailed information
-		ramGraph := t.createSolidGraph(memInfo.UsagePercent)
+		// ОСНОВНАЯ ИНФОРМАЦИЯ О ПАМЯТИ
+		// Используем UsedBytes для точного расчета процента использования
+		totalBytes := memInfo.UsedBytes + memInfo.AvailableBytes
+		actualUsagePercent := 0.0
+		if totalBytes > 0 {
+			actualUsagePercent = float64(memInfo.UsedBytes) / float64(totalBytes) * 100
+		}
+		
+		ramGraph := t.createSolidGraph(actualUsagePercent)
 		row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
 			t.config.T("memory.ram"), memInfo.Used, memInfo.Total, 
-			memInfo.UsagePercent, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+			actualUsagePercent, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+
+		// ДЕТАЛЬНАЯ ИНФОРМАЦИЯ О ИСПОЛЬЗОВАНИИ
+		row = t.printSimple(row, fmt.Sprintf("Processes: %s | Cached: %s | Buffers: %s", 
+			memInfo.UsedByProcesses, memInfo.Cached, memInfo.Buffers), 
+			tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+		row = t.printSimple(row, fmt.Sprintf("Active: %s | Inactive: %s | Shared: %s", 
+			memInfo.Active, memInfo.Inactive, memInfo.Shared), 
+			tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
 			t.config.T("common.available"), memInfo.Available,
 			t.config.T("common.free"), memInfo.Free), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
 		if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" && memInfo.SwapTotal != "0" {
-			// Swap usage with graph
 			swapGraph := t.createSolidGraph(memInfo.SwapUsagePercent)
 			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
 				t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, 
 				memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 		}
 
-		// ИСПРАВЛЕНО: Отображение информации о модулях памяти с процентами использования
+		// ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ
 		if len(memInfo.Modules) > 0 {
-			row = t.printSimple(row, fmt.Sprintf("%s:", t.config.T("memory.modules")), tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
+			row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", t.config.T("memory.modules"), len(memInfo.Modules)), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
 			
-			for _, module := range memInfo.Modules {
+			for i, module := range memInfo.Modules {
 				// Используем реальное поле UsagePercent из структуры MemoryModule
 				moduleGraph := t.createSolidGraph(module.UsagePercent)
-				row = t.printSimple(row, fmt.Sprintf("  %s: %s %s @ %s (%s) %.1f%% %s",
-					module.Slot, module.Size, module.Type, module.Speed, 
-					module.Manufacturer, module.UsagePercent, moduleGraph), 
-					tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				
+				// Форматируем информацию о модуле
+				moduleInfo := fmt.Sprintf("  %s: %s %s @ %s", module.Slot, module.Size, module.Type, module.Speed)
+				
+				// Добавляем производителя и серийный номер если доступно
+				if module.Manufacturer != "" && module.Manufacturer != "Unknown" {
+					moduleInfo += fmt.Sprintf(" (%s", module.Manufacturer)
+					if module.PartNumber != "" && module.PartNumber != "Unknown" {
+						moduleInfo += fmt.Sprintf(" - %s", module.PartNumber)
+					}
+					moduleInfo += ")"
+				}
+				
+				// Добавляем процент использования
+				moduleInfo += fmt.Sprintf(" %.1f%% %s", module.UsagePercent, moduleGraph)
+				
+				row = t.printSimple(row, moduleInfo, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				
+				// Ограничиваем количество отображаемых модулей для экономии места
+				if i >= 4 { // Показываем максимум 5 модулей
+					remaining := len(memInfo.Modules) - 5
+					if remaining > 0 {
+						row = t.printSimple(row, fmt.Sprintf("  ... and %d more modules", remaining), 
+							tcell.StyleDefault.Foreground(tcell.ColorGray))
+					}
+					break
+				}
 			}
+		} else {
+			row = t.printSimple(row, "Memory modules: Information not available", 
+				tcell.StyleDefault.Foreground(tcell.ColorGray))
 		}
 	}
 	return row + 1

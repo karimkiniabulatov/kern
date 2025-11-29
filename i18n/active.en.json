@@ -30,12 +30,19 @@
       "load_average": "Load Average"
     },
     "memory": {
+	  "active": "Active",
+	  "buffers": "Buffers",
+	  "cached": "Cached",
+	  "detailed_usage": "Detailed Usage",
+	  "inactive": "Inactive",
       "title": "Memory Information", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Physical Memory",
+	  "processes": "Processes",
       "virtual": "Virtual Memory",
       "modules": "Memory Modules",
+	  "shared": "Shared"
       "slot": "Slot",
       "module_type": "Type",
       "manufacturer": "Manufacturer",
