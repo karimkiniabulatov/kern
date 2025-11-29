@@ -108,6 +108,24 @@ func Summary() (*MemoryInfo, error) {
     return info, nil
 }
 
+// calculateAverageUsage вычисляет среднюю загруженность известных модулей памяти
+func calculateAverageUsage(modules []MemoryModule) float64 {
+    var totalUsage float64
+    var knownModules int
+    
+    for _, module := range modules {
+        if module.SizeBytes > 0 && module.UsagePercent > 0 {
+            totalUsage += module.UsagePercent
+            knownModules++
+        }
+    }
+    
+    if knownModules > 0 {
+        return totalUsage / float64(knownModules)
+    }
+    return 0.0
+}
+
 func getMemoryInfo() (*MemoryInfo, error) {
     virtMem, err := mem.VirtualMemory()
     if err != nil {
@@ -145,16 +163,21 @@ func getMemoryInfo() (*MemoryInfo, error) {
     // Получаем детальную информацию о памяти
     cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
-    // Обновляем процент использования для каждого модуля памяти
+    // Вычисляем среднюю загруженность известных модулей
+    averageUsage := calculateAverageUsage(modules)
+
+    // Обновляем процент использования для каждого модуля
     for i := range modules {
         if modules[i].SizeBytes > 0 {
+            // Для известных модулей - реальный расчет
             modules[i].UsagePercent = calculateModuleUsage(
                 modules[i].SizeBytes, 
                 virtMem.Total, 
                 usedMemory, // используем corrected usedMemory
             )
         } else {
-            modules[i].UsagePercent = 0.0
+            // Для неизвестных модулей - используем среднюю загруженность от известных
+            modules[i].UsagePercent = averageUsage
         }
     }
 
@@ -208,19 +231,10 @@ func analyzeMemoryArchitecture(modules []MemoryModule, totalMemory uint64) []Mem
     }
 
     // Если есть неизвестные слоты и известная память не совпадает с общей
-    if unknownSlots > 0 && knownSize < totalMemory {
-        remainingMemory := totalMemory - knownSize
-        estimatedModuleSize := remainingMemory / uint64(unknownSlots)
-        
-        // Обновляем неизвестные модули с предполагаемыми размерами
-        for i := range modules {
-            if modules[i].SizeBytes == 0 {
-                modules[i].SizeBytes = estimatedModuleSize
-                modules[i].Size = formatBytes(estimatedModuleSize)
-                modules[i].Type = "DDR4" // Предполагаем наиболее современный тип
-                modules[i].Speed = "Unknown"
-            }
-        }
+    if unknownSlots > 0 {
+        // Не вычисляем предполагаемые размеры для неизвестных модулей
+        // Они остаются с SizeBytes = 0 и Size = "Unknown" или ""
+        // Загруженность будет установлена позже на основе известных модулей
     }
 
     return modules

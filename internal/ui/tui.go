@@ -296,13 +296,10 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 var moduleInfo string
                 
                 if module.Size == "Unknown" || module.SizeBytes == 0 {
-                    // Модуль без информации
+                    // НЕИЗВЕСТНЫЙ модуль - показываем только слот и используем среднюю загруженность
                     moduleInfo = fmt.Sprintf("  %s: нет информации", module.Slot)
                 } else {
-                    // Модуль с данными - фиксированный формат процентов
-                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
-                    moduleGraph := t.createSolidGraph(module.UsagePercent)
-                    
+                    // ИЗВЕСТНЫЙ модуль с данными
                     moduleInfo = fmt.Sprintf("  %s: %s %s @ %s", 
                         module.Slot, module.Size, module.Type, module.Speed)
                     
@@ -317,42 +314,34 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                         }
                         moduleInfo += ")"
                     }
-                    
-                    // Выравниваем гистограммы - добавляем пробелы для одинаковой длины
-                    currentLength := len(moduleInfo)
-                    if currentLength > maxLineLength {
-                        maxLineLength = currentLength
-                    }
-                    
-                    moduleInfo += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                }
+                
+                // Для ВСЕХ модулей (известных и неизвестных) вычисляем длину строки
+                currentLength := len(moduleInfo)
+                if currentLength > maxLineLength {
+                    maxLineLength = currentLength
                 }
                 
                 moduleLines = append(moduleLines, moduleInfo)
             }
             
             // Выводим все строки с выровненными гистограммами
-            for _, line := range moduleLines {
-                // Если строка содержит гистограмму, выравниваем ее
-                if strings.Contains(line, "%") {
-                    parts := strings.Split(line, "%")
-                    if len(parts) >= 2 {
-                        infoPart := parts[0]
-                        graphPart := "%" + parts[1]
-                        
-                        // Добавляем пробелы для выравнивания
-                        padding := maxLineLength - len(infoPart)
-                        if padding > 0 {
-                            infoPart += strings.Repeat(" ", padding)
-                        }
-                        
-                        row = t.printSimple(row, infoPart + graphPart, 
-                            tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-                        continue
-                    }
+            for i, line := range moduleLines {
+                module := memInfo.Modules[i]
+                usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
+                moduleGraph := t.createSolidGraph(module.UsagePercent)
+                
+                // Добавляем пробелы для выравнивания
+                padding := maxLineLength - len(line)
+                if padding > 0 {
+                    line += strings.Repeat(" ", padding)
                 }
                 
-                // Обычная строка без гистограммы
-                row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                // Добавляем проценты и гистограмму для ВСЕХ модулей
+                line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                
+                row = t.printSimple(row, line, 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
             }
         } else {
             row = t.printSimple(row, "Memory modules: Information not available", 
@@ -921,21 +910,25 @@ func (t *TUI) createSolidGraph(percent float64) string {
         percent = 100
     }
 
-    // 20 сегментов = 5% на элемент
     segments := 20
     filled := int((percent / 100) * float64(segments))
     
-    // Гарантируем, что при ненулевом проценте показывается хотя бы один сегмент
+    // ГАРАНТИРУЕМ ОБНОВЛЕНИЕ: даже при малых изменениях процента
+    // Если процент > 0, показываем хотя бы 1 сегмент
     if percent > 0 && filled == 0 {
         filled = 1
+    }
+    // Если процент < 100, но близок к полному, показываем почти полную гистограмму
+    if percent > 95 && filled < segments {
+        filled = segments
     }
     if filled > segments {
         filled = segments
     }
 
-    // Используем более совместимые символы для гистограммы
-    graph := strings.Repeat("█", filled)  // Полный блок
-    empty := strings.Repeat("░", segments-filled) // Светлый блок
+    // Используем блоки Unicode для гистограммы (5% на сегмент)
+    graph := strings.Repeat("█", filled)
+    empty := strings.Repeat("░", segments-filled)
     
     return graph + empty
 }
