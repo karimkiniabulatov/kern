@@ -226,95 +226,6 @@ func analyzeMemoryArchitecture(modules []MemoryModule, totalMemory uint64) []Mem
     return modules
 }
 
-// НОВАЯ ФУНКЦИЯ: Детальный анализ архитектуры памяти
-func detectMemoryArchitecture() string {
-    switch runtime.GOOS {
-    case "linux":
-        return analyzeLinuxMemoryArchitecture()
-    case "windows":
-        return analyzeWindowsMemoryArchitecture()
-    case "darwin":
-        return analyzeMacMemoryArchitecture()
-    default:
-        return "Unknown Architecture"
-    }
-}
-
-// Анализ архитектуры для Linux
-func analyzeLinuxMemoryArchitecture() string {
-    // Анализ через dmidecode
-    if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
-        outputStr := string(output)
-        
-        // Определяем тип архитектуры
-        if strings.Contains(outputStr, "DDR5") {
-            return "DDR5 Architecture"
-        } else if strings.Contains(outputStr, "DDR4") {
-            return "DDR4 Architecture" 
-        } else if strings.Contains(outputStr, "DDR3") {
-            return "DDR3 Architecture"
-        } else if strings.Contains(outputStr, "DDR2") {
-            return "DDR2 Architecture"
-        }
-        
-        // Проверяем наличие нескольких каналов
-        if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") {
-            return "Dual Channel Architecture"
-        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") && 
-                  strings.Contains(outputStr, "ChannelC") {
-            return "Triple Channel Architecture"
-        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") &&
-                  strings.Contains(outputStr, "ChannelC") && strings.Contains(outputStr, "ChannelD") {
-            return "Quad Channel Architecture"
-        }
-    }
-    
-    return "Standard Architecture"
-}
-
-// Анализ архитектуры для Windows
-func analyzeWindowsMemoryArchitecture() string {
-    cmd := exec.Command("wmic", "memorychip", "get", "MemoryType,ConfiguredClockSpeed,DataWidth", "/format:csv")
-    if output, err := cmd.Output(); err == nil {
-        outputStr := string(output)
-        
-        // Анализируем тип памяти и скорость
-        if strings.Contains(outputStr, "34") { // DDR5
-            return "DDR5 Architecture"
-        } else if strings.Contains(outputStr, "26") { // DDR4
-            return "DDR4 Architecture"
-        } else if strings.Contains(outputStr, "24") { // DDR3
-            return "DDR3 Architecture"
-        } else if strings.Contains(outputStr, "21") { // DDR2
-            return "DDR2 Architecture"
-        }
-    }
-    
-    return "Standard Architecture"
-}
-
-// Анализ архитектуры для macOS
-func analyzeMacMemoryArchitecture() string {
-    if output, err := exec.Command("system_profiler", "SPMemoryDataType").Output(); err == nil {
-        outputStr := string(output)
-        
-        if strings.Contains(outputStr, "DDR5") {
-            return "DDR5 Architecture"
-        } else if strings.Contains(outputStr, "DDR4") {
-            return "DDR4 Architecture"
-        } else if strings.Contains(outputStr, "DDR3") {
-            return "DDR3 Architecture"
-        }
-        
-        // Проверяем унифицированную память Apple Silicon
-        if strings.Contains(outputStr, "Unified") {
-            return "Apple Unified Memory Architecture"
-        }
-    }
-    
-    return "Standard Architecture"
-}
-
 // НОВАЯ ФУНКЦИЯ: Получение детальной информации о памяти
 func getDetailedMemoryInfo() (uint64, uint64, uint64, uint64, uint64) {
 	var cached, buffers, active, inactive, shared uint64
@@ -873,4 +784,93 @@ func formatBytes(bytes uint64) string {
 		str = str[:len(str)-2]
 	}
 	return str + unit
+}
+
+// НОВАЯ ФУНКЦИЯ: Детальный анализ архитектуры памяти
+func DetectMemoryArchitecture() string {
+    switch runtime.GOOS {
+    case "linux":
+        return analyzeLinuxMemoryArchitecture()
+    case "windows":
+        return analyzeWindowsMemoryArchitecture()
+    case "darwin":
+        return analyzeMacMemoryArchitecture()
+    default:
+        return "Standard Architecture"
+    }
+}
+
+// Анализ архитектуры для Linux
+func analyzeLinuxMemoryArchitecture() string {
+    // Анализ через dmidecode
+    if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
+        outputStr := string(output)
+        
+        // Определяем тип архитектуры
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture" 
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "DDR2") {
+            return "DDR2 Architecture"
+        }
+        
+        // Проверяем наличие нескольких каналов
+        if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") {
+            return "Dual Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") && 
+                  strings.Contains(outputStr, "ChannelC") {
+            return "Triple Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") &&
+                  strings.Contains(outputStr, "ChannelC") && strings.Contains(outputStr, "ChannelD") {
+            return "Quad Channel Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для Windows
+func analyzeWindowsMemoryArchitecture() string {
+    cmd := exec.Command("wmic", "memorychip", "get", "MemoryType,ConfiguredClockSpeed,DataWidth", "/format:csv")
+    if output, err := cmd.Output(); err == nil {
+        outputStr := string(output)
+        
+        // Анализируем тип памяти и скорость
+        if strings.Contains(outputStr, "34") { // DDR5
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "26") { // DDR4
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "24") { // DDR3
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "21") { // DDR2
+            return "DDR2 Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для macOS
+func analyzeMacMemoryArchitecture() string {
+    if output, err := exec.Command("system_profiler", "SPMemoryDataType").Output(); err == nil {
+        outputStr := string(output)
+        
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        }
+        
+        // Проверяем унифицированную память Apple Silicon
+        if strings.Contains(outputStr, "Unified") {
+            return "Apple Unified Memory Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
 }
