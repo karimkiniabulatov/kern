@@ -334,72 +334,97 @@ func showLogo() {
 }
 
 func runMonitor(cfg *config.Config, showLogo bool) {
-	// Initialize TUI
-	tui, err := ui.NewTUI(cfg, showLogo)
-	if err != nil {
-		log.Fatalf("Failed to initialize TUI: %v", err)
-	}
-	defer tui.Fini()
+    // Initialize TUI
+    tui, err := ui.NewTUI(cfg, showLogo)
+    if err != nil {
+        log.Fatalf("Failed to initialize TUI: %v", err)
+    }
+    defer tui.Fini()
 
-	// Обработка сигналов для гарантированного выхода
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+    // УЛУЧШЕННАЯ обработка сигналов для гарантированного выхода
+    sigChan := make(chan os.Signal, 1)
+    signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	// Для Windows добавляем дополнительные сигналы
-	if runtime.GOOS == "windows" {
-		signal.Notify(sigChan, syscall.SIGQUIT)
-	}
+    // Для Windows добавляем дополнительные сигналы
+    if runtime.GOOS == "windows" {
+        signal.Notify(sigChan, syscall.SIGQUIT)
+    }
 
-	// Канал для выхода
-	quitChan := make(chan bool, 1)
+    // Канал для выхода
+    quitChan := make(chan bool, 1)
 
-	// Запускаем сбор данных в отдельной горутине
-	go func() {
-		ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
-		defer ticker.Stop()
+    // Мьютекс для защиты данных от гонки
+    var dataMutex sync.RWMutex
+    var currentData map[string]interface{}
 
-		// Первое обновление сразу
-		data := collectData(cfg)
-		tui.Render(data)
+    // Запускаем сбор данных в отдельной горутине
+    go func() {
+        ticker := time.NewTicker(time.Duration(cfg.RefreshRate) * time.Second)
+        defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				data := collectData(cfg)
-				tui.Render(data)
-			case <-quitChan:
-				return
-			}
-		}
-	}()
+        // Первое обновление сразу
+        data := collectData(cfg)
+        dataMutex.Lock()
+        currentData = data
+        dataMutex.Unlock()
+        tui.Render(data)
 
-	// Основной цикл обработки событий
-	for {
-		ev := tui.PollEvent()
-		if ev == nil {
-			continue
-		}
+        for {
+            select {
+            case <-ticker.C:
+                data := collectData(cfg)
+                dataMutex.Lock()
+                currentData = data
+                dataMutex.Unlock()
+                tui.Render(data)
+            case <-quitChan:
+                return
+            }
+        }
+    }()
 
-		switch e := ev.(type) {
-		case *tcell.EventKey:
-			if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC ||
-				(e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
-				quitChan <- true
-				return
-			}
-		case *tcell.EventResize:
-			tui.ForceRedraw()
-		}
+    // Основной цикл обработки событий
+    for {
+        // Используем неблокирующий PollEvent с таймаутом
+        ev := tui.PollEvent()
+        if ev == nil {
+            // Проверяем сигналы без блокировки
+            select {
+            case <-sigChan:
+                quitChan <- true
+                return
+            default:
+                // Небольшая пауза чтобы не грузить CPU
+                time.Sleep(50 * time.Millisecond)
+            }
+            continue
+        }
 
-		// Проверяем сигналы без блокировки
-		select {
-		case <-sigChan:
-			quitChan <- true
-			return
-		default:
-			// продолжаем
-		}
-	}
+        switch e := ev.(type) {
+        case *tcell.EventKey:
+            if e.Key() == tcell.KeyEscape || e.Key() == tcell.KeyCtrlC ||
+                (e.Key() == tcell.KeyRune && (e.Rune() == 'q' || e.Rune() == 'Q')) {
+                quitChan <- true
+                return
+            }
+        case *tcell.EventResize:
+            // При изменении размера перерисовываем с текущими данными
+            dataMutex.RLock()
+            if currentData != nil {
+                tui.Render(currentData)
+            }
+            dataMutex.RUnlock()
+        }
+
+        // Проверяем сигналы без блокировки
+        select {
+        case <-sigChan:
+            quitChan <- true
+            return
+        default:
+            // продолжаем
+        }
+    }
 }
 
 func collectData(cfg *config.Config) map[string]interface{} {
