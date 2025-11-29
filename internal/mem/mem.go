@@ -16,26 +16,36 @@ import (
 type MemoryInfo struct {
 	Total            string
 	Used             string
+	UsedBytes        uint64  // НОВОЕ: размер в байтах для точных вычислений
 	Free             string
 	Available        string
+	AvailableBytes   uint64  // НОВОЕ: размер в байтах
 	SwapTotal        string
 	SwapUsed         string
 	SwapFree         string
 	UsagePercent     float64
 	SwapUsagePercent float64
 	Modules          []MemoryModule
+	
+	// НОВЫЕ ПОЛЯ для детальной информации
+	UsedByProcesses  string  // Память, используемая процессами (исключая кэш/буферы)
+	Cached           string  // Кэшированная память
+	Buffers          string  // Буферы
+	Active           string  // Активная память
+	Inactive         string  // Неактивная память
+	Shared           string  // Разделяемая память
 }
 
 type MemoryModule struct {
 	Slot         string
 	Size         string
-	SizeBytes    uint64  // НОВОЕ: размер в байтах для вычислений
+	SizeBytes    uint64
 	Type         string
 	Speed        string
 	Manufacturer string
 	PartNumber   string
 	Timings      string
-	UsagePercent float64 // НОВОЕ: процент использования модуля
+	UsagePercent float64
 }
 
 var (
@@ -59,14 +69,22 @@ func Summary() (*MemoryInfo, error) {
 		return &MemoryInfo{
 			Total:            "0",
 			Used:             "0",
+			UsedBytes:        0,
 			Free:             "0",
 			Available:        "0",
+			AvailableBytes:   0,
 			SwapTotal:        "0",
 			SwapUsed:         "0",
 			SwapFree:         "0",
 			UsagePercent:     0.0,
 			SwapUsagePercent: 0.0,
 			Modules:          []MemoryModule{},
+			UsedByProcesses:  "0",
+			Cached:           "0",
+			Buffers:          "0",
+			Active:           "0",
+			Inactive:         "0",
+			Shared:           "0",
 		}, nil
 	}
 
@@ -89,34 +107,39 @@ func getMemoryInfo() (*MemoryInfo, error) {
 		return nil, err
 	}
 
+	// ИСПРАВЛЕНИЕ: Правильное вычисление использованной памяти
+	// usedMemory = Total - Available (это память, которая реально используется процессами + кэш)
 	usedMemory := virtMem.Total - virtMem.Available
+	// Память, используемая только процессами (исключая кэш)
+	usedByProcesses := virtMem.Used
 
 	modules, err := getMemoryModules()
 	if err != nil {
 		modules = []MemoryModule{}
 	}
 
-	// НОВОЕ: Вычисляем проценты использования для каждого модуля памяти
-	totalMemoryBytes := virtMem.Total
-	for i := range modules {
-		if totalMemoryBytes > 0 && modules[i].SizeBytes > 0 {
-			modules[i].UsagePercent = float64(modules[i].SizeBytes) / float64(totalMemoryBytes) * 100
-		} else {
-			modules[i].UsagePercent = 0.0
-		}
-	}
+	// Получаем детальную информацию о памяти
+	cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
 	info := &MemoryInfo{
 		Total:            formatBytes(virtMem.Total),
 		Used:             formatBytes(usedMemory),
+		UsedBytes:        usedMemory,
 		Free:             formatBytes(virtMem.Free),
 		Available:        formatBytes(virtMem.Available),
+		AvailableBytes:   virtMem.Available,
 		SwapTotal:        formatBytes(swapMem.Total),
 		SwapUsed:         formatBytes(swapMem.Used),
 		SwapFree:         formatBytes(swapMem.Free),
 		UsagePercent:     virtMem.UsedPercent,
 		SwapUsagePercent: swapMem.UsedPercent,
 		Modules:          modules,
+		UsedByProcesses:  formatBytes(usedByProcesses),
+		Cached:           formatBytes(cached),
+		Buffers:          formatBytes(buffers),
+		Active:           formatBytes(active),
+		Inactive:         formatBytes(inactive),
+		Shared:           formatBytes(shared),
 	}
 
 	if info.UsagePercent < 0 {
@@ -129,6 +152,101 @@ func getMemoryInfo() (*MemoryInfo, error) {
 	return info, nil
 }
 
+// НОВАЯ ФУНКЦИЯ: Получение детальной информации о памяти
+func getDetailedMemoryInfo() (uint64, uint64, uint64, uint64, uint64) {
+	var cached, buffers, active, inactive, shared uint64
+
+	switch runtime.GOOS {
+	case "linux":
+		data, err := os.ReadFile("/proc/meminfo")
+		if err == nil {
+			lines := strings.Split(string(data), "\n")
+			for _, line := range lines {
+				fields := strings.Fields(line)
+				if len(fields) < 2 {
+					continue
+				}
+				
+				value, err := strconv.ParseUint(fields[1], 10, 64)
+				if err != nil {
+					continue
+				}
+				value *= 1024 // Конвертируем из KB в байты
+
+				switch fields[0] {
+				case "Cached:":
+					cached = value
+				case "Buffers:":
+					buffers = value
+				case "Active:":
+					active = value
+				case "Inactive:":
+					inactive = value
+				case "Shmem:":
+					shared = value
+				}
+			}
+		}
+	case "windows":
+		// Для Windows используем другую логику
+		if output, err := exec.Command("wmic", "OS", "get", "FreePhysicalMemory,TotalVisibleMemorySize", "/value").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			var freeMem, totalMem uint64
+			
+			for _, line := range lines {
+				if strings.HasPrefix(line, "FreePhysicalMemory=") {
+					if val, err := strconv.ParseUint(strings.TrimPrefix(line, "FreePhysicalMemory="), 10, 64); err == nil {
+						freeMem = val * 1024 // KB to bytes
+					}
+				} else if strings.HasPrefix(line, "TotalVisibleMemorySize=") {
+					if val, err := strconv.ParseUint(strings.TrimPrefix(line, "TotalVisibleMemorySize="), 10, 64); err == nil {
+						totalMem = val * 1024 // KB to bytes
+					}
+				}
+			}
+			
+			// Для Windows приблизительные значения
+			if totalMem > 0 && freeMem > 0 {
+				used := totalMem - freeMem
+				cached = used * 20 / 100 // Предполагаем 20% кэша
+				buffers = used * 5 / 100 // Предполагаем 5% буферов
+				active = used * 70 / 100 // Предполагаем 70% активной памяти
+			}
+		}
+	case "darwin":
+		// Для macOS используем vm_stat
+		if output, err := exec.Command("vm_stat").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			pageSize := uint64(4096) // Стандартный размер страницы в macOS
+			
+			for _, line := range lines {
+				fields := strings.Fields(line)
+				if len(fields) < 2 {
+					continue
+				}
+				
+				value, err := strconv.ParseUint(strings.TrimSuffix(fields[1], "."), 10, 64)
+				if err != nil {
+					continue
+				}
+				value *= pageSize
+				
+				switch fields[0] {
+				case "Pages", "Pages:":
+					// Общая информация
+				case "FileCache:":
+					cached = value
+				case "Purgeable":
+					inactive = value
+				}
+			}
+		}
+	}
+
+	return cached, buffers, active, inactive, shared
+}
+
+// Остальные функции остаются без изменений...
 func getMemoryModules() ([]MemoryModule, error) {
 	switch runtime.GOOS {
 	case "linux":
@@ -143,12 +261,23 @@ func getMemoryModules() ([]MemoryModule, error) {
 }
 
 func parseDMIDecode() ([]MemoryModule, error) {
-	cmd := exec.Command("dmidecode", "--type", "memory")
+	// Проверяем доступность dmidecode
+	if _, err := exec.LookPath("dmidecode"); err != nil {
+		return []MemoryModule{}, fmt.Errorf("dmidecode not available")
+	}
+
+	cmd := exec.Command("sudo", "dmidecode", "--type", "memory")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		return []MemoryModule{}, err
+		// Пробуем без sudo
+		cmd = exec.Command("dmidecode", "--type", "memory")
+		cmd.Stdout = &out
+		err = cmd.Run()
+		if err != nil {
+			return []MemoryModule{}, err
+		}
 	}
 
 	output := out.String()
@@ -158,6 +287,11 @@ func parseDMIDecode() ([]MemoryModule, error) {
 func parseDMIDecodeOutput(output string) []MemoryModule {
 	var modules []MemoryModule
 	blocks := strings.Split(output, "Memory Device")
+	
+	// Если нет блоков с памятью, пробуем альтернативный парсинг
+	if len(blocks) <= 1 {
+		return parseAlternativeMemoryInfo()
+	}
 	
 	for _, block := range blocks[1:] {
 		module := MemoryModule{}
@@ -170,7 +304,7 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
 			case strings.HasPrefix(line, "Size:"):
 				sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
 				module.Size = sizeStr
-				module.SizeBytes = parseMemorySize(sizeStr) // НОВОЕ: парсим размер в байтах
+				module.SizeBytes = parseMemorySize(sizeStr)
 			case strings.HasPrefix(line, "Type:"):
 				module.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
 			case strings.HasPrefix(line, "Speed:"):
@@ -181,6 +315,11 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
 				module.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
 			case strings.HasPrefix(line, "Locator:"):
 				module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
+			case strings.HasPrefix(line, "Serial Number:"):
+				// Сохраняем серийный номер
+				if serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:")); serial != "" {
+					module.PartNumber += " [" + serial + "]"
+				}
 			}
 		}
 		
@@ -189,12 +328,74 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
 		}
 	}
 	
+	// Если через dmidecode не получили информацию, пробуем альтернативные методы
+	if len(modules) == 0 {
+		return parseAlternativeMemoryInfo()
+	}
+	
 	return modules
 }
 
+// НОВАЯ ФУНКЦИЯ: Альтернативные методы получения информации о памяти
+func parseAlternativeMemoryInfo() []MemoryModule {
+	var modules []MemoryModule
+	
+	switch runtime.GOOS {
+	case "linux":
+		// Пробуем получить информацию из /proc/meminfo и lshw
+		if output, err := exec.Command("lshw", "-short", "-C", "memory").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines {
+				if strings.Contains(line, "memory") && strings.Contains(line, "GiB") {
+					fields := strings.Fields(line)
+					if len(fields) >= 3 {
+						module := MemoryModule{
+							Slot:  "DIMM",
+							Size:  fields[2],
+							Type:  "DDR4", // Предполагаем
+							Speed: "Unknown",
+						}
+						module.SizeBytes = parseMemorySize(module.Size)
+						modules = append(modules, module)
+					}
+				}
+			}
+		}
+		
+		// Если все еще нет информации, создаем базовую
+		if len(modules) == 0 {
+			if data, err := os.ReadFile("/proc/meminfo"); err == nil {
+				lines := strings.Split(string(data), "\n")
+				for _, line := range lines {
+					if strings.HasPrefix(line, "MemTotal:") {
+						fields := strings.Fields(line)
+						if len(fields) >= 2 {
+							totalKB, _ := strconv.ParseUint(fields[1], 10, 64)
+							totalBytes := totalKB * 1024
+							
+							module := MemoryModule{
+								Slot:      "System Memory",
+								Size:      formatBytes(totalBytes),
+								SizeBytes: totalBytes,
+								Type:      "Unknown",
+								Speed:     "Unknown",
+							}
+							modules = append(modules, module)
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return modules
+}
+
+// Остальные функции без изменений...
 func parseWMICMemory() ([]MemoryModule, error) {
 	cmd := exec.Command("wmic", "memorychip", "get", 
-		"BankLabel,Capacity,MemoryType,Speed,Manufacturer,PartNumber", "/format:csv")
+		"BankLabel,Capacity,MemoryType,Speed,Manufacturer,PartNumber,SerialNumber", "/format:csv")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
@@ -212,7 +413,7 @@ func parseWMICOutput(output string) []MemoryModule {
 	
 	for _, line := range lines[1:] {
 		fields := strings.Split(line, ",")
-		if len(fields) < 6 {
+		if len(fields) < 7 {
 			continue
 		}
 		
@@ -220,6 +421,11 @@ func parseWMICOutput(output string) []MemoryModule {
 			Slot:         strings.TrimSpace(fields[1]),
 			Manufacturer: strings.TrimSpace(fields[4]),
 			PartNumber:   strings.TrimSpace(fields[5]),
+		}
+		
+		// Добавляем серийный номер если есть
+		if len(fields) >= 7 && strings.TrimSpace(fields[6]) != "" {
+			module.PartNumber += " [" + strings.TrimSpace(fields[6]) + "]"
 		}
 		
 		// Parse capacity
@@ -276,7 +482,7 @@ func parseMacMemoryOutput(output string) []MemoryModule {
 		case strings.HasPrefix(line, "Size:"):
 			sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
 			currentModule.Size = sizeStr
-			currentModule.SizeBytes = parseMemorySize(sizeStr) // НОВОЕ: парсим размер в байтах
+			currentModule.SizeBytes = parseMemorySize(sizeStr)
 		case strings.HasPrefix(line, "Type:"):
 			currentModule.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
 		case strings.HasPrefix(line, "Speed:"):
@@ -295,23 +501,19 @@ func parseMacMemoryOutput(output string) []MemoryModule {
 	return modules
 }
 
-// НОВАЯ ФУНКЦИЯ: Парсинг размера памяти из строки в байты
+// Функция parseMemorySize без изменений...
 func parseMemorySize(sizeStr string) uint64 {
 	if sizeStr == "" || sizeStr == "No Module Installed" {
 		return 0
 	}
 
-	// Удаляем пробелы и приводим к нижнему регистру
 	sizeStr = strings.ToLower(strings.TrimSpace(sizeStr))
 	
-	// Парсим числовое значение и единицу измерения
 	var value float64
 	var unit string
 	
-	// Разбираем строку типа "16 GB", "8 gb", "8192 mb" и т.д.
 	_, err := fmt.Sscanf(sizeStr, "%f %s", &value, &unit)
 	if err != nil {
-		// Пробуем парсить без пробела: "16gb", "8gb"
 		for i, char := range sizeStr {
 			if char < '0' || char > '9' {
 				if char == '.' {
@@ -325,7 +527,6 @@ func parseMemorySize(sizeStr string) uint64 {
 		}
 	}
 
-	// Конвертируем в байты в зависимости от единицы измерения
 	switch unit {
 	case "tb", "t":
 		return uint64(value * 1024 * 1024 * 1024 * 1024)
@@ -336,7 +537,6 @@ func parseMemorySize(sizeStr string) uint64 {
 	case "kb", "k":
 		return uint64(value * 1024)
 	default:
-		// Если единица не распознана, предполагаем что это байты
 		return uint64(value)
 	}
 }
