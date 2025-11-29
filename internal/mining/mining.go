@@ -7,7 +7,6 @@ import (
     "strings"
     "path/filepath"
     "os"
-    "io/ioutil"
     "regexp"
 )
 
@@ -263,7 +262,7 @@ func (m *MiningInfo) parseMinerLogs() {
 
 // Анализ конкретного файла лога
 func (m *MiningInfo) parseLogFile(filename string) {
-    content, err := ioutil.ReadFile(filename)
+    content, err := os.ReadFile(filename)
     if err != nil {
         return
     }

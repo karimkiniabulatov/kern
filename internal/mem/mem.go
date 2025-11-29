@@ -3,6 +3,7 @@ package mem
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -159,32 +160,34 @@ func getDetailedMemoryInfo() (uint64, uint64, uint64, uint64, uint64) {
 	switch runtime.GOOS {
 	case "linux":
 		data, err := os.ReadFile("/proc/meminfo")
-		if err == nil {
-			lines := strings.Split(string(data), "\n")
-			for _, line := range lines {
-				fields := strings.Fields(line)
-				if len(fields) < 2 {
-					continue
-				}
-				
-				value, err := strconv.ParseUint(fields[1], 10, 64)
-				if err != nil {
-					continue
-				}
-				value *= 1024 // Конвертируем из KB в байты
+		if err != nil {
+			// Возвращаем нулевые значения при ошибке
+			return 0, 0, 0, 0, 0
+		}
+		lines := strings.Split(string(data), "\n")
+		for _, line := range lines {
+			fields := strings.Fields(line)
+			if len(fields) < 2 {
+				continue
+			}
+			
+			value, err := strconv.ParseUint(fields[1], 10, 64)
+			if err != nil {
+				continue
+			}
+			value *= 1024 // Конвертируем из KB в байты
 
-				switch fields[0] {
-				case "Cached:":
-					cached = value
-				case "Buffers:":
-					buffers = value
-				case "Active:":
-					active = value
-				case "Inactive:":
-					inactive = value
-				case "Shmem:":
-					shared = value
-				}
+			switch fields[0] {
+			case "Cached:":
+				cached = value
+			case "Buffers:":
+				buffers = value
+			case "Active:":
+				active = value
+			case "Inactive:":
+				inactive = value
+			case "Shmem:":
+				shared = value
 			}
 		}
 	case "windows":
