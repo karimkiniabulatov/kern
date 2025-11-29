@@ -974,4 +974,4 @@ func (t *TUI) drawText(x, y int, style tcell.Style, text string) {
 		t.screen.SetContent(x, y, r, nil, style)
 		x += runewidth.RuneWidth(r)
 	}
-}
+}   
