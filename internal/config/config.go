@@ -14,6 +14,7 @@ type Config struct {
 	Colors      bool   `json:"colors"`
 	Theme       string `json:"theme"`
 	DetailedCPU bool   `json:"detailed_cpu"`
+	DetailedMem bool   `json:"detailed_mem"` // НОВОЕ: детальная информация о памяти
 	ShowDisk    bool   `json:"show_disk"`
 	ShowCPU     bool   `json:"show_cpu"`
 	ShowMem     bool   `json:"show_mem"`
@@ -138,7 +139,8 @@ func getDefaultConfig(language string) *Config {
 		RefreshRate: 2,
 		Colors:      true,
 		Theme:       "default",
-		DetailedCPU: false,
+		DetailedCPU: false,  // По умолчанию не показывать детальную информацию CPU
+		DetailedMem: false,  // По умолчанию не показывать детальную информацию памяти
 		ShowDisk:    true,
 		ShowCPU:     true,
 		ShowMem:     true,

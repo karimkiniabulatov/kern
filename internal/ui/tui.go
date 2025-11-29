@@ -218,6 +218,9 @@ func (t *TUI) renderCPU(startRow int, data interface{}) int {
 					}
 					row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 				}
+			} else if t.config.DetailedCPU && len(cpuInfo.CoreUsage) == 0 {
+				row = t.printSimple(row, "  Core usage data not available", 
+					tcell.StyleDefault.Foreground(tcell.ColorGray))
 			}
 
 			// Добавляем отступ между процессорами, если их несколько
@@ -296,7 +299,7 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 var moduleInfo string
                 
                 if module.Size == "Unknown" || module.SizeBytes == 0 {
-                    // НЕИЗВЕСТНЫЙ модуль - показываем только слот и используем среднюю загруженность
+                    // НЕИЗВЕСТНЫЙ модуль - показываем только слот
                     moduleInfo = fmt.Sprintf("  %s: нет информации", module.Slot)
                 } else {
                     // ИЗВЕСТНЫЙ модуль с данными
@@ -316,7 +319,6 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                     }
                 }
                 
-                // Для ВСЕХ модулей (известных и неизвестных) вычисляем длину строки
                 currentLength := len(moduleInfo)
                 if currentLength > maxLineLength {
                     maxLineLength = currentLength
@@ -328,8 +330,6 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
             // Выводим все строки с выровненными гистограммами
             for i, line := range moduleLines {
                 module := memInfo.Modules[i]
-                usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
-                moduleGraph := t.createSolidGraph(module.UsagePercent)
                 
                 // Добавляем пробелы для выравнивания
                 padding := maxLineLength - len(line)
@@ -337,8 +337,18 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                     line += strings.Repeat(" ", padding)
                 }
                 
-                // Добавляем проценты и гистограмму для ВСЕХ модулей
-                line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                // Для ВСЕХ модулей добавляем проценты и гистограмму
+                if module.Size == "Unknown" || module.SizeBytes == 0 {
+                    // Для неизвестных модулей используем среднюю загрузку
+                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
+                    moduleGraph := t.createSolidGraph(module.UsagePercent)
+                    line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                } else {
+                    // Для известных модулей используем расчетную загрузку
+                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
+                    moduleGraph := t.createSolidGraph(module.UsagePercent)
+                    line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                }
                 
                 row = t.printSimple(row, line, 
                     tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
@@ -625,7 +635,7 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 	case *gpu.GPUInfo:
 		// Fallback for single GPU (legacy format)
 		row = t.renderHeader(row, t.config.T("gpu.title"))
-		row = t.renderSingleGPUInfo(row, gpuData) // ИСПРАВЛЕНО: было gpuInfo
+		row = t.renderSingleGPUInfo(row, gpuData)
 		
 	case map[string]interface{}:
 		// Handle error case
@@ -974,4 +984,4 @@ func (t *TUI) drawText(x, y int, style tcell.Style, text string) {
 		t.screen.SetContent(x, y, r, nil, style)
 		x += runewidth.RuneWidth(r)
 	}
-}   
+}

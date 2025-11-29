@@ -169,11 +169,11 @@ func getMemoryInfo() (*MemoryInfo, error) {
     // Обновляем процент использования для каждого модуля
     for i := range modules {
         if modules[i].SizeBytes > 0 {
-            // Для известных модулей - реальный расчет
+            // Для известных модулей - распределяем использование пропорционально размеру
             modules[i].UsagePercent = calculateModuleUsage(
                 modules[i].SizeBytes, 
                 virtMem.Total, 
-                usedMemory, // используем corrected usedMemory
+                usedMemory,
             )
         } else {
             // Для неизвестных модулей - используем среднюю загруженность от известных
@@ -447,25 +447,25 @@ func isTrulyUniqueModule(modules []MemoryModule, slot string, serial string) boo
     return true
 }
 
-// ОБНОВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля
 func calculateModuleUsage(moduleSize uint64, totalSystemMemory uint64, usedSystemMemory uint64) float64 {
     if totalSystemMemory == 0 || moduleSize == 0 {
         return 0.0
     }
     
-    // Более точный расчет с учетом архитектуры
-    moduleRatio := float64(moduleSize) / float64(totalSystemMemory)
-    usagePercent := (float64(usedSystemMemory) / float64(totalSystemMemory)) * 100
+    // Распределяем общее использование пропорционально размеру модуля
+    moduleShare := float64(moduleSize) / float64(totalSystemMemory)
+    moduleUsed := float64(usedSystemMemory) * moduleShare
+    usagePercent := (moduleUsed / float64(moduleSize)) * 100
     
     // Гарантируем корректные границы
-    result := usagePercent * moduleRatio
-    if result < 0 {
+    if usagePercent < 0 {
         return 0.0
     }
-    if result > 100 {
+    if usagePercent > 100 {
         return 100.0
     }
-    return result
+    return usagePercent
 }
 
 // Улучшенная функция для альтернативного получения информации о памяти

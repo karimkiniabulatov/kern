@@ -38,6 +38,8 @@ var (
 	flagGPU       = flag.Bool("g", false, "Show GPU information")
 	flagAI        = flag.Bool("ai", false, "Show AI training information")
 	flagMining    = flag.Bool("mining", false, "Show mining information")
+	flagDetailedMem = flag.Bool("dm", false, "Show detailed memory module information")
+	flagDetailedMemLong = flag.Bool("detailed-mem", false, "Show detailed memory module information")
 	
 	// Общие флаги
 	flagAll       = flag.Bool("a", false, "Show all information")
@@ -88,6 +90,7 @@ func init() {
 	flag.BoolVar(flagHelp, "help", false, "Show help")
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
 	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
+	flag.BoolVar(flagDetailedMem, "detailed-memory", false, "Show detailed memory module information")
 	
 	// Сервисные флаги с альтернативными именами
 	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
@@ -115,6 +118,9 @@ func main() {
 		fmt.Println("  --detailed, -de      Show detailed CPU core information")
 		fmt.Println("  --refresh SECONDS    Refresh interval in seconds (default: 2)")
 		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
+		fmt.Println("\nDetailed Information Options:")
+		fmt.Println("  --detailed, -de      Show detailed CPU core information")
+		fmt.Println("  --detailed-mem, -dm  Show detailed memory module information")
 		
 		fmt.Println("\nLanguage Options:")
 		fmt.Println("  -l LANG              Language code (e.g., 'ru' for Russian)")
@@ -259,6 +265,10 @@ func main() {
 	// Добавляем поддержку длинных флагов для CPU детализации
 	if *flagDetailed {
 		cfg.DetailedCPU = true
+	}
+	
+	if *flagDetailedMem || *flagDetailedMemLong {
+		cfg.DetailedMem = true
 	}
 
 	// NEW: Smart default behavior - use last used modules if no flags provided
