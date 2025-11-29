@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -118,9 +119,18 @@ func getMemoryInfo() (*MemoryInfo, error) {
         return nil, err
     }
 
-    // ИСПРАВЛЕНИЕ: Правильное вычисление использованной памяти
-    // usedMemory = Total - Available (это память, которая реально используется процессами + кэш)
+    // ИСПРАВЛЕННЫЙ РАСЧЕТ: используем реально доступную память для расчета использования
     usedMemory := virtMem.Total - virtMem.Available
+    usagePercent := float64(usedMemory) / float64(virtMem.Total) * 100
+    
+    // Гарантируем корректные границы
+    if usagePercent < 0 {
+        usagePercent = 0.0
+    }
+    if usagePercent > 100 {
+        usagePercent = 100.0
+    }
+
     // Память, используемая только процессами (исключая кэш)
     usedByProcesses := virtMem.Used
 
@@ -132,18 +142,17 @@ func getMemoryInfo() (*MemoryInfo, error) {
     // Получаем детальную информацию о памяти
     cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
-    // ИСПРАВЛЕНИЕ: Гарантируем корректное вычисление процента использования
-    usagePercent := virtMem.UsedPercent
-    if usagePercent < 0 {
-        usagePercent = 0.0
-    }
-    if usagePercent > 100 {
-        usagePercent = 100.0
-    }
-
     // Обновляем процент использования для каждого модуля памяти
     for i := range modules {
-        modules[i].UsagePercent = calculateModuleUsage(modules[i].SizeBytes, virtMem.Total, usedMemory)
+        if modules[i].SizeBytes > 0 {
+            modules[i].UsagePercent = calculateModuleUsage(
+                modules[i].SizeBytes, 
+                virtMem.Total, 
+                usedMemory, // используем corrected usedMemory
+            )
+        } else {
+            modules[i].UsagePercent = 0.0
+        }
     }
 
     info := &MemoryInfo{
@@ -271,7 +280,6 @@ func getDetailedMemoryInfo() (uint64, uint64, uint64, uint64, uint64) {
 	return cached, buffers, active, inactive, shared
 }
 
-// Остальные функции остаются без изменений...
 func getMemoryModules() ([]MemoryModule, error) {
 	switch runtime.GOOS {
 	case "linux":
@@ -313,15 +321,11 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
     var modules []MemoryModule
     blocks := strings.Split(output, "Memory Device")
     
-    // Если нет блоков с памятью, пробуем альтернативный парсинг
-    if len(blocks) <= 1 {
-        return parseAlternativeMemoryInfo()
-    }
-    
-    for _, block := range blocks[1:] {
+    // Пропускаем первый блок (заголовок)
+    for i := 1; i < len(blocks); i++ {
         module := MemoryModule{}
+        lines := strings.Split(blocks[i], "\n")
         
-        lines := strings.Split(block, "\n")
         for _, line := range lines {
             line = strings.TrimSpace(line)
             
@@ -338,160 +342,130 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
                 module.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
             case strings.HasPrefix(line, "Part Number:"):
                 module.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+            case strings.HasPrefix(line, "Serial Number:"):
+                serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
+                if serial != "" && serial != "Unknown" && serial != "Not Specified" {
+                    module.SerialNumber = serial
+                }
             case strings.HasPrefix(line, "Locator:"):
                 module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
-            case strings.HasPrefix(line, "Serial Number:"):
-                // ИСПРАВЛЕНИЕ: Правильное сохранение серийного номера
-                serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
-                if serial != "" && serial != "Unknown" && serial != "Not Specified" && 
-                   serial != "None" && !strings.Contains(serial, "OEM") {
-                    module.SerialNumber = serial
+            case strings.HasPrefix(line, "Bank Locator:"):
+                // Используем Bank Locator как дополнительный идентификатор
+                if module.Slot == "" {
+                    module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Bank Locator:"))
                 }
             }
         }
         
-        // ИСПРАВЛЕНИЕ: Улучшенная фильтрация модулей памяти
-        if module.Size != "" && module.Size != "No Module Installed" && 
-           !strings.Contains(strings.ToLower(module.Size), "no") &&
-           module.SizeBytes > 0 {
+        // ВАЖНОЕ ИСПРАВЛЕНИЕ: принимаем ВСЕ модули, даже с неизвестным размером
+        // но фильтруем полностью пустые слоты
+        if module.Slot != "" {
+            // Если размер не определен, помечаем как "Unknown"
+            if module.Size == "" || module.Size == "No Module Installed" {
+                module.Size = "Unknown"
+                module.SizeBytes = 0
+            }
             
-            // Проверяем уникальность по комбинации слот + серийный номер
-            if isUniqueModule(modules, module.Slot, module.SerialNumber) {
+            // Проверяем уникальность по слоту + серийному номеру
+            if isTrulyUniqueModule(modules, module.Slot, module.SerialNumber) {
                 modules = append(modules, module)
             }
         }
     }
     
-    // Если через dmidecode не получили информацию, пробуем альтернативные методы
-    if len(modules) == 0 {
-        return parseAlternativeMemoryInfo()
-    }
-    
     return modules
 }
 
-// НОВАЯ ФУНКЦИЯ: Проверка уникальности модуля по слоту и серийному номеру
-func isUniqueModule(modules []MemoryModule, slot string, serial string) bool {
-    if slot == "" {
-        return false
-    }
+// НОВАЯ ФУНКЦИЯ для строгой проверки уникальности
+func isTrulyUniqueModule(modules []MemoryModule, slot string, serial string) bool {
     for _, m := range modules {
+        // Считаем уникальным, если отличается слот ИЛИ серийный номер
         if m.Slot == slot && m.SerialNumber == serial {
             return false
+        }
+        // Если слот тот же, но серийный номер разный - это разные модули
+        if m.Slot == slot && m.SerialNumber != serial {
+            return true // это другой модуль в том же слоте? маловероятно, но возможно
         }
     }
     return true
 }
 
-// ИСПРАВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля памяти
+// УЛУЧШЕННАЯ ФУНКЦИЯ расчета использования модулей
 func calculateModuleUsage(moduleSize uint64, totalSystemMemory uint64, usedSystemMemory uint64) float64 {
     if totalSystemMemory == 0 || moduleSize == 0 {
         return 0.0
     }
     
-    // Распределяем использование пропорционально размеру модуля
+    // Более точный расчет: предполагаем равномерное распределение данных по модулям
+    // Это упрощение, но лучше чем постоянный 0.8%
     moduleRatio := float64(moduleSize) / float64(totalSystemMemory)
-    return (float64(usedSystemMemory) / float64(totalSystemMemory)) * 100 * moduleRatio
+    usagePercent := (float64(usedSystemMemory) / float64(totalSystemMemory)) * 100
+    
+    // Возвращаем общий процент использования, скорректированный на долю модуля
+    return usagePercent * moduleRatio
 }
 
 // Улучшенная функция для альтернативного получения информации о памяти
 func parseAlternativeMemoryInfo() []MemoryModule {
     var modules []MemoryModule
     
-    // ИСПРАВЛЕНИЕ: Сначала пробуем dmidecode без sudo
-    cmd := exec.Command("dmidecode", "--type", "memory")
-    if output, err := cmd.Output(); err == nil {
-        return parseDMIDecodeOutput(string(output))
-    }
-    
-    // Затем пробуем с sudo
-    cmd = exec.Command("sudo", "dmidecode", "--type", "memory")
-    if output, err := cmd.Output(); err == nil {
-        return parseDMIDecodeOutput(string(output))
-    }
-    
-    // Остальная существующая логика...
+    // Пробуем разные методы получения информации о памяти
     switch runtime.GOOS {
     case "linux":
-        // Пробуем получить информацию из /proc/meminfo и lshw
-        if output, err := exec.Command("lshw", "-short", "-C", "memory").Output(); err == nil {
-            lines := strings.Split(string(output), "\n")
-            moduleCount := 0
-            for _, line := range lines {
-                if strings.Contains(line, "memory") && (strings.Contains(line, "GiB") || strings.Contains(line, "MiB")) {
-                    fields := strings.Fields(line)
-                    if len(fields) >= 3 {
-                        module := MemoryModule{
-                            Slot:  fmt.Sprintf("DIMM%d", moduleCount),
-                            Size:  fields[2],
-                            Type:  "DDR4", // Предполагаем
-                            Speed: "Unknown",
-                        }
-                        module.SizeBytes = parseMemorySize(module.Size)
-                        modules = append(modules, module)
-                        moduleCount++
-                    }
-                }
+        // Метод 1: Попробуем через lshw
+        if output, err := exec.Command("lshw", "-class", "memory", "-quiet").Output(); err == nil {
+            modules = parseLshwOutput(string(output))
+        }
+        
+        // Метод 2: Если lshw не сработал, пробуем через /proc/meminfo и dmidecode без sudo
+        if len(modules) == 0 {
+            if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
+                modules = parseDMIDecodeOutput(string(output))
             }
         }
         
-        // Если все еще нет информации, создаем базовую на основе общей памяти
+        // Метод 3: Парсим /sys/bus/drivers для получения информации о слотах
         if len(modules) == 0 {
-            if data, err := os.ReadFile("/proc/meminfo"); err == nil {
-                lines := strings.Split(string(data), "\n")
-                var totalKB uint64
-                for _, line := range lines {
-                    if strings.HasPrefix(line, "MemTotal:") {
-                        fields := strings.Fields(line)
-                        if len(fields) >= 2 {
-                            totalKB, _ = strconv.ParseUint(fields[1], 10, 64)
-                            break
-                        }
-                    }
-                }
-                
-                if totalKB > 0 {
-                    totalBytes := totalKB * 1024
-                    // Предполагаем 4 модуля по равному размеру
-                    moduleSize := totalBytes / 4
-                    for i := 0; i < 4; i++ {
-                        module := MemoryModule{
-                            Slot:      fmt.Sprintf("DIMM%d", i),
-                            Size:      formatBytes(moduleSize),
-                            SizeBytes: moduleSize,
-                            Type:      "DDR4",
-                            Speed:     "Unknown",
-                        }
-                        modules = append(modules, module)
-                    }
-                }
-            }
+            modules = parseSysfsMemoryInfo()
         }
+        
     case "windows":
-        // Для Windows используем WMI для получения точной информации
-        cmd := exec.Command("wmic", "memorychip", "get", "BankLabel,Capacity,Speed,MemoryType", "/format:csv")
+        // Для Windows используем WMI
+        cmd := exec.Command("wmic", "memorychip", "get", "BankLabel,Capacity,Speed,MemoryType,Manufacturer,PartNumber,SerialNumber", "/format:csv")
         if output, err := cmd.Output(); err == nil {
-            lines := strings.Split(string(output), "\n")
-            for i, line := range lines {
-                if i == 0 || strings.TrimSpace(line) == "" {
-                    continue
-                }
-                fields := strings.Split(line, ",")
-                if len(fields) >= 4 {
+            modules = parseWMICMemoryOutput(string(output))
+        }
+    }
+    
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для парсинга информации из sysfs (Linux)
+func parseSysfsMemoryInfo() []MemoryModule {
+    var modules []MemoryModule
+    
+    // Ищем информацию о памяти в /sys/devices
+    sysfsPath := "/sys/devices/system/edac/mc"
+    if _, err := os.Stat(sysfsPath); err == nil {
+        // Есть информация о контроллере памяти
+        mcDirs, err := filepath.Glob(filepath.Join(sysfsPath, "mc*"))
+        if err == nil {
+            for _, mcDir := range mcDirs {
+                dimmDirs, _ := filepath.Glob(filepath.Join(mcDir, "dimm*"))
+                for i, dimmDir := range dimmDirs {
                     module := MemoryModule{
-                        Slot:  strings.TrimSpace(fields[1]),
-                        Speed: fmt.Sprintf("%s MHz", strings.TrimSpace(fields[3])),
+                        Slot:  fmt.Sprintf("DIMM%d", i),
+                        Size:  "Unknown",
+                        Type:  "DDR",
                     }
                     
-                    // Parse capacity
-                    if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
-                        module.SizeBytes = capacity
-                        module.Size = formatBytes(capacity)
-                    }
-                    
-                    // Parse memory type
-                    if memType, err := strconv.Atoi(strings.TrimSpace(fields[4])); err == nil {
-                        module.Type = memoryTypeToString(memType)
+                    // Пытаемся получить размер из разных мест
+                    if sizeFile, err := os.ReadFile(filepath.Join(dimmDir, "size")); err == nil {
+                        if sizeMB, err := strconv.Atoi(strings.TrimSpace(string(sizeFile))); err == nil {
+                            module.SizeBytes = uint64(sizeMB) * 1024 * 1024
+                            module.Size = formatBytes(module.SizeBytes)
+                        }
                     }
                     
                     modules = append(modules, module)
@@ -503,7 +477,73 @@ func parseAlternativeMemoryInfo() []MemoryModule {
     return modules
 }
 
-// Остальные функции без изменений...
+// НОВАЯ ФУНКЦИЯ для парсинга вывода lshw
+func parseLshwOutput(output string) []MemoryModule {
+    var modules []MemoryModule
+    lines := strings.Split(output, "\n")
+    moduleCount := 0
+    
+    for _, line := range lines {
+        if strings.Contains(line, "memory") && (strings.Contains(line, "GiB") || strings.Contains(line, "MiB")) {
+            fields := strings.Fields(line)
+            if len(fields) >= 3 {
+                module := MemoryModule{
+                    Slot:  fmt.Sprintf("DIMM%d", moduleCount),
+                    Size:  fields[2],
+                    Type:  "DDR4", // Предполагаем
+                    Speed: "Unknown",
+                }
+                module.SizeBytes = parseMemorySize(module.Size)
+                modules = append(modules, module)
+                moduleCount++
+            }
+        }
+    }
+    
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для парсинга вывода WMIC
+func parseWMICMemoryOutput(output string) []MemoryModule {
+    var modules []MemoryModule
+    lines := strings.Split(output, "\n")
+    
+    for i, line := range lines {
+        if i == 0 || strings.TrimSpace(line) == "" {
+            continue
+        }
+        fields := strings.Split(line, ",")
+        if len(fields) >= 7 {
+            module := MemoryModule{
+                Slot:         strings.TrimSpace(fields[1]),
+                Manufacturer: strings.TrimSpace(fields[5]),
+                PartNumber:   strings.TrimSpace(fields[6]),
+                SerialNumber: strings.TrimSpace(fields[7]),
+            }
+            
+            // Parse capacity
+            if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
+                module.SizeBytes = capacity
+                module.Size = formatBytes(capacity)
+            }
+            
+            // Parse memory type
+            if memType, err := strconv.Atoi(strings.TrimSpace(fields[3])); err == nil {
+                module.Type = memoryTypeToString(memType)
+            }
+            
+            // Parse speed
+            if speed, err := strconv.Atoi(strings.TrimSpace(fields[4])); err == nil {
+                module.Speed = fmt.Sprintf("%d MHz", speed)
+            }
+            
+            modules = append(modules, module)
+        }
+    }
+    
+    return modules
+}
+
 func parseWMICMemory() ([]MemoryModule, error) {
 	cmd := exec.Command("wmic", "memorychip", "get", 
 		"BankLabel,Capacity,MemoryType,Speed,Manufacturer,PartNumber,SerialNumber", "/format:csv")

@@ -276,32 +276,38 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
         }
 
-        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - УБИРАЕМ ОГРАНИЧЕНИЕ НА 5 МОДУЛЕЙ
+        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - УЛУЧШЕННОЕ ОТОБРАЖЕНИЕ
         if len(memInfo.Modules) > 0 {
-            row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", t.config.T("memory.modules"), len(memInfo.Modules)), 
+            row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", 
+                t.config.T("memory.modules"), len(memInfo.Modules)), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
             
             for _, module := range memInfo.Modules {
-                // Используем реальное поле UsagePercent из структуры MemoryModule
-                moduleGraph := t.createSolidGraph(module.UsagePercent)
+                var moduleInfo string
                 
-                // Форматируем информацию о модуле
-                moduleInfo := fmt.Sprintf("  %s: %s %s @ %s", module.Slot, module.Size, module.Type, module.Speed)
-                
-                // Добавляем производителя, номер детали и серийный номер если доступно
-                if module.Manufacturer != "" && module.Manufacturer != "Unknown" {
-                    moduleInfo += fmt.Sprintf(" (%s", module.Manufacturer)
-                    if module.PartNumber != "" && module.PartNumber != "Unknown" {
-                        moduleInfo += fmt.Sprintf(" - %s", module.PartNumber)
+                if module.Size == "Unknown" || module.SizeBytes == 0 {
+                    // Пустой или неизвестный модуль
+                    moduleInfo = fmt.Sprintf("  %s: [Empty Slot]", module.Slot)
+                } else {
+                    // Модуль с данными
+                    moduleGraph := t.createSolidGraph(module.UsagePercent)
+                    moduleInfo = fmt.Sprintf("  %s: %s %s @ %s", 
+                        module.Slot, module.Size, module.Type, module.Speed)
+                    
+                    // Добавляем производителя и серийный номер
+                    if module.Manufacturer != "" && module.Manufacturer != "Unknown" {
+                        moduleInfo += fmt.Sprintf(" (%s", module.Manufacturer)
+                        if module.PartNumber != "" && module.PartNumber != "Unknown" {
+                            moduleInfo += fmt.Sprintf(" - %s", module.PartNumber)
+                        }
+                        if module.SerialNumber != "" && module.SerialNumber != "Unknown" {
+                            moduleInfo += fmt.Sprintf(" [SN:%s]", module.SerialNumber)
+                        }
+                        moduleInfo += ")"
                     }
-                    if module.SerialNumber != "" && module.SerialNumber != "Unknown" {
-                        moduleInfo += fmt.Sprintf(" [%s]", module.SerialNumber)
-                    }
-                    moduleInfo += ")"
+                    
+                    moduleInfo += fmt.Sprintf(" %.1f%% %s", module.UsagePercent, moduleGraph)
                 }
-                
-                // Добавляем процент использования
-                moduleInfo += fmt.Sprintf(" %.1f%% %s", module.UsagePercent, moduleGraph)
                 
                 row = t.printSimple(row, moduleInfo, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
             }
