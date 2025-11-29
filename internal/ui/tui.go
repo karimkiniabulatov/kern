@@ -249,12 +249,17 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
     row := t.renderHeader(startRow, t.config.T("memory.title"))
 
     if memInfo, ok := data.(*mem.MemoryInfo); ok {
-        // ОСНОВНАЯ ИНФОРМАЦИЯ О ПАМЯТИ
-        // Используем UsagePercent который теперь корректно вычислен
+        // Информация об архитектуре памяти
+        archInfo := mem.DetectMemoryArchitecture()
+        row = t.printSimple(row, fmt.Sprintf("Architecture: %s", archInfo), 
+            tcell.StyleDefault.Foreground(tcell.ColorYellow))
+
+        // ОСНОВНАЯ ИНФОРМАЦИЯ О ПАМЯТИ - ФИКСИРОВАННЫЙ ФОРМАТ ПРОЦЕНТОВ
+        ramUsageFormatted := fmt.Sprintf("%05.1f", memInfo.UsagePercent) // Формат 001.3%
         ramGraph := t.createSolidGraph(memInfo.UsagePercent)
-        row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
+        row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%s%%) %s",
             t.config.T("memory.ram"), memInfo.Used, memInfo.Total, 
-            memInfo.UsagePercent, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+            ramUsageFormatted, ramGraph), tcell.StyleDefault.Foreground(tcell.ColorGreen))
 
         // ДЕТАЛЬНАЯ ИНФОРМАЦИЯ О ИСПОЛЬЗОВАНИИ
         row = t.printSimple(row, fmt.Sprintf("Processes: %s | Cached: %s | Buffers: %s", 
@@ -270,27 +275,34 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
             t.config.T("common.free"), memInfo.Free), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
         if memInfo.SwapTotal != "0B" && memInfo.SwapTotal != "" && memInfo.SwapTotal != "0" {
+            swapUsageFormatted := fmt.Sprintf("%05.1f", memInfo.SwapUsagePercent)
             swapGraph := t.createSolidGraph(memInfo.SwapUsagePercent)
-            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s",
+            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%s%%) %s",
                 t.config.T("memory.swap"), memInfo.SwapUsed, memInfo.SwapTotal, 
-                memInfo.SwapUsagePercent, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+                swapUsageFormatted, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
         }
 
-        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - УЛУЧШЕННОЕ ОТОБРАЖЕНИЕ
+        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - ВЫРОВНЕННЫЕ ГИСТОГРАММЫ
         if len(memInfo.Modules) > 0 {
             row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", 
                 t.config.T("memory.modules"), len(memInfo.Modules)), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
             
+            // Находим максимальную длину для выравнивания
+            maxLineLength := 0
+            var moduleLines []string
+            
             for _, module := range memInfo.Modules {
                 var moduleInfo string
                 
                 if module.Size == "Unknown" || module.SizeBytes == 0 {
-                    // Пустой или неизвестный модуль
-                    moduleInfo = fmt.Sprintf("  %s: [Empty Slot]", module.Slot)
+                    // Модуль без информации
+                    moduleInfo = fmt.Sprintf("  %s: нет информации", module.Slot)
                 } else {
-                    // Модуль с данными
+                    // Модуль с данными - фиксированный формат процентов
+                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
                     moduleGraph := t.createSolidGraph(module.UsagePercent)
+                    
                     moduleInfo = fmt.Sprintf("  %s: %s %s @ %s", 
                         module.Slot, module.Size, module.Type, module.Speed)
                     
@@ -306,10 +318,41 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                         moduleInfo += ")"
                     }
                     
-                    moduleInfo += fmt.Sprintf(" %.1f%% %s", module.UsagePercent, moduleGraph)
+                    // Выравниваем гистограммы - добавляем пробелы для одинаковой длины
+                    currentLength := len(moduleInfo)
+                    if currentLength > maxLineLength {
+                        maxLineLength = currentLength
+                    }
+                    
+                    moduleInfo += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
                 }
                 
-                row = t.printSimple(row, moduleInfo, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                moduleLines = append(moduleLines, moduleInfo)
+            }
+            
+            // Выводим все строки с выровненными гистограммами
+            for _, line := range moduleLines {
+                // Если строка содержит гистограмму, выравниваем ее
+                if strings.Contains(line, "%") {
+                    parts := strings.Split(line, "%")
+                    if len(parts) >= 2 {
+                        infoPart := parts[0]
+                        graphPart := "%" + parts[1]
+                        
+                        // Добавляем пробелы для выравнивания
+                        padding := maxLineLength - len(infoPart)
+                        if padding > 0 {
+                            infoPart += strings.Repeat(" ", padding)
+                        }
+                        
+                        row = t.printSimple(row, infoPart + graphPart, 
+                            tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                        continue
+                    }
+                }
+                
+                // Обычная строка без гистограммы
+                row = t.printSimple(row, line, tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
             }
         } else {
             row = t.printSimple(row, "Memory modules: Information not available", 
@@ -869,39 +912,32 @@ func (t *TUI) printCentered(row int, text string, style tcell.Style) {
 	}
 }
 
-// Сплошная гистограмма с фиксированным количеством сегментов (20 сегментов = 5% на элемент)
+// ОБНОВЛЕННАЯ ФУНКЦИЯ: Создание гистограммы (5% на сегмент)
 func (t *TUI) createSolidGraph(percent float64) string {
-	if percent < 0 {
-		percent = 0
-	}
-	if percent > 100 {
-		percent = 100
-	}
+    if percent < 0 {
+        percent = 0
+    }
+    if percent > 100 {
+        percent = 100
+    }
 
-	segments := 20
-	filled := int((percent / 100) * float64(segments))
-	
-	// Гарантируем, что при ненулевом проценте показывается хотя бы один сегмент
-	if percent > 0 && filled == 0 {
-		filled = 1
-	}
-	if filled > segments {
-		filled = segments
-	}
+    // 20 сегментов = 5% на элемент
+    segments := 20
+    filled := int((percent / 100) * float64(segments))
+    
+    // Гарантируем, что при ненулевом проценте показывается хотя бы один сегмент
+    if percent > 0 && filled == 0 {
+        filled = 1
+    }
+    if filled > segments {
+        filled = segments
+    }
 
-	// Используем более совместимые символы для гистограммы
-	graph := strings.Repeat("█", filled)  // Полный блок
-	empty := strings.Repeat("░", segments-filled) // Светлый блок
-	
-	// Альтернатива если есть проблемы с юникодом:
-	// graph := strings.Repeat("■", filled)
-	// empty := strings.Repeat("□", segments-filled)
-	
-	// Или ASCII версия:
-	// graph := strings.Repeat("#", filled)
-	// empty := strings.Repeat(".", segments-filled)
-
-	return graph + empty
+    // Используем более совместимые символы для гистограммы
+    graph := strings.Repeat("█", filled)  // Полный блок
+    empty := strings.Repeat("░", segments-filled) // Светлый блок
+    
+    return graph + empty
 }
 
 // Старая функция для совместимости

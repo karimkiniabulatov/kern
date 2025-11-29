@@ -139,6 +139,9 @@ func getMemoryInfo() (*MemoryInfo, error) {
         modules = []MemoryModule{}
     }
 
+    // Анализируем архитектуру памяти
+    modules = analyzeMemoryArchitecture(modules, virtMem.Total)
+
     // Получаем детальную информацию о памяти
     cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
@@ -182,6 +185,134 @@ func getMemoryInfo() (*MemoryInfo, error) {
     }
 
     return info, nil
+}
+
+// НОВАЯ ФУНКЦИЯ: Анализ архитектуры памяти
+func analyzeMemoryArchitecture(modules []MemoryModule, totalMemory uint64) []MemoryModule {
+    if len(modules) == 0 || totalMemory == 0 {
+        return modules
+    }
+
+    // Считаем общий размер известных модулей
+    var knownSize uint64
+    var unknownSlots int
+    var knownModules []MemoryModule
+    
+    for _, module := range modules {
+        if module.SizeBytes > 0 {
+            knownSize += module.SizeBytes
+            knownModules = append(knownModules, module)
+        } else {
+            unknownSlots++
+        }
+    }
+
+    // Если есть неизвестные слоты и известная память не совпадает с общей
+    if unknownSlots > 0 && knownSize < totalMemory {
+        remainingMemory := totalMemory - knownSize
+        estimatedModuleSize := remainingMemory / uint64(unknownSlots)
+        
+        // Обновляем неизвестные модули с предполагаемыми размерами
+        for i := range modules {
+            if modules[i].SizeBytes == 0 {
+                modules[i].SizeBytes = estimatedModuleSize
+                modules[i].Size = formatBytes(estimatedModuleSize)
+                modules[i].Type = "DDR4" // Предполагаем наиболее современный тип
+                modules[i].Speed = "Unknown"
+            }
+        }
+    }
+
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ: Детальный анализ архитектуры памяти
+func detectMemoryArchitecture() string {
+    switch runtime.GOOS {
+    case "linux":
+        return analyzeLinuxMemoryArchitecture()
+    case "windows":
+        return analyzeWindowsMemoryArchitecture()
+    case "darwin":
+        return analyzeMacMemoryArchitecture()
+    default:
+        return "Unknown Architecture"
+    }
+}
+
+// Анализ архитектуры для Linux
+func analyzeLinuxMemoryArchitecture() string {
+    // Анализ через dmidecode
+    if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
+        outputStr := string(output)
+        
+        // Определяем тип архитектуры
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture" 
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "DDR2") {
+            return "DDR2 Architecture"
+        }
+        
+        // Проверяем наличие нескольких каналов
+        if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") {
+            return "Dual Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") && 
+                  strings.Contains(outputStr, "ChannelC") {
+            return "Triple Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") &&
+                  strings.Contains(outputStr, "ChannelC") && strings.Contains(outputStr, "ChannelD") {
+            return "Quad Channel Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для Windows
+func analyzeWindowsMemoryArchitecture() string {
+    cmd := exec.Command("wmic", "memorychip", "get", "MemoryType,ConfiguredClockSpeed,DataWidth", "/format:csv")
+    if output, err := cmd.Output(); err == nil {
+        outputStr := string(output)
+        
+        // Анализируем тип памяти и скорость
+        if strings.Contains(outputStr, "34") { // DDR5
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "26") { // DDR4
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "24") { // DDR3
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "21") { // DDR2
+            return "DDR2 Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для macOS
+func analyzeMacMemoryArchitecture() string {
+    if output, err := exec.Command("system_profiler", "SPMemoryDataType").Output(); err == nil {
+        outputStr := string(output)
+        
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        }
+        
+        // Проверяем унифицированную память Apple Silicon
+        if strings.Contains(outputStr, "Unified") {
+            return "Apple Unified Memory Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
 }
 
 // НОВАЯ ФУНКЦИЯ: Получение детальной информации о памяти
@@ -391,19 +522,25 @@ func isTrulyUniqueModule(modules []MemoryModule, slot string, serial string) boo
     return true
 }
 
-// УЛУЧШЕННАЯ ФУНКЦИЯ расчета использования модулей
+// ОБНОВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля
 func calculateModuleUsage(moduleSize uint64, totalSystemMemory uint64, usedSystemMemory uint64) float64 {
     if totalSystemMemory == 0 || moduleSize == 0 {
         return 0.0
     }
     
-    // Более точный расчет: предполагаем равномерное распределение данных по модулям
-    // Это упрощение, но лучше чем постоянный 0.8%
+    // Более точный расчет с учетом архитектуры
     moduleRatio := float64(moduleSize) / float64(totalSystemMemory)
     usagePercent := (float64(usedSystemMemory) / float64(totalSystemMemory)) * 100
     
-    // Возвращаем общий процент использования, скорректированный на долю модуля
-    return usagePercent * moduleRatio
+    // Гарантируем корректные границы
+    result := usagePercent * moduleRatio
+    if result < 0 {
+        return 0.0
+    }
+    if result > 100 {
+        return 100.0
+    }
+    return result
 }
 
 // Улучшенная функция для альтернативного получения информации о памяти
