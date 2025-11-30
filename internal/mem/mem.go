@@ -405,7 +405,6 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
     var modules []MemoryModule
     blocks := strings.Split(output, "Memory Device")
     
-    // Пропускаем первый блок (заголовок)
     for i := 1; i < len(blocks); i++ {
         module := MemoryModule{}
         lines := strings.Split(blocks[i], "\n")
@@ -434,29 +433,71 @@ func parseDMIDecodeOutput(output string) []MemoryModule {
             case strings.HasPrefix(line, "Locator:"):
                 module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
             case strings.HasPrefix(line, "Bank Locator:"):
-                // Используем Bank Locator как дополнительный идентификатор
                 if module.Slot == "" {
                     module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Bank Locator:"))
                 }
             }
         }
         
-        // ВАЖНОЕ ИСПРАВЛЕНИЕ: принимаем ВСЕ модули, даже с неизвестным размером
-        // но фильтруем полностью пустые слоты
+        // ИСПРАВЛЕНИЕ: Принимаем ВСЕ модули, включая нераспознанные
         if module.Slot != "" {
-            // Если размер не определен, помечаем как "Unknown"
+            // Если размер не определен, помечаем как "Не распознан"
             if module.Size == "" || module.Size == "No Module Installed" {
-                module.Size = "Unknown"
+                module.Size = "Не распознан"
                 module.SizeBytes = 0
             }
             
-            // Проверяем уникальность по слоту + серийному номеру
-            if isTrulyUniqueModule(modules, module.Slot, module.SerialNumber) {
-                modules = append(modules, module)
+            // Для нераспознанных модулей устанавливаем Type как "Unknown"
+            if module.Type == "" {
+                module.Type = "Unknown"
             }
+            
+            modules = append(modules, module)
         }
     }
     
+    return modules
+}
+
+// В функции parseDMIDecodeOutput ИСПРАВИТЬ обработку нераспознанных модулей:
+func calculateUnknownModuleUsage(modules []MemoryModule, totalSystemMemory uint64, usedSystemMemory uint64) []MemoryModule {
+    if len(modules) == 0 || totalSystemMemory == 0 {
+        return modules
+    }
+
+    // Считаем общий размер известных модулей
+    var knownSize uint64
+    var knownModules int
+    
+    for _, module := range modules {
+        if module.SizeBytes > 0 {
+            knownSize += module.SizeBytes
+            knownModules++
+        }
+    }
+
+    // Вычисляем использование для нераспознанных модулей
+    systemUsagePercent := float64(usedSystemMemory) / float64(totalSystemMemory) * 100
+    
+    for i := range modules {
+        if modules[i].SizeBytes == 0 {
+            // Для нераспознанных модулей используем системное использование
+            modules[i].UsagePercent = systemUsagePercent
+        } else {
+            // Для известных модулей распределяем использование пропорционально
+            moduleShare := float64(modules[i].SizeBytes) / float64(knownSize)
+            modules[i].UsagePercent = systemUsagePercent * moduleShare
+        }
+        
+        // Гарантируем корректные границы
+        if modules[i].UsagePercent < 0 {
+            modules[i].UsagePercent = 0.0
+        }
+        if modules[i].UsagePercent > 100 {
+            modules[i].UsagePercent = 100.0
+        }
+    }
+
     return modules
 }
 

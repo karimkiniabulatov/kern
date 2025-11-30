@@ -124,21 +124,16 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
         return getFallbackNetworkInterfacesWithDefaults()
     }
 
-    // Гарантируем, что все поля заполнены корректными значениями
-    for i := range interfaces {
-        interfaces[i] = ensureNetworkInfoDefaults(interfaces[i])
-    }
-
-    // ВОТ ИСПРАВЛЕНИЕ - показываем ВСЕ интерфейсы кроме полностью нерабочих
+    // ИСПРАВЛЕНИЕ: Убрать избыточную фильтрацию и показывать ВСЕ интерфейсы
     var filteredInterfaces []NetworkInfo
     for _, iface := range interfaces {
-        // Включаем все интерфейсы кроме loopback и полностью нерабочих
-        if iface.ConnectionType != "Loopback" && iface.Status != "DOWN" {
+        // Включаем все интерфейсы кроме полностью нерабочих и loopback
+        if iface.Status != "DOWN" && iface.ConnectionType != "Loopback" {
             filteredInterfaces = append(filteredInterfaces, iface)
         }
     }
 
-    // Если после фильтрации нет интерфейсов, показываем все кроме loopback
+    // Если после фильтрации нет интерфейсов, показываем ВСЕ кроме loopback
     if len(filteredInterfaces) == 0 {
         for _, iface := range interfaces {
             if iface.ConnectionType != "Loopback" {
@@ -644,6 +639,11 @@ func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
 			
 			// Пропускаем пустые имена
 			if ifaceName == "" {
+				continue
+			}
+
+			// ИСКЛЮЧАЕМ ТОЛЬКО loopback интерфейсы
+			if ifaceName == "lo" {
 				continue
 			}
 

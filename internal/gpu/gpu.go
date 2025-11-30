@@ -190,6 +190,12 @@ func detectGenericIntel() []*GPUInfo {
 			}
 		}
 	case "windows":
+		// Улучшенное обнаружение Intel GPU на Windows через WMI
+		if intelGPUs, err := getWindowsIntelGPUInfo(); err == nil && len(intelGPUs) > 0 {
+			return intelGPUs
+		}
+		
+		// Fallback: базовое обнаружение через wmic
 		if output, err := exec.Command("wmic", "path", "win32_VideoController", "get", "name", "/value").Output(); err == nil {
 			lines := strings.Split(string(output), "\n")
 			for _, line := range lines {
@@ -220,6 +226,78 @@ func detectGenericIntel() []*GPUInfo {
 	}
 	
 	return gpus
+}
+
+// getWindowsIntelGPUInfo улучшенное обнаружение Intel GPU на Windows через WMI
+func getWindowsIntelGPUInfo() ([]*GPUInfo, error) {
+	var gpus []*GPUInfo
+
+	// Использование WMI для получения детальной информации о GPU Intel
+	cmd := exec.Command("wmic", "path", "win32_VideoController", "get", "Name,DriverVersion,AdapterRAM,VideoProcessor,AdapterCompatibility", "/format:csv")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	gpuMap := make(map[string]*GPUInfo)
+	
+	for i, line := range lines {
+		if i == 0 || strings.TrimSpace(line) == "" {
+			continue
+		}
+		
+		fields := strings.Split(line, ",")
+		if len(fields) >= 6 {
+			deviceID := strings.TrimSpace(fields[1])
+			name := strings.TrimSpace(fields[2])
+			driverVersion := strings.TrimSpace(fields[3])
+			adapterRAM := strings.TrimSpace(fields[4])
+			videoProcessor := strings.TrimSpace(fields[5])
+			adapterCompatibility := strings.TrimSpace(fields[6])
+
+			// Фильтруем только Intel GPU
+			if !strings.Contains(strings.ToLower(name), "intel") && 
+			   !strings.Contains(strings.ToLower(adapterCompatibility), "intel") &&
+			   !strings.Contains(strings.ToLower(videoProcessor), "intel") {
+				continue
+			}
+
+			gpu := &GPUInfo{
+				Model:         name,
+				DriverVersion: driverVersion,
+				PerformanceState: "Active",
+			}
+
+			// Обработка памяти
+			if adapterRAM != "" {
+				if ramBytes, err := strconv.ParseUint(adapterRAM, 10, 64); err == nil {
+					ramMB := ramBytes / 1024 / 1024
+					gpu.MemoryTotal = fmt.Sprintf("%d MB", ramMB)
+				}
+			}
+
+			// Используем VideoProcessor как дополнительный идентификатор
+			if videoProcessor != "" && videoProcessor != "Unknown" {
+				if gpu.Model == "" || gpu.Model == "Intel GPU" {
+					gpu.Model = videoProcessor
+				}
+			}
+
+			gpuMap[deviceID] = gpu
+		}
+	}
+
+	// Преобразуем map в slice
+	for _, gpu := range gpuMap {
+		gpus = append(gpus, gpu)
+	}
+
+	if len(gpus) > 0 {
+		return gpus, nil
+	}
+
+	return nil, fmt.Errorf("no Intel GPUs found via WMI")
 }
 
 // parseNvidiaSMIOutput парсит вывод nvidia-smi для нескольких GPU

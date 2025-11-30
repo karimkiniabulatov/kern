@@ -599,6 +599,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
+	
+	log.Printf("WARNING: API server is accessible from all network interfaces on port %d", port)
+	log.Printf("For production use, consider configuring firewall rules")
+	
     if port <= 0 || port > 65535 {
         port = 28126 // порт по умолчанию для API
     }
@@ -831,9 +835,9 @@ func startRemoteServer(cfg *config.Config, port int) {
     })
 
     server := &http.Server{
-        Addr:    fmt.Sprintf(":%d", port),
-        Handler: mux,
-    }
+		Addr:    fmt.Sprintf("0.0.0.0:%d", port), // Принимать соединения со всех интерфейсов
+		Handler: mux,
+	}
 
     log.Printf("API server running on http://localhost:%d", port)
     log.Printf("Available endpoints:")

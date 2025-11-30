@@ -709,70 +709,68 @@ func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 
 // AI training rendering function
 func (t *TUI) renderAI(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("ai.title"))
+    row := t.renderHeader(startRow, t.config.T("ai.title"))
 
-	switch aiData := data.(type) {
-	case *ai.AIInfo:
-		if aiData.ProcessCount > 0 {
-			if aiData.Framework != "" {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("ai.framework"), aiData.Framework), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			}
-			row = t.printSimple(row, fmt.Sprintf("%s: %d", t.config.T("ai.processes"), aiData.ProcessCount), tcell.StyleDefault.Foreground(tcell.ColorGreen))
-			
-			if aiData.VRAMUsage != "" && aiData.VRAMTotal != "" {
-				// Вычисляем процент использования VRAM для гистограммы
-				usedMB := extractMemoryMB(aiData.VRAMUsage)
-				totalMB := extractMemoryMB(aiData.VRAMTotal)
-				if totalMB > 0 {
-					vramPercent := float64(usedMB) / float64(totalMB) * 100
-					vramGraph := t.createSolidGraph(vramPercent)
-					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
-						t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal, 
-						vramPercent, vramGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				} else {
-					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-						t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal), 
-						tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				}
-			}
+    switch aiData := data.(type) {
+    case *ai.AIInfo:
+        if aiData.ProcessCount > 0 {
+            if aiData.Framework != "" {
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("ai.framework"), aiData.Framework), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            }
+            row = t.printSimple(row, fmt.Sprintf("%s: %d", t.config.T("ai.processes"), aiData.ProcessCount), tcell.StyleDefault.Foreground(tcell.ColorGreen))
+            
+            if aiData.VRAMUsage != "" && aiData.VRAMTotal != "" {
+                // ИСПРАВЛЕНИЕ: гистограмма на отдельной строке как в памяти
+                usedMB := extractMemoryMB(aiData.VRAMUsage)
+                totalMB := extractMemoryMB(aiData.VRAMTotal)
+                if totalMB > 0 {
+                    vramPercent := float64(usedMB) / float64(totalMB) * 100
+                    vramGraph := t.createSolidGraph(vramPercent)
+                    row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+                        t.config.T("ai.vram"), aiData.VRAMUsage, aiData.VRAMTotal), 
+                        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                    // ГИСТОГРАММА НА ОТДЕЛЬНОЙ СТРОКЕ
+                    row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", vramPercent, vramGraph), 
+                        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                }
+            }
 
-			if aiData.ModelName != "" {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("ai.model"), aiData.ModelName), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			}
+            if aiData.ModelName != "" {
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("ai.model"), aiData.ModelName), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            }
 
-			if aiData.BatchSize > 0 {
-				// Гистограмма для throughput
-				throughputGraph := t.createSolidGraph(aiData.Throughput / 100.0) // Нормализуем для отображения
-				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.1f samples/sec %s", 
-					t.config.T("ai.batch_size"), aiData.BatchSize,
-					t.config.T("ai.throughput"), aiData.Throughput, throughputGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-			}
+            if aiData.BatchSize > 0 {
+                // ГИСТОГРАММА throughput на отдельной строке
+                throughputGraph := t.createSolidGraph(aiData.Throughput)
+                row = t.printSimple(row, fmt.Sprintf("%s: %d", 
+                    t.config.T("ai.batch_size"), aiData.BatchSize), 
+                    tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                row = t.printSimple(row, fmt.Sprintf("%s: %.1f samples/sec", 
+                    t.config.T("ai.throughput"), aiData.Throughput), 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                // ГИСТОГРАММА НА ОТДЕЛЬНОЙ СТРОКЕ
+                row = t.printSimple(row, fmt.Sprintf("  %s", throughputGraph), 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+            }
 
-			if aiData.Epoch > 0 {
-				// Гистограмма для точности
-				accuracyGraph := t.createSolidGraph(aiData.Accuracy * 100)
-				row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.3f | %s: %.1f%% %s", 
-					t.config.T("ai.epoch"), aiData.Epoch,
-					t.config.T("ai.loss"), aiData.Loss,
-					t.config.T("ai.accuracy"), aiData.Accuracy*100, accuracyGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-			}
-
-			if aiData.TrainingTime != "" {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("ai.training_time"), aiData.TrainingTime), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			}
-		} else {
-			row = t.printSimple(row, t.config.T("ai.no_training"), tcell.StyleDefault.Foreground(tcell.ColorGray))
-		}
-	case map[string]interface{}:
-		if errorMsg, exists := aiData["error"]; exists {
-			if errorStr, ok := errorMsg.(string); ok {
-				row = t.printSimple(row, fmt.Sprintf("Error: %s", errorStr), tcell.StyleDefault.Foreground(tcell.ColorRed))
-			}
-		}
-	default:
-		row = t.printSimple(row, t.config.T("ai.no_training"), tcell.StyleDefault.Foreground(tcell.ColorGray))
-	}
-	return row + 1
+            if aiData.Epoch > 0 {
+                // ГИСТОГРАММА accuracy на отдельной строке
+                accuracyPercent := aiData.Accuracy * 100
+                accuracyGraph := t.createSolidGraph(accuracyPercent)
+                row = t.printSimple(row, fmt.Sprintf("%s: %d | %s: %.3f", 
+                    t.config.T("ai.epoch"), aiData.Epoch,
+                    t.config.T("ai.loss"), aiData.Loss), 
+                    tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
+                    t.config.T("ai.accuracy"), accuracyPercent), 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                // ГИСТОГРАММА НА ОТДЕЛЬНОЙ СТРОКЕ
+                row = t.printSimple(row, fmt.Sprintf("  %s", accuracyGraph), 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+            }
+        }
+    }
+    return row + 1
 }
 
 // Mining rendering function
@@ -785,7 +783,12 @@ func (t *TUI) renderMining(startRow int, data interface{}) int {
 			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("mining.algorithm"), miningData.Algorithm), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 			
 			if miningData.Hashrate != "" {
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("mining.hashrate"), miningData.Hashrate), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				// ГИСТОГРАММА ДОБАВЛЕНА - на основе хешрейта
+				hashrateValue := extractHashrateValue(miningData.Hashrate)
+				hashrateGraph := t.createSolidGraph(hashrateValue)
+				row = t.printSimple(row, fmt.Sprintf("%s: %s %s", 
+					t.config.T("mining.hashrate"), miningData.Hashrate, hashrateGraph), 
+					tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 
 			if miningData.SharesValid > 0 {
@@ -837,6 +840,18 @@ func (t *TUI) renderMining(startRow int, data interface{}) int {
 		row = t.printSimple(row, t.config.T("mining.not_detected"), tcell.StyleDefault.Foreground(tcell.ColorGray))
 	}
 	return row + 1
+}
+
+func extractHashrateValue(hashrate string) float64 {
+    // Пример: "45.7 MH/s" -> 45.7
+    re := regexp.MustCompile(`(\d+\.?\d*)`)
+    matches := re.FindStringSubmatch(hashrate)
+    if len(matches) > 1 {
+        if value, err := strconv.ParseFloat(matches[1], 64); err == nil {
+            return value
+        }
+    }
+    return 0.0
 }
 
 func (t *TUI) renderHeader(startRow int, title string) int {
