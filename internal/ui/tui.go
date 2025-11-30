@@ -286,7 +286,7 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
         }
 
         // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - ВЫРОВНЕННЫЕ ГИСТОГРАММЫ
-        if len(memInfo.Modules) > 0 {
+        if t.config.DetailedMem && len(memInfo.Modules) > 0 {
             row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", 
                 t.config.T("memory.modules"), len(memInfo.Modules)), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
