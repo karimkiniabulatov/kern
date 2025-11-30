@@ -72,7 +72,7 @@ var (
 	// Флаги управления приложением
 	flagAppPause    = flag.Bool("pause", false, "Pause kern application")
 	flagAppResume   = flag.Bool("resume", false, "Resume kern application") 
-	flagAppStop     = flag.Bool("stop", false, "Stop kern application")
+	flagAppStop     = flag.Bool("stop-app", false, "Stop kern application")
 	flagAppRestart  = flag.Bool("restart-app", false, "Restart kern application")
 )
 
@@ -100,10 +100,10 @@ func init() {
 	
 	// Сервисные флаги с альтернативными именами
 	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
-	flag.BoolVar(flagStart, "start", false, "Start the kern daemon")
-	flag.BoolVar(flagStop, "stop", false, "Stop the kern daemon")
-	flag.BoolVar(flagRestart, "restart", false, "Restart the kern daemon")
-	flag.BoolVar(flagStatus, "status", false, "Show daemon status")
+	flag.BoolVar(flagStart, "start-daemon", false, "Start the kern daemon")
+	flag.BoolVar(flagStop, "stop-daemon", false, "Stop the kern daemon")
+	flag.BoolVar(flagRestart, "restart-daemon", false, "Restart the kern daemon")
+	flag.BoolVar(flagStatus, "daemon-status", false, "Show daemon status")
 	flag.BoolVar(flagVersion, "version", false, "Show version")
 }
 
@@ -125,7 +125,7 @@ func main() {
 		fmt.Println("  --refresh SECONDS    Refresh interval in seconds (default: 2)")
 		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
 		fmt.Println("\nDetailed Information Options:")
-		fmt.Println("  --detailed, -de      Show detailed CPU core information")
+		fmt.Println("  --detailed, -deflag.BoolVar(flagDaemon,      Show detailed CPU core information")
 		fmt.Println("  q, -dm  Show detailed memory module information")
 		
 		fmt.Println("\nLanguage Options:")
@@ -147,10 +147,10 @@ func main() {
 		
 		fmt.Println("\nService Management:")
 		fmt.Println("  --daemon, --dmn      Start kern as a daemon service")
-		fmt.Println("  --start-service, --start Start the kern daemon")
-		fmt.Println("  --stop-service, --stop Stop the kern daemon")
-		fmt.Println("  --restart-service, --restart Restart the kern daemon")
-		fmt.Println("  --service-status, --status Show daemon status")
+		fmt.Println("  --start-service      Start the kern daemon")
+		fmt.Println("  --stop-service       Stop the kern daemon")
+		fmt.Println("  --restart-service    Restart the kern daemon")
+		fmt.Println("  --service-status     Show daemon status")
 		fmt.Println("  --enable-service     Enable auto-start on boot")
 		fmt.Println("  --disable-service    Disable auto-start on boot")
 		fmt.Println("  --ensure-running     Ensure daemon is running")
