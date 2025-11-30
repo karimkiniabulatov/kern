@@ -225,6 +225,12 @@ func main() {
 
 	// Remote API monitoring
 	if *flagAPI != "" {
+		// Проверяем валидность URL
+		if !strings.HasPrefix(*flagAPI, "http://") && !strings.HasPrefix(*flagAPI, "https://") {
+			// Автоматически добавляем http:// если не указан протокол
+			*flagAPI = "http://" + *flagAPI
+		}
+		
 		monitorRemoteAPI(*flagAPI)
 		return
 	}
@@ -593,356 +599,483 @@ func collectData(cfg *config.Config) map[string]interface{} {
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
-	if port <= 0 || port > 65535 {
-		port = 28126 // порт по умолчанию для API
-	}
+    if port <= 0 || port > 65535 {
+        port = 28126 // порт по умолчанию для API
+    }
 
-	showLogo()
-	log.Printf("Starting remote API server on port %d...", port)
+    showLogo()
+    log.Printf("Starting remote API server on port %d...", port)
 
-	// Create a new mux to avoid global http.HandleFunc conflicts
-	mux := http.NewServeMux()
+    // Create a new mux to avoid global http.HandleFunc conflicts
+    mux := http.NewServeMux()
 
-	// CPU endpoint
-	mux.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := cpu.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // Добавляем middleware для логирования и CORS
+    mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+        // Логируем запрос
+        log.Printf("API Request: %s %s", r.Method, r.URL.Path)
+        
+        // CORS headers
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        // Продолжаем к оригинальному обработчику
+        mux.ServeHTTP(w, r)
+    })
 
-	// Memory endpoint
-	mux.HandleFunc("/api/mem", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := mem.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // CPU endpoint
+    mux.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := cpu.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// Disk endpoint
-	mux.HandleFunc("/api/disk", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := disk.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // Memory endpoint
+    mux.HandleFunc("/api/mem", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := mem.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// Network endpoint
-	mux.HandleFunc("/api/net", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := net.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // Disk endpoint
+    mux.HandleFunc("/api/disk", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := disk.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// NEW: GPU endpoint
-	mux.HandleFunc("/api/gpu", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := gpu.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // Network endpoint
+    mux.HandleFunc("/api/net", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := net.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// NEW: AI endpoint
-	mux.HandleFunc("/api/ai", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := ai.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // NEW: GPU endpoint
+    mux.HandleFunc("/api/gpu", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := gpu.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// NEW: Mining endpoint
-	mux.HandleFunc("/api/mining", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		data, err := mining.Summary()
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(data)
-	})
+    // NEW: AI endpoint
+    mux.HandleFunc("/api/ai", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := ai.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// System info endpoint
-	mux.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		systemInfo := map[string]interface{}{
-			"version": version,
-			"time":    time.Now().Format(time.RFC3339),
-			"os":      runtime.GOOS,
-			"arch":    runtime.GOARCH,
-		}
-		json.NewEncoder(w).Encode(systemInfo)
-	})
+    // NEW: Mining endpoint
+    mux.HandleFunc("/api/mining", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        data, err := mining.Summary()
+        if err != nil {
+            http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+            return
+        }
+        json.NewEncoder(w).Encode(data)
+    })
 
-	// Health check endpoint
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-	})
+    // System info endpoint
+    mux.HandleFunc("/api/system", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        systemInfo := map[string]interface{}{
+            "version": version,
+            "time":    time.Now().Format(time.RFC3339),
+            "os":      runtime.GOOS,
+            "arch":    runtime.GOARCH,
+        }
+        json.NewEncoder(w).Encode(systemInfo)
+    })
 
-	// Root endpoint with API info
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		
-		if r.Method == "OPTIONS" {
-			return
-		}
-		
-		apiInfo := map[string]interface{}{
-			"name":    "kern API",
-			"version": version,
-			"os":      runtime.GOOS,
-			"arch":    runtime.GOARCH,
-			"endpoints": []string{
-				"/api/cpu",
-				"/api/mem",
-				"/api/disk",
-				"/api/net",
-				"/api/gpu",
-				"/api/ai",
-				"/api/mining",
-				"/api/system",
-				"/health",
-			},
-			"protocols": []string{
-				"HTTP",
-				"HTTPS (with TLS)",
-			},
-			"access": "Local network and global internet (if port forwarded)",
-		}
-		json.NewEncoder(w).Encode(apiInfo)
-	})
+    // Health check endpoint
+    mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+    })
 
-	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: mux,
-	}
+    // Root endpoint with API info
+    mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        
+        if r.Method == "OPTIONS" {
+            return
+        }
+        
+        apiInfo := map[string]interface{}{
+            "name":    "kern API",
+            "version": version,
+            "os":      runtime.GOOS,
+            "arch":    runtime.GOARCH,
+            "endpoints": []string{
+                "/api/cpu",
+                "/api/mem",
+                "/api/disk",
+                "/api/net",
+                "/api/gpu",
+                "/api/ai",
+                "/api/mining",
+                "/api/system",
+                "/health",
+            },
+            "protocols": []string{
+                "HTTP",
+                "HTTPS (with TLS)",
+            },
+            "access": "Local network and global internet (if port forwarded)",
+        }
+        json.NewEncoder(w).Encode(apiInfo)
+    })
 
-	log.Printf("API server running on http://localhost:%d", port)
-	log.Printf("Available endpoints:")
-	log.Printf("  GET /api/cpu    - CPU information")
-	log.Printf("  GET /api/mem    - Memory information")
-	log.Printf("  GET /api/disk   - Disk information")
-	log.Printf("  GET /api/net    - Network information")
-	log.Printf("  GET /api/gpu    - GPU information")
-	log.Printf("  GET /api/ai     - AI training information")
-	log.Printf("  GET /api/mining - Mining information")
-	log.Printf("  GET /api/system - System information")
-	log.Printf("  GET /health     - Health check")
-	log.Printf("")
-	log.Printf("Access methods:")
-	log.Printf("  Local:  http://localhost:%d/api/cpu", port)
-	log.Printf("  Remote: http://your-ip:%d/api/cpu", port)
-	log.Printf("  HTTPS:  Configure reverse proxy with TLS")
-	log.Printf("  SSH:    Use SSH tunneling: ssh -L %d:localhost:%d user@host", port, port)
-	log.Printf("")
-	log.Printf("Press Ctrl+C to stop the server")
+    server := &http.Server{
+        Addr:    fmt.Sprintf(":%d", port),
+        Handler: mux,
+    }
 
-	// Handle graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+    log.Printf("API server running on http://localhost:%d", port)
+    log.Printf("Available endpoints:")
+    log.Printf("  GET /api/cpu    - CPU information")
+    log.Printf("  GET /api/mem    - Memory information")
+    log.Printf("  GET /api/disk   - Disk information")
+    log.Printf("  GET /api/net    - Network information")
+    log.Printf("  GET /api/gpu    - GPU information")
+    log.Printf("  GET /api/ai     - AI training information")
+    log.Printf("  GET /api/mining - Mining information")
+    log.Printf("  GET /api/system - System information")
+    log.Printf("  GET /health     - Health check")
+    log.Printf("")
+    log.Printf("Access methods:")
+    log.Printf("  Local:  http://localhost:%d/api/cpu", port)
+    log.Printf("  Remote: http://your-ip:%d/api/cpu", port)
+    log.Printf("  HTTPS:  Configure reverse proxy with TLS")
+    log.Printf("  SSH:    Use SSH tunneling: ssh -L %d:localhost:%d user@host", port, port)
+    log.Printf("")
+    log.Printf("Press Ctrl+C to stop the server")
 
-	// Для Windows добавляем дополнительные сигналы
-	if runtime.GOOS == "windows" {
-		signal.Notify(sigChan, syscall.SIGQUIT)
-	}
+    // Handle graceful shutdown
+    sigChan := make(chan os.Signal, 1)
+    signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		<-sigChan
-		log.Printf("Shutting down API server...")
-		server.Close()
-	}()
+    // Для Windows добавляем дополнительные сигналы
+    if runtime.GOOS == "windows" {
+        signal.Notify(sigChan, syscall.SIGQUIT)
+    }
 
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Failed to start API server: %v", err)
-	}
+    go func() {
+        <-sigChan
+        log.Printf("Shutting down API server...")
+        server.Close()
+    }()
 
-	log.Printf("API server stopped")
+    if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+        log.Fatalf("Failed to start API server: %v", err)
+    }
+
+    log.Printf("API server stopped")
 }
 
-// NEW: Remote API monitoring function
+// NEW: Improved Remote API monitoring function
 func monitorRemoteAPI(apiURL string) {
-	showLogo()
-	fmt.Printf("Monitoring remote server via API: %s\n", apiURL)
-	fmt.Println("Press Ctrl+C to exit")
-	fmt.Println()
+    showLogo()
+    
+    // Проверяем, указан ли конкретный эндпоинт
+    isSpecificEndpoint := strings.Contains(apiURL, "/api/") || strings.Contains(apiURL, "/health")
+    
+    if isSpecificEndpoint {
+        // Режим единичного запроса к конкретному эндпоинту
+        fmt.Printf("Fetching data from: %s\n", apiURL)
+        
+        data, err := fetchSpecificEndpoint(apiURL)
+        if err != nil {
+            fmt.Printf("Error fetching data: %v\n", err)
+            return
+        }
+        
+        displaySpecificEndpointData(apiURL, data)
+        return
+    } else {
+        // Режим мониторинга всех эндпоинтов
+        fmt.Printf("Monitoring remote server via API: %s\n", apiURL)
+        fmt.Println("Press Ctrl+C to exit")
+        fmt.Println()
 
-	ticker := time.NewTicker(2 * time.Second)
-	defer ticker.Stop()
+        ticker := time.NewTicker(2 * time.Second)
+        defer ticker.Stop()
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+        sigChan := make(chan os.Signal, 1)
+        signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	// Для Windows добавляем дополнительные сигналы
-	if runtime.GOOS == "windows" {
-		signal.Notify(sigChan, syscall.SIGQUIT)
-	}
+        // Для Windows добавляем дополнительные сигналы
+        if runtime.GOOS == "windows" {
+            signal.Notify(sigChan, syscall.SIGQUIT)
+        }
 
-	for {
-		select {
-		case <-ticker.C:
-			data, err := fetchRemoteData(apiURL)
-			if err != nil {
-				fmt.Printf("Error fetching data: %v\n", err)
-				continue
-			}
-			displayRemoteData(data)
-			// Кроссплатформенная очистка экрана
-			clearScreen()
-		case <-sigChan:
-			fmt.Println("\nExiting remote monitoring...")
-			return
-		}
-	}
+        for {
+            select {
+            case <-ticker.C:
+                data, err := fetchRemoteData(apiURL)
+                if err != nil {
+                    fmt.Printf("Error fetching data: %v\n", err)
+                    continue
+                }
+                displayRemoteData(data)
+                // Кроссплатформенная очистка экрана
+                clearScreen()
+            case <-sigChan:
+                fmt.Println("\nExiting remote monitoring...")
+                return
+            }
+        }
+    }
 }
+
+// NEW: Fetch specific endpoint data
+func fetchSpecificEndpoint(url string) (interface{}, error) {
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Get(url)
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to %s: %v", url, err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("server returned status: %s", resp.Status)
+    }
+
+    var data interface{}
+    if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+        return nil, fmt.Errorf("failed to parse response: %v", err)
+    }
+
+    return data, nil
+}
+
+// NEW: Display specific endpoint data
+func displaySpecificEndpointData(url string, data interface{}) {
+    endpoint := extractEndpointName(url)
+    fmt.Printf("=== %s ===\n", strings.ToUpper(endpoint))
+    
+    jsonData, err := json.MarshalIndent(data, "", "  ")
+    if err != nil {
+        fmt.Printf("Error formatting data: %v\n", err)
+        return
+    }
+    
+    fmt.Println(string(jsonData))
+}
+
+// NEW: Extract endpoint name from URL
+func extractEndpointName(url string) string {
+    if strings.Contains(url, "/api/") {
+        parts := strings.Split(url, "/api/")
+        if len(parts) > 1 {
+            return parts[1]
+        }
+    } else if strings.Contains(url, "/health") {
+        return "health"
+    }
+    return "unknown"
+}
+
+
 
 // Кроссплатформенная функция очистки экрана
 func clearScreen() {
-	switch runtime.GOOS {
-	case "windows":
-		// Для Windows
-		fmt.Print("\033[2J\033[H")
-	default:
-		// Для Unix-систем
-		fmt.Print("\033[2J\033[H")
-	}
+    switch runtime.GOOS {
+    case "windows":
+        // Для Windows
+        fmt.Print("\033[2J\033[H")
+    default:
+        // Для Unix-систем
+        fmt.Print("\033[2J\033[H")
+    }
 }
 
-// NEW: Fetch data from remote API
+// NEW: Improved fetchRemoteData to handle errors better
 func fetchRemoteData(baseURL string) (map[string]interface{}, error) {
-	endpoints := []string{"cpu", "mem", "disk", "net", "gpu", "ai", "mining"}
-	results := make(map[string]interface{})
+    endpoints := []string{"cpu", "mem", "disk", "net", "gpu", "ai", "mining", "health"}
+    results := make(map[string]interface{})
+    
+    client := &http.Client{Timeout: 5 * time.Second}
 
-	for _, endpoint := range endpoints {
-		url := fmt.Sprintf("%s/api/%s", baseURL, endpoint)
-		resp, err := http.Get(url)
-		if err != nil {
-			results[endpoint] = map[string]string{"error": err.Error()}
-			continue
-		}
-		defer resp.Body.Close()
+    for _, endpoint := range endpoints {
+        url := fmt.Sprintf("%s/api/%s", baseURL, endpoint)
+        if endpoint == "health" {
+            url = fmt.Sprintf("%s/health", baseURL)
+        }
+        
+        resp, err := client.Get(url)
+        if err != nil {
+            results[endpoint] = map[string]string{"error": err.Error()}
+            continue
+        }
+        
+        if resp.StatusCode != http.StatusOK {
+            results[endpoint] = map[string]string{"error": fmt.Sprintf("HTTP %d", resp.StatusCode)}
+            resp.Body.Close()
+            continue
+        }
 
-		var data interface{}
-		if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-			results[endpoint] = map[string]string{"error": err.Error()}
-			continue
-		}
+        var data interface{}
+        if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+            results[endpoint] = map[string]string{"error": err.Error()}
+            resp.Body.Close()
+            continue
+        }
 
-		results[endpoint] = data
-	}
+        results[endpoint] = data
+        resp.Body.Close()
+    }
 
-	return results, nil
+    return results, nil
 }
 
-// NEW: Display remote data
-func displayRemoteData(data map[string]interface{}) {
-	fmt.Println("=== Remote System Monitoring ===")
 
-	for module, moduleData := range data {
-		fmt.Printf("\n%s:\n", strings.ToUpper(module))
-		if errorData, isError := moduleData.(map[string]interface{}); isError {
-			if errorMsg, exists := errorData["error"]; exists {
-				fmt.Printf("  Error: %v\n", errorMsg)
-			}
-		} else {
-			// Simple display of remote data
-			jsonData, _ := json.MarshalIndent(moduleData, "  ", "  ")
-			fmt.Printf("  %s\n", string(jsonData))
-		}
-	}
+
+// NEW: Improved display for remote data
+func displayRemoteData(data map[string]interface{}) {
+    fmt.Println("=== Remote System Monitoring ===")
+    fmt.Println()
+
+    // Определяем порядок вывода модулей
+    modulesOrder := []string{"cpu", "mem", "disk", "net", "gpu", "ai", "mining", "health"}
+    
+    for _, module := range modulesOrder {
+        if moduleData, exists := data[module]; exists {
+            fmt.Printf("%s:\n", strings.ToUpper(module))
+            
+            if errorData, isError := moduleData.(map[string]interface{}); isError {
+                if errorMsg, exists := errorData["error"]; exists {
+                    fmt.Printf("  Error: %v\n", errorMsg)
+                }
+            } else {
+                // Форматируем вывод для лучшей читаемости
+                displayFormattedModuleData(moduleData, "  ")
+            }
+            fmt.Println()
+        }
+    }
+}
+
+// NEW: Helper function to display formatted module data
+func displayFormattedModuleData(data interface{}, indent string) {
+    switch v := data.(type) {
+    case map[string]interface{}:
+        for key, value := range v {
+            fmt.Printf("%s%s: ", indent, key)
+            displayFormattedModuleData(value, indent+"  ")
+        }
+    case []interface{}:
+        for i, item := range v {
+            fmt.Printf("%s[%d]: ", indent, i)
+            displayFormattedModuleData(item, indent+"  ")
+        }
+    default:
+        fmt.Printf("%v\n", v)
+    }
 }
 
 // NEW: SSH monitoring function (placeholder)
