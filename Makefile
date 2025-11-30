@@ -1,7 +1,7 @@
 .PHONY: all build linux windows macos clean install
 
 BINARY_NAME=kern
-VERSION=1.2.1
+VERSION=1.2.3
 
 # Добавить платформо-специфичные флаги
 BUILD_FLAGS_LINUX = -tags linux

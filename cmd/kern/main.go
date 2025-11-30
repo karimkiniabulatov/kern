@@ -70,7 +70,7 @@ var (
 	flagDetailedShort = flag.Bool("de", false, "Show detailed CPU core information (short)")
 )
 
-const version = "1.2.1"
+const version = "1.2.3"
 
 func init() {
 	// Для Windows: настраиваем цветной вывод

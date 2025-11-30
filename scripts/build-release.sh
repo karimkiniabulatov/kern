@@ -2,7 +2,7 @@
 set -e
 
 echo "Building kern - System Monitoring Tool"
-VERSION="1.2.0"
+VERSION="1.2.3"
 
 # Определяем корневую директорию проекта
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
