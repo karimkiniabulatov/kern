@@ -118,8 +118,11 @@ Set interface language. Language pack must be downloaded first using \fB\-\-down
 .BI \-r " [PORT]" "\fR, " \-\-remote " [PORT]"
 Start remote API server on specified port. Default port is 28126 if not specified.
 .TP
-.B \-\-detailed
-Show detailed CPU core information including individual core usage percentages.
+.BR \-\-detailed ", " \-de
+Show detailed CPU core information including individual core usage percentages. This setting is not persisted between sessions.
+.TP
+.BR \-\-detailed-mem ", " \-dm
+Show detailed memory module information including slot, size, type, speed, and usage percentages. This setting is not persisted between sessions.
 .TP
 .BI \-\-api " URL"
 Monitor remote server via HTTP/HTTPS API. URL should be in format http://host:port or https://host:port.
@@ -159,6 +162,9 @@ Disable auto-start on system boot.
 .TP
 .B \-\-ensure-running
 Ensure daemon service is running.
+.TP
+.BI \-\-remote-port " PORT"
+Start API server on custom port (used with \-\-remote).
 
 .SH EXAMPLES
 .TP

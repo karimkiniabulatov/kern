@@ -13,8 +13,8 @@ type Config struct {
 	RefreshRate int    `json:"refresh_rate"`
 	Colors      bool   `json:"colors"`
 	Theme       string `json:"theme"`
-	DetailedCPU bool   `json:"detailed_cpu"`
-	DetailedMem bool   `json:"detailed_mem"` // НОВОЕ: детальная информация о памяти
+	DetailedCPU bool   `json:"-"` // Убрано сохранение в JSON
+	DetailedMem bool   `json:"-"` // Убрано сохранение в JSON
 	ShowDisk    bool   `json:"show_disk"`
 	ShowCPU     bool   `json:"show_cpu"`
 	ShowMem     bool   `json:"show_mem"`

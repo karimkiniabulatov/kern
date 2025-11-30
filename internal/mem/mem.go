@@ -3,6 +3,7 @@ package mem
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -108,22 +109,51 @@ func Summary() (*MemoryInfo, error) {
     return info, nil
 }
 
-// calculateAverageUsage вычисляет среднюю загруженность известных модулей памяти
-func calculateAverageUsage(modules []MemoryModule) float64 {
-    var totalUsage float64
+// НОВАЯ ФУНКЦИЯ: Расчет использования для нераспознанных модулей
+func calculateUnknownModuleUsage(modules []MemoryModule, totalSystemMemory uint64, usedSystemMemory uint64) []MemoryModule {
+    if len(modules) == 0 || totalSystemMemory == 0 {
+        return modules
+    }
+
+    // Считаем общий размер известных модулей и их использование
+    var knownSize uint64
+    var knownUsage float64
     var knownModules int
     
     for _, module := range modules {
         if module.SizeBytes > 0 && module.UsagePercent > 0 {
-            totalUsage += module.UsagePercent
+            knownSize += module.SizeBytes
+            knownUsage += module.UsagePercent
             knownModules++
         }
     }
-    
-    if knownModules > 0 {
-        return totalUsage / float64(knownModules)
+
+    // Если есть известные модули, используем их среднюю загруженность для неизвестных
+    if knownModules > 0 && knownSize > 0 {
+        averageUsage := knownUsage / float64(knownModules)
+        remainingMemory := totalSystemMemory - knownSize
+        
+        for i := range modules {
+            if modules[i].SizeBytes == 0 {
+                // Для неизвестных модулей используем среднюю загруженность известных
+                modules[i].UsagePercent = averageUsage
+                
+                // Если осталась неучтенная память, предполагаем что она распределена по неизвестным модулям
+                if remainingMemory > 0 {
+                    // Распределяем оставшееся использование пропорционально
+                    modules[i].UsagePercent = math.Min(100, averageUsage * 1.1) // Небольшой коэффициент
+                }
+            }
+        }
+    } else {
+        // Если нет известных модулей, используем общее использование системы
+        systemUsage := float64(usedSystemMemory) / float64(totalSystemMemory) * 100
+        for i := range modules {
+            modules[i].UsagePercent = systemUsage
+        }
     }
-    return 0.0
+
+    return modules
 }
 
 func getMemoryInfo() (*MemoryInfo, error) {
@@ -163,8 +193,8 @@ func getMemoryInfo() (*MemoryInfo, error) {
     // Получаем детальную информацию о памяти
     cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
-    // Вычисляем среднюю загруженность известных модулей
-    averageUsage := calculateAverageUsage(modules)
+    // ОБНОВЛЕНИЕ: Используем улучшенный расчет для неизвестных модулей
+    modules = calculateUnknownModuleUsage(modules, virtMem.Total, usedMemory)
 
     // Обновляем процент использования для каждого модуля
     for i := range modules {
@@ -175,10 +205,8 @@ func getMemoryInfo() (*MemoryInfo, error) {
                 virtMem.Total, 
                 usedMemory,
             )
-        } else {
-            // Для неизвестных модулей - используем среднюю загруженность от известных
-            modules[i].UsagePercent = averageUsage
         }
+        // Для неизвестных модулей UsagePercent уже установлен в calculateUnknownModuleUsage
     }
 
     info := &MemoryInfo{

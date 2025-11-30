@@ -285,13 +285,13 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 swapUsageFormatted, swapGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
         }
 
-        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - ВЫРОВНЕННЫЕ ГИСТОГРАММЫ
+        // ИНФОРМАЦИЯ О МОДУЛЯХ ПАМЯТИ - УЛУЧШЕННОЕ ВЫРАВНИВАНИЕ
         if t.config.DetailedMem && len(memInfo.Modules) > 0 {
             row = t.printSimple(row, fmt.Sprintf("%s (%d modules):", 
                 t.config.T("memory.modules"), len(memInfo.Modules)), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true))
             
-            // Находим максимальную длину для выравнивания
+            // НАХОДИМ МАКСИМАЛЬНУЮ ДЛИНУ ДЛЯ ИДЕАЛЬНОГО ВЫРАВНИВАНИЯ
             maxLineLength := 0
             var moduleLines []string
             
@@ -313,7 +313,12 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                             moduleInfo += fmt.Sprintf(" - %s", module.PartNumber)
                         }
                         if module.SerialNumber != "" && module.SerialNumber != "Unknown" {
-                            moduleInfo += fmt.Sprintf(" [SN:%s]", module.SerialNumber)
+                            // Сокращаем длинный серийный номер
+                            serial := module.SerialNumber
+                            if len(serial) > 8 {
+                                serial = serial[:8] + "..."
+                            }
+                            moduleInfo += fmt.Sprintf(" [SN:%s]", serial)
                         }
                         moduleInfo += ")"
                     }
@@ -327,32 +332,42 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 moduleLines = append(moduleLines, moduleInfo)
             }
             
-            // Выводим все строки с выровненными гистограммами
+            // ДОБАВЛЯЕМ ДОПОЛНИТЕЛЬНЫЙ ОТСТУП ДЛЯ КРАСИВОГО ВЫРАВНИВАНИЯ
+            maxLineLength += 5
+            
+            // ВЫВОДИМ ВСЕ СТРОКИ С ИДЕАЛЬНО ВЫРОВНЕННЫМИ ГИСТОГРАММАМИ
             for i, line := range moduleLines {
                 module := memInfo.Modules[i]
                 
-                // Добавляем пробелы для выравнивания
+                // ДОБАВЛЯЕМ ПРОБЕЛЫ ДЛЯ ВЫРАВНИВАНИЯ
                 padding := maxLineLength - len(line)
                 if padding > 0 {
                     line += strings.Repeat(" ", padding)
                 }
                 
-                // Для ВСЕХ модулей добавляем проценты и гистограмму
+                // ДЛЯ ВСЕХ МОДУЛЕЙ ДОБАВЛЯЕМ ПРОЦЕНТЫ И ГИСТОГРАММУ
+                usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
+                moduleGraph := t.createSolidGraph(module.UsagePercent)
+                
+                // ФОРМИРУЕМ ФИНАЛЬНУЮ СТРОКУ С ВЫРАВНИВАНИЕМ
+                finalLine := fmt.Sprintf("%s %s%% %s", line, usageFormatted, moduleGraph)
+                
+                // ОПРЕДЕЛЯЕМ ЦВЕТ В ЗАВИСИМОСТИ ОТ ТИПА МОДУЛЯ
+                moduleColor := tcell.ColorLightCoral
                 if module.Size == "Unknown" || module.SizeBytes == 0 {
-                    // Для неизвестных модулей используем среднюю загрузку
-                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
-                    moduleGraph := t.createSolidGraph(module.UsagePercent)
-                    line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
-                } else {
-                    // Для известных модулей используем расчетную загрузку
-                    usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
-                    moduleGraph := t.createSolidGraph(module.UsagePercent)
-                    line += fmt.Sprintf(" %s%% %s", usageFormatted, moduleGraph)
+                    moduleColor = tcell.ColorGray // Серый для неизвестных модулей
+                } else if module.UsagePercent > 80 {
+                    moduleColor = tcell.ColorRed // Красный для сильно загруженных
+                } else if module.UsagePercent > 50 {
+                    moduleColor = tcell.ColorYellow // Желтый для средне загруженных
                 }
                 
-                row = t.printSimple(row, line, 
-                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                row = t.printSimple(row, finalLine, 
+                    tcell.StyleDefault.Foreground(moduleColor))
             }
+        } else if t.config.DetailedMem && len(memInfo.Modules) == 0 {
+            row = t.printSimple(row, "Memory modules: Information not available", 
+                tcell.StyleDefault.Foreground(tcell.ColorGray))
         } else {
             row = t.printSimple(row, "Memory modules: Information not available", 
                 tcell.StyleDefault.Foreground(tcell.ColorGray))

@@ -120,7 +120,7 @@ func main() {
 		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
 		fmt.Println("\nDetailed Information Options:")
 		fmt.Println("  --detailed, -de      Show detailed CPU core information")
-		fmt.Println("  --detailed-mem, -dm  Show detailed memory module information")
+		fmt.Println("  q, -dm  Show detailed memory module information")
 		
 		fmt.Println("\nLanguage Options:")
 		fmt.Println("  -l LANG              Language code (e.g., 'ru' for Russian)")
@@ -233,11 +233,20 @@ func main() {
 		return
 	}
 
+	// Убираем сохранение детальных флагов в конфиг
+	// Вместо этого используем временные переменные
+	detailedCPU := *flagDetailed || *flagDetailedShort
+	detailedMem := *flagDetailedMem || *flagDetailedMemLong
+
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
+
+	// Устанавливаем детальные флаги только для этой сессии
+	cfg.DetailedCPU = detailedCPU
+	cfg.DetailedMem = detailedMem
 
 	// Проверяем поддержку языка
 	if *flagLang != "" && !i18n.IsLanguageSupported(*flagLang) {
@@ -261,15 +270,6 @@ func main() {
 	showGPU := *flagGPU || *flagAll
 	showAI := *flagAI || *flagAll
 	showMining := *flagMining || *flagAll
-
-	// Добавляем поддержку длинных флагов для CPU детализации
-	if *flagDetailed {
-		cfg.DetailedCPU = true
-	}
-	
-	if *flagDetailedMem || *flagDetailedMemLong {
-		cfg.DetailedMem = true
-	}
 
 	// NEW: Smart default behavior - use last used modules if no flags provided
 	noFlagsProvided := !*flagDisk && !*flagCPU && !*flagMem && !*flagNet && 
@@ -315,7 +315,6 @@ func main() {
 	cfg.ShowAI = showAI
 	cfg.ShowMining = showMining
 
-	// DetailedCPU уже установлен выше при обработке флага --detailed
 	if *flagRefresh > 0 {
 		cfg.RefreshRate = *flagRefresh
 	}
