@@ -15,7 +15,7 @@ show_logo() {
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
 EOF
-    echo "kern v1.2.2 - System Monitoring Tool"
+    echo "kern v1.2.3 - System Monitoring Tool"
     echo -e "\033[0m"
 }
 

@@ -91,17 +91,18 @@ func getFallbackEmptyInterfaces() []NetworkInfo {
 }
 
 func removeDuplicateInterfaces(networks []NetworkInfo) []NetworkInfo {
-	seen := make(map[string]bool)
-	var result []NetworkInfo
-	
-	for _, net := range networks {
-		if !seen[net.Interface] {
-			seen[net.Interface] = true
-			result = append(result, net)
-		}
-	}
-	
-	return result
+    seen := make(map[string]bool)
+    var result []NetworkInfo
+    
+    for _, net := range networks {
+        key := net.Interface + "|" + net.MACAddress
+        if !seen[key] {
+            seen[key] = true
+            result = append(result, net)
+        }
+    }
+    
+    return result
 }
 
 func getNetworkInterfaces() ([]NetworkInfo, error) {

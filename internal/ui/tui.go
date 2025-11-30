@@ -517,6 +517,17 @@ func (t *TUI) renderNetwork(startRow int, data interface{}) int {
 	return row + 1
 }
 
+// Новая функция для подзаголовков процессоров
+func (t *TUI) renderSubHeader(startRow int, title string) int {
+	style := tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true)
+	
+	// Create sub-header line with padding
+	header := fmt.Sprintf(" %s ", title)
+	t.printSimple(startRow, header, style)
+	
+	return startRow + 1
+}
+
 // getConnectionLabel возвращает ASCII обозначение для типа соединения
 func (t *TUI) getConnectionLabel(connectionType string) string {
 	switch connectionType {

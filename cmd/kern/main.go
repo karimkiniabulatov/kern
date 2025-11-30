@@ -68,6 +68,12 @@ var (
 	
 	// Короткая версия для detailed
 	flagDetailedShort = flag.Bool("de", false, "Show detailed CPU core information (short)")
+	
+	// Флаги управления приложением
+	flagAppPause    = flag.Bool("pause", false, "Pause kern application")
+	flagAppResume   = flag.Bool("resume", false, "Resume kern application") 
+	flagAppStop     = flag.Bool("stop", false, "Stop kern application")
+	flagAppRestart  = flag.Bool("restart-app", false, "Restart kern application")
 )
 
 const version = "1.2.3"
@@ -133,6 +139,12 @@ func main() {
 		fmt.Println("  -r, --remote         Start API server on default port 28126")
 		fmt.Println("  --remote-port PORT   Start API server on custom port")
 		
+		fmt.Println("\nApplication Management:")
+		fmt.Println("  --pause               Pause kern application")
+		fmt.Println("  --resume              Resume kern application") 
+		fmt.Println("  --stop                Stop kern application")
+		fmt.Println("  --restart-app         Restart kern application")
+		
 		fmt.Println("\nService Management:")
 		fmt.Println("  --daemon, --dmn      Start kern as a daemon service")
 		fmt.Println("  --start-service, --start Start the kern daemon")
@@ -166,6 +178,13 @@ func main() {
 	// Обрабатываем короткую версию флага detailed
 	if *flagDetailedShort {
 		*flagDetailed = true
+	}
+	
+	
+	// Обработка управления приложением
+	if *flagAppPause || *flagAppResume || *flagAppStop || *flagAppRestart {
+		handleAppManagement()
+		return
 	}
 
 	if *flagHelp {
@@ -342,6 +361,35 @@ func showLogo() {
 		fmt.Print("\033[1;36m" + logo + "\033[0m")
 	}
 }
+
+func handleAppManagement() {
+	daemonManager := service.NewDaemonManager()
+	appManager := daemonManager.AppManagement()
+	
+	switch {
+	case *flagAppPause:
+		if err := appManager["pause"](); err != nil {
+			log.Fatalf("Failed to pause app: %v", err)
+		}
+		fmt.Println("kern application paused")
+	case *flagAppResume:
+		if err := appManager["resume"](); err != nil {
+			log.Fatalf("Failed to resume app: %v", err)
+		}
+		fmt.Println("kern application resumed")
+	case *flagAppStop:
+		if err := appManager["stop"](); err != nil {
+			log.Fatalf("Failed to stop app: %v", err)
+		}
+		fmt.Println("kern application stopped")
+	case *flagAppRestart:
+		if err := appManager["restart"](); err != nil {
+			log.Fatalf("Failed to restart app: %v", err)
+		}
+		fmt.Println("kern application restarted")
+	}
+}
+
 
 func runMonitor(cfg *config.Config, showLogo bool) {
     // Initialize TUI

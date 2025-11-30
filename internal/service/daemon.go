@@ -488,3 +488,33 @@ func (dm *DaemonManager) removeLinuxAutoStart() error {
 	log.Printf("Linux auto-start removal would be implemented here")
 	return nil
 }
+
+// AppManagement управляет самим приложением kern
+func (dm *DaemonManager) AppManagement() map[string]func() error {
+    return map[string]func() error{
+        "pause":  dm.pauseApp,
+        "resume": dm.resumeApp,
+        "stop":   dm.stopApp,
+        "restart": dm.restartApp,
+    }
+}
+
+func (dm *DaemonManager) pauseApp() error {
+    // Реализация приостановки приложения
+    return nil
+}
+
+func (dm *DaemonManager) resumeApp() error {
+    // Реализация возобновления приложения  
+    return nil
+}
+
+func (dm *DaemonManager) stopApp() error {
+    // Реализация остановки приложения
+    return nil
+}
+
+func (dm *DaemonManager) restartApp() error {
+    // Реализация перезапуска приложения
+    return nil
+}

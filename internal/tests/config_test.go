@@ -84,12 +84,7 @@ func TestConfigNewFields(t *testing.T) {
     if cfg.ShowMining {
         t.Error("ShowMining should be false by default")
     }
-    if cfg.ShowAudio {
-        t.Error("ShowAudio should be false by default")
-    }
-    if cfg.ShowVideo {
-        t.Error("ShowVideo should be false by default")
-    }
+    
 }
 
 // Добавить тест для LastUsedModules

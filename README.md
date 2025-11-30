@@ -1,6 +1,6 @@
 # kern - Advanced System Monitoring Tool 🔍
 
-![kern Logo](https://img.shields.io/badge/kern-v1.2.1-blue)
+![kern Logo](https://img.shields.io/badge/kern-v1.2.3-blue)
 ![Go Version](https://img.shields.io/badge/Go-1.21+-green)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%20%7C%20macOS-lightgrey)
 
