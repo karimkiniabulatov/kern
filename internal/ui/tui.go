@@ -506,44 +506,74 @@ func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
 					row++
 				}
 			} else {
-				// КОМПАКТНЫЙ РЕЖИМ: показывать только сводную информацию
-				// Одна строка на интерфейс с основной информацией
-				statusIcon := "▼"
-				if netInfo.Status == "UP" {
-					statusIcon = "▲"
+				// КОМПАКТНЫЙ РЕЖИМ, но многострочный (как в примере)
+				if len(networks) > 1 {
+					interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
+					row = t.renderSubHeader(row, interfaceHeader)
 				}
+
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 				
-				// Определяем цвет для статуса
+				// Физический/виртуальный статус
+				physStatus := "Virtual"
+				if netInfo.IsPhysical {
+					physStatus = "Physical"
+				}
+				driverInfo := ""
+				if netInfo.Driver != "" && netInfo.Driver != "Unknown" {
+					driverInfo = fmt.Sprintf(" (%s)", netInfo.Driver)
+				}
+				row = t.printSimple(row, fmt.Sprintf("Type: %s%s", physStatus, driverInfo), tcell.StyleDefault.Foreground(tcell.ColorGray))
+
+				if netInfo.IPAddress != "" {
+					row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+
+				if netInfo.MACAddress != "" && netInfo.MACAddress != "N/A" {
+					row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				}
+
+				// Статус интерфейса
 				statusColor := tcell.ColorRed
 				if netInfo.Status == "UP" {
 					statusColor = tcell.ColorGreen
 				} else if netInfo.Status == "UNKNOWN" {
 					statusColor = tcell.ColorYellow
 				}
-				
-				// Создаем компактную строку
-				compactLine := fmt.Sprintf("%s %s: %s", 
-					statusIcon, 
-					netInfo.Interface,
-					netInfo.IPAddress)
-				
-				// Добавляем тип соединения если есть
+				row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
+
+				// MTU information
+				if netInfo.MTU > 0 {
+					row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
+
+				// Тип соединения с ASCII обозначением
 				if netInfo.ConnectionType != "" && netInfo.ConnectionType != "Unknown" {
-					compactLine += fmt.Sprintf(" [%s]", netInfo.ConnectionType)
+					connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
+					row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+						t.config.T("network.connection_type"), connectionLabel), 
+						tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
 				}
-				
-				// Добавляем скорость если есть
-				if netInfo.RXSpeed != "0 B/s" || netInfo.TXSpeed != "0 B/s" {
-					compactLine += fmt.Sprintf(" (%s↓/%s↑)", netInfo.RXSpeed, netInfo.TXSpeed)
+
+				// Технология и максимальная скорость
+				if netInfo.Technology != "" && netInfo.Technology != "Unknown" {
+					techInfo := fmt.Sprintf("%s: %s (%s)", 
+						t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed)
+					row = t.printSimple(row, techInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua))
 				}
-				
-				row = t.printSimple(row, compactLine, tcell.StyleDefault.Foreground(statusColor))
-				
-				// Если есть активность, показываем график на следующей строке
-				if netInfo.ActivityPercent > 0 {
-					activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
-					graphLine := fmt.Sprintf("  %.1f%% %s", netInfo.ActivityPercent, activityGraph)
-					row = t.printSimple(row, graphLine, tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+
+				// Активность сети с графиком
+				activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), 
+					tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+
+				// Скорость передачи данных
+				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), 
+					tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+				// Добавляем отступ между интерфейсами, если их несколько
+				if i < len(networks)-1 {
+					row++
 				}
 			}
 		}
