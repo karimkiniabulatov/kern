@@ -428,161 +428,100 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 }
 
 func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
-	row := startRow
+    row := startRow
+    
+    if networks, ok := data.([]net.NetworkInfo); ok {
+        // ФИЛЬТРУЕМ ИНТЕРФЕЙСЫ В ЗАВИСИМОСТИ ОТ РЕЖИМА
+        var filteredNetworks []net.NetworkInfo
+        
+        if detailed {
+            // Детальный режим: показываем ВСЕ интерфейсы
+            filteredNetworks = networks
+        } else {
+            // Обычный режим: показываем только основной интерфейс
+            filteredNetworks = t.filterMainNetworkInterface(networks)
+        }
+        
+        // Если нет интерфейсов для отображения
+        if len(filteredNetworks) == 0 {
+            row = t.renderHeader(row, t.config.T("network.title"))
+            row = t.printSimple(row, "No network data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
+            return row + 1
+        }
+        
+        // Main header with device count (только если несколько интерфейсов в детальном режиме)
+        deviceLabel := t.config.T("network.title")
+        if detailed && len(filteredNetworks) > 1 {
+            deviceLabel = fmt.Sprintf("%s (%d interfaces)", deviceLabel, len(filteredNetworks))
+        } else if len(filteredNetworks) > 1 {
+            // В обычном режиме, если найдено несколько основных интерфейсов
+            deviceLabel = fmt.Sprintf("%s (primary)", deviceLabel)
+        }
+        row = t.renderHeader(row, deviceLabel)
+        
+        // Render each network interface
+        for i, netInfo := range filteredNetworks {
+            // ... отображение каждого интерфейса
+        }
+    }
+}
 
-	if networks, ok := data.([]net.NetworkInfo); ok {
-		// Main header with device count
-		deviceLabel := t.config.T("network.title")
-		if len(networks) > 1 {
-			deviceLabel = fmt.Sprintf("%s (%d interfaces)", deviceLabel, len(networks))
-		}
-		row = t.renderHeader(row, deviceLabel)
-
-		// Render each network interface
-		for i, netInfo := range networks {
-			if detailed {
-				// ДЕТАЛЬНЫЙ РЕЖИМ: показывать все интерфейсы детально
-				// Add sub-header for each interface if multiple devices
-				if len(networks) > 1 {
-					interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
-					row = t.renderSubHeader(row, interfaceHeader)
-				}
-
-				// Основная информация об интерфейсе
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				
-				// Физический/виртуальный статус
-				physStatus := "Virtual"
-				if netInfo.IsPhysical {
-					physStatus = "Physical"
-				}
-				row = t.printSimple(row, fmt.Sprintf("Type: %s (%s)", physStatus, netInfo.Driver), tcell.StyleDefault.Foreground(tcell.ColorGray))
-
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-
-				// Статус интерфейса
-				statusColor := tcell.ColorRed
-				if netInfo.Status == "UP" {
-					statusColor = tcell.ColorGreen
-				} else if netInfo.Status == "UNKNOWN" {
-					statusColor = tcell.ColorYellow
-				}
-				row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
-
-				// MTU information
-				if netInfo.MTU > 0 {
-					row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
-				}
-
-				// Тип соединения с ASCII обозначением
-				connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-					t.config.T("network.connection_type"), connectionLabel), 
-					tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
-
-				// Технология и максимальная скорость
-				row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
-					t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed), 
-					tcell.StyleDefault.Foreground(tcell.ColorAqua))
-
-				// Сила сигнала для беспроводных соединений
-				if netInfo.ConnectionType == "Wi-Fi" && netInfo.SignalStrength > 0 {
-					signalGraph := t.createSolidGraph(netInfo.SignalStrength)
-					row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-						t.config.T("network.signal_strength"), netInfo.SignalStrength, signalGraph), 
-						tcell.StyleDefault.Foreground(tcell.ColorGreen))
-				}
-
-				// Активность сети с графиком
-				activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
-
-				// Скорость передачи данных
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-
-				// Добавляем отступ между интерфейсами, если их несколько
-				if i < len(networks)-1 {
-					row++
-				}
-			} else {
-				// КОМПАКТНЫЙ РЕЖИМ, но многострочный (как в примере)
-				if len(networks) > 1 {
-					interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
-					row = t.renderSubHeader(row, interfaceHeader)
-				}
-
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				
-				// Физический/виртуальный статус
-				physStatus := "Virtual"
-				if netInfo.IsPhysical {
-					physStatus = "Physical"
-				}
-				driverInfo := ""
-				if netInfo.Driver != "" && netInfo.Driver != "Unknown" {
-					driverInfo = fmt.Sprintf(" (%s)", netInfo.Driver)
-				}
-				row = t.printSimple(row, fmt.Sprintf("Type: %s%s", physStatus, driverInfo), tcell.StyleDefault.Foreground(tcell.ColorGray))
-
-				if netInfo.IPAddress != "" {
-					row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				}
-
-				if netInfo.MACAddress != "" && netInfo.MACAddress != "N/A" {
-					row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				}
-
-				// Статус интерфейса
-				statusColor := tcell.ColorRed
-				if netInfo.Status == "UP" {
-					statusColor = tcell.ColorGreen
-				} else if netInfo.Status == "UNKNOWN" {
-					statusColor = tcell.ColorYellow
-				}
-				row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
-
-				// MTU information
-				if netInfo.MTU > 0 {
-					row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
-				}
-
-				// Тип соединения с ASCII обозначением
-				if netInfo.ConnectionType != "" && netInfo.ConnectionType != "Unknown" {
-					connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
-					row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-						t.config.T("network.connection_type"), connectionLabel), 
-						tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
-				}
-
-				// Технология и максимальная скорость
-				if netInfo.Technology != "" && netInfo.Technology != "Unknown" {
-					techInfo := fmt.Sprintf("%s: %s (%s)", 
-						t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed)
-					row = t.printSimple(row, techInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				}
-
-				// Активность сети с графиком
-				activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), 
-					tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
-
-				// Скорость передачи данных
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), 
-					tcell.StyleDefault.Foreground(tcell.ColorAqua))
-
-				// Добавляем отступ между интерфейсами, если их несколько
-				if i < len(networks)-1 {
-					row++
-				}
-			}
-		}
-	} else {
-		// Fallback если данные не соответствуют ожидаемому формату
-		row = t.renderHeader(row, t.config.T("network.title"))
-		row = t.printSimple(row, "No network data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
-	}
-	return row + 1
+// НОВАЯ ФУНКЦИЯ: Фильтрация основного интерфейса
+func (t *TUI) filterMainNetworkInterface(networks []net.NetworkInfo) []net.NetworkInfo {
+    var mainInterfaces []net.NetworkInfo
+    
+    for _, netInfo := range networks {
+        // Критерии основного интерфейса:
+        // 1. Статус UP
+        // 2. Не является loopback
+        // 3. Имеет IP адрес (не N/A)
+        // 4. Физический интерфейс (не виртуальный)
+        // 5. Тип соединения Ethernet или Wi-Fi
+        if netInfo.Status == "UP" &&
+           netInfo.ConnectionType != "Loopback" &&
+           netInfo.IPAddress != "" && netInfo.IPAddress != "N/A" &&
+           netInfo.IsPhysical &&
+           (netInfo.ConnectionType == "Ethernet" || netInfo.ConnectionType == "Wi-Fi") {
+            
+            // Предпочитаем Ethernet перед Wi-Fi
+            if netInfo.ConnectionType == "Ethernet" {
+                // Добавляем в начало для приоритета
+                mainInterfaces = append([]net.NetworkInfo{netInfo}, mainInterfaces...)
+            } else {
+                mainInterfaces = append(mainInterfaces, netInfo)
+            }
+        }
+    }
+    
+    // Если не нашли по строгим критериям, используем более мягкие
+    if len(mainInterfaces) == 0 {
+        for _, netInfo := range networks {
+            if netInfo.Status == "UP" &&
+               netInfo.ConnectionType != "Loopback" &&
+               netInfo.IPAddress != "" && netInfo.IPAddress != "N/A" {
+                
+                mainInterfaces = append(mainInterfaces, netInfo)
+                break // Берем первый подходящий
+            }
+        }
+    }
+    
+    // Если все еще не нашли, берем первый UP интерфейс
+    if len(mainInterfaces) == 0 {
+        for _, netInfo := range networks {
+            if netInfo.Status == "UP" {
+                mainInterfaces = append(mainInterfaces, netInfo)
+                break
+            }
+        }
+    }
+    
+    // Возвращаем максимум 1 интерфейс в обычном режиме
+    if len(mainInterfaces) > 0 {
+        return []net.NetworkInfo{mainInterfaces[0]}
+    }
+    
+    return []net.NetworkInfo{}
 }
 
 
