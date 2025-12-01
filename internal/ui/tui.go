@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"regexp"
+	"sort"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/karimkiniabulatov/kern/internal/config"
@@ -434,9 +435,19 @@ func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
         // ФИЛЬТРУЕМ ИНТЕРФЕЙСЫ В ЗАВИСИМОСТИ ОТ РЕЖИМА
         var filteredNetworks []net.NetworkInfo
         
-        if detailed {
+        if detailed || t.config.DetailedNet {
             // Детальный режим: показываем ВСЕ интерфейсы
             filteredNetworks = networks
+            // Сортируем: сначала UP, затем другие
+            sort.Slice(filteredNetworks, func(i, j int) bool {
+                if filteredNetworks[i].Status == "UP" && filteredNetworks[j].Status != "UP" {
+                    return true
+                }
+                if filteredNetworks[i].Status != "UP" && filteredNetworks[j].Status == "UP" {
+                    return false
+                }
+                return filteredNetworks[i].Interface < filteredNetworks[j].Interface
+            })
         } else {
             // Обычный режим: показываем только основной интерфейс
             filteredNetworks = t.filterMainNetworkInterface(networks)
@@ -451,22 +462,96 @@ func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
         
         // Main header with device count (только если несколько интерфейсов в детальном режиме)
         deviceLabel := t.config.T("network.title")
-        if detailed && len(filteredNetworks) > 1 {
+        if (detailed || t.config.DetailedNet) && len(filteredNetworks) > 1 {
             deviceLabel = fmt.Sprintf("%s (%d interfaces)", deviceLabel, len(filteredNetworks))
-        } else if len(filteredNetworks) > 1 {
-            // В обычном режиме, если найдено несколько основных интерфейсов
+        } else if len(filteredNetworks) == 1 && !detailed && !t.config.DetailedNet {
             deviceLabel = fmt.Sprintf("%s (primary)", deviceLabel)
         }
         row = t.renderHeader(row, deviceLabel)
         
         // Render each network interface
         for i, netInfo := range filteredNetworks {
-            // ... отображение каждого интерфейса
+            if (detailed || t.config.DetailedNet) && len(filteredNetworks) > 1 {
+                interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
+                row = t.renderSubHeader(row, interfaceHeader)
+            }
+            
+            row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            
+            // Физический/виртуальный статус
+            physStatus := "Virtual"
+            if netInfo.IsPhysical {
+                physStatus = "Physical"
+            }
+            driverInfo := ""
+            if netInfo.Driver != "" && netInfo.Driver != "Unknown" {
+                driverInfo = fmt.Sprintf(" (%s)", netInfo.Driver)
+            }
+            row = t.printSimple(row, fmt.Sprintf("Type: %s%s", physStatus, driverInfo), tcell.StyleDefault.Foreground(tcell.ColorGray))
+
+            if netInfo.IPAddress != "" && netInfo.IPAddress != "N/A" {
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            }
+
+            if netInfo.MACAddress != "" && netInfo.MACAddress != "N/A" {
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            }
+
+            // Статус интерфейса
+            statusColor := tcell.ColorRed
+            if netInfo.Status == "UP" {
+                statusColor = tcell.ColorGreen
+            } else if netInfo.Status == "UNKNOWN" {
+                statusColor = tcell.ColorYellow
+            }
+            row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
+
+            // MTU information
+            if netInfo.MTU > 0 {
+                row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
+            }
+
+            // Тип соединения с ASCII обозначением
+            if netInfo.ConnectionType != "" && netInfo.ConnectionType != "Unknown" {
+                connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+                    t.config.T("network.connection_type"), connectionLabel), 
+                    tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
+            }
+
+            // Технология и максимальная скорость
+            if netInfo.Technology != "" && netInfo.Technology != "Unknown" && netInfo.MaxSpeed != "" && netInfo.MaxSpeed != "N/A" {
+                techInfo := fmt.Sprintf("%s: %s (%s)", 
+                    t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed)
+                row = t.printSimple(row, techInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            }
+
+            // Активность сети с графиком
+            activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
+            row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), 
+                tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+
+            // Скорость передачи данных
+            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua))
+
+            // Добавляем отступ между интерфейсами, если их несколько
+            if i < len(filteredNetworks)-1 {
+                row++
+            }
         }
+        
+        return row + 1
+    } else {
+        // Fallback если данные не соответствуют ожидаемому формату
+        row = t.renderHeader(row, t.config.T("network.title"))
+        row = t.printSimple(row, "No network data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
+        return row + 1
     }
 }
 
 // НОВАЯ ФУНКЦИЯ: Фильтрация основного интерфейса
+// filterMainNetworkInterface фильтрует основной сетевой интерфейс
 func (t *TUI) filterMainNetworkInterface(networks []net.NetworkInfo) []net.NetworkInfo {
     var mainInterfaces []net.NetworkInfo
     
