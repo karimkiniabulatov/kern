@@ -13,8 +13,9 @@ type Config struct {
 	RefreshRate int    `json:"refresh_rate"`
 	Colors      bool   `json:"colors"`
 	Theme       string `json:"theme"`
-	DetailedCPU bool   `json:"-"` // Убрано сохранение в JSON
-	DetailedMem bool   `json:"-"` // Убрано сохранение в JSON
+	DetailedCPU bool   `json:"-"` 
+	DetailedMem bool   `json:"-"`
+	DetailedNet bool   `json:"-"`
 	ShowDisk    bool   `json:"show_disk"`
 	ShowCPU     bool   `json:"show_cpu"`
 	ShowMem     bool   `json:"show_mem"`
@@ -141,6 +142,7 @@ func getDefaultConfig(language string) *Config {
 		Theme:       "default",
 		DetailedCPU: false,  // По умолчанию не показывать детальную информацию CPU
 		DetailedMem: false,  // По умолчанию не показывать детальную информацию памяти
+		DetailedNet: false,
 		ShowDisk:    true,
 		ShowCPU:     true,
 		ShowMem:     true,

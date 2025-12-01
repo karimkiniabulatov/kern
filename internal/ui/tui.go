@@ -74,7 +74,7 @@ func (t *TUI) Render(data map[string]interface{}) {
 
 	if t.config.ShowNet {
 		if netData, exists := data["net"]; exists {
-			row = t.renderNetwork(row, netData)
+			row = t.renderNetwork(row, netData, t.config.DetailedNet)
 		}
 	}
 
@@ -130,7 +130,7 @@ func (t *TUI) renderLogo(startRow int) int {
 		" ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║",
 		" ██║  ██╗███████╗██║  ██║██║ ╚████║",
 		" ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝",
-		" kern v1.2.1 - System Monitoring Tool",
+		" kern v1.2.3 - System Monitoring Tool",
 	}
 
 	cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
@@ -427,7 +427,7 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 	return row + 1
 }
 
-func (t *TUI) renderNetwork(startRow int, data interface{}) int {
+func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
 	row := startRow
 
 	if networks, ok := data.([]net.NetworkInfo); ok {
@@ -438,70 +438,113 @@ func (t *TUI) renderNetwork(startRow int, data interface{}) int {
 		}
 		row = t.renderHeader(row, deviceLabel)
 
-		// Render each network interface with numbering
+		// Render each network interface
 		for i, netInfo := range networks {
-			// Add sub-header for each interface if multiple devices
-			if len(networks) > 1 {
-				interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
-				row = t.renderSubHeader(row, interfaceHeader)
-			}
+			if detailed {
+				// ДЕТАЛЬНЫЙ РЕЖИМ: показывать все интерфейсы детально
+				// Add sub-header for each interface if multiple devices
+				if len(networks) > 1 {
+					interfaceHeader := fmt.Sprintf("Network Interface #%d", i+1)
+					row = t.renderSubHeader(row, interfaceHeader)
+				}
 
-			// Основная информация об интерфейсе
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			
-			// Физический/виртуальный статус
-			physStatus := "Virtual"
-			if netInfo.IsPhysical {
-				physStatus = "Physical"
-			}
-			row = t.printSimple(row, fmt.Sprintf("Type: %s (%s)", physStatus, netInfo.Driver), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				// Основная информация об интерфейсе
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("network.interface"), netInfo.Interface), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				
+				// Физический/виртуальный статус
+				physStatus := "Virtual"
+				if netInfo.IsPhysical {
+					physStatus = "Physical"
+				}
+				row = t.printSimple(row, fmt.Sprintf("Type: %s (%s)", physStatus, netInfo.Driver), tcell.StyleDefault.Foreground(tcell.ColorGray))
 
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", "IP Address", netInfo.IPAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", "MAC Address", netInfo.MACAddress), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
-			// Статус интерфейса
-			statusColor := tcell.ColorRed
-			if netInfo.Status == "UP" {
-				statusColor = tcell.ColorGreen
-			} else if netInfo.Status == "UNKNOWN" {
-				statusColor = tcell.ColorYellow
-			}
-			row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
+				// Статус интерфейса
+				statusColor := tcell.ColorRed
+				if netInfo.Status == "UP" {
+					statusColor = tcell.ColorGreen
+				} else if netInfo.Status == "UNKNOWN" {
+					statusColor = tcell.ColorYellow
+				}
+				row = t.printSimple(row, fmt.Sprintf("Status: %s", netInfo.Status), tcell.StyleDefault.Foreground(statusColor))
 
-			// MTU information
-			if netInfo.MTU > 0 {
-				row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
-			}
+				// MTU information
+				if netInfo.MTU > 0 {
+					row = t.printSimple(row, fmt.Sprintf("MTU: %d", netInfo.MTU), tcell.StyleDefault.Foreground(tcell.ColorGray))
+				}
 
-			// Тип соединения с ASCII обозначением
-			connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
-			row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-				t.config.T("network.connection_type"), connectionLabel), 
-				tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
+				// Тип соединения с ASCII обозначением
+				connectionLabel := t.getConnectionLabel(netInfo.ConnectionType)
+				row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+					t.config.T("network.connection_type"), connectionLabel), 
+					tcell.StyleDefault.Foreground(t.getConnectionColor(netInfo.ConnectionType)))
 
-			// Технология и максимальная скорость
-			row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
-				t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed), 
-				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				// Технология и максимальная скорость
+				row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
+					t.config.T("network.technology"), netInfo.Technology, netInfo.MaxSpeed), 
+					tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
-			// Сила сигнала для беспроводных соединений
-			if netInfo.ConnectionType == "Wi-Fi" && netInfo.SignalStrength > 0 {
-				signalGraph := t.createSolidGraph(netInfo.SignalStrength)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-					t.config.T("network.signal_strength"), netInfo.SignalStrength, signalGraph), 
-					tcell.StyleDefault.Foreground(tcell.ColorGreen))
-			}
+				// Сила сигнала для беспроводных соединений
+				if netInfo.ConnectionType == "Wi-Fi" && netInfo.SignalStrength > 0 {
+					signalGraph := t.createSolidGraph(netInfo.SignalStrength)
+					row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+						t.config.T("network.signal_strength"), netInfo.SignalStrength, signalGraph), 
+						tcell.StyleDefault.Foreground(tcell.ColorGreen))
+				}
 
-			// Активность сети с графиком
-			activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
-			row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+				// Активность сети с графиком
+				activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 
-			// Скорость передачи данных
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+				// Скорость передачи данных
+				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
-			// Добавляем отступ между интерфейсами, если их несколько
-			if i < len(networks)-1 {
-				row++
+				// Добавляем отступ между интерфейсами, если их несколько
+				if i < len(networks)-1 {
+					row++
+				}
+			} else {
+				// КОМПАКТНЫЙ РЕЖИМ: показывать только сводную информацию
+				// Одна строка на интерфейс с основной информацией
+				statusIcon := "▼"
+				if netInfo.Status == "UP" {
+					statusIcon = "▲"
+				}
+				
+				// Определяем цвет для статуса
+				statusColor := tcell.ColorRed
+				if netInfo.Status == "UP" {
+					statusColor = tcell.ColorGreen
+				} else if netInfo.Status == "UNKNOWN" {
+					statusColor = tcell.ColorYellow
+				}
+				
+				// Создаем компактную строку
+				compactLine := fmt.Sprintf("%s %s: %s", 
+					statusIcon, 
+					netInfo.Interface,
+					netInfo.IPAddress)
+				
+				// Добавляем тип соединения если есть
+				if netInfo.ConnectionType != "" && netInfo.ConnectionType != "Unknown" {
+					compactLine += fmt.Sprintf(" [%s]", netInfo.ConnectionType)
+				}
+				
+				// Добавляем скорость если есть
+				if netInfo.RXSpeed != "0 B/s" || netInfo.TXSpeed != "0 B/s" {
+					compactLine += fmt.Sprintf(" (%s↓/%s↑)", netInfo.RXSpeed, netInfo.TXSpeed)
+				}
+				
+				row = t.printSimple(row, compactLine, tcell.StyleDefault.Foreground(statusColor))
+				
+				// Если есть активность, показываем график на следующей строке
+				if netInfo.ActivityPercent > 0 {
+					activityGraph := t.createSolidGraph(netInfo.ActivityPercent)
+					graphLine := fmt.Sprintf("  %.1f%% %s", netInfo.ActivityPercent, activityGraph)
+					row = t.printSimple(row, graphLine, tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
+				}
 			}
 		}
 	} else {
@@ -559,6 +602,7 @@ func (t *TUI) getConnectionColor(connectionType string) tcell.Color {
 }
 
 // GPU rendering function with multiple GPU support
+// GPU rendering function with multiple GPU support
 func (t *TUI) renderGPU(startRow int, data interface{}) int {
 	row := startRow
 
@@ -606,12 +650,11 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 			}
 
 			if gpuInfo.Utilization > 0 {
-				// Utilization histogram на отдельной строке
+				// Utilization histogram - теперь на той же строке
 				utilGraph := t.createSolidGraph(gpuInfo.Utilization)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
-					t.config.T("gpu.utilization"), gpuInfo.Utilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-				// Гистограмма на отдельной строке
-				row = t.printSimple(row, fmt.Sprintf("  %s", utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+					t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), 
+					tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 
 			if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
@@ -621,11 +664,10 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 				if memTotalMB > 0 {
 					memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
 					memGraph := t.createSolidGraph(memUsagePercent)
-					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
-						tcell.StyleDefault.Foreground(tcell.ColorAqua))
-					// Гистограмма памяти на отдельной строке
-					row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", memUsagePercent, memGraph), 
+					// Теперь гистограмма памяти на той же строке
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
+						memUsagePercent, memGraph), 
 						tcell.StyleDefault.Foreground(tcell.ColorAqua))
 				} else {
 					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
@@ -669,6 +711,69 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 		row = t.printSimple(row, "No GPU data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
 	}
 	return row + 1
+}
+
+// Helper function to render single GPU info (for legacy format)
+func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
+	row := startRow
+	
+	row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	
+	if gpuInfo.DriverVersion != "" && gpuInfo.DriverVersion != "Unknown" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	}
+	
+	if gpuInfo.GPUTemp > 0 {
+		// Temperature histogram на отдельной строке
+		tempPercent := gpuInfo.GPUTemp
+		if tempPercent > 100 {
+			tempPercent = 100
+		}
+		tempGraph := t.createSolidGraph(tempPercent)
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C", 
+			t.config.T("gpu.temperature"), gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed))
+		// Гистограмма на отдельной строке
+		row = t.printSimple(row, fmt.Sprintf("  %s", tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
+	}
+
+	if gpuInfo.Utilization > 0 {
+		// Utilization histogram - теперь на той же строке
+		utilGraph := t.createSolidGraph(gpuInfo.Utilization)
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
+			t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), 
+			tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+	}
+
+	if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
+		memUsedMB := extractMemoryMB(gpuInfo.MemoryUsed)
+		memTotalMB := extractMemoryMB(gpuInfo.MemoryTotal)
+		if memTotalMB > 0 {
+			memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
+			memGraph := t.createSolidGraph(memUsagePercent)
+			// Теперь гистограмма памяти на той же строке
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
+				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
+				memUsagePercent, memGraph), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		} else {
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+		}
+	}
+	
+	if gpuInfo.PowerDraw != "" && gpuInfo.PowerDraw != "0 W" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+			t.config.T("gpu.power"), gpuInfo.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+	}
+		
+	if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
+		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
+			t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
+			t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+	}
+	
+	return row
 }
 
 // Helper function to render single GPU info (for legacy format)
@@ -899,7 +1004,7 @@ func (t *TUI) renderFooter(startRow int) {
 		return
 	}
 
-	footerText := fmt.Sprintf("Press 'q' or Ctrl+C to exit | Refresh: %ds | kern v1.2.1", t.config.RefreshRate)
+	footerText := fmt.Sprintf("Press 'q' or Ctrl+C to exit | Refresh: %ds | kern v1.2.3", t.config.RefreshRate)
 	style := tcell.StyleDefault.Foreground(tcell.ColorGray)
 	
 	// Обеспечиваем что футер внизу и выровнен по левому краю

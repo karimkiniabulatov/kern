@@ -71,32 +71,36 @@ func detectAllGPUs() ([]*GPUInfo, error) {
 // Улучшенное обнаружение GPU с несколькими методами
 func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
     var gpus []*GPUInfo
+    seenGPUs := make(map[string]bool)
     
     // Метод 1: NVIDIA через nvidia-smi
     if nvidiaGPUs, err := detectNVIDIA(); err == nil {
-        gpus = append(gpus, nvidiaGPUs...)
-    }
-    
-    // Метод 2: NVIDIA через PCI анализ (для старых карт)
-    if len(gpus) == 0 {
-        if nvidiaGPUs, err := detectNVIDIAViaPCI(); err == nil {
-            gpus = append(gpus, nvidiaGPUs...)
+        for _, gpu := range nvidiaGPUs {
+            if _, exists := seenGPUs[gpu.Model]; !exists {
+                seenGPUs[gpu.Model] = true
+                gpus = append(gpus, gpu)
+            }
         }
     }
     
-    // Метод 3: AMD через rocm-smi
+    // Метод 2: AMD через rocm-smi
     if amdGPUs, err := detectAMD(); err == nil {
-        gpus = append(gpus, amdGPUs...)
+        for _, gpu := range amdGPUs {
+            if _, exists := seenGPUs[gpu.Model]; !exists {
+                seenGPUs[gpu.Model] = true
+                gpus = append(gpus, gpu)
+            }
+        }
     }
     
-    // Метод 4: Intel через разные методы
+    // Метод 3: Intel через разные методы
     if intelGPUs, err := detectIntelEnhanced(); err == nil {
-        gpus = append(gpus, intelGPUs...)
-    }
-    
-    // Метод 5: Общее обнаружение через lspci/PCI
-    if genericGPUs := detectGenericGPUsViaPCI(); len(genericGPUs) > 0 {
-        gpus = append(gpus, genericGPUs...)
+        for _, gpu := range intelGPUs {
+            if _, exists := seenGPUs[gpu.Model]; !exists {
+                seenGPUs[gpu.Model] = true
+                gpus = append(gpus, gpu)
+            }
+        }
     }
     
     if len(gpus) > 0 {
@@ -681,30 +685,39 @@ func parseAMDSMIOutput(output string) ([]*GPUInfo, error) {
 
 // detectGenericGPUs возвращает информацию о GPU для универсального обнаружения
 func detectGenericGPUs() []*GPUInfo {
-	var gpus []*GPUInfo
-	info := &GPUInfo{
-		Model:         "",
-		DriverVersion: "Unknown",
-	}
+    var gpus []*GPUInfo
+    info := &GPUInfo{
+        Model:            detectPlatformGPU(),
+        DriverVersion:    "Unknown",
+        GPUTemp:          0.0,
+        MemoryTotal:      "0 MB",
+        MemoryUsed:       "0 MB",
+        MemoryFree:       "0 MB",
+        Utilization:      0.0,
+        PowerDraw:        "0 W",
+        PowerLimit:       "0 W",
+        FanSpeed:         0.0,
+        ClockCore:        "0 MHz",
+        ClockMemory:      "0 MHz",
+        PerformanceState: "Unknown",
+    }
 
-	switch runtime.GOOS {
-	case "darwin": // macOS
-		info.Model = detectMacGPU()
-	case "windows":
-		info.Model = detectWindowsGPU()
-	case "linux":
-		info.Model = detectLinuxGPU()
-	default:
-		info.Model = "Generic GPU (Unknown platform)"
-	}
+    gpus = append(gpus, info)
+    return gpus
+}
 
-	if info.Model == "" {
-		info.Model = "Generic GPU (No specific GPU detected)"
-	}
-
-	// Для универсального обнаружения предполагаем одну GPU
-	gpus = append(gpus, info)
-	return gpus
+// detectPlatformGPU определяет GPU для текущей платформы
+func detectPlatformGPU() string {
+    switch runtime.GOOS {
+    case "darwin":
+        return detectMacGPU()
+    case "windows":
+        return detectWindowsGPU()
+    case "linux":
+        return detectLinuxGPU()
+    default:
+        return "Generic GPU (Unknown platform)"
+    }
 }
 
 func detectMacGPU() string {

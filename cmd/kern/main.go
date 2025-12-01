@@ -40,6 +40,8 @@ var (
 	flagMining    = flag.Bool("mining", false, "Show mining information")
 	flagDetailedMem = flag.Bool("dm", false, "Show detailed memory module information")
 	flagDetailedMemLong = flag.Bool("detailed-mem", false, "Show detailed memory module information")
+	flagDetailedNet      = flag.Bool("dn", false, "Show detailed network interface information")
+	flagDetailedNetLong  = flag.Bool("detailed-net", false, "Show detailed network interface information")
 	
 	// Общие флаги
 	flagAll       = flag.Bool("a", false, "Show all information")
@@ -97,6 +99,7 @@ func init() {
 	flag.BoolVar(flagLogo, "show-logo", false, "Show logo during monitoring")
 	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
 	flag.BoolVar(flagDetailedMem, "detailed-memory", false, "Show detailed memory module information")
+	flag.BoolVar(flagDetailedNet, "detailed-network", false, "Show detailed network interface information")
 	
 	// Сервисные флаги с альтернативными именами
 	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
@@ -127,6 +130,7 @@ func main() {
 		fmt.Println("\nDetailed Information Options:")
 		fmt.Println("  --detailed, -deflag.BoolVar(flagDaemon,      Show detailed CPU core information")
 		fmt.Println("  q, -dm  Show detailed memory module information")
+		fmt.Println("  -dn, --detailed-net  Show detailed network interface information")
 		
 		fmt.Println("\nLanguage Options:")
 		fmt.Println("  -l LANG              Language code (e.g., 'ru' for Russian)")
@@ -262,6 +266,7 @@ func main() {
 	// Вместо этого используем временные переменные
 	detailedCPU := *flagDetailed || *flagDetailedShort
 	detailedMem := *flagDetailedMem || *flagDetailedMemLong
+	detailedNet := *flagDetailedNet || *flagDetailedNetLong
 
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
@@ -272,6 +277,7 @@ func main() {
 	// Устанавливаем детальные флаги только для этой сессии
 	cfg.DetailedCPU = detailedCPU
 	cfg.DetailedMem = detailedMem
+	cfg.DetailedNet = detailedNet
 
 	// Проверяем поддержку языка
 	if *flagLang != "" && !i18n.IsLanguageSupported(*flagLang) {
