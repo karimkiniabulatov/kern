@@ -146,20 +146,15 @@ func getMemoryInfo() (*MemoryInfo, error) {
     // Получаем детальную информацию о памяти
     cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
 
-    // ОБНОВЛЕНИЕ: Используем улучшенный расчет для неизвестных модулей
+    // Используем улучшенный расчет для всех модулей (известных и неизвестных)
     modules = calculateUnknownModuleUsage(modules, virtMem.Total, usedMemory)
 
-    // Обновляем процент использования для каждого модуля
+    // Дополнительно гарантируем, что все модули имеют метку размера
     for i := range modules {
-        if modules[i].SizeBytes > 0 {
-            // Для известных модулей - распределяем использование пропорционально размеру
-            modules[i].UsagePercent = calculateModuleUsage(
-                modules[i].SizeBytes, 
-                virtMem.Total, 
-                usedMemory,
-            )
+        if modules[i].Size == "" || modules[i].SizeBytes == 0 {
+            modules[i].Size = "не опознан"
+            modules[i].SizeBytes = 0
         }
-        // Для неизвестных модулей UsagePercent уже установлен в calculateUnknownModuleUsage
     }
 
     info := &MemoryInfo{
@@ -420,29 +415,60 @@ func calculateUnknownModuleUsage(modules []MemoryModule, totalSystemMemory uint6
 
     // Считаем общий размер известных модулей
     var knownSize uint64
-    var knownModules int
+    var knownModulesList []MemoryModule
+    var unknownModulesList []int
     
-    for _, module := range modules {
+    for i, module := range modules {
         if module.SizeBytes > 0 {
             knownSize += module.SizeBytes
-            knownModules++
+            knownModulesList = append(knownModulesList, module)
+        } else {
+            unknownModulesList = append(unknownModulesList, i)
         }
     }
 
-    // Вычисляем использование для нераспознанных модулей
+    // Вычисляем системное использование в процентах
     systemUsagePercent := float64(usedSystemMemory) / float64(totalSystemMemory) * 100
     
+    // Для известных модулей распределяем использование пропорционально размеру
     for i := range modules {
-        if modules[i].SizeBytes == 0 {
-            // Для нераспознанных модулей используем системное использование
-            modules[i].UsagePercent = systemUsagePercent
-        } else {
-            // Для известных модулей распределяем использование пропорционально
+        if modules[i].SizeBytes > 0 {
+            // Рассчитываем долю модуля в общей известной памяти
             moduleShare := float64(modules[i].SizeBytes) / float64(knownSize)
+            // Распределяем системное использование пропорционально
             modules[i].UsagePercent = systemUsagePercent * moduleShare
         }
+    }
+    
+    // Для нераспознанных модулей вычисляем оставшееся использование
+    if len(unknownModulesList) > 0 {
+        // Считаем общее использование известных модулей
+        var totalKnownUsage float64
+        for _, module := range modules {
+            if module.SizeBytes > 0 {
+                totalKnownUsage += module.UsagePercent
+            }
+        }
         
-        // Гарантируем корректные границы
+        // Оставшееся использование распределяем между нераспознанными модулями поровну
+        remainingUsage := systemUsagePercent - totalKnownUsage
+        if remainingUsage < 0 {
+            remainingUsage = 0
+        }
+        
+        usagePerUnknown := remainingUsage / float64(len(unknownModulesList))
+        for _, idx := range unknownModulesList {
+            modules[idx].UsagePercent = usagePerUnknown
+            
+            // Устанавливаем метку "не опознан" для отображения
+            if modules[idx].Size == "" {
+                modules[idx].Size = "не опознан"
+            }
+        }
+    }
+    
+    // Гарантируем корректные границы для всех модулей
+    for i := range modules {
         if modules[i].UsagePercent < 0 {
             modules[i].UsagePercent = 0.0
         }

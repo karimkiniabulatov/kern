@@ -532,8 +532,29 @@ func collectData(cfg *config.Config) map[string]interface{} {
 	// NEW: GPU monitoring
 	if cfg.ShowGPU {
 		go func() {
+			// Используем улучшенную функцию Summary из обновленного gpu.go
 			data, err := gpu.Summary()
-			resultChan <- result{"gpu", data, err}
+			if err != nil {
+				// Если не удалось получить данные, создаем минимальный набор
+				fallbackData := []*gpu.GPUInfo{{
+					Model:           "GPU не обнаружена",
+					DriverVersion:   "N/A",
+					GPUTemp:         0.0,
+					MemoryTotal:     "0 MB",
+					MemoryUsed:      "0 MB",
+					MemoryFree:      "0 MB",
+					Utilization:     0.0,
+					PowerDraw:       "0 W",
+					PowerLimit:      "0 W",
+					FanSpeed:        0.0,
+					ClockCore:       "0 MHz",
+					ClockMemory:     "0 MHz",
+					PerformanceState: "N/A",
+				}}
+				resultChan <- result{"gpu", fallbackData, nil}
+			} else {
+				resultChan <- result{"gpu", data, nil}
+			}
 		}()
 	}
 

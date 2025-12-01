@@ -299,9 +299,9 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
             for _, module := range memInfo.Modules {
                 var moduleInfo string
                 
-                if module.Size == "Unknown" || module.SizeBytes == 0 {
-                    // НЕИЗВЕСТНЫЙ модуль - показываем только слот
-                    moduleInfo = fmt.Sprintf("  %s: нет информации", module.Slot)
+                if module.Size == "Unknown" || module.SizeBytes == 0 || module.Size == "Не распознан" {
+                    // НЕИЗВЕСТНЫЙ модуль - показываем слот и метку "не опознан"
+                    moduleInfo = fmt.Sprintf("  %s: не опознан", module.Slot)
                 } else {
                     // ИЗВЕСТНЫЙ модуль с данными
                     moduleInfo = fmt.Sprintf("  %s: %s %s @ %s", 
@@ -329,8 +329,9 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                 row = t.printSimple(row, moduleInfo, 
                     tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
                 
-                // ВЫВОДИМ ГИСТОГРАММУ НА ОТДЕЛЬНОЙ СТРОКЕ
-                if module.Size != "Unknown" && module.SizeBytes > 0 {
+                // ВЫВОДИМ ГИСТОГРАММУ НА ОТДЕЛЬНОЙ СТРОКЕ ДЛЯ ВСЕХ МОДУЛЕЙ
+                // Даже для нераспознанных показываем гистограмму на основе системного использования
+                if module.UsagePercent > 0 {
                     usageFormatted := fmt.Sprintf("%05.1f", module.UsagePercent)
                     moduleGraph := t.createSolidGraph(module.UsagePercent)
                     graphLine := fmt.Sprintf("    %s%% %s", usageFormatted, moduleGraph)
@@ -345,9 +346,20 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
                     
                     row = t.printSimple(row, graphLine, 
                         tcell.StyleDefault.Foreground(graphColor))
+                } else if module.Size == "Unknown" || module.SizeBytes == 0 {
+                    // Для нераспознанных модулей с нулевым UsagePercent показываем базовую гистограмму
+                    // Используем системное использование или 0%
+                    systemUsage := 0.0 // Будет заменено на реальное значение
+                    if memInfo, ok := data.(*mem.MemoryInfo); ok {
+                        systemUsage = memInfo.UsagePercent
+                    }
+                    usageFormatted := fmt.Sprintf("%05.1f", systemUsage)
+                    moduleGraph := t.createSolidGraph(systemUsage)
+                    row = t.printSimple(row, fmt.Sprintf("    %s%% %s", usageFormatted, moduleGraph), 
+                        tcell.StyleDefault.Foreground(tcell.ColorGray))
                 } else {
-                    // Для неизвестных модулей показываем пустую гистограмму
-                    row = t.printSimple(row, "    ---", 
+                    // Для известных модулей с нулевым использованием
+                    row = t.printSimple(row, "    0.0% ░░░░░░░░░░░░░░░░░░░░", 
                         tcell.StyleDefault.Foreground(tcell.ColorGray))
                 }
             }
@@ -581,21 +593,25 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 			}
 			
 			if gpuInfo.GPUTemp > 0 {
-				// Temperature histogram (normalized to 100°C)
+				// Temperature histogram (normalized to 100°C) на отдельной строке
 				tempPercent := gpuInfo.GPUTemp
 				if tempPercent > 100 {
 					tempPercent = 100
 				}
 				tempGraph := t.createSolidGraph(tempPercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
-					t.config.T("gpu.temperature"), gpuInfo.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C", 
+					t.config.T("gpu.temperature"), gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed))
+				// Гистограмма на отдельной строке
+				row = t.printSimple(row, fmt.Sprintf("  %s", tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
 			}
 
 			if gpuInfo.Utilization > 0 {
-				// Utilization histogram
+				// Utilization histogram на отдельной строке
 				utilGraph := t.createSolidGraph(gpuInfo.Utilization)
-				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-					t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
+					t.config.T("gpu.utilization"), gpuInfo.Utilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+				// Гистограмма на отдельной строке
+				row = t.printSimple(row, fmt.Sprintf("  %s", utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 			}
 
 			if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
@@ -605,9 +621,12 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 				if memTotalMB > 0 {
 					memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
 					memGraph := t.createSolidGraph(memUsagePercent)
-					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
-						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
-						memUsagePercent, memGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua))
+					// Гистограмма памяти на отдельной строке
+					row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", memUsagePercent, memGraph), 
+						tcell.StyleDefault.Foreground(tcell.ColorAqua))
 				} else {
 					row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
 						t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
@@ -653,6 +672,7 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 }
 
 // Helper function to render single GPU info (for legacy format)
+// Helper function to render single GPU info (for legacy format)
 func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 	row := startRow
 	
@@ -663,19 +683,25 @@ func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 	}
 	
 	if gpuInfo.GPUTemp > 0 {
+		// Temperature histogram на отдельной строке
 		tempPercent := gpuInfo.GPUTemp
 		if tempPercent > 100 {
 			tempPercent = 100
 		}
 		tempGraph := t.createSolidGraph(tempPercent)
-		row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C %s", 
-			t.config.T("gpu.temperature"), gpuInfo.GPUTemp, tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C", 
+			t.config.T("gpu.temperature"), gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed))
+		// Гистограмма на отдельной строке
+		row = t.printSimple(row, fmt.Sprintf("  %s", tempGraph), tcell.StyleDefault.Foreground(tcell.ColorRed))
 	}
 
 	if gpuInfo.Utilization > 0 {
+		// Utilization histogram на отдельной строке
 		utilGraph := t.createSolidGraph(gpuInfo.Utilization)
-		row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", 
-			t.config.T("gpu.utilization"), gpuInfo.Utilization, utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+		row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
+			t.config.T("gpu.utilization"), gpuInfo.Utilization), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+		// Гистограмма на отдельной строке
+		row = t.printSimple(row, fmt.Sprintf("  %s", utilGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 	}
 
 	if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" && gpuInfo.MemoryUsed != "0 MB" {
@@ -684,9 +710,12 @@ func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 		if memTotalMB > 0 {
 			memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
 			memGraph := t.createSolidGraph(memUsagePercent)
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%) %s", 
-				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
-				memUsagePercent, memGraph), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			// Гистограмма памяти на отдельной строке
+			row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", memUsagePercent, memGraph), 
+				tcell.StyleDefault.Foreground(tcell.ColorAqua))
 		} else {
 			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
 				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 

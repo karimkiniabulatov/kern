@@ -40,16 +40,20 @@ var lastNetworkStats = make(map[string]struct {
 })
 
 func Summary() ([]NetworkInfo, error) {
-	interfaces, err := getNetworkInterfaces()
+	// Используем расширенную функцию обнаружения
+	interfaces, err := detectAllNetworkInterfaces()
 	if err != nil {
-		// В случае ошибки возвращаем пустой, но валидный набор данных
-		return getFallbackEmptyInterfaces(), nil
+		// Фоллбэк на старый метод
+		interfaces, err = getNetworkInterfaces()
+		if err != nil {
+			return getFallbackEmptyInterfaces(), nil
+		}
 	}
 
 	var networks []NetworkInfo
 	for _, iface := range interfaces {
-		// Включаем все интерфейсы кроме полностью нерабочих
-		if iface.Status == "UP" || iface.Status == "UNKNOWN" {
+		// Включаем ВСЕ интерфейсы (кроме loopback)
+		if iface.Interface != "lo" {
 			networks = append(networks, iface)
 		}
 	}
@@ -148,6 +152,139 @@ func getNetworkInterfaces() ([]NetworkInfo, error) {
     }
 
     return removeDuplicateInterfaces(filteredInterfaces), nil
+}
+
+// Новая функция для расширенного обнаружения интерфейсов
+func detectAllNetworkInterfaces() ([]NetworkInfo, error) {
+    var allInterfaces []NetworkInfo
+    
+    // Получаем базовые интерфейсы
+    baseInterfaces, err := getLinuxNetworkInterfaces()
+    if err != nil {
+        baseInterfaces, _ = getFallbackNetworkInterfaces()
+    }
+    
+    // Добавляем Wi-Fi интерфейсы
+    wifiInterfaces := detectWifiInterfaces()
+    allInterfaces = append(allInterfaces, baseInterfaces...)
+    allInterfaces = append(allInterfaces, wifiInterfaces...)
+    
+    // Добавляем Bluetooth интерфейсы
+    btInterfaces := detectBluetoothInterfaces()
+    allInterfaces = append(allInterfaces, btInterfaces...)
+    
+    // Добавляем VPN интерфейсы
+    vpnInterfaces := detectVPNInterfaces()
+    allInterfaces = append(allInterfaces, vpnInterfaces...)
+    
+    // Убираем дубликаты
+    return removeDuplicateInterfaces(allInterfaces), nil
+}
+
+// Функция обнаружения Wi-Fi интерфейсов
+func detectWifiInterfaces() []NetworkInfo {
+    var wifiInterfaces []NetworkInfo
+    
+    // Метод 1: Через iw
+    cmd := exec.Command("iw", "dev")
+    output, err := cmd.Output()
+    if err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.Contains(line, "Interface") {
+                parts := strings.Fields(line)
+                if len(parts) >= 2 {
+                    ifaceName := parts[1]
+                    // Добавляем как Wi-Fi интерфейс
+                    wifiInterfaces = append(wifiInterfaces, NetworkInfo{
+                        Interface:      ifaceName,
+                        ConnectionType: "Wi-Fi",
+                        Status:         "UP",
+                        IsPhysical:     true,
+                    })
+                }
+            }
+        }
+    }
+    
+    // Метод 2: Через ip link (имена wlan*, wlp*)
+    cmd = exec.Command("ip", "-o", "link", "show")
+    output, err = cmd.Output()
+    if err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.Contains(line, "wlan") || strings.Contains(line, "wlp") {
+                fields := strings.Fields(line)
+                if len(fields) >= 2 {
+                    ifaceName := strings.TrimSuffix(fields[1], ":")
+                    wifiInterfaces = append(wifiInterfaces, NetworkInfo{
+                        Interface:      ifaceName,
+                        ConnectionType: "Wi-Fi",
+                        Status:         "UP",
+                        IsPhysical:     true,
+                    })
+                }
+            }
+        }
+    }
+    
+    return wifiInterfaces
+}
+
+// Функция обнаружения Bluetooth интерфейсов
+func detectBluetoothInterfaces() []NetworkInfo {
+    var btInterfaces []NetworkInfo
+    
+    // Через hciconfig
+    cmd := exec.Command("hciconfig")
+    output, err := cmd.Output()
+    if err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.Contains(line, "hci") {
+                parts := strings.Split(line, ":")
+                if len(parts) > 0 {
+                    ifaceName := strings.TrimSpace(parts[0])
+                    btInterfaces = append(btInterfaces, NetworkInfo{
+                        Interface:      ifaceName,
+                        ConnectionType: "Bluetooth",
+                        Status:         "UP",
+                        IsPhysical:     true,
+                    })
+                }
+            }
+        }
+    }
+    
+    return btInterfaces
+}
+
+// Функция обнаружения VPN интерфейсов
+func detectVPNInterfaces() []NetworkInfo {
+    var vpnInterfaces []NetworkInfo
+    
+    // Через ip link (имена tun*, tap*)
+    cmd := exec.Command("ip", "-o", "link", "show")
+    output, err := cmd.Output()
+    if err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.Contains(line, "tun") || strings.Contains(line, "tap") {
+                fields := strings.Fields(line)
+                if len(fields) >= 2 {
+                    ifaceName := strings.TrimSuffix(fields[1], ":")
+                    vpnInterfaces = append(vpnInterfaces, NetworkInfo{
+                        Interface:      ifaceName,
+                        ConnectionType: "VPN",
+                        Status:         "UP",
+                        IsPhysical:     false,
+                    })
+                }
+            }
+        }
+    }
+    
+    return vpnInterfaces
 }
 
 // ensureNetworkInfoDefaults гарантирует, что все поля NetworkInfo имеют валидные значения
@@ -642,11 +779,12 @@ func getLinuxNetworkInterfaces() ([]NetworkInfo, error) {
 				continue
 			}
 
-			// ИСКЛЮЧАЕМ ТОЛЬКО loopback интерфейсы
+			// Пропускаем только loopback интерфейсы
 			if ifaceName == "lo" {
 				continue
 			}
 
+			// Получаем все интерфейсы без фильтрации по статусу
 			iface := NetworkInfo{
 				Interface: ifaceName,
 				Status:    "DOWN",

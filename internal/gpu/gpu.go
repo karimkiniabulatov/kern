@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -26,7 +27,13 @@ type GPUInfo struct {
 
 // Summary возвращает информацию о всех GPU в системе
 func Summary() ([]*GPUInfo, error) {
-	return detectAllGPUs()
+    // Используем улучшенное обнаружение
+    gpus, err := detectAllGPUsEnhanced()
+    if err != nil {
+        // Фоллбэк на старый метод
+        return detectAllGPUs()
+    }
+    return gpus, nil
 }
 
 // Универсальное обнаружение GPU
@@ -59,6 +66,235 @@ func detectAllGPUs() ([]*GPUInfo, error) {
     
 	// Return empty slice if no GPUs found
 	return gpus, fmt.Errorf("no GPU devices detected")
+}
+
+// Улучшенное обнаружение GPU с несколькими методами
+func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
+    var gpus []*GPUInfo
+    
+    // Метод 1: NVIDIA через nvidia-smi
+    if nvidiaGPUs, err := detectNVIDIA(); err == nil {
+        gpus = append(gpus, nvidiaGPUs...)
+    }
+    
+    // Метод 2: NVIDIA через PCI анализ (для старых карт)
+    if len(gpus) == 0 {
+        if nvidiaGPUs, err := detectNVIDIAViaPCI(); err == nil {
+            gpus = append(gpus, nvidiaGPUs...)
+        }
+    }
+    
+    // Метод 3: AMD через rocm-smi
+    if amdGPUs, err := detectAMD(); err == nil {
+        gpus = append(gpus, amdGPUs...)
+    }
+    
+    // Метод 4: Intel через разные методы
+    if intelGPUs, err := detectIntelEnhanced(); err == nil {
+        gpus = append(gpus, intelGPUs...)
+    }
+    
+    // Метод 5: Общее обнаружение через lspci/PCI
+    if genericGPUs := detectGenericGPUsViaPCI(); len(genericGPUs) > 0 {
+        gpus = append(gpus, genericGPUs...)
+    }
+    
+    if len(gpus) > 0 {
+        return gpus, nil
+    }
+    
+    return gpus, fmt.Errorf("no GPU devices detected")
+}
+
+// Обнаружение NVIDIA через PCI анализ
+func detectNVIDIAViaPCI() ([]*GPUInfo, error) {
+    var gpus []*GPUInfo
+    
+    // Используем lspci для Linux
+    if runtime.GOOS == "linux" {
+        cmd := exec.Command("lspci", "-nn")
+        output, err := cmd.Output()
+        if err == nil {
+            lines := strings.Split(string(output), "\n")
+            for _, line := range lines {
+                // Ищем NVIDIA устройства (10de - vendor ID NVIDIA)
+                if (strings.Contains(line, "VGA") || strings.Contains(line, "3D controller")) && 
+                   strings.Contains(line, "10de") {
+                    gpu := &GPUInfo{
+                        Model:           "NVIDIA " + extractGPUModelFromPCI(line),
+                        DriverVersion:   "Unknown",
+                        PerformanceState: "Active",
+                    }
+                    gpus = append(gpus, gpu)
+                }
+            }
+        }
+    }
+    
+    // Для Windows используем WMI расширенный поиск
+    if runtime.GOOS == "windows" {
+        cmd := exec.Command("wmic", "path", "win32_VideoController", "get", "Name,DriverVersion,AdapterRAM", "/format:csv")
+        output, err := cmd.Output()
+        if err == nil {
+            lines := strings.Split(string(output), "\n")
+            for i, line := range lines {
+                if i == 0 || strings.TrimSpace(line) == "" {
+                    continue
+                }
+                fields := strings.Split(line, ",")
+                if len(fields) >= 4 {
+                    model := strings.TrimSpace(fields[2])
+                    // Ищем NVIDIA в названии
+                    if strings.Contains(strings.ToLower(model), "nvidia") || 
+                       strings.Contains(strings.ToLower(model), "geforce") {
+                        gpu := &GPUInfo{
+                            Model:           model,
+                            DriverVersion:   strings.TrimSpace(fields[3]),
+                            PerformanceState: "Active",
+                        }
+                        // Парсим память
+                        if adapterRAM := strings.TrimSpace(fields[4]); adapterRAM != "" {
+                            if ramBytes, err := strconv.ParseUint(adapterRAM, 10, 64); err == nil {
+                                ramMB := ramBytes / 1024 / 1024
+                                gpu.MemoryTotal = fmt.Sprintf("%d MB", ramMB)
+                            }
+                        }
+                        gpus = append(gpus, gpu)
+                    }
+                }
+            }
+        }
+    }
+    
+    if len(gpus) > 0 {
+        return gpus, nil
+    }
+    
+    return nil, fmt.Errorf("no NVIDIA GPUs found via PCI")
+}
+
+// Вспомогательная функция для извлечения модели из строки lspci
+func extractGPUModelFromPCI(line string) string {
+    // Пример строки: "01:00.0 VGA compatible controller: NVIDIA Corporation GK107 [GeForce GT 1030] (rev a1)"
+    parts := strings.Split(line, ":")
+    if len(parts) >= 3 {
+        modelPart := parts[2]
+        // Ищем квадратные скобки
+        start := strings.Index(modelPart, "[")
+        end := strings.Index(modelPart, "]")
+        if start != -1 && end != -1 && end > start {
+            return modelPart[start+1 : end]
+        }
+        // Если нет скобок, берем последнюю часть
+        subparts := strings.Fields(modelPart)
+        if len(subparts) > 0 {
+            return subparts[len(subparts)-1]
+        }
+    }
+    return "Unknown GPU"
+}
+
+// Улучшенное обнаружение Intel
+func detectIntelEnhanced() ([]*GPUInfo, error) {
+    var gpus []*GPUInfo
+    
+    // Метод 1: Через lspci для Linux
+    if runtime.GOOS == "linux" {
+        cmd := exec.Command("lspci", "-nn")
+        output, err := cmd.Output()
+        if err == nil {
+            lines := strings.Split(string(output), "\n")
+            for _, line := range lines {
+                // Ищем Intel устройства (8086 - vendor ID Intel)
+                if strings.Contains(line, "VGA") && strings.Contains(line, "8086") {
+                    gpu := &GPUInfo{
+                        Model:           "Intel " + extractIntelModelFromPCI(line),
+                        DriverVersion:   "Unknown",
+                        PerformanceState: "Active",
+                    }
+                    gpus = append(gpus, gpu)
+                }
+            }
+        }
+    }
+    
+    // Метод 2: Через sysfs для детальной информации
+    if len(gpus) > 0 {
+        for _, gpu := range gpus {
+            // Попробуем получить детали из sysfs
+            if runtime.GOOS == "linux" {
+                // Проверяем наличие файла с моделью
+                modelPath := "/sys/class/drm/card0/device/name"
+                if data, err := os.ReadFile(modelPath); err == nil {
+                    gpu.Model = "Intel " + strings.TrimSpace(string(data))
+                }
+                
+                // Получаем частоту
+                clockPath := "/sys/class/drm/card0/device/gt_cur_freq_mhz"
+                if data, err := os.ReadFile(clockPath); err == nil {
+                    if freq, err := strconv.Atoi(strings.TrimSpace(string(data))); err == nil {
+                        gpu.ClockCore = fmt.Sprintf("%d MHz", freq)
+                    }
+                }
+            }
+        }
+    }
+    
+    if len(gpus) > 0 {
+        return gpus, nil
+    }
+    
+    return detectIntel() // Фоллбэк на старый метод
+}
+
+// Общее обнаружение через PCI
+func detectGenericGPUsViaPCI() []*GPUInfo {
+    var gpus []*GPUInfo
+    
+    if runtime.GOOS == "linux" {
+        cmd := exec.Command("lspci", "-nn")
+        output, err := cmd.Output()
+        if err == nil {
+            lines := strings.Split(string(output), "\n")
+            for _, line := range lines {
+                // Ищем любые VGA/Display контроллеры
+                if strings.Contains(line, "VGA") || strings.Contains(line, "Display") || 
+                   strings.Contains(line, "3D controller") {
+                    parts := strings.Split(line, ":")
+                    if len(parts) >= 3 {
+                        model := strings.TrimSpace(parts[2])
+                        gpu := &GPUInfo{
+                            Model:           model,
+                            DriverVersion:   "Unknown",
+                            PerformanceState: "Active",
+                        }
+                        gpus = append(gpus, gpu)
+                    }
+                }
+            }
+        }
+    }
+    
+    return gpus
+}
+
+// extractIntelModelFromPCI извлекает модель Intel GPU из строки lspci
+func extractIntelModelFromPCI(line string) string {
+    // Пример: "00:02.0 VGA compatible controller: Intel Corporation HD Graphics 620 (rev 02)"
+    parts := strings.Split(line, ":")
+    if len(parts) >= 3 {
+        modelPart := parts[2]
+        // Удаляем "Intel Corporation" и лишние пробелы
+        modelPart = strings.TrimPrefix(modelPart, "Intel Corporation")
+        modelPart = strings.TrimSpace(modelPart)
+        
+        // Убираем часть в скобках в конце (rev xx)
+        if idx := strings.LastIndex(modelPart, "("); idx != -1 {
+            modelPart = modelPart[:idx]
+        }
+        return strings.TrimSpace(modelPart)
+    }
+    return "Integrated Graphics"
 }
 
 // detectNVIDIA обнаруживает NVIDIA GPU через nvidia-smi
