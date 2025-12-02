@@ -7,7 +7,6 @@ import (
     "runtime"
     "strconv"
     "strings"
-    "unsafe"
 )
 
 type GPUInfo struct {

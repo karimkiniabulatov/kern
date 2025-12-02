@@ -85,7 +85,7 @@ func parsePCIDeviceLinux(devicePath, deviceName string) *GPUInfo {
     
     // Определяем производителя
     vendorName := getVendorName(vendorID)
-    deviceName := getDeviceName(vendorID, deviceID)
+    deviceName = getDeviceName(vendorID, deviceID)
     
     gpu := &GPUInfo{
         Model:           fmt.Sprintf("%s %s", vendorName, deviceName),
