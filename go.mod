@@ -8,7 +8,6 @@ require (
     github.com/mattn/go-runewidth v0.0.15
     github.com/shirou/gopsutil/v3 v3.24.5
     golang.org/x/term v0.18.0
-    // Добавить зависимости для системных вызовов
     golang.org/x/sys v0.20.0
     github.com/lxn/win v0.0.0-20210218163916-a377121e959e // для Windows API
 )

@@ -9,7 +9,8 @@ import (
 )
 
 func detectGPUsViaPCIHardware() ([]*GPUInfo, error) {
-    return detectPCIWindows()
+    gpus := detectPCIWindows()
+    return gpus, nil
 }
 
 func detectPCIWindows() []*GPUInfo {
