@@ -535,13 +535,13 @@ func collectData(cfg *config.Config) map[string]interface{} {
 		}()
 	}
 
-	// NEW: GPU monitoring
+	// NEW: GPU monitoring - с исправленной обработкой ошибок
 	if cfg.ShowGPU {
 		go func() {
 			// Используем улучшенную функцию Summary из обновленного gpu.go
 			data, err := gpu.Summary()
 			if err != nil {
-				// Если не удалось получить данные, создаем минимальный набор
+				// Всегда возвращать структуру с гистограммами
 				fallbackData := []*gpu.GPUInfo{{
 					Model:           "GPU не обнаружена",
 					DriverVersion:   "N/A",
@@ -549,7 +549,7 @@ func collectData(cfg *config.Config) map[string]interface{} {
 					MemoryTotal:     "0 MB",
 					MemoryUsed:      "0 MB",
 					MemoryFree:      "0 MB",
-					Utilization:     0.0,
+					Utilization:     0.0,  // Важно: 0% для гистограммы
 					PowerDraw:       "0 W",
 					PowerLimit:      "0 W",
 					FanSpeed:        0.0,
@@ -615,10 +615,53 @@ func collectData(cfg *config.Config) map[string]interface{} {
 	}
 
 	// Гарантируем, что все запрошенные модули возвращают данные
-	for _, module := range []string{"disk", "cpu", "mem", "net", "gpu", "ai", "mining"} {
+	// Только для модулей, которые были запрошены через cfg
+	requestedModules := make([]string, 0)
+	if cfg.ShowDisk {
+		requestedModules = append(requestedModules, "disk")
+	}
+	if cfg.ShowCPU {
+		requestedModules = append(requestedModules, "cpu")
+	}
+	if cfg.ShowMem {
+		requestedModules = append(requestedModules, "mem")
+	}
+	if cfg.ShowNet {
+		requestedModules = append(requestedModules, "net")
+	}
+	if cfg.ShowGPU {
+		requestedModules = append(requestedModules, "gpu")
+	}
+	if cfg.ShowAI {
+		requestedModules = append(requestedModules, "ai")
+	}
+	if cfg.ShowMining {
+		requestedModules = append(requestedModules, "mining")
+	}
+
+	for _, module := range requestedModules {
 		if _, exists := results[module]; !exists {
-			// Создаем пустые данные для отображения гистограмм
-			results[module] = map[string]string{"status": "no data"}
+			// Создаем минимальные данные для отображения гистограмм
+			switch module {
+			case "gpu":
+				results[module] = []*gpu.GPUInfo{{
+					Model:           "GPU не обнаружена",
+					DriverVersion:   "N/A",
+					GPUTemp:         0.0,
+					MemoryTotal:     "0 MB",
+					MemoryUsed:      "0 MB",
+					MemoryFree:      "0 MB",
+					Utilization:     0.0,
+					PowerDraw:       "0 W",
+					PowerLimit:      "0 W",
+					FanSpeed:        0.0,
+					ClockCore:       "0 MHz",
+					ClockMemory:     "0 MHz",
+					PerformanceState: "N/A",
+				}}
+			default:
+				results[module] = map[string]string{"status": "no data"}
+			}
 		}
 	}
 	
