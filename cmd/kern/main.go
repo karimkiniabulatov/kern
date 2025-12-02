@@ -129,7 +129,7 @@ func main() {
 		fmt.Println("  --logo, --show-logo  Show logo during monitoring")
 		fmt.Println("\nDetailed Information Options:")
 		fmt.Println("  --detailed, -deflag.BoolVar(flagDaemon,      Show detailed CPU core information")
-		fmt.Println("  q, -dm  Show detailed memory module information")
+		fmt.Println("  -dm, --detailed-mem  Show detailed memory module information")
 		fmt.Println("  -dn, --detailed-net  Show detailed network interface information")
 		
 		fmt.Println("\nLanguage Options:")
