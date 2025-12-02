@@ -241,3 +241,9 @@ func formatBytes(bytes uint64) string {
         return fmt.Sprintf("%d B", bytes)
     }
 }
+
+// detectAllStorageDevicesWindows - заглушка для Windows
+func detectAllStorageDevicesWindows() ([]DiskInfo, error) {
+    // Реализация уже есть в detectStorageDevicesWindows
+    return detectStorageDevicesWindows()
+}

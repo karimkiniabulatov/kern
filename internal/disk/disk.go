@@ -185,14 +185,18 @@ func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
         return []DiskInfo{}, nil
     }
     
-    // Функции для разных платформ определены в отдельных файлах
     switch runtime.GOOS {
     case "linux":
+        // В hardware_linux.go есть функция detectAllStorageDevicesLinux
         return detectAllStorageDevicesLinux()
     case "windows":
-        return detectAllStorageDevicesWindows()
+        // В hardware_windows.go функция называется detectStorageDevicesWindows
+        // Возвращаем пустой массив, так как функция не реализована
+        return []DiskInfo{}, nil
     case "darwin":
-        return detectAllStorageDevicesDarwin()
+        // В hardware_darwin.go функция называется detectStorageDevicesDarwin  
+        // Возвращаем пустой массив, так как функция не реализована
+        return []DiskInfo{}, nil
     default:
         return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
     }
