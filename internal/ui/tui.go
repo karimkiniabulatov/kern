@@ -473,29 +473,6 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
     return row + 1
 }
 
-// Обновленная функция getDeviceType
-func (t *TUI) getDeviceType(filesystem string, mountPoint string, diskType string) string {
-    if diskType != "Unknown" && diskType != "" {
-        return diskType
-    }
-    
-    if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
-        return "SSD"
-    } else if strings.Contains(filesystem, "sd") {
-        return "HDD"
-    } else if mountPoint == "/" {
-        return "ROOT"
-    } else if strings.Contains(mountPoint, "home") {
-        return "HOME"
-    } else if strings.Contains(mountPoint, "boot") {
-        return "BOOT"
-    } else if strings.Contains(filesystem, "//") || strings.Contains(mountPoint, "smb") {
-        return "Network"
-    } else if strings.Contains(filesystem, "tmpfs") {
-        return "Temporary"
-    }
-    return "STORAGE"
-}
 
 func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
     row := startRow
@@ -1180,19 +1157,29 @@ func (t *TUI) createCompactGraph(percent float64) string {
 	return t.createSolidGraph(percent)
 }
 
-func (t *TUI) getDeviceType(filesystem string, mountPoint string) string {
-	if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
-		return "SSD"
-	} else if strings.Contains(filesystem, "sd") {
-		return "HDD"
-	} else if mountPoint == "/" {
-		return "ROOT"
-	} else if strings.Contains(mountPoint, "home") {
-		return "HOME"
-	} else if strings.Contains(mountPoint, "boot") {
-		return "BOOT"
-	}
-	return "STORAGE"
+func (t *TUI) getDeviceType(filesystem string, mountPoint string, diskType string) string {
+    // Если тип диска уже известен и не "Unknown", используем его
+    if diskType != "" && diskType != "Unknown" {
+        return diskType
+    }
+    
+    // Определяем тип по файловой системе
+    if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
+        return "SSD"
+    } else if strings.Contains(filesystem, "sd") {
+        return "HDD"
+    } else if mountPoint == "/" {
+        return "ROOT"
+    } else if strings.Contains(mountPoint, "home") {
+        return "HOME"
+    } else if strings.Contains(mountPoint, "boot") {
+        return "BOOT"
+    } else if strings.Contains(filesystem, "//") || strings.Contains(mountPoint, "smb") {
+        return "Network"
+    } else if strings.Contains(filesystem, "tmpfs") {
+        return "Temporary"
+    }
+    return "STORAGE"
 }
 
 // Вспомогательная функция для извлечения числового значения памяти из строки
