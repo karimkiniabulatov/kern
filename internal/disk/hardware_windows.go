@@ -22,28 +22,20 @@ type WindowsPhysicalDisk struct {
     HealthStatus  string `json:"HealthStatus"`
 }
 
-// detectAllStorageDevices обнаруживает все устройства хранения в Windows
-func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
+// detectAllStorageDevicesWindows обнаруживает все устройства хранения в Windows
+func detectAllStorageDevicesWindows() ([]DiskInfo, error) {
     var devices []DiskInfo
 
-    if detailed {
-        // Метод 1: PowerShell для получения детальной информации о физических дисках
-        devices1, err1 := getPhysicalDisksViaPowerShell()
-        if err1 == nil && len(devices1) > 0 {
-            devices = append(devices, devices1...)
-        }
-
-        // Метод 2: WMI для получения базовой информации
-        devices2, err2 := getStorageDevicesViaWMI()
-        if err2 == nil && len(devices2) > 0 {
-            devices = append(devices, devices2...)
-        }
+    // Метод 1: PowerShell для получения детальной информации о физических дисках
+    devices1, err1 := getPhysicalDisksViaPowerShell()
+    if err1 == nil && len(devices1) > 0 {
+        devices = append(devices, devices1...)
     }
 
-    // Метод 3: Универсальный - получение логических дисков через WMIC
-    logicalDisks, err3 := getLogicalDisks()
-    if err3 == nil && len(logicalDisks) > 0 {
-        devices = append(devices, logicalDisks...)
+    // Метод 2: WMI для получения базовой информации
+    devices2, err2 := getStorageDevicesViaWMI()
+    if err2 == nil && len(devices2) > 0 {
+        devices = append(devices, devices2...)
     }
 
     // Если ничего не найдено, возвращаем минимальный набор данных
@@ -152,7 +144,6 @@ func getStorageDevicesViaWMI() ([]DiskInfo, error) {
     var disks []DiskInfo
 
     cmd := exec.Command("wmic", "diskdrive", "get", "Caption,Size,Model,SerialNumber,MediaType,InterfaceType", "/format:csv")
-
     output, err := cmd.Output()
     if err != nil {
         return disks, err
@@ -196,61 +187,6 @@ func getStorageDevicesViaWMI() ([]DiskInfo, error) {
     return disks, nil
 }
 
-// getLogicalDisks получает информацию о логических дисках
-func getLogicalDisks() ([]DiskInfo, error) {
-    var disks []DiskInfo
-
-    cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption,drivetype,volumename", "/format:csv")
-
-    output, err := cmd.Output()
-    if err != nil {
-        return disks, err
-    }
-
-    lines := strings.Split(string(output), "\n")
-    for i, line := range lines {
-        if i == 0 || strings.TrimSpace(line) == "" {
-            continue
-        }
-
-        fields := strings.Split(line, ",")
-        if len(fields) >= 6 {
-            freeSpace, _ := strconv.ParseUint(strings.TrimSpace(fields[1]), 10, 64)
-            totalSize, _ := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64)
-            driveLetter := strings.TrimSpace(fields[3])
-            driveType, _ := strconv.Atoi(strings.TrimSpace(fields[4]))
-            volumeName := strings.TrimSpace(fields[5])
-
-            used := totalSize - freeSpace
-            usePercent := 0.0
-            if totalSize > 0 {
-                usePercent = float64(used) / float64(totalSize) * 100
-            }
-
-            // Определяем тип устройства
-            physical, diskType := determineWindowsDiskType(driveType, volumeName)
-
-            disk := DiskInfo{
-                Filesystem: driveLetter,
-                Size:       formatBytes(totalSize),
-                Used:       formatBytes(used),
-                Available:  formatBytes(freeSpace),
-                UsePercent: usePercent,
-                MountedOn:  driveLetter,
-                Physical:   physical,
-                DiskType:   diskType,
-                Model:      volumeName,
-                Serial:     "Unknown",
-                SMARTStatus: "UNKNOWN",
-            }
-
-            disks = append(disks, disk)
-        }
-    }
-
-    return disks, nil
-}
-
 // convertMediaType конвертирует тип носителя Windows в читаемый формат
 func convertMediaType(mediaType string) string {
     switch strings.ToLower(mediaType) {
@@ -280,31 +216,6 @@ func convertHealthStatus(healthStatus string) string {
         return "FAILED"
     default:
         return "UNKNOWN"
-    }
-}
-
-// determineWindowsDiskType определяет тип диска на основе driveType
-func determineWindowsDiskType(driveType int, volumeName string) (bool, string) {
-    switch driveType {
-    case 0: // Unknown
-        return false, "Unknown"
-    case 1: // No Root Directory
-        return false, "No Root"
-    case 2: // Removable Disk
-        return false, "Removable"
-    case 3: // Local Disk
-        if strings.Contains(strings.ToLower(volumeName), "ssd") {
-            return true, "SSD"
-        }
-        return true, "HDD"
-    case 4: // Network Drive
-        return false, "Network"
-    case 5: // Compact Disc
-        return false, "CD/DVD"
-    case 6: // RAM Disk
-        return false, "RAM Disk"
-    default:
-        return true, "Local Disk"
     }
 }
 

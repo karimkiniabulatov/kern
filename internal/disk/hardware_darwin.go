@@ -10,28 +10,26 @@ import (
     "strings"
 )
 
-// detectAllStorageDevices обнаруживает все устройства хранения в macOS
-func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
+// Добавляем поле SizeBytes в DiskInfo для macOS
+type DiskInfoExtended struct {
+    DiskInfo
+    SizeBytes uint64
+}
+
+// detectAllStorageDevicesDarwin обнаруживает все устройства хранения в macOS
+func detectAllStorageDevicesDarwin() ([]DiskInfo, error) {
     var devices []DiskInfo
 
-    if detailed {
-        // Метод 1: system_profiler для получения детальной информации о хранилище
-        devices1, err1 := getStorageViaSystemProfiler()
-        if err1 == nil && len(devices1) > 0 {
-            devices = append(devices, devices1...)
-        }
-
-        // Метод 2: diskutil для получения информации о дисках
-        devices2, err2 := getStorageViaDiskUtil()
-        if err2 == nil && len(devices2) > 0 {
-            devices = append(devices, devices2...)
-        }
+    // Метод 1: system_profiler для получения детальной информации о хранилище
+    devices1, err1 := getStorageViaSystemProfiler()
+    if err1 == nil && len(devices1) > 0 {
+        devices = append(devices, devices1...)
     }
 
-    // Метод 3: Универсальный - df для получения смонтированных файловых систем
-    mountedDevices, err3 := getMountedFilesystems()
-    if err3 == nil && len(mountedDevices) > 0 {
-        devices = append(devices, mountedDevices...)
+    // Метод 2: diskutil для получения информации о дисках
+    devices2, err2 := getStorageViaDiskUtil()
+    if err2 == nil && len(devices2) > 0 {
+        devices = append(devices, devices2...)
     }
 
     // Если ничего не найдено, возвращаем минимальный набор данных
@@ -61,14 +59,13 @@ func getStorageViaSystemProfiler() ([]DiskInfo, error) {
     var disks []DiskInfo
 
     cmd := exec.Command("system_profiler", "SPStorageDataType")
-
     output, err := cmd.Output()
     if err != nil {
         return disks, err
     }
 
     lines := strings.Split(string(output), "\n")
-    var currentDisk *DiskInfo
+    var currentDisk *DiskInfoExtended
     var inStorageSection bool
 
     for _, line := range lines {
@@ -77,11 +74,13 @@ func getStorageViaSystemProfiler() ([]DiskInfo, error) {
         // Начало нового раздела хранилища
         if strings.HasPrefix(line, "Storage:") {
             if currentDisk != nil {
-                disks = append(disks, *currentDisk)
+                disks = append(disks, currentDisk.DiskInfo)
             }
-            currentDisk = &DiskInfo{
-                Physical:   true,
-                SMARTStatus: "UNKNOWN",
+            currentDisk = &DiskInfoExtended{
+                DiskInfo: DiskInfo{
+                    Physical:   true,
+                    SMARTStatus: "UNKNOWN",
+                },
             }
             inStorageSection = true
             continue
@@ -93,7 +92,7 @@ func getStorageViaSystemProfiler() ([]DiskInfo, error) {
 
         // Конец раздела
         if line == "" && currentDisk.Filesystem != "" {
-            disks = append(disks, *currentDisk)
+            disks = append(disks, currentDisk.DiskInfo)
             currentDisk = nil
             inStorageSection = false
             continue
@@ -168,7 +167,7 @@ func getStorageViaSystemProfiler() ([]DiskInfo, error) {
 
     // Добавляем последний диск
     if currentDisk != nil && currentDisk.Filesystem != "" {
-        disks = append(disks, *currentDisk)
+        disks = append(disks, currentDisk.DiskInfo)
     }
 
     return disks, nil
@@ -179,7 +178,6 @@ func getStorageViaDiskUtil() ([]DiskInfo, error) {
     var disks []DiskInfo
 
     cmd := exec.Command("diskutil", "list")
-
     output, err := cmd.Output()
     if err != nil {
         return disks, err
@@ -214,8 +212,6 @@ func getStorageViaDiskUtil() ([]DiskInfo, error) {
             inDeviceSection = false
             continue
         }
-
-        // Здесь можно парсить информацию о разделах, но в этом примере мы пропускаем
     }
 
     // Обрабатываем последнее устройство
@@ -315,75 +311,6 @@ func getMountPoint(device string) (string, error) {
     return "", fmt.Errorf("mount point not found")
 }
 
-// getMountedFilesystems получает информацию о смонтированных файловых системах через df
-func getMountedFilesystems() ([]DiskInfo, error) {
-    var disks []DiskInfo
-
-    cmd := exec.Command("df", "-H")
-    output, err := cmd.Output()
-    if err != nil {
-        return disks, err
-    }
-
-    lines := strings.Split(string(output), "\n")
-    for i, line := range lines {
-        if i == 0 || strings.TrimSpace(line) == "" {
-            continue
-        }
-
-        fields := strings.Fields(line)
-        if len(fields) >= 6 {
-            // Пропускаем временные файловые системы
-            if strings.HasPrefix(fields[0], "devfs") || 
-               strings.HasPrefix(fields[0], "map") ||
-               strings.HasPrefix(fields[0], "//") {
-                continue
-            }
-
-            // Парсим использование
-            usePercentStr := strings.TrimSuffix(fields[4], "%")
-            usePercent, err := strconv.ParseFloat(usePercentStr, 64)
-            if err != nil {
-                usePercent = 0.0
-            }
-
-            // Определяем тип устройства
-            physical, diskType := determineMacDiskType(fields[0])
-
-            disk := DiskInfo{
-                Filesystem: fields[0],
-                Size:       fields[1],
-                Used:       fields[2],
-                Available:  fields[3],
-                UsePercent: usePercent,
-                MountedOn:  fields[5],
-                Physical:   physical,
-                DiskType:   diskType,
-                SMARTStatus: "UNKNOWN",
-            }
-
-            // Пытаемся получить больше информации для физических устройств
-            if physical && strings.HasPrefix(fields[0], "/dev/") {
-                if details, err := getDiskDetails(fields[0]); err == nil {
-                    if details.Model != "" {
-                        disk.Model = details.Model
-                    }
-                    if details.Serial != "" {
-                        disk.Serial = details.Serial
-                    }
-                    if details.SMARTStatus != "UNKNOWN" {
-                        disk.SMARTStatus = details.SMARTStatus
-                    }
-                }
-            }
-
-            disks = append(disks, disk)
-        }
-    }
-
-    return disks, nil
-}
-
 // parseStorageSize парсит размер хранилища из строки macOS
 func parseStorageSize(sizeStr string) (uint64, error) {
     // Пример: "500.1 GB (500,107,862,016 bytes)"
@@ -481,20 +408,5 @@ func convertMacSMARTStatus(status string) string {
         return "FAILED"
     default:
         return "UNKNOWN"
-    }
-}
-
-// determineMacDiskType определяет тип диска для macOS
-func determineMacDiskType(filesystem string) (bool, string) {
-    if strings.HasPrefix(filesystem, "/dev/disk") {
-        return true, "Physical"
-    } else if strings.HasPrefix(filesystem, "devfs") {
-        return false, "Device FS"
-    } else if strings.HasPrefix(filesystem, "map ") {
-        return false, "Network"
-    } else if strings.HasPrefix(filesystem, "//") {
-        return false, "Network"
-    } else {
-        return false, "Virtual"
     }
 }

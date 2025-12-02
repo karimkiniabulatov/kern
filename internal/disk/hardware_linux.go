@@ -6,11 +6,12 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "strconv"
     "strings"
 )
 
-// detectAllStorageDevices обнаруживает все устройства хранения в Linux
-func detectAllStorageDevices() ([]DiskInfo, error) {
+// detectAllStorageDevicesLinux обнаруживает все устройства хранения в Linux
+func detectAllStorageDevicesLinux() ([]DiskInfo, error) {
     var devices []DiskInfo
     
     // Сканируем устройства в /sys/block
@@ -34,7 +35,7 @@ func detectAllStorageDevices() ([]DiskInfo, error) {
         
         // Проверяем, является ли это устройством хранения
         if isStorageDevice(devicePath) {
-            device := parseStorageDevice(devicePath, deviceName)
+            device := parseStorageDeviceLinux(devicePath, deviceName)
             if device != nil {
                 devices = append(devices, *device)
             }
@@ -62,18 +63,22 @@ func isStorageDevice(devicePath string) bool {
     return true
 }
 
-func parseStorageDevice(devicePath, deviceName string) *DiskInfo {
+func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
     device := &DiskInfo{
         Filesystem: "/dev/" + deviceName,
         Physical:   true,
+        SMARTStatus: "UNKNOWN",
     }
     
-    // Получаем размер
+    // Получаем размер в секторах
     sizePath := filepath.Join(devicePath, "size")
     if data, err := os.ReadFile(sizePath); err == nil {
         sizeStr := strings.TrimSpace(string(data))
         // Размер в секторах по 512 байт
-        // Конвертируем в байты и форматируем
+        if sectors, err := strconv.ParseUint(sizeStr, 10, 64); err == nil {
+            sizeBytes := sectors * 512
+            device.Size = formatBytes(sizeBytes)
+        }
     }
     
     // Получаем модель
@@ -86,6 +91,15 @@ func parseStorageDevice(devicePath, deviceName string) *DiskInfo {
     serialPath := filepath.Join(devicePath, "device", "serial")
     if data, err := os.ReadFile(serialPath); err == nil {
         device.Serial = strings.TrimSpace(string(data))
+    }
+    
+    // Получаем vendor
+    vendorPath := filepath.Join(devicePath, "device", "vendor")
+    if data, err := os.ReadFile(vendorPath); err == nil {
+        vendor := strings.TrimSpace(string(data))
+        if vendor != "" && device.Model != "" {
+            device.Model = vendor + " " + device.Model
+        }
     }
     
     // Определяем тип (SSD/HDD)
@@ -103,8 +117,46 @@ func parseStorageDevice(devicePath, deviceName string) *DiskInfo {
     if data, err := os.ReadFile(removablePath); err == nil {
         if strings.TrimSpace(string(data)) == "1" {
             device.DiskType = "Removable"
+            // Для съемных устройств пытаемся определить USB
+            if isUSBDevice(devicePath) {
+                device.DiskType = "USB"
+            }
         }
     }
     
+    // Проверяем NVMe
+    if strings.HasPrefix(deviceName, "nvme") {
+        device.DiskType = "NVMe"
+    }
+    
+    // Получаем SMART статус
+    smartStatus := getSMARTStatus(deviceName)
+    if smartStatus != "Unavailable" {
+        device.SMARTStatus = smartStatus
+    }
+    
     return device
+}
+
+func isUSBDevice(devicePath string) bool {
+    // Проверяем, является ли устройство USB
+    subsystemPath := filepath.Join(devicePath, "device", "subsystem")
+    if data, err := exec.Command("readlink", "-f", subsystemPath).Output(); err == nil {
+        path := strings.TrimSpace(string(data))
+        if strings.Contains(path, "usb") {
+            return true
+        }
+    }
+    
+    // Альтернативный метод: проверка через uevents
+    ueventPath := filepath.Join(devicePath, "device", "uevent")
+    if data, err := os.ReadFile(ueventPath); err == nil {
+        content := string(data)
+        if strings.Contains(content, "DRIVER=usb-storage") || 
+           strings.Contains(content, "MODALIAS=usb:") {
+            return true
+        }
+    }
+    
+    return false
 }
