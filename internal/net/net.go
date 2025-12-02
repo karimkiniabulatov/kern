@@ -1214,9 +1214,6 @@ func calculateNetworkSpeed(iface string, currentRX, currentTX uint64) (string, s
 	return "0B/s", "0B/s", 0.0
 }
 
-func FormatSpeed(bytesPerSec float64) string {
-	return formatSpeed(bytesPerSec)
-}
 
 func formatSpeed(bytesPerSec float64) string {
 	units := []string{"B/s", "KB/s", "MB/s", "GB/s"}

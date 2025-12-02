@@ -533,8 +533,8 @@ func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
             row = t.printSimple(row, fmt.Sprintf("%s: %.1f%% %s", "Activity", netInfo.ActivityPercent, activityGraph), 
                 tcell.StyleDefault.Foreground(tcell.ColorFuchsia))
 
-            // Скорость передачи данных
-            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), 
+            // Скорость передачи данных с Unicode стрелками
+            row = t.printSimple(row, fmt.Sprintf("%s: ↓%s / ↑%s", "Speed", netInfo.RXSpeed, netInfo.TXSpeed), 
                 tcell.StyleDefault.Foreground(tcell.ColorAqua))
 
             // Добавляем отступ между интерфейсами, если их несколько

@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -165,6 +166,14 @@ func getLinuxAllCPUInfo() ([]*CPUInfo, error) {
 		threadsPerCore = 1
 	}
 
+	// Получаем среднюю загрузку системы
+	load1, load5, load15, err := getLoadAverage()
+	if err != nil {
+		// Логируем ошибку, но продолжаем
+		log.Printf("Failed to get load average: %v", err)
+		load1, load5, load15 = 0.0, 0.0, 0.0
+	}
+
 	// Получаем информацию о NUMA нодах
 	numaNodes := getLinuxNUMANodes()
 
@@ -178,6 +187,9 @@ func getLinuxAllCPUInfo() ([]*CPUInfo, error) {
 			Cores:        coresPerSocket,
 			Threads:      coresPerSocket * threadsPerCore,
 			Usage:        0.0,
+			Load1:        load1,
+			Load5:        load5,
+			Load15:       load15,
 			NUMANode:     i % len(numaNodes), // Распределяем по нодам циклически
 			Physical:     true,
 		}
@@ -643,33 +655,89 @@ func getLinuxCPUUsage() (float64, error) {
 	return 0, nil
 }
 
-func getLoadAverage() (float64, float64, float64, error) {
-	switch runtime.GOOS {
-	case "linux":
-		return getLinuxLoadAverage()
-	case "windows", "darwin":
-		// TODO: Реализовать для Windows и macOS
-		return 0, 0, 0, nil
-	default:
-		return 0, 0, 0, nil
-	}
+func getLinuxLoadAverage() (float64, float64, float64, error) {
+    data, err := os.ReadFile("/proc/loadavg")
+    if err != nil {
+        return 0, 0, 0, err
+    }
+
+    fields := strings.Fields(string(data))
+    if len(fields) >= 3 {
+        load1, err1 := strconv.ParseFloat(fields[0], 64)
+        load5, err2 := strconv.ParseFloat(fields[1], 64)
+        load15, err3 := strconv.ParseFloat(fields[2], 64)
+        
+        if err1 == nil && err2 == nil && err3 == nil {
+            return load1, load5, load15, nil
+        }
+    }
+
+    return 0, 0, 0, fmt.Errorf("invalid loadavg format")
 }
 
-func getLinuxLoadAverage() (float64, float64, float64, error) {
-	data, err := os.ReadFile("/proc/loadavg")
-	if err != nil {
-		return 0, 0, 0, err
-	}
+// Добавить функцию для Windows
+func getWindowsLoadAverage() (float64, float64, float64, error) {
+    // Используем PowerShell для получения средней загрузки на Windows
+    cmd := exec.Command("powershell", "-Command", 
+        "Get-WmiObject Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average")
+    
+    output, err := cmd.Output()
+    if err != nil {
+        return 0, 0, 0, err
+    }
+    
+    avgStr := strings.TrimSpace(string(output))
+    if avgStr == "" {
+        return 0, 0, 0, fmt.Errorf("no output from PowerShell")
+    }
+    
+    avg, err := strconv.ParseFloat(avgStr, 64)
+    if err != nil {
+        return 0, 0, 0, err
+    }
+    
+    // Для Windows возвращаем одно значение для всех трех интервалов
+    return avg, avg, avg, nil
+}
 
-	fields := strings.Fields(string(data))
-	if len(fields) >= 3 {
-		load1, _ := strconv.ParseFloat(fields[0], 64)
-		load5, _ := strconv.ParseFloat(fields[1], 64)
-		load15, _ := strconv.ParseFloat(fields[2], 64)
-		return load1, load5, load15, nil
-	}
+// Добавить функцию для macOS
+func getDarwinLoadAverage() (float64, float64, float64, error) {
+    cmd := exec.Command("sysctl", "-n", "vm.loadavg")
+    output, err := cmd.Output()
+    if err != nil {
+        return 0, 0, 0, err
+    }
+    
+    outputStr := strings.TrimSpace(string(output))
+    // Формат: { 1.23 0.56 0.34 }
+    outputStr = strings.Trim(outputStr, "{} ")
+    fields := strings.Fields(outputStr)
+    
+    if len(fields) >= 3 {
+        load1, err1 := strconv.ParseFloat(fields[0], 64)
+        load5, err2 := strconv.ParseFloat(fields[1], 64)
+        load15, err3 := strconv.ParseFloat(fields[2], 64)
+        
+        if err1 == nil && err2 == nil && err3 == nil {
+            return load1, load5, load15, nil
+        }
+    }
+    
+    return 0, 0, 0, fmt.Errorf("invalid loadavg format")
+}
 
-	return 0, 0, 0, nil
+// Обновить функцию getLoadAverage
+func getLoadAverage() (float64, float64, float64, error) {
+    switch runtime.GOOS {
+    case "linux":
+        return getLinuxLoadAverage()
+    case "windows":
+        return getWindowsLoadAverage()
+    case "darwin":
+        return getDarwinLoadAverage()
+    default:
+        return 0, 0, 0, fmt.Errorf("load average not supported on %s", runtime.GOOS)
+    }
 }
 
 func getCPUFrequency() (string, error) {
