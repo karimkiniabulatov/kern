@@ -47,7 +47,7 @@ build_target() {
     
     # Копируем конфиги
     mkdir -p "$output_dir/config"
-    cp internal/i18n/active.*.json "$output_dir/config/" 2>/dev/null || echo "No language files found, continuing..."
+    cp i18n/active.*.json "$output_dir/config/" 2>/dev/null || echo "No language files found, continuing..."
     
     # Создаем README
     create_readme "$os" "$output_dir"
