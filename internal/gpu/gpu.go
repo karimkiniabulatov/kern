@@ -8,9 +8,6 @@ import (
     "strconv"
     "strings"
     "unsafe"
-    
-    // Для Windows API
-    "golang.org/x/sys/windows"
 )
 
 type GPUInfo struct {
@@ -67,35 +64,9 @@ func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
     var gpus []*GPUInfo
     seenGPUs := make(map[string]bool)
     
-    // 1. Попробовать аппаратное обнаружение через PCI
-    if pciGPUs, err := detectGPUsViaPCI(); err == nil {
-        for _, pciDev := range pciGPUs {
-            gpu := &GPUInfo{
-                Model:         fmt.Sprintf("PCI Device %04X:%04X", pciDev.VendorID, pciDev.DeviceID),
-                DriverVersion: "Hardware Detected",
-                GPUTemp:       0.0,
-                MemoryTotal:   "0 MB",
-                MemoryUsed:    "0 MB",
-                MemoryFree:    "0 MB",
-                Utilization:   0.0,
-                PowerDraw:     "0 W",
-                PowerLimit:    "0 W",
-                FanSpeed:      0.0,
-                ClockCore:     "0 MHz",
-                ClockMemory:   "0 MHz",
-                PerformanceState: "Active",
-            }
-            
-            // Определить вендора по VendorID
-            switch pciDev.VendorID {
-            case 0x10DE: // NVIDIA
-                gpu.Model = "NVIDIA GPU (Hardware ID: " + fmt.Sprintf("%04X:%04X", pciDev.VendorID, pciDev.DeviceID) + ")"
-            case 0x1002: // AMD
-                gpu.Model = "AMD GPU (Hardware ID: " + fmt.Sprintf("%04X:%04X", pciDev.VendorID, pciDev.DeviceID) + ")"
-            case 0x8086: // Intel
-                gpu.Model = "Intel GPU (Hardware ID: " + fmt.Sprintf("%04X:%04X", pciDev.VendorID, pciDev.DeviceID) + ")"
-            }
-            
+    // Метод 0: Аппаратное обнаружение через PCI (ОСНОВНОЙ МЕТОД)
+    if hardwareGPUs, err := detectGPUsViaPCIHardware(); err == nil && len(hardwareGPUs) > 0 {
+        for _, gpu := range hardwareGPUs {
             if _, exists := seenGPUs[gpu.Model]; !exists {
                 seenGPUs[gpu.Model] = true
                 gpus = append(gpus, gpu)
@@ -103,7 +74,7 @@ func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
         }
     }
     
-    // 2. Попробовать NVIDIA через nvidia-smi
+    // Метод 1: NVIDIA через nvidia-smi (дополнительный)
     if nvidiaGPUs, err := detectNVIDIA(); err == nil {
         for _, gpu := range nvidiaGPUs {
             if _, exists := seenGPUs[gpu.Model]; !exists {
@@ -113,7 +84,7 @@ func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
         }
     }
     
-    // 3. Попробовать AMD через rocm-smi
+    // Метод 2: AMD через rocm-smi (дополнительный)
     if amdGPUs, err := detectAMD(); err == nil {
         for _, gpu := range amdGPUs {
             if _, exists := seenGPUs[gpu.Model]; !exists {
@@ -123,7 +94,7 @@ func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
         }
     }
     
-    // 4. Попробовать Intel через разные методы
+    // Метод 3: Intel через разные методы (дополнительный)
     if intelGPUs, err := detectIntelEnhanced(); err == nil {
         for _, gpu := range intelGPUs {
             if _, exists := seenGPUs[gpu.Model]; !exists {
@@ -137,7 +108,62 @@ func detectAllGPUsEnhanced() ([]*GPUInfo, error) {
         return gpus, nil
     }
     
-    return nil, fmt.Errorf("no GPU devices detected")
+    // Если ничего не найдено, возвращаем заглушку с гистограммой
+    return []*GPUInfo{{
+        Model:           "GPU не обнаружена",
+        DriverVersion:   "N/A",
+        GPUTemp:         0.0,
+        MemoryTotal:     "0 MB",
+        MemoryUsed:      "0 MB",
+        MemoryFree:      "0 MB",
+        Utilization:     0.0,  // Важно: 0% для гистограммы
+        PowerDraw:       "0 W",
+        PowerLimit:      "0 W",
+        FanSpeed:        0.0,
+        ClockCore:       "0 MHz",
+        ClockMemory:     "0 MHz",
+        PerformanceState: "N/A",
+    }}, nil
+}
+
+// detectGPUsViaPCIHardware - аппаратное обнаружение GPU через PCI с именами вендоров и устройств
+func detectGPUsViaPCIHardware() ([]*GPUInfo, error) {
+    pciDevices, err := detectGPUsViaPCI()
+    if err != nil {
+        return nil, err
+    }
+
+    var gpus []*GPUInfo
+    for _, pciDev := range pciDevices {
+        vendorIDStr := fmt.Sprintf("%04x", pciDev.VendorID)
+        deviceIDStr := fmt.Sprintf("%04x", pciDev.DeviceID)
+
+        vendorName := getVendorName(vendorIDStr)
+        deviceName := getDeviceName(vendorIDStr, deviceIDStr)
+
+        gpu := &GPUInfo{
+            Model:           fmt.Sprintf("%s %s", vendorName, deviceName),
+            DriverVersion:   "Hardware Detected",
+            GPUTemp:         0.0,
+            MemoryTotal:     "0 MB",
+            MemoryUsed:      "0 MB",
+            MemoryFree:      "0 MB",
+            Utilization:     0.0,
+            PowerDraw:       "0 W",
+            PowerLimit:      "0 W",
+            FanSpeed:        0.0,
+            ClockCore:       "0 MHz",
+            ClockMemory:     "0 MHz",
+            PerformanceState: "Active",
+        }
+        gpus = append(gpus, gpu)
+    }
+
+    if len(gpus) == 0 {
+        return nil, fmt.Errorf("no PCI GPU devices found")
+    }
+
+    return gpus, nil
 }
 
 // detectGPUsViaPCI - аппаратное обнаружение через PCI
@@ -1057,4 +1083,51 @@ func detectLinuxGPU() string {
     }
 
     return "Integrated Graphics (Linux)"
+}
+
+func getVendorName(vendorID string) string {
+    switch vendorID {
+    case "10de":
+        return "NVIDIA"
+    case "1002":
+        return "AMD"
+    case "8086":
+        return "Intel"
+    case "102b":
+        return "Matrox"
+    case "1a03":
+        return "ASPEED"
+    default:
+        return "Unknown Vendor"
+    }
+}
+
+func getDeviceName(vendorID, deviceID string) string {
+    // База данных известных устройств (упрощенная)
+    devices := map[string]map[string]string{
+        "10de": { // NVIDIA
+            "1b80": "GeForce GTX 1080",
+            "1c81": "GeForce GTX 1060",
+            "1f08": "GeForce RTX 2060",
+            "2204": "GeForce RTX 3080",
+        },
+        "1002": { // AMD
+            "67df": "Radeon RX 580",
+            "7340": "Radeon RX 5700 XT",
+            "73bf": "Radeon RX 6900 XT",
+        },
+        "8086": { // Intel
+            "5912": "HD Graphics 630",
+            "9bc5": "UHD Graphics 630",
+            "4c8a": "Iris Xe Graphics",
+        },
+    }
+    
+    if vendorDevices, ok := devices[vendorID]; ok {
+        if name, ok := vendorDevices[deviceID]; ok {
+            return name
+        }
+    }
+    
+    return fmt.Sprintf("Device %s", deviceID)
 }
