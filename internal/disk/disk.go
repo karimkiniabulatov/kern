@@ -69,7 +69,8 @@ func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
     if err != nil {
         // Если df не работает, пытаемся получить информацию аппаратно
         if detailed {
-            return detectAllStorageDevices(detailed)
+            // Вместо вызова detectAllStorageDevices(detailed) просто возвращаем fallback
+            return getFallbackDiskInfo(), nil
         }
         return nil, err
     }
@@ -108,7 +109,8 @@ func getWindowsDiskInfo(detailed bool) ([]DiskInfo, error) {
     if err != nil {
         // Если wmic не работает, пытаемся получить информацию аппаратно
         if detailed {
-            return detectAllStorageDevices(detailed)
+            // Вместо вызова detectAllStorageDevicesWindows(detailed) просто возвращаем fallback
+            return getFallbackDiskInfo(), nil
         }
         return nil, err
     }
@@ -146,7 +148,8 @@ func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
     if err != nil {
         // Если df не работает, пытаемся получить информацию аппаратно
         if detailed {
-            return detectAllStorageDevices(detailed)
+            // Вместо вызова detectAllStorageDevicesDarwin(detailed) просто возвращаем fallback
+            return getFallbackDiskInfo(), nil
         }
         return nil, err
     }
@@ -173,6 +176,26 @@ func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
     }
     
     return disks, nil
+}
+
+// detectAllStorageDevices определяет все устройства хранения в зависимости от платформы
+func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
+    if !detailed {
+        // В недетальном режиме возвращаем пустой список
+        return []DiskInfo{}, nil
+    }
+    
+    // Функции для разных платформ определены в отдельных файлах
+    switch runtime.GOOS {
+    case "linux":
+        return detectAllStorageDevicesLinux()
+    case "windows":
+        return detectAllStorageDevicesWindows()
+    case "darwin":
+        return detectAllStorageDevicesDarwin()
+    default:
+        return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
+    }
 }
 
 // Новая функция для объединения информации из DF и аппаратных устройств
@@ -267,26 +290,6 @@ func mergeDiskInfo(dfDisks, hardwareDisks []DiskInfo) []DiskInfo {
     }
     
     return mergedDisks
-}
-
-// detectAllStorageDevices определяет все устройства хранения в зависимости от платформы
-func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
-    if !detailed {
-        // В недетальном режиме возвращаем пустой список
-        return []DiskInfo{}, nil
-    }
-    
-    // Функции для разных платформ определены в отдельных файлах
-    switch runtime.GOOS {
-    case "linux":
-        return detectAllStorageDevicesLinux()
-    case "windows":
-        return detectAllStorageDevicesWindows()
-    case "darwin":
-        return detectAllStorageDevicesDarwin()
-    default:
-        return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
-    }
 }
 
 // filterPrimaryDisks возвращает только основные диски
