@@ -124,22 +124,24 @@ func (t *TUI) Fini() {
 }
 
 func (t *TUI) renderLogo(startRow int) int {
-	logo := []string{
-		" ██╗  ██╗███████╗██████╗ ███╗   ██╗",
-		" ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║",
-		" █████╔╝ █████╗  ██████╔╝██╔██╗ ██║",
-		" ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║",
-		" ██║  ██╗███████╗██║  ██║██║ ╚████║",
-		" ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝",
-		" kern v1.2.3 - System Monitoring Tool",
-	}
+    logo := []string{
+        " ██╗  ██╗███████╗██████╗ ███╗   ██╗",
+        " ██║ ██╔╝██╔════╝██╔══██╗████╗  ██║",
+        " █████╔╝ █████╗  ██████╔╝██╔██╗ ██║",
+        " ██╔═██╗ ██╔══╝  ██╔══██╗██║╚██╗██║",
+        " ██║  ██╗███████╗██║  ██║██║ ╚████║", 
+        " ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝",
+        " kern v1.2.3 - System Monitoring Tool",
+    }
 
-	cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
-	for i, line := range logo {
-		t.printCentered(startRow+i, line, cyan)
-	}
-
-	return startRow + len(logo) + 1
+    cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
+    // Заменяем printCentered на printSimple для вывода слева
+    for i, line := range logo {
+        // Добавляем 2 пробела для отступа от левого края
+        t.printSimple(startRow+i, "  "+line, cyan)
+    }
+    
+    return startRow + len(logo) + 1
 }
 
 func (t *TUI) renderCPU(startRow int, data interface{}) int {
