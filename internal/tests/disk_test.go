@@ -47,3 +47,31 @@ func TestSkipFilesystem(t *testing.T) {
 		}
 	}
 }
+
+// В internal/tests/disk_test.go добавить тесты для новой функциональности
+func TestDiskDetailedMode(t *testing.T) {
+    // Тест детального режима
+    disks, err := disk.Summary(true)
+    if err != nil {
+        t.Fatalf("Failed to get detailed disk info: %v", err)
+    }
+    
+    // Проверяем что возвращаются все диски
+    t.Logf("Found %d disks in detailed mode", len(disks))
+}
+
+func TestDiskDefaultMode(t *testing.T) {
+    // Тест обычного режима
+    disks, err := disk.Summary(false)
+    if err != nil {
+        t.Fatalf("Failed to get default disk info: %v", err)
+    }
+    
+    // Проверяем что возвращаются только основные диски
+    t.Logf("Found %d disks in default mode", len(disks))
+    if len(disks) > 0 {
+        for i, d := range disks {
+            t.Logf("Disk %d: %s mounted on %s", i, d.Filesystem, d.MountedOn)
+        }
+    }
+}

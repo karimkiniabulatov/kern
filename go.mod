@@ -10,6 +10,8 @@ require (
     golang.org/x/term v0.18.0
     golang.org/x/sys v0.20.0
     github.com/lxn/win v0.0.0-20210218163916-a377121e959e // для Windows API
+	github.com/StackExchange/wmi v1.2.1 // Для Windows WMI
+
 )
 
 require (

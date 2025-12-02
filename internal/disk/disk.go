@@ -24,22 +24,22 @@ type DiskInfo struct {
 	SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
 }
 
-func Summary() ([]DiskInfo, error) {
+// Изменить сигнатуру функции для поддержки детального режима
+func Summary(detailed bool) ([]DiskInfo, error) {
 	var disks []DiskInfo
 	var err error
 	
 	switch runtime.GOOS {
 	case "windows":
-		disks, err = getWindowsDiskInfo()
+		disks, err = getWindowsDiskInfo(detailed)
 	case "darwin":
-		disks, err = getDarwinDiskInfo()
+		disks, err = getDarwinDiskInfo(detailed)
 	default:
-		disks, err = getLinuxDiskInfo()
+		disks, err = getLinuxDiskInfo(detailed)
 	}
 
-	// Если произошла ошибка или нет данных, возвращаем пустую структуру с гарантированными полями
+	// Если произошла ошибка или нет данных
 	if err != nil || len(disks) == 0 {
-		// Создаем минимальный набор данных для обеспечения ожидаемого формата
 		defaultDisk := DiskInfo{
 			Filesystem: "unknown",
 			Size:       "0 B",
@@ -56,7 +56,12 @@ func Summary() ([]DiskInfo, error) {
 		return []DiskInfo{defaultDisk}, nil
 	}
 
-	// Гарантируем, что все UsePercent имеют числовое значение
+	// Применить фильтрацию в зависимости от режима
+	if !detailed {
+		disks = filterPrimaryDisks(disks)
+	}
+
+	// Гарантируем корректные значения UsePercent
 	for i := range disks {
 		if disks[i].UsePercent < 0 {
 			disks[i].UsePercent = 0.0
@@ -66,34 +71,111 @@ func Summary() ([]DiskInfo, error) {
 	return disks, nil
 }
 
-func getLinuxDiskInfo() ([]DiskInfo, error) {
+// filterPrimaryDisks возвращает только основные диски (аналогично сетевому модулю)
+func filterPrimaryDisks(disks []DiskInfo) []DiskInfo {
+	var primaryDisks []DiskInfo
+	
+	for _, disk := range disks {
+		if isPrimaryDisk(disk) {
+			primaryDisks = append(primaryDisks, disk)
+		}
+	}
+	
+	// Если не найдено основных дисков, возвращаем первые 3
+	if len(primaryDisks) == 0 && len(disks) > 0 {
+		maxDisks := len(disks)
+		if maxDisks > 3 {
+			maxDisks = 3
+		}
+		return disks[:maxDisks]
+	}
+	
+	return primaryDisks
+}
+
+// isPrimaryDisk определяет, является ли диск основным
+func isPrimaryDisk(disk DiskInfo) bool {
+	// Критерии для разных ОС
+	switch runtime.GOOS {
+	case "linux":
+		// Основные точки монтирования
+		primaryMounts := []string{"/", "/home", "/boot", "/var", "/usr"}
+		for _, mount := range primaryMounts {
+			if disk.MountedOn == mount {
+				return true
+			}
+		}
+		// Исключаем временные файловые системы
+		if strings.HasPrefix(disk.Filesystem, "tmpfs") || 
+		   strings.HasPrefix(disk.Filesystem, "devtmpfs") ||
+		   strings.Contains(disk.MountedOn, "/mnt/") ||
+		   strings.Contains(disk.MountedOn, "/media/") {
+			return false
+		}
+		// Физические диски считаем основными
+		return disk.Physical
+		
+	case "windows":
+		// Основные системные диски
+		if disk.MountedOn == "C:" || disk.MountedOn == "D:" {
+			return true
+		}
+		// Исключаем сетевые и съемные диски
+		if disk.DiskType == "Network" || strings.HasPrefix(disk.Filesystem, "\\\\") {
+			return false
+		}
+		// Физические диски
+		return disk.Physical
+		
+	case "darwin":
+		// Основные точки монтирования macOS
+		primaryMounts := []string{"/", "/System", "/Users", "/Volumes/Macintosh HD"}
+		for _, mount := range primaryMounts {
+			if disk.MountedOn == mount {
+				return true
+			}
+		}
+		// Исключаем временные и сетевые
+		if strings.Contains(disk.MountedOn, "/Volumes/") && !disk.Physical {
+			return false
+		}
+		return disk.Physical
+		
+	default:
+		// По умолчанию возвращаем физические диски
+		return disk.Physical
+	}
+}
+
+// Обновить все платформо-зависимые функции для поддержки параметра detailed
+func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
 	cmd := exec.Command("df", "-h")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
-	return parseDFOutput(string(output))
+	return parseDFOutput(string(output), detailed)
 }
 
-func getDarwinDiskInfo() ([]DiskInfo, error) {
+func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
 	cmd := exec.Command("df", "-h")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
-	return parseDFOutput(string(output))
+	return parseDFOutput(string(output), detailed)
 }
 
-func getWindowsDiskInfo() ([]DiskInfo, error) {
-	cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption")
+func getWindowsDiskInfo(detailed bool) ([]DiskInfo, error) {
+	cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption,drivetype")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
-	return parseWMICOutput(string(output))
+	return parseWMICOutput(string(output), detailed)
 }
 
-func parseDFOutput(output string) ([]DiskInfo, error) {
+func parseDFOutput(output string, detailed bool) ([]DiskInfo, error) {
 	lines := strings.Split(output, "\n")
 	var disks []DiskInfo
 
@@ -113,8 +195,8 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 				usePercent = 0.0
 			}
 
-			// Пропускаем временные файловые системы и специальные точки монтирования
-			if shouldSkipFilesystem(fields[0], fields[5]) {
+			// В детальном режиме не пропускаем файловые системы
+			if !detailed && shouldSkipFilesystem(fields[0], fields[5]) {
 				continue
 			}
 
@@ -141,7 +223,7 @@ func parseDFOutput(output string) ([]DiskInfo, error) {
 	return disks, nil
 }
 
-func parseWMICOutput(output string) ([]DiskInfo, error) {
+func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
 	lines := strings.Split(output, "\n")
 	var disks []DiskInfo
 
@@ -153,7 +235,20 @@ func parseWMICOutput(output string) ([]DiskInfo, error) {
 		re := regexp.MustCompile(`\s+`)
 		fields := re.Split(line, -1)
 
-		if len(fields) >= 3 {
+		if len(fields) >= 4 {
+			// Поле drivetype: 2=съемный, 3=локальный HDD, 4=сеть, 5=CD-ROM
+			driveType := 3
+			if len(fields) >= 4 {
+				if dt, err := strconv.Atoi(fields[3]); err == nil {
+					driveType = dt
+				}
+			}
+
+			// В недетальном режиме пропускаем съемные и сетевые диски
+			if !detailed && (driveType == 2 || driveType == 4 || driveType == 5) {
+				continue
+			}
+
 			freeSpace, err := strconv.ParseUint(fields[1], 10, 64)
 			if err != nil {
 				continue
@@ -171,7 +266,7 @@ func parseWMICOutput(output string) ([]DiskInfo, error) {
 			}
 
 			// Для Windows определяем тип устройства
-			physical, diskType, model, serial, smartStatus := detectWindowsDiskProperties(fields[0])
+			physical, diskType, model, serial, smartStatus := detectWindowsDiskProperties(fields[0], driveType)
 
 			disk := DiskInfo{
 				Filesystem: fields[0],
@@ -265,6 +360,68 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
 		if diskType == "LVM" || strings.Contains(diskType, "RAID") {
 			physical = false
 		}
+	}
+
+	return physical, diskType, model, serial, smartStatus
+}
+
+// Обновление функции обнаружения свойств Windows
+func detectWindowsDiskProperties(drive string, driveType int) (bool, string, string, string, string) {
+	physical := true
+	diskType := "Unknown"
+	model := "Unknown"
+	serial := "Unknown"
+	smartStatus := "UNKNOWN"
+
+	// Определяем тип по driveType
+	switch driveType {
+	case 2:
+		diskType = "Removable"
+		physical = false
+	case 3:
+		diskType = "Local Disk"
+		physical = true
+	case 4:
+		diskType = "Network"
+		physical = false
+	case 5:
+		diskType = "CD-ROM"
+		physical = false
+	}
+
+	// Получаем дополнительную информацию через wmic
+	if diskType == "Local Disk" || diskType == "Removable" {
+		cmd := exec.Command("wmic", "diskdrive", "get", "model,serialnumber,mediatype,size")
+		output, err := cmd.Output()
+		if err == nil {
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines {
+				fields := strings.Fields(line)
+				if len(fields) >= 4 {
+					model = fields[0]
+					serial = fields[1]
+					
+					switch fields[2] {
+					case "Fixed hard disk media":
+						diskType = "HDD"
+					case "SSD":
+						diskType = "SSD"
+					case "NVMe":
+						diskType = "NVMe"
+					case "Removable media":
+						diskType = "Removable"
+						physical = false
+					}
+					break
+				}
+			}
+		}
+	}
+
+	// Сетевые диски
+	if strings.HasPrefix(drive, "\\\\") {
+		diskType = "Network"
+		physical = false
 	}
 
 	return physical, diskType, model, serial, smartStatus
@@ -366,51 +523,6 @@ func getDiskInfoWithLsblk(filesystem string) (lsblkInfo, error) {
 	}
 
 	return info, nil
-}
-
-// detectWindowsDiskProperties определяет свойства диска для Windows
-func detectWindowsDiskProperties(drive string) (bool, string, string, string, string) {
-	physical := true
-	diskType := "Unknown"
-	model := "Unknown"
-	serial := "Unknown"
-	smartStatus := "UNKNOWN"
-
-	// Для Windows пытаемся определить тип через wmic
-	cmd := exec.Command("wmic", "diskdrive", "get", "model,serialnumber,mediatype")
-	output, err := cmd.Output()
-	if err == nil {
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
-			fields := strings.Fields(line)
-			if len(fields) >= 3 {
-				model = fields[0]
-				serial = fields[1]
-				mediaType := fields[2]
-				
-				switch mediaType {
-				case "Fixed hard disk media":
-					diskType = "HDD"
-				case "SSD":
-					diskType = "SSD"
-				case "NVMe":
-					diskType = "NVMe"
-				}
-				break
-			}
-		}
-	}
-
-	// Сетевые диски и CD-ROM помечаем как логические
-	if strings.HasPrefix(drive, "\\\\") {
-		diskType = "Network"
-		physical = false
-	} else if drive == "CD-ROM" {
-		diskType = "CD-ROM"
-		physical = false
-	}
-
-	return physical, diskType, model, serial, smartStatus
 }
 
 func formatBytes(bytes uint64) string {

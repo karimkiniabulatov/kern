@@ -42,6 +42,8 @@ var (
 	flagDetailedMemLong = flag.Bool("detailed-mem", false, "Show detailed memory module information")
 	flagDetailedNet      = flag.Bool("dn", false, "Show detailed network interface information")
 	flagDetailedNetLong  = flag.Bool("detailed-net", false, "Show detailed network interface information")
+	flagDetailedDisk      = flag.Bool("dd", false, "Show detailed disk information (including all storage devices)")
+	flagDetailedDiskLong  = flag.Bool("detailed-disk", false, "Show detailed disk information (including all storage devices)")
 	
 	// Общие флаги
 	flagAll       = flag.Bool("a", false, "Show all information")
@@ -100,6 +102,7 @@ func init() {
 	flag.BoolVar(flagRemote, "remote", false, "Start remote API server (default port: 28126)")
 	flag.BoolVar(flagDetailedMem, "detailed-memory", false, "Show detailed memory module information")
 	flag.BoolVar(flagDetailedNet, "detailed-network", false, "Show detailed network interface information")
+	flag.BoolVar(flagDetailedDisk, "detailed-storage", false, "Show detailed storage information")
 	
 	// Сервисные флаги с альтернативными именами
 	flag.BoolVar(flagDaemon, "dmn", false, "Start kern as a daemon service")
@@ -131,6 +134,7 @@ func main() {
 		fmt.Println("  --detailed, -deflag.BoolVar(flagDaemon,      Show detailed CPU core information")
 		fmt.Println("  -dm, --detailed-mem  Show detailed memory module information")
 		fmt.Println("  -dn, --detailed-net  Show detailed network interface information")
+		fmt.Println("  -dd, --detailed-disk  Show detailed storage information (all devices)")
 		
 		fmt.Println("\nLanguage Options:")
 		fmt.Println("  -l LANG              Language code (e.g., 'ru' for Russian)")
@@ -267,6 +271,7 @@ func main() {
 	detailedCPU := *flagDetailed || *flagDetailedShort
 	detailedMem := *flagDetailedMem || *flagDetailedMemLong
 	detailedNet := *flagDetailedNet || *flagDetailedNetLong
+	detailedDisk := *flagDetailedDisk || *flagDetailedDiskLong
 
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
@@ -278,6 +283,7 @@ func main() {
 	cfg.DetailedCPU = detailedCPU
 	cfg.DetailedMem = detailedMem
 	cfg.DetailedNet = detailedNet
+	cfg.DetailedDisk = detailedDisk
 
 	// Проверяем поддержку языка
 	if *flagLang != "" && !i18n.IsLanguageSupported(*flagLang) {
@@ -498,174 +504,175 @@ func runMonitor(cfg *config.Config, showLogo bool) {
 }
 
 func collectData(cfg *config.Config) map[string]interface{} {
-	type result struct {
-		module string
-		data   interface{}
-		err    error
-	}
+    type result struct {
+        module string
+        data   interface{}
+        err    error
+    }
 
-	resultChan := make(chan result, 7) // Adjusted buffer size after removing audio/video
+    resultChan := make(chan result, 7) // Adjusted buffer size after removing audio/video
 
-	// Launch goroutines only for enabled modules
-	if cfg.ShowDisk {
-		go func() {
-			data, err := disk.Summary()
-			resultChan <- result{"disk", data, err}
-		}()
-	}
+    // Launch goroutines only for enabled modules
+    if cfg.ShowDisk {
+        go func() {
+            // Передавать флаг детального режима
+            data, err := disk.Summary(cfg.DetailedDisk)
+            resultChan <- result{"disk", data, err}
+        }()
+    }
 
-	if cfg.ShowCPU {
-		go func() {
-			data, err := cpu.Summary()
-			resultChan <- result{"cpu", data, err}
-		}()
-	}
+    if cfg.ShowCPU {
+        go func() {
+            data, err := cpu.Summary()
+            resultChan <- result{"cpu", data, err}
+        }()
+    }
 
-	if cfg.ShowMem {
-		go func() {
-			data, err := mem.Summary()
-			resultChan <- result{"mem", data, err}
-		}()
-	}
+    if cfg.ShowMem {
+        go func() {
+            data, err := mem.Summary()
+            resultChan <- result{"mem", data, err}
+        }()
+    }
 
-	if cfg.ShowNet {
-		go func() {
-			data, err := net.Summary()
-			resultChan <- result{"net", data, err}
-		}()
-	}
+    if cfg.ShowNet {
+        go func() {
+            data, err := net.Summary()
+            resultChan <- result{"net", data, err}
+        }()
+    }
 
-	// NEW: GPU monitoring - с исправленной обработкой ошибок
-	if cfg.ShowGPU {
-		go func() {
-			// Используем улучшенную функцию Summary из обновленного gpu.go
-			data, err := gpu.Summary()
-			if err != nil {
-				// Всегда возвращать структуру с гистограммами
-				fallbackData := []*gpu.GPUInfo{{
-					Model:           "GPU не обнаружена",
-					DriverVersion:   "N/A",
-					GPUTemp:         0.0,
-					MemoryTotal:     "0 MB",
-					MemoryUsed:      "0 MB",
-					MemoryFree:      "0 MB",
-					Utilization:     0.0,  // Важно: 0% для гистограммы
-					PowerDraw:       "0 W",
-					PowerLimit:      "0 W",
-					FanSpeed:        0.0,
-					ClockCore:       "0 MHz",
-					ClockMemory:     "0 MHz",
-					PerformanceState: "N/A",
-				}}
-				resultChan <- result{"gpu", fallbackData, nil}
-			} else {
-				resultChan <- result{"gpu", data, nil}
-			}
-		}()
-	}
+    // NEW: GPU monitoring - с исправленной обработкой ошибок
+    if cfg.ShowGPU {
+        go func() {
+            // Используем улучшенную функцию Summary из обновленного gpu.go
+            data, err := gpu.Summary()
+            if err != nil {
+                // Всегда возвращать структуру с гистограммами
+                fallbackData := []*gpu.GPUInfo{{
+                    Model:           "GPU не обнаружена",
+                    DriverVersion:   "N/A",
+                    GPUTemp:         0.0,
+                    MemoryTotal:     "0 MB",
+                    MemoryUsed:      "0 MB",
+                    MemoryFree:      "0 MB",
+                    Utilization:     0.0,  // Важно: 0% для гистограммы
+                    PowerDraw:       "0 W",
+                    PowerLimit:      "0 W",
+                    FanSpeed:        0.0,
+                    ClockCore:       "0 MHz",
+                    ClockMemory:     "0 MHz",
+                    PerformanceState: "N/A",
+                }}
+                resultChan <- result{"gpu", fallbackData, nil}
+            } else {
+                resultChan <- result{"gpu", data, nil}
+            }
+        }()
+    }
 
-	// NEW: AI training monitoring
-	if cfg.ShowAI {
-		go func() {
-			data, err := ai.Summary()
-			resultChan <- result{"ai", data, err}
-		}()
-	}
+    // NEW: AI training monitoring
+    if cfg.ShowAI {
+        go func() {
+            data, err := ai.Summary()
+            resultChan <- result{"ai", data, err}
+        }()
+    }
 
-	// NEW: Mining monitoring
-	if cfg.ShowMining {
-		go func() {
-			data, err := mining.Summary()
-			resultChan <- result{"mining", data, err}
-		}()
-	}
+    // NEW: Mining monitoring
+    if cfg.ShowMining {
+        go func() {
+            data, err := mining.Summary()
+            resultChan <- result{"mining", data, err}
+        }()
+    }
 
-	// Collect results
-	results := make(map[string]interface{})
-	moduleCount := 0
-	if cfg.ShowDisk {
-		moduleCount++
-	}
-	if cfg.ShowCPU {
-		moduleCount++
-	}
-	if cfg.ShowMem {
-		moduleCount++
-	}
-	if cfg.ShowNet {
-		moduleCount++
-	}
-	if cfg.ShowGPU {
-		moduleCount++
-	}
-	if cfg.ShowAI {
-		moduleCount++
-	}
-	if cfg.ShowMining {
-		moduleCount++
-	}
+    // Collect results
+    results := make(map[string]interface{})
+    moduleCount := 0
+    if cfg.ShowDisk {
+        moduleCount++
+    }
+    if cfg.ShowCPU {
+        moduleCount++
+    }
+    if cfg.ShowMem {
+        moduleCount++
+    }
+    if cfg.ShowNet {
+        moduleCount++
+    }
+    if cfg.ShowGPU {
+        moduleCount++
+    }
+    if cfg.ShowAI {
+        moduleCount++
+    }
+    if cfg.ShowMining {
+        moduleCount++
+    }
 
-	for i := 0; i < moduleCount; i++ {
-		res := <-resultChan
-		if res.err != nil {
-			results[res.module] = map[string]string{"error": res.err.Error()}
-		} else {
-			results[res.module] = res.data
-		}
-	}
+    for i := 0; i < moduleCount; i++ {
+        res := <-resultChan
+        if res.err != nil {
+            results[res.module] = map[string]string{"error": res.err.Error()}
+        } else {
+            results[res.module] = res.data
+        }
+    }
 
-	// Гарантируем, что все запрошенные модули возвращают данные
-	// Только для модулей, которые были запрошены через cfg
-	requestedModules := make([]string, 0)
-	if cfg.ShowDisk {
-		requestedModules = append(requestedModules, "disk")
-	}
-	if cfg.ShowCPU {
-		requestedModules = append(requestedModules, "cpu")
-	}
-	if cfg.ShowMem {
-		requestedModules = append(requestedModules, "mem")
-	}
-	if cfg.ShowNet {
-		requestedModules = append(requestedModules, "net")
-	}
-	if cfg.ShowGPU {
-		requestedModules = append(requestedModules, "gpu")
-	}
-	if cfg.ShowAI {
-		requestedModules = append(requestedModules, "ai")
-	}
-	if cfg.ShowMining {
-		requestedModules = append(requestedModules, "mining")
-	}
+    // Гарантируем, что все запрошенные модули возвращают данные
+    // Только для модулей, которые были запрошены через cfg
+    requestedModules := make([]string, 0)
+    if cfg.ShowDisk {
+        requestedModules = append(requestedModules, "disk")
+    }
+    if cfg.ShowCPU {
+        requestedModules = append(requestedModules, "cpu")
+    }
+    if cfg.ShowMem {
+        requestedModules = append(requestedModules, "mem")
+    }
+    if cfg.ShowNet {
+        requestedModules = append(requestedModules, "net")
+    }
+    if cfg.ShowGPU {
+        requestedModules = append(requestedModules, "gpu")
+    }
+    if cfg.ShowAI {
+        requestedModules = append(requestedModules, "ai")
+    }
+    if cfg.ShowMining {
+        requestedModules = append(requestedModules, "mining")
+    }
 
-	for _, module := range requestedModules {
-		if _, exists := results[module]; !exists {
-			// Создаем минимальные данные для отображения гистограмм
-			switch module {
-			case "gpu":
-				results[module] = []*gpu.GPUInfo{{
-					Model:           "GPU не обнаружена",
-					DriverVersion:   "N/A",
-					GPUTemp:         0.0,
-					MemoryTotal:     "0 MB",
-					MemoryUsed:      "0 MB",
-					MemoryFree:      "0 MB",
-					Utilization:     0.0,
-					PowerDraw:       "0 W",
-					PowerLimit:      "0 W",
-					FanSpeed:        0.0,
-					ClockCore:       "0 MHz",
-					ClockMemory:     "0 MHz",
-					PerformanceState: "N/A",
-				}}
-			default:
-				results[module] = map[string]string{"status": "no data"}
-			}
-		}
-	}
-	
-	return results
+    for _, module := range requestedModules {
+        if _, exists := results[module]; !exists {
+            // Создаем минимальные данные для отображения гистограмм
+            switch module {
+            case "gpu":
+                results[module] = []*gpu.GPUInfo{{
+                    Model:           "GPU не обнаружена",
+                    DriverVersion:   "N/A",
+                    GPUTemp:         0.0,
+                    MemoryTotal:     "0 MB",
+                    MemoryUsed:      "0 MB",
+                    MemoryFree:      "0 MB",
+                    Utilization:     0.0,
+                    PowerDraw:       "0 W",
+                    PowerLimit:      "0 W",
+                    FanSpeed:        0.0,
+                    ClockCore:       "0 MHz",
+                    ClockMemory:     "0 MHz",
+                    PerformanceState: "N/A",
+                }}
+            default:
+                results[module] = map[string]string{"status": "no data"}
+            }
+        }
+    }
+    
+    return results
 }
 
 func startRemoteServer(cfg *config.Config, port int) {

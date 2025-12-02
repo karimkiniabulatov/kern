@@ -375,59 +375,126 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
 }
 
 func (t *TUI) renderDisk(startRow int, data interface{}) int {
-	row := t.renderHeader(startRow, t.config.T("disk.title"))
+    row := t.renderHeader(startRow, t.config.T("disk.title"))
 
-	if disks, ok := data.([]disk.DiskInfo); ok {
-		count := 0
-		for _, d := range disks {
-			if strings.HasPrefix(d.Filesystem, "/dev/") && count < 3 {
-				// Определяем тип устройства для отображения
-				devType := t.getDeviceType(d.Filesystem, d.MountedOn)
-				
-				// Добавляем информацию о физическом/логическом типе и модели
-				deviceInfo := devType
-				if d.DiskType != "Unknown" && d.DiskType != "" {
-					deviceInfo = d.DiskType
-				}
-				
-				// Показываем физический/логический статус
-				physStatus := "Logical"
-				if d.Physical {
-					physStatus = "Physical"
-				}
-				deviceInfo = fmt.Sprintf("%s (%s)", deviceInfo, physStatus)
+    if disks, ok := data.([]disk.DiskInfo); ok {
+        // Проверяем детальный режим и добавляем информацию о количестве
+        var headerInfo string
+        if t.config.DetailedDisk {
+            headerInfo = fmt.Sprintf(" (%d devices)", len(disks))
+        } else {
+            headerInfo = " (primary)"
+        }
+        
+        // Обновляем заголовок
+        t.renderHeader(row, t.config.T("disk.title")+headerInfo)
+        row++
 
-				mountPoint := d.MountedOn
-				if mountPoint == "/" {
-					mountPoint = "ROOT"
-				}
+        count := 0
+        for _, d := range disks {
+            // В обычном режиме показываем только первые 3 диска
+            if !t.config.DetailedDisk && count >= 3 {
+                break
+            }
+            
+            if strings.HasPrefix(d.Filesystem, "/dev/") {
+                // Определяем тип устройства для отображения
+                devType := t.getDeviceType(d.Filesystem, d.MountedOn, d.DiskType)
+                
+                // Добавляем информацию о физическом/логическом типе
+                deviceInfo := devType
+                if d.DiskType != "Unknown" && d.DiskType != "" {
+                    deviceInfo = d.DiskType
+                }
+                
+                // Показываем физический/логический статус
+                physStatus := "Logical"
+                if d.Physical {
+                    physStatus = "Physical"
+                }
+                
+                // Для детального режима добавляем больше информации
+                if t.config.DetailedDisk {
+                    deviceInfo = fmt.Sprintf("%s (%s)", deviceInfo, physStatus)
+                }
 
-				// Основная информация о файловой системе
-				row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", t.config.T("disk.filesystem"), d.Filesystem, deviceInfo), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-				row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("disk.mounted"), mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                mountPoint := d.MountedOn
+                if mountPoint == "/" {
+                    mountPoint = "ROOT"
+                }
 
-				// Информация о модели и серийном номере, если доступна
-				if d.Model != "Unknown" && d.Model != "" {
-					modelInfo := fmt.Sprintf("Model: %s", d.Model)
-					if d.Serial != "Unknown" && d.Serial != "" {
-						modelInfo += fmt.Sprintf(" [%s]", d.Serial)
-					}
-					row = t.printSimple(row, modelInfo, tcell.StyleDefault.Foreground(tcell.ColorGray))
-				}
+                // Основная информация о файловой системе
+                row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("disk.filesystem"), d.Filesystem), 
+                    tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                
+                // В детальном режиме показываем полную информацию
+                if t.config.DetailedDisk {
+                    row = t.printSimple(row, fmt.Sprintf("  Type: %s | Mount: %s", deviceInfo, mountPoint), 
+                        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                    
+                    // Информация о модели и серийном номере, если доступна
+                    if d.Model != "Unknown" && d.Model != "" {
+                        modelInfo := fmt.Sprintf("  Model: %s", d.Model)
+                        if d.Serial != "Unknown" && d.Serial != "" {
+                            modelInfo += fmt.Sprintf(" [%s]", d.Serial)
+                        }
+                        row = t.printSimple(row, modelInfo, tcell.StyleDefault.Foreground(tcell.ColorGray))
+                    }
+                    
+                    // SMART статус
+                    if d.SMARTStatus != "UNKNOWN" && d.SMARTStatus != "Unavailable" {
+                        smartColor := tcell.ColorGreen
+                        if d.SMARTStatus == "FAILED" {
+                            smartColor = tcell.ColorRed
+                        }
+                        row = t.printSimple(row, fmt.Sprintf("  SMART: %s", d.SMARTStatus), 
+                            tcell.StyleDefault.Foreground(smartColor))
+                    }
+                } else {
+                    // В обычном режиме компактная информация
+                    row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
+                        t.config.T("disk.mounted"), mountPoint, deviceInfo), 
+                        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                }
 
-				// Disk usage with graph
-				diskGraph := t.createSolidGraph(d.UsePercent)
-				row = t.printSimple(row, fmt.Sprintf("%s: %s / %s %.1f%% %s",
-					t.config.T("disk.usage"), d.Used, d.Size, d.UsePercent, diskGraph), tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+                // Disk usage with graph
+                diskGraph := t.createSolidGraph(d.UsePercent)
+                row = t.printSimple(row, fmt.Sprintf("%s: %s / %s %.1f%% %s",
+                    t.config.T("disk.usage"), d.Used, d.Size, d.UsePercent, diskGraph), 
+                    tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 
-				count++
-				if count < 3 {
-					row++
-				}
-			}
-		}
-	}
-	return row + 1
+                count++
+                if count < 3 && !t.config.DetailedDisk {
+                    row++
+                }
+            }
+        }
+    }
+    return row + 1
+}
+
+// Обновленная функция getDeviceType
+func (t *TUI) getDeviceType(filesystem string, mountPoint string, diskType string) string {
+    if diskType != "Unknown" && diskType != "" {
+        return diskType
+    }
+    
+    if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
+        return "SSD"
+    } else if strings.Contains(filesystem, "sd") {
+        return "HDD"
+    } else if mountPoint == "/" {
+        return "ROOT"
+    } else if strings.Contains(mountPoint, "home") {
+        return "HOME"
+    } else if strings.Contains(mountPoint, "boot") {
+        return "BOOT"
+    } else if strings.Contains(filesystem, "//") || strings.Contains(mountPoint, "smb") {
+        return "Network"
+    } else if strings.Contains(filesystem, "tmpfs") {
+        return "Temporary"
+    }
+    return "STORAGE"
 }
 
 func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {

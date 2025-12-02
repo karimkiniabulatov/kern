@@ -13,9 +13,10 @@ type Config struct {
 	RefreshRate int    `json:"refresh_rate"`
 	Colors      bool   `json:"colors"`
 	Theme       string `json:"theme"`
-	DetailedCPU bool   `json:"-"` 
+	DetailedCPU bool   `json:"-"`
 	DetailedMem bool   `json:"-"`
 	DetailedNet bool   `json:"-"`
+	DetailedDisk bool  `json:"-"` // Новое поле: флаг детального отображения дисков
 	ShowDisk    bool   `json:"show_disk"`
 	ShowCPU     bool   `json:"show_cpu"`
 	ShowMem     bool   `json:"show_mem"`
@@ -24,22 +25,23 @@ type Config struct {
 	ShowAI      bool   `json:"show_ai"`
 	ShowMining  bool   `json:"show_mining"`
 	
-	// NEW: User preferences for default view
+	// Обновлено: User preferences for default view
 	LastUsedModules *LastUsedModules `json:"last_used_modules,omitempty"`
 	
-	// NEW: Гистограмма настроек
+	// Гистограмма настроек
 	ShowHistograms    bool `json:"show_histograms"`
 	HistogramSegments int  `json:"histogram_segments"` // Количество сегментов в гистограмме
 }
 
 type LastUsedModules struct {
-	ShowDisk   bool `json:"show_disk"`
-	ShowCPU    bool `json:"show_cpu"`
-	ShowMem    bool `json:"show_mem"`
-	ShowNet    bool `json:"show_net"`
-	ShowGPU    bool `json:"show_gpu"`
-	ShowAI     bool `json:"show_ai"`
-	ShowMining bool `json:"show_mining"`
+	ShowDisk     bool `json:"show_disk"`
+	ShowCPU      bool `json:"show_cpu"`
+	ShowMem      bool `json:"show_mem"`
+	ShowNet      bool `json:"show_net"`
+	ShowGPU      bool `json:"show_gpu"`
+	ShowAI       bool `json:"show_ai"`
+	ShowMining   bool `json:"show_mining"`
+	DetailedDisk bool `json:"detailed_disk"` // Новое поле
 }
 
 func (c *Config) T(key string) string {
@@ -47,7 +49,7 @@ func (c *Config) T(key string) string {
 }
 
 // UpdateLastUsedModules updates the last used module preferences
-func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining bool) {
+func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining, detailedDisk bool) {
 	if c.LastUsedModules == nil {
 		c.LastUsedModules = &LastUsedModules{}
 	}
@@ -59,6 +61,7 @@ func (c *Config) UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, show
 	c.LastUsedModules.ShowGPU = showGPU
 	c.LastUsedModules.ShowAI = showAI
 	c.LastUsedModules.ShowMining = showMining
+	c.LastUsedModules.DetailedDisk = detailedDisk
 	
 	// Save the updated config
 	c.Save()
@@ -74,6 +77,7 @@ func (c *Config) UseLastUsedModules() {
 		c.ShowGPU = c.LastUsedModules.ShowGPU
 		c.ShowAI = c.LastUsedModules.ShowAI
 		c.ShowMining = c.LastUsedModules.ShowMining
+		c.DetailedDisk = c.LastUsedModules.DetailedDisk
 	}
 }
 
@@ -143,6 +147,7 @@ func getDefaultConfig(language string) *Config {
 		DetailedCPU: false,  // По умолчанию не показывать детальную информацию CPU
 		DetailedMem: false,  // По умолчанию не показывать детальную информацию памяти
 		DetailedNet: false,
+		DetailedDisk: false, // По умолчанию не показывать детальную информацию дисков
 		ShowDisk:    true,
 		ShowCPU:     true,
 		ShowMem:     true,
