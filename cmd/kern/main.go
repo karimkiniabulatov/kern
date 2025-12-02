@@ -340,7 +340,7 @@ func main() {
 		}
 	} else {
 		// Flags were provided - save these as last used modules
-		cfg.UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining)
+		cfg.UpdateLastUsedModules(showDisk, showCPU, showMem, showNet, showGPU, showAI, showMining, detailedDisk)
 	}
 
 	// Передаем флаги в конфиг
