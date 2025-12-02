@@ -294,9 +294,15 @@ kern is developed with ❤️ as an open-source project. Your support helps:
 
 🔗 Cryptocurrency Donations
 
-Bitcoin (BTC): ```text 1GymM3w4fmbWj6K6dHydgGWYwMckCpHVAn ```
+Bitcoin (BTC): 
+```text 
+1GymM3w4fmbWj6K6dHydgGWYwMckCpHVAn
+```
 
-Ethereum (ERC20): ```text 0x78509af08ce7f9c4a34d87612d47aceef9b534c ```
+Ethereum (ERC20): 
+```text
+0x78509af08ce7f9c4a34d87612d47aceef9b534c
+```
 
 🙌 Other Ways to Support
 ⭐ Star the repository on GitHub
