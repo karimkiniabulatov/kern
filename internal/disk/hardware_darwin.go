@@ -410,9 +410,3 @@ func convertMacSMARTStatus(status string) string {
         return "UNKNOWN"
     }
 }
-
-// detectAllStorageDevicesDarwin - заглушка для macOS
-func detectAllStorageDevicesDarwin() ([]DiskInfo, error) {
-    // Реализация уже есть в detectAllStorageDevicesDarwin
-    return detectAllStorageDevicesDarwin()
-}

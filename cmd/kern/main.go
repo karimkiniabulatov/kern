@@ -757,7 +757,7 @@ func startRemoteServer(cfg *config.Config, port int) {
             return
         }
         
-        data, err := disk.Summary()
+        data, err := disk.Summary(cfg.DetailedDisk)
         if err != nil {
             http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
             return
