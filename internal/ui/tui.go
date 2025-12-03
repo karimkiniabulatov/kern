@@ -429,14 +429,31 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
                 
                 // В детальном режиме показываем полную информацию
                 if t.config.DetailedDisk {
-                    row = t.printSimple(row, fmt.Sprintf("  Type: %s | Mount: %s", deviceInfo, mountPoint), 
-                        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                    // Для RAID массивов показываем специальную информацию
+                    if strings.Contains(d.DiskType, "RAID") {
+                        row = t.printSimple(row, fmt.Sprintf("  Type: %s | Mount: %s", 
+                            deviceInfo, mountPoint), tcell.StyleDefault.Foreground(tcell.ColorYellow).Bold(true))
+                        
+                        // Если есть модель RAID (с уровнем RAID)
+                        if d.Model != "Unknown" && d.Model != "" && !strings.Contains(d.Model, "Unknown") {
+                            row = t.printSimple(row, fmt.Sprintf("  %s", d.Model), 
+                                tcell.StyleDefault.Foreground(tcell.ColorYellow))
+                        }
+                    } else {
+                        row = t.printSimple(row, fmt.Sprintf("  Type: %s | Mount: %s", 
+                            deviceInfo, mountPoint), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+                    }
                     
                     // Информация о модели и серийном номере, если доступна
-                    if d.Model != "Unknown" && d.Model != "" {
+                    if d.Model != "Unknown" && d.Model != "" && !strings.Contains(d.Model, "RAID") {
                         modelInfo := fmt.Sprintf("  Model: %s", d.Model)
                         if d.Serial != "Unknown" && d.Serial != "" {
-                            modelInfo += fmt.Sprintf(" [%s]", d.Serial)
+                            // Сокращаем длинный серийный номер для отображения
+                            serial := d.Serial
+                            if len(serial) > 12 {
+                                serial = serial[:12] + "..."
+                            }
+                            modelInfo += fmt.Sprintf(" [SN:%s]", serial)
                         }
                         row = t.printSimple(row, modelInfo, tcell.StyleDefault.Foreground(tcell.ColorGray))
                     }
@@ -1160,14 +1177,22 @@ func (t *TUI) createCompactGraph(percent float64) string {
 func (t *TUI) getDeviceType(filesystem string, mountPoint string, diskType string) string {
     // Если тип диска уже известен и не "Unknown", используем его
     if diskType != "" && diskType != "Unknown" {
+        // Для RAID показываем как RAID Array
+        if strings.Contains(strings.ToUpper(diskType), "RAID") {
+            return "RAID Array"
+        }
         return diskType
     }
     
     // Определяем тип по файловой системе
-    if strings.Contains(filesystem, "nvme") || strings.Contains(filesystem, "ssd") {
+    if strings.Contains(filesystem, "nvme") {
+        return "NVMe"
+    } else if strings.Contains(filesystem, "ssd") {
         return "SSD"
-    } else if strings.Contains(filesystem, "sd") {
+    } else if strings.Contains(filesystem, "sd") || strings.Contains(filesystem, "hd") {
         return "HDD"
+    } else if strings.Contains(filesystem, "md") {
+        return "RAID Array"  // Обновлено: показываем как RAID Array
     } else if mountPoint == "/" {
         return "ROOT"
     } else if strings.Contains(mountPoint, "home") {
