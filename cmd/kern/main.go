@@ -83,7 +83,7 @@ var (
 // Глобальные переменные для кэширования данных
 var (
 	// Кэш для данных о дисках
-	lastDiskData []disk.DiskInfo = []disk.DiskInfo{}
+	lastDiskData interface{} = []disk.DiskInfo{}
 	diskDataMutex sync.RWMutex
 	
 	// Кэш для данных о CPU
@@ -215,14 +215,6 @@ func main() {
 	flag.Parse()
 
 	// ДОБАВЛЕНО: Обработка флагов детального отображения диска
-	if *flagDetailedDisk {
-		detailedDisk = true
-	}
-	if *flagDetailedDiskLong {
-		detailedDisk = true
-	}
-	
-	// Убедитесь, что это делается ДО использования detailedDisk:
 	detailedDisk := *flagDetailedDisk || *flagDetailedDiskLong
 	
 	// Также добавьте проверку в init() или после flag.Parse():
@@ -471,7 +463,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 diskDataMutex.RLock()
-                data = lastDiskData
+                // Приводим тип
+                if cached, ok := lastDiskData.([]disk.DiskInfo); ok {
+                    data = cached
+                }
                 diskDataMutex.RUnlock()
                 log.Printf("Error getting disk data: %v. Using cached data.", err)
             } else {
@@ -490,7 +485,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 cpuDataMutex.RLock()
-                data = lastCPUData
+                // Приводим тип
+                if cached, ok := lastCPUData.(*cpu.SystemCPUInfo); ok {
+                    data = cached
+                }
                 cpuDataMutex.RUnlock()
                 log.Printf("Error getting CPU data: %v. Using cached data.", err)
             } else {
@@ -509,7 +507,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 memDataMutex.RLock()
-                data = lastMemData
+                // Приводим тип
+                if cached, ok := lastMemData.(*mem.MemoryInfo); ok {
+                    data = cached
+                }
                 memDataMutex.RUnlock()
                 log.Printf("Error getting memory data: %v. Using cached data.", err)
             } else {
@@ -528,7 +529,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 netDataMutex.RLock()
-                data = lastNetData
+                // Приводим тип
+                if cached, ok := lastNetData.([]net.NetworkInfo); ok {
+                    data = cached
+                }
                 netDataMutex.RUnlock()
                 log.Printf("Error getting network data: %v. Using cached data.", err)
             } else {
@@ -548,9 +552,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 gpuDataMutex.RLock()
-                data = lastGPUData
-                gpuDataMutex.RUnlock()
-                if data == nil {
+                // Приводим тип
+                if cached, ok := lastGPUData.([]*gpu.GPUInfo); ok {
+                    data = cached
+                } else {
                     // Если нет кэшированных данных, создаем fallback
                     fallbackData := []*gpu.GPUInfo{{
                         Model:           "GPU не обнаружена",
@@ -587,7 +592,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 aiDataMutex.RLock()
-                data = lastAIData
+                // Приводим тип
+                if cached, ok := lastAIData.(*ai.AIInfo); ok {
+                    data = cached
+                }
                 aiDataMutex.RUnlock()
                 log.Printf("Error getting AI data: %v. Using cached data.", err)
             } else {
@@ -607,7 +615,10 @@ func collectData(cfg *config.Config) map[string]interface{} {
             if err != nil {
                 // При ошибке возвращаем предыдущие данные
                 miningDataMutex.RLock()
-                data = lastMiningData
+                // Приводим тип
+                if cached, ok := lastMiningData.(*mining.MiningInfo); ok {
+                    data = cached
+                }
                 miningDataMutex.RUnlock()
                 log.Printf("Error getting mining data: %v. Using cached data.", err)
             } else {
