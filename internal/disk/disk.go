@@ -9,6 +9,12 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
+)
+
+var (
+	previousDisks   []DiskInfo
+	diskCacheMutex sync.RWMutex
 )
 
 type DiskInfo struct {
@@ -25,44 +31,110 @@ type DiskInfo struct {
 	SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
 }
 
+// groupDisksByPhysicalDevice группирует диски по физическим устройствам
+func groupDisksByPhysicalDevice(disks []DiskInfo) map[string][]DiskInfo {
+    groups := make(map[string][]DiskInfo)
+    
+    for _, disk := range disks {
+        // Создаем ключ для группировки
+        var key string
+        
+        if disk.Physical && disk.Model != "Unknown" && disk.Serial != "Unknown" {
+            // Для физических дисков используем модель+серийник
+            key = fmt.Sprintf("PHYSICAL:%s:%s", disk.Model, disk.Serial)
+        } else if strings.HasPrefix(disk.Filesystem, "/dev/") {
+            // Для логических разделов определяем базовое устройство
+            baseDevice := getBaseDevice(strings.TrimPrefix(disk.Filesystem, "/dev/"))
+            key = fmt.Sprintf("LOGICAL:%s", baseDevice)
+        } else if strings.Contains(disk.DiskType, "RAID") {
+            // Для RAID массивов
+            key = fmt.Sprintf("RAID:%s", disk.Model)
+        } else {
+            // Остальные
+            key = fmt.Sprintf("OTHER:%s", disk.Filesystem)
+        }
+        
+        groups[key] = append(groups[key], disk)
+    }
+    
+    return groups
+}
+
 // sortDisks стабильно сортирует диски для отображения
 func sortDisks(disks []DiskInfo) []DiskInfo {
-	sort.SliceStable(disks, func(i, j int) bool {
-		// 1. Сначала физические диски
-		if disks[i].Physical != disks[j].Physical {
-			return disks[i].Physical && !disks[j].Physical
-		}
-		
-		// 2. Затем по типу диска (системные/корневые первыми)
-		if disks[i].MountedOn != disks[j].MountedOn {
-			// Корневой диск первый
-			if disks[i].MountedOn == "/" {
-				return true
-			}
-			if disks[j].MountedOn == "/" {
-				return false
-			}
-			// Затем другие системные диски
-			primaryMounts := []string{"/home", "/boot", "/var", "/usr"}
-			for _, mount := range primaryMounts {
-				if disks[i].MountedOn == mount && disks[j].MountedOn != mount {
-					return true
-				}
-				if disks[j].MountedOn == mount && disks[i].MountedOn != mount {
-					return false
-				}
-			}
-		}
-		
-		// 3. По алфавиту файловой системы
-		return disks[i].Filesystem < disks[j].Filesystem
-	})
-	
-	return disks
+    // Группируем по физическим устройствам
+    groups := groupDisksByPhysicalDevice(disks)
+    
+    var sortedDisks []DiskInfo
+    
+    // Сначала физические диски
+    for key, group := range groups {
+        if strings.HasPrefix(key, "PHYSICAL:") {
+            // Сортируем разделы внутри физического диска
+            sort.SliceStable(group, func(i, j int) bool {
+                // Сначала корневые разделы, затем остальные
+                if group[i].MountedOn == "/" && group[j].MountedOn != "/" {
+                    return true
+                }
+                if group[i].MountedOn != "/" && group[j].MountedOn == "/" {
+                    return false
+                }
+                return group[i].Filesystem < group[j].Filesystem
+            })
+            sortedDisks = append(sortedDisks, group...)
+        }
+    }
+    
+    // Затем RAID массивы
+    for key, group := range groups {
+        if strings.HasPrefix(key, "RAID:") {
+            sortedDisks = append(sortedDisks, group...)
+        }
+    }
+    
+    // Затем логические разделы
+    for key, group := range groups {
+        if strings.HasPrefix(key, "LOGICAL:") {
+            sortedDisks = append(sortedDisks, group...)
+        }
+    }
+    
+    // Остальные
+    for key, group := range groups {
+        if strings.HasPrefix(key, "OTHER:") {
+            sortedDisks = append(sortedDisks, group...)
+        }
+    }
+    
+    return sortedDisks
+}
+
+// filterRemovedDisks удаляет из предыдущих данных диски, которых нет в текущих
+func filterRemovedDisks(current, previous []DiskInfo) []DiskInfo {
+    // Создаем карту текущих дисков для быстрого поиска
+    currentMap := make(map[string]bool)
+    for _, disk := range current {
+        key := fmt.Sprintf("%s:%s", disk.Filesystem, disk.MountedOn)
+        currentMap[key] = true
+    }
+    
+    // Удаляем из предыдущих те, которых нет в текущих
+    var filtered []DiskInfo
+    for _, disk := range previous {
+        key := fmt.Sprintf("%s:%s", disk.Filesystem, disk.MountedOn)
+        if currentMap[key] {
+            filtered = append(filtered, disk)
+        }
+    }
+    
+    return filtered
 }
 
 // Изменить сигнатуру функции для поддержки детального режима
 func Summary(detailed bool) ([]DiskInfo, error) {
+	diskCacheMutex.Lock()
+	defer diskCacheMutex.Unlock()
+    
 	var disks []DiskInfo
 	var err error
 	
@@ -77,8 +149,20 @@ func Summary(detailed bool) ([]DiskInfo, error) {
 
 	// Если произошла ошибка или нет данных
 	if err != nil || len(disks) == 0 {
+		// Возвращаем предыдущие данные или заглушку
+		if len(previousDisks) > 0 {
+			return previousDisks, nil
+		}
 		return getFallbackDiskInfo(), nil
 	}
+
+	// Фильтруем отключенные диски
+	if len(previousDisks) > 0 {
+		disks = filterRemovedDisks(disks, previousDisks)
+	}
+	
+	// Обновляем кэш
+	previousDisks = disks
 
 	// Применить фильтрацию в зависимости от режима
 	if !detailed {
@@ -546,124 +630,137 @@ func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
 
 // detectDiskProperties определяет свойства диска для Linux/Unix систем
 func detectDiskProperties(filesystem string) (bool, string, string, string, string) {
-	physical := true
-	diskType := "Unknown"
-	model := "Unknown"
-	serial := "Unknown"
-	smartStatus := "UNKNOWN"
+    physical := true
+    diskType := "Unknown"
+    model := "Unknown"
+    serial := "Unknown"
+    smartStatus := "UNKNOWN"
 
-	// Проверяем RAID массивы Linux
-	if strings.HasPrefix(filesystem, "/dev/md") {
-		diskType = "RAID"
-		physical = false
-		
-		// Пытаемся получить информацию о RAID
-		if raidInfo := getRaidInfo(filesystem); raidInfo != "" {
-			model = raidInfo
-		}
-	}
-	
-	// Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
-	device := strings.TrimPrefix(filesystem, "/dev/")
-	if device == "" {
-		return physical, diskType, model, serial, smartStatus
-	}
+    // Улучшенное определение RAID
+    if strings.HasPrefix(filesystem, "/dev/md") {
+        diskType = "RAID"
+        physical = false
+        
+        // Получаем детальную информацию о RAID
+        if raidInfo := getRaidDetails(filesystem); raidInfo != "" {
+            model = raidInfo
+        } else {
+            model = "RAID Array"
+        }
+    }
+    
+    // Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
+    device := strings.TrimPrefix(filesystem, "/dev/")
+    if device == "" {
+        return physical, diskType, model, serial, smartStatus
+    }
 
-	// Получаем базовое устройство (без номера раздела)
-	baseDevice := getBaseDevice(device)
-	
-	// Определяем базовый тип по имени устройства
-	if strings.Contains(filesystem, "nvme") {
-		diskType = "NVMe"
-	} else if strings.Contains(filesystem, "ssd") {
-		diskType = "SSD"
-	} else if strings.Contains(filesystem, "sd") || strings.Contains(filesystem, "hd") {
-		diskType = "HDD"
-	} else if strings.Contains(filesystem, "md") {
-		diskType = "RAID"
-	} else if strings.Contains(filesystem, "dm-") {
-		diskType = "LVM"
-		physical = false
-	} else if strings.Contains(filesystem, "loop") {
-		diskType = "Loopback"
-		physical = false
-	} else if strings.HasPrefix(filesystem, "//") || strings.Contains(filesystem, "nfs") {
-		diskType = "Network"
-		physical = false
-	} else if strings.Contains(filesystem, "tmpfs") {
-		diskType = "Temporary"
-		physical = false
-	}
+    // Получаем базовое устройство (без номера раздела)
+    baseDevice := getBaseDevice(device)
+    
+    // Определяем базовый тип по имени устройства
+    if strings.Contains(filesystem, "nvme") {
+        diskType = "NVMe"
+    } else if strings.Contains(filesystem, "ssd") {
+        diskType = "SSD"
+    } else if strings.Contains(filesystem, "sd") || strings.Contains(filesystem, "hd") {
+        diskType = "HDD"
+    } else if strings.Contains(filesystem, "md") {
+        diskType = "RAID"
+    } else if strings.Contains(filesystem, "dm-") {
+        diskType = "LVM"
+        physical = false
+    } else if strings.Contains(filesystem, "loop") {
+        diskType = "Loopback"
+        physical = false
+    } else if strings.HasPrefix(filesystem, "//") || strings.Contains(filesystem, "nfs") {
+        diskType = "Network"
+        physical = false
+    } else if strings.Contains(filesystem, "tmpfs") {
+        diskType = "Temporary"
+        physical = false
+    }
 
-	// Пытаемся получить дополнительную информацию через lsblk и smartctl (для Linux)
-	if runtime.GOOS != "windows" && diskType != "Network" && diskType != "Temporary" && physical {
-		// Уточняем тип диска через rotational флаг
-		rotationalPath := fmt.Sprintf("/sys/block/%s/queue/rotational", baseDevice)
-		if data, err := os.ReadFile(rotationalPath); err == nil {
-			if strings.TrimSpace(string(data)) == "0" {
-				diskType = "SSD"
-			} else if strings.TrimSpace(string(data)) == "1" {
-				diskType = "HDD"
-			}
-		}
+    // Пытаемся получить дополнительную информацию через lsblk и smartctl (для Linux)
+    if runtime.GOOS != "windows" && diskType != "Network" && diskType != "Temporary" && physical {
+        // Уточняем тип диска через rotational флаг
+        rotationalPath := fmt.Sprintf("/sys/block/%s/queue/rotational", baseDevice)
+        if data, err := os.ReadFile(rotationalPath); err == nil {
+            if strings.TrimSpace(string(data)) == "0" {
+                diskType = "SSD"
+            } else if strings.TrimSpace(string(data)) == "1" {
+                diskType = "HDD"
+            }
+        }
 
-		// Получаем информацию через lsblk
-		if info, err := getDiskInfoWithLsblk(filesystem); err == nil {
-			if info.diskType != "" && info.diskType != "Partition" {
-				diskType = info.diskType
-			}
-			if info.model != "" {
-				model = info.model
-			}
-			if info.serial != "" {
-				serial = info.serial
-			}
-		}
+        // Получаем информацию через lsblk
+        if info, err := getDiskInfoWithLsblk(filesystem); err == nil {
+            if info.diskType != "" && info.diskType != "Partition" {
+                diskType = info.diskType
+            }
+            if info.model != "" {
+                model = info.model
+            }
+            if info.serial != "" {
+                serial = info.serial
+            }
+        }
 
-		// Получаем SMART-статус
-		smartStatus = getSMARTStatus(baseDevice)
+        // Получаем SMART-статус
+        smartStatus = getSMARTStatus(baseDevice)
 
-		// Если это LVM, RAID или другие виртуальные устройства, помечаем как логические
-		if diskType == "LVM" || strings.Contains(diskType, "RAID") {
-			physical = false
-		}
-	}
+        // Если это LVM, RAID или другие виртуальные устройства, помечаем как логические
+        if diskType == "LVM" || strings.Contains(diskType, "RAID") {
+            physical = false
+        }
+    }
 
-	return physical, diskType, model, serial, smartStatus
+    return physical, diskType, model, serial, smartStatus
 }
 
-// getRaidInfo получает информацию о RAID массиве
-func getRaidInfo(device string) string {
-	// Убираем /dev/ из начала
-	deviceName := strings.TrimPrefix(device, "/dev/")
-	
-	// Проверяем уровень RAID через mdadm
-	if runtime.GOOS == "linux" {
-		cmd := exec.Command("mdadm", "--detail", "--brief", "/dev/"+deviceName)
-		output, err := cmd.Output()
-		if err == nil {
-			lines := strings.Split(string(output), "\n")
-			for _, line := range lines {
-				if strings.Contains(line, "level=") {
-					// Извлекаем уровень RAID
-					parts := strings.Split(line, "level=")
-					if len(parts) > 1 {
-						level := strings.Fields(parts[1])[0]
-						return fmt.Sprintf("RAID %s Array", level)
-					}
-				}
-			}
-		}
-		
-		// Альтернативно: проверяем через sysfs
-		levelPath := fmt.Sprintf("/sys/block/%s/md/level", deviceName)
-		if data, err := os.ReadFile(levelPath); err == nil {
-			level := strings.TrimSpace(string(data))
-			return fmt.Sprintf("RAID %s Array", level)
-		}
-	}
-	
-	return "RAID Array"
+// getRaidDetails получает детальную информацию о RAID массиве
+func getRaidDetails(device string) string {
+    deviceName := strings.TrimPrefix(device, "/dev/")
+    
+    if runtime.GOOS == "linux" {
+        // Получаем уровень RAID и компоненты
+        cmd := exec.Command("mdadm", "--detail", "--brief", "/dev/"+deviceName)
+        if output, err := cmd.Output(); err == nil {
+            lines := strings.Split(string(output), "\n")
+            var level, components string
+            
+            for _, line := range lines {
+                if strings.Contains(line, "level=") {
+                    parts := strings.Split(line, "level=")
+                    if len(parts) > 1 {
+                        level = strings.Fields(parts[1])[0]
+                    }
+                }
+                if strings.Contains(line, "devices=") {
+                    parts := strings.Split(line, "devices=")
+                    if len(parts) > 1 {
+                        components = strings.Fields(parts[1])[0]
+                    }
+                }
+            }
+            
+            if level != "" {
+                if components != "" {
+                    return fmt.Sprintf("RAID %s (%s drives)", level, components)
+                }
+                return fmt.Sprintf("RAID %s", level)
+            }
+        }
+        
+        // Альтернативно: проверяем через sysfs
+        levelPath := fmt.Sprintf("/sys/block/%s/md/level", deviceName)
+        if data, err := os.ReadFile(levelPath); err == nil {
+            level := strings.TrimSpace(string(data))
+            return fmt.Sprintf("RAID %s", level)
+        }
+    }
+    
+    return "RAID Array"
 }
 
 // Обновление функции обнаружения свойств Windows

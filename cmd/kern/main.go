@@ -80,6 +80,37 @@ var (
 	flagAppRestart  = flag.Bool("restart-app", false, "Restart kern application")
 )
 
+// Глобальные переменные для кэширования данных
+var (
+	// Кэш для данных о дисках
+	lastDiskData []disk.DiskInfo = []disk.DiskInfo{}
+	diskDataMutex sync.RWMutex
+	
+	// Кэш для данных о CPU
+	lastCPUData interface{}
+	cpuDataMutex sync.RWMutex
+	
+	// Кэш для данных о памяти
+	lastMemData interface{}
+	memDataMutex sync.RWMutex
+	
+	// Кэш для данных о сети
+	lastNetData interface{}
+	netDataMutex sync.RWMutex
+	
+	// Кэш для данных о GPU
+	lastGPUData interface{}
+	gpuDataMutex sync.RWMutex
+	
+	// Кэш для данных об AI
+	lastAIData interface{}
+	aiDataMutex sync.RWMutex
+	
+	// Кэш для данных о майнинге
+	lastMiningData interface{}
+	miningDataMutex sync.RWMutex
+)
+
 const version = "1.2.3"
 
 func init() {
@@ -183,11 +214,25 @@ func main() {
 
 	flag.Parse()
 
+	// ДОБАВЛЕНО: Обработка флагов детального отображения диска
+	if *flagDetailedDisk {
+		detailedDisk = true
+	}
+	if *flagDetailedDiskLong {
+		detailedDisk = true
+	}
+	
+	// Убедитесь, что это делается ДО использования detailedDisk:
+	detailedDisk := *flagDetailedDisk || *flagDetailedDiskLong
+	
+	// Также добавьте проверку в init() или после flag.Parse():
+	fmt.Printf("DEBUG: flagDetailedDisk=%v, flagDetailedDiskLong=%v, detailedDisk=%v\n", 
+		*flagDetailedDisk, *flagDetailedDiskLong, detailedDisk)
+
 	// Обрабатываем короткую версию флага detailed
 	if *flagDetailedShort {
 		*flagDetailed = true
 	}
-	
 	
 	// Обработка управления приложением
 	if *flagAppPause || *flagAppResume || *flagAppStop || *flagAppRestart {
@@ -271,7 +316,7 @@ func main() {
 	detailedCPU := *flagDetailed || *flagDetailedShort
 	detailedMem := *flagDetailedMem || *flagDetailedMemLong
 	detailedNet := *flagDetailedNet || *flagDetailedNetLong
-	detailedDisk := *flagDetailedDisk || *flagDetailedDiskLong
+	// detailedDisk уже объявлена выше
 
 	// Load configuration and localization
 	cfg, err := config.Load(*flagLang)
@@ -408,6 +453,260 @@ func handleAppManagement() {
 	}
 }
 
+// Структура для результата сбора данных
+type result struct {
+	module string
+	data   interface{}
+	err    error
+}
+
+// Функция сбора данных с поддержкой кэширования
+func collectData(cfg *config.Config) map[string]interface{} {
+    resultChan := make(chan result, 7) // Adjusted buffer size after removing audio/video
+
+    // Launch goroutines only for enabled modules
+    if cfg.ShowDisk {
+        go func() {
+            data, err := disk.Summary(cfg.DetailedDisk)
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                diskDataMutex.RLock()
+                data = lastDiskData
+                diskDataMutex.RUnlock()
+                log.Printf("Error getting disk data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                diskDataMutex.Lock()
+                lastDiskData = data
+                diskDataMutex.Unlock()
+            }
+            resultChan <- result{"disk", data, nil}
+        }()
+    }
+
+    if cfg.ShowCPU {
+        go func() {
+            data, err := cpu.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                cpuDataMutex.RLock()
+                data = lastCPUData
+                cpuDataMutex.RUnlock()
+                log.Printf("Error getting CPU data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                cpuDataMutex.Lock()
+                lastCPUData = data
+                cpuDataMutex.Unlock()
+            }
+            resultChan <- result{"cpu", data, err}
+        }()
+    }
+
+    if cfg.ShowMem {
+        go func() {
+            data, err := mem.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                memDataMutex.RLock()
+                data = lastMemData
+                memDataMutex.RUnlock()
+                log.Printf("Error getting memory data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                memDataMutex.Lock()
+                lastMemData = data
+                memDataMutex.Unlock()
+            }
+            resultChan <- result{"mem", data, err}
+        }()
+    }
+
+    if cfg.ShowNet {
+        go func() {
+            data, err := net.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                netDataMutex.RLock()
+                data = lastNetData
+                netDataMutex.RUnlock()
+                log.Printf("Error getting network data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                netDataMutex.Lock()
+                lastNetData = data
+                netDataMutex.Unlock()
+            }
+            resultChan <- result{"net", data, err}
+        }()
+    }
+
+    // GPU monitoring
+    if cfg.ShowGPU {
+        go func() {
+            data, err := gpu.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                gpuDataMutex.RLock()
+                data = lastGPUData
+                gpuDataMutex.RUnlock()
+                if data == nil {
+                    // Если нет кэшированных данных, создаем fallback
+                    fallbackData := []*gpu.GPUInfo{{
+                        Model:           "GPU не обнаружена",
+                        DriverVersion:   "N/A",
+                        GPUTemp:         0.0,
+                        MemoryTotal:     "0 MB",
+                        MemoryUsed:      "0 MB",
+                        MemoryFree:      "0 MB",
+                        Utilization:     0.0,
+                        PowerDraw:       "0 W",
+                        PowerLimit:      "0 W",
+                        FanSpeed:        0.0,
+                        ClockCore:       "0 MHz",
+                        ClockMemory:     "0 MHz",
+                        PerformanceState: "N/A",
+                    }}
+                    data = fallbackData
+                }
+                log.Printf("Error getting GPU data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                gpuDataMutex.Lock()
+                lastGPUData = data
+                gpuDataMutex.Unlock()
+            }
+            resultChan <- result{"gpu", data, nil}
+        }()
+    }
+
+    // AI training monitoring
+    if cfg.ShowAI {
+        go func() {
+            data, err := ai.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                aiDataMutex.RLock()
+                data = lastAIData
+                aiDataMutex.RUnlock()
+                log.Printf("Error getting AI data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                aiDataMutex.Lock()
+                lastAIData = data
+                aiDataMutex.Unlock()
+            }
+            resultChan <- result{"ai", data, err}
+        }()
+    }
+
+    // Mining monitoring
+    if cfg.ShowMining {
+        go func() {
+            data, err := mining.Summary()
+            if err != nil {
+                // При ошибке возвращаем предыдущие данные
+                miningDataMutex.RLock()
+                data = lastMiningData
+                miningDataMutex.RUnlock()
+                log.Printf("Error getting mining data: %v. Using cached data.", err)
+            } else {
+                // Обновляем предыдущие данные
+                miningDataMutex.Lock()
+                lastMiningData = data
+                miningDataMutex.Unlock()
+            }
+            resultChan <- result{"mining", data, err}
+        }()
+    }
+
+    // Collect results
+    results := make(map[string]interface{})
+    moduleCount := 0
+    if cfg.ShowDisk {
+        moduleCount++
+    }
+    if cfg.ShowCPU {
+        moduleCount++
+    }
+    if cfg.ShowMem {
+        moduleCount++
+    }
+    if cfg.ShowNet {
+        moduleCount++
+    }
+    if cfg.ShowGPU {
+        moduleCount++
+    }
+    if cfg.ShowAI {
+        moduleCount++
+    }
+    if cfg.ShowMining {
+        moduleCount++
+    }
+
+    for i := 0; i < moduleCount; i++ {
+        res := <-resultChan
+        if res.err != nil {
+            results[res.module] = map[string]string{"error": res.err.Error()}
+        } else {
+            results[res.module] = res.data
+        }
+    }
+
+    // Гарантируем, что все запрошенные модули возвращают данные
+    // Только для модулей, которые были запрошены через cfg
+    requestedModules := make([]string, 0)
+    if cfg.ShowDisk {
+        requestedModules = append(requestedModules, "disk")
+    }
+    if cfg.ShowCPU {
+        requestedModules = append(requestedModules, "cpu")
+    }
+    if cfg.ShowMem {
+        requestedModules = append(requestedModules, "mem")
+    }
+    if cfg.ShowNet {
+        requestedModules = append(requestedModules, "net")
+    }
+    if cfg.ShowGPU {
+        requestedModules = append(requestedModules, "gpu")
+    }
+    if cfg.ShowAI {
+        requestedModules = append(requestedModules, "ai")
+    }
+    if cfg.ShowMining {
+        requestedModules = append(requestedModules, "mining")
+    }
+
+    for _, module := range requestedModules {
+        if _, exists := results[module]; !exists {
+            // Создаем минимальные данные для отображения гистограмм
+            switch module {
+            case "gpu":
+                results[module] = []*gpu.GPUInfo{{
+                    Model:           "GPU не обнаружена",
+                    DriverVersion:   "N/A",
+                    GPUTemp:         0.0,
+                    MemoryTotal:     "0 MB",
+                    MemoryUsed:      "0 MB",
+                    MemoryFree:      "0 MB",
+                    Utilization:     0.0,
+                    PowerDraw:       "0 W",
+                    PowerLimit:      "0 W",
+                    FanSpeed:        0.0,
+                    ClockCore:       "0 MHz",
+                    ClockMemory:     "0 MHz",
+                    PerformanceState: "N/A",
+                }}
+            default:
+                results[module] = map[string]string{"status": "no data"}
+            }
+        }
+    }
+    
+    return results
+}
 
 func runMonitor(cfg *config.Config, showLogo bool) {
     // Initialize TUI
@@ -501,178 +800,6 @@ func runMonitor(cfg *config.Config, showLogo bool) {
             // продолжаем
         }
     }
-}
-
-func collectData(cfg *config.Config) map[string]interface{} {
-    type result struct {
-        module string
-        data   interface{}
-        err    error
-    }
-
-    resultChan := make(chan result, 7) // Adjusted buffer size after removing audio/video
-
-    // Launch goroutines only for enabled modules
-    if cfg.ShowDisk {
-        go func() {
-            // Передавать флаг детального режима
-            data, err := disk.Summary(cfg.DetailedDisk)
-            resultChan <- result{"disk", data, err}
-        }()
-    }
-
-    if cfg.ShowCPU {
-        go func() {
-            data, err := cpu.Summary()
-            resultChan <- result{"cpu", data, err}
-        }()
-    }
-
-    if cfg.ShowMem {
-        go func() {
-            data, err := mem.Summary()
-            resultChan <- result{"mem", data, err}
-        }()
-    }
-
-    if cfg.ShowNet {
-        go func() {
-            data, err := net.Summary()
-            resultChan <- result{"net", data, err}
-        }()
-    }
-
-    // NEW: GPU monitoring - с исправленной обработкой ошибок
-    if cfg.ShowGPU {
-        go func() {
-            // Используем улучшенную функцию Summary из обновленного gpu.go
-            data, err := gpu.Summary()
-            if err != nil {
-                // Всегда возвращать структуру с гистограммами
-                fallbackData := []*gpu.GPUInfo{{
-                    Model:           "GPU не обнаружена",
-                    DriverVersion:   "N/A",
-                    GPUTemp:         0.0,
-                    MemoryTotal:     "0 MB",
-                    MemoryUsed:      "0 MB",
-                    MemoryFree:      "0 MB",
-                    Utilization:     0.0,  // Важно: 0% для гистограммы
-                    PowerDraw:       "0 W",
-                    PowerLimit:      "0 W",
-                    FanSpeed:        0.0,
-                    ClockCore:       "0 MHz",
-                    ClockMemory:     "0 MHz",
-                    PerformanceState: "N/A",
-                }}
-                resultChan <- result{"gpu", fallbackData, nil}
-            } else {
-                resultChan <- result{"gpu", data, nil}
-            }
-        }()
-    }
-
-    // NEW: AI training monitoring
-    if cfg.ShowAI {
-        go func() {
-            data, err := ai.Summary()
-            resultChan <- result{"ai", data, err}
-        }()
-    }
-
-    // NEW: Mining monitoring
-    if cfg.ShowMining {
-        go func() {
-            data, err := mining.Summary()
-            resultChan <- result{"mining", data, err}
-        }()
-    }
-
-    // Collect results
-    results := make(map[string]interface{})
-    moduleCount := 0
-    if cfg.ShowDisk {
-        moduleCount++
-    }
-    if cfg.ShowCPU {
-        moduleCount++
-    }
-    if cfg.ShowMem {
-        moduleCount++
-    }
-    if cfg.ShowNet {
-        moduleCount++
-    }
-    if cfg.ShowGPU {
-        moduleCount++
-    }
-    if cfg.ShowAI {
-        moduleCount++
-    }
-    if cfg.ShowMining {
-        moduleCount++
-    }
-
-    for i := 0; i < moduleCount; i++ {
-        res := <-resultChan
-        if res.err != nil {
-            results[res.module] = map[string]string{"error": res.err.Error()}
-        } else {
-            results[res.module] = res.data
-        }
-    }
-
-    // Гарантируем, что все запрошенные модули возвращают данные
-    // Только для модулей, которые были запрошены через cfg
-    requestedModules := make([]string, 0)
-    if cfg.ShowDisk {
-        requestedModules = append(requestedModules, "disk")
-    }
-    if cfg.ShowCPU {
-        requestedModules = append(requestedModules, "cpu")
-    }
-    if cfg.ShowMem {
-        requestedModules = append(requestedModules, "mem")
-    }
-    if cfg.ShowNet {
-        requestedModules = append(requestedModules, "net")
-    }
-    if cfg.ShowGPU {
-        requestedModules = append(requestedModules, "gpu")
-    }
-    if cfg.ShowAI {
-        requestedModules = append(requestedModules, "ai")
-    }
-    if cfg.ShowMining {
-        requestedModules = append(requestedModules, "mining")
-    }
-
-    for _, module := range requestedModules {
-        if _, exists := results[module]; !exists {
-            // Создаем минимальные данные для отображения гистограмм
-            switch module {
-            case "gpu":
-                results[module] = []*gpu.GPUInfo{{
-                    Model:           "GPU не обнаружена",
-                    DriverVersion:   "N/A",
-                    GPUTemp:         0.0,
-                    MemoryTotal:     "0 MB",
-                    MemoryUsed:      "0 MB",
-                    MemoryFree:      "0 MB",
-                    Utilization:     0.0,
-                    PowerDraw:       "0 W",
-                    PowerLimit:      "0 W",
-                    FanSpeed:        0.0,
-                    ClockCore:       "0 MHz",
-                    ClockMemory:     "0 MHz",
-                    PerformanceState: "N/A",
-                }}
-            default:
-                results[module] = map[string]string{"status": "no data"}
-            }
-        }
-    }
-    
-    return results
 }
 
 func startRemoteServer(cfg *config.Config, port int) {
