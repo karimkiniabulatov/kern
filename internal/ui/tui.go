@@ -420,81 +420,50 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
     return row + 1
 }
 
-func (t *TUI) groupDisksForDisplay(disks []disk.DiskInfo, detailed bool) map[string][]disk.DiskInfo {
-    groups := make(map[string][]disk.DiskInfo)
-    
-    if detailed {
-        // Счетчик для нумерации физических дисков
-        physicalDiskCounter := 1
+ffunc (t *TUI) renderDisk(startRow int, data interface{}) int {
+    row := startRow
+
+    if disks, ok := data.([]disk.DiskInfo); ok {
+        // Динамическое обновление заголовка
+        deviceCount := 0
+        mountedCount := 0
         
-        // Сначала собираем физические диски
-        physicalDisks := make(map[string][]disk.DiskInfo)
+        // Сначала фильтруем диски (как в groupDisksForDisplay)
+        var filteredDisks []disk.DiskInfo
         for _, d := range disks {
-            if d.Physical && d.Model != "Unknown" && d.Model != "" {
-                // Создаем ключ для группировки физических дисков
-                var groupKey string
-                if d.Serial != "Unknown" && d.Serial != "" {
-                    // Сокращаем серийный номер для отображения
-                    serial := d.Serial
-                    if len(serial) > 12 {
-                        serial = serial[:12] + "..."
-                    }
-                    groupKey = fmt.Sprintf("Disk #%d: %s (SN: %s)", physicalDiskCounter, d.Model, serial)
-                } else {
-                    groupKey = fmt.Sprintf("Disk #%d: %s", physicalDiskCounter, d.Model)
-                }
-                
-                // Проверяем, не добавили ли мы уже этот физический диск
-                if _, exists := groups[groupKey]; !exists {
-                    // Ищем все разделы этого физического диска
-                    var partitions []disk.DiskInfo
-                    for _, partition := range disks {
-                        // Проверяем, относится ли раздел к этому физическому диску
-                        if partition.Model == d.Model && partition.Serial == d.Serial {
-                            partitions = append(partitions, partition)
-                        }
-                    }
-                    
-                    // Сортируем разделы по точке монтирования
-                    sort.Slice(partitions, func(i, j int) bool {
-                        if partitions[i].MountedOn == "/" && partitions[j].MountedOn != "/" {
-                            return true
-                        }
-                        return partitions[i].MountedOn < partitions[j].MountedOn
-                    })
-                    
-                    groups[groupKey] = partitions
-                    physicalDiskCounter++
-                }
-            }
-        }
-        
-        // Затем добавляем логические/виртуальные диски
-        for _, d := range disks {
-            // Пропускаем физические диски, которые уже добавлены
-            if d.Physical && d.Model != "Unknown" && d.Model != "" {
+            if !strings.HasPrefix(d.Filesystem, "/dev/") {
                 continue
             }
-            
-            // Группируем остальные диски по типу
-            groupKey := d.DiskType
-            if groupKey == "" || groupKey == "Unknown" {
-                groupKey = "Other Storage"
+            filteredDisks = append(filteredDisks, d)
+            deviceCount++
+            if d.MountedOn != "(unmounted)" && !strings.Contains(d.MountedOn, "unmounted") {
+                mountedCount++
             }
-            groups[groupKey] = append(groups[groupKey], d)
         }
-    } else {
-        // Обычный режим - просто список (первые 3 диска)
-        groupKey := "Storage Devices"
-        for _, d := range disks {
-            if len(groups[groupKey]) >= 3 {
-                break
+        
+        // Формируем заголовок
+        title := fmt.Sprintf("%s (%d devices, %d mounted)", 
+            t.config.T("disk.title"), deviceCount, mountedCount)
+        
+        // Обновляем заголовок
+        row = t.renderHeader(startRow, title)
+        
+        // Группируем диски для отображения (используем отфильтрованные диски)
+        groupedDisks := t.groupDisksForDisplay(filteredDisks, t.config.DetailedDisk)
+        
+        for groupName, groupDisks := range groupedDisks {
+            // Заголовок группы
+            if t.config.DetailedDisk && len(groupDisks) > 1 {
+                row = t.renderSubHeader(row, groupName)
             }
-            groups[groupKey] = append(groups[groupKey], d)
+            
+            for _, d := range groupDisks {
+                row = t.renderSingleDisk(row, d, t.config.DetailedDisk)
+                row++
+            }
         }
     }
-    
-    return groups
+    return row + 1
 }
 
 func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
