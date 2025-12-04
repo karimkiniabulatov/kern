@@ -130,56 +130,104 @@ func filterRemovedDisks(current, previous []DiskInfo) []DiskInfo {
     return filtered
 }
 
+// stableSortDisks стабильно сортирует диски для отображения без скачков
+func stableSortDisks(disks []DiskInfo) []DiskInfo {
+    // Создаем мапу для группировки по физическим устройствам
+    deviceMap := make(map[string][]DiskInfo)
+    var deviceOrder []string
+    
+    for _, disk := range disks {
+        // Определяем базовое устройство
+        baseDevice := getBaseDevice(strings.TrimPrefix(disk.Filesystem, "/dev/"))
+        if baseDevice == "" {
+            baseDevice = "unknown"
+        }
+        
+        // Группируем по физическим устройствам
+        if _, exists := deviceMap[baseDevice]; !exists {
+            deviceOrder = append(deviceOrder, baseDevice)
+        }
+        deviceMap[baseDevice] = append(deviceMap[baseDevice], disk)
+    }
+    
+    // Сортируем ключи устройств для стабильного порядка
+    sort.Strings(deviceOrder)
+    
+    var sortedDisks []DiskInfo
+    
+    // Собираем диски в стабильном порядке
+    for _, device := range deviceOrder {
+        deviceDisks := deviceMap[device]
+        
+        // Сортируем разделы внутри устройства
+        sort.SliceStable(deviceDisks, func(i, j int) bool {
+            // Сначала системные разделы
+            if deviceDisks[i].MountedOn == "/" && deviceDisks[j].MountedOn != "/" {
+                return true
+            }
+            if deviceDisks[i].MountedOn != "/" && deviceDisks[j].MountedOn == "/" {
+                return false
+            }
+            // Затем по алфавиту
+            return deviceDisks[i].MountedOn < deviceDisks[j].MountedOn
+        })
+        
+        sortedDisks = append(sortedDisks, deviceDisks...)
+    }
+    
+    return sortedDisks
+}
+
 // Изменить сигнатуру функции для поддержки детального режима
 func Summary(detailed bool) ([]DiskInfo, error) {
-	diskCacheMutex.Lock()
-	defer diskCacheMutex.Unlock()
+    diskCacheMutex.Lock()
+    defer diskCacheMutex.Unlock()
     
-	var disks []DiskInfo
-	var err error
-	
-	switch runtime.GOOS {
-	case "windows":
-		disks, err = getWindowsDiskInfo(detailed)
-	case "darwin":
-		disks, err = getDarwinDiskInfo(detailed)
-	default:
-		disks, err = getLinuxDiskInfo(detailed)
-	}
+    var disks []DiskInfo
+    var err error
+    
+    switch runtime.GOOS {
+    case "windows":
+        disks, err = getWindowsDiskInfo(detailed)
+    case "darwin":
+        disks, err = getDarwinDiskInfo(detailed)
+    default:
+        disks, err = getLinuxDiskInfo(detailed)
+    }
 
-	// Если произошла ошибка или нет данных
-	if err != nil || len(disks) == 0 {
-		// Возвращаем предыдущие данные или заглушку
-		if len(previousDisks) > 0 {
-			return previousDisks, nil
-		}
-		return getFallbackDiskInfo(), nil
-	}
+    // Если произошла ошибка или нет данных
+    if err != nil || len(disks) == 0 {
+        // Возвращаем предыдущие данные или заглушку
+        if len(previousDisks) > 0 {
+            return previousDisks, nil
+        }
+        return getFallbackDiskInfo(), nil
+    }
 
-	// Фильтруем отключенные диски
-	if len(previousDisks) > 0 {
-		disks = filterRemovedDisks(disks, previousDisks)
-	}
-	
-	// Обновляем кэш
-	previousDisks = disks
+    // Фильтруем отключенные диски
+    if len(previousDisks) > 0 {
+        disks = filterRemovedDisks(disks, previousDisks)
+    }
+    
+    // Обновляем кэш
+    previousDisks = disks
 
-	// Применить фильтрацию в зависимости от режима
-	if !detailed {
-		disks = filterPrimaryDisks(disks)
-	}
+    // Применить фильтрацию в зависимости от режима
+    if !detailed {
+        disks = filterPrimaryDisks(disks)
+    }
 
-	// Гарантируем корректные значения UsePercent
-	for i := range disks {
-		if disks[i].UsePercent < 0 {
-			disks[i].UsePercent = 0.0
-		}
-	}
+    // Гарантируем корректные значения UsePercent
+    for i := range disks {
+        if disks[i].UsePercent < 0 {
+            disks[i].UsePercent = 0.0
+        }
+    }
 
-	// СОРТИРОВАТЬ перед возвратом
-	disks = sortDisks(disks)
+    // СТАБИЛЬНАЯ СОРТИРОВКА для предотвращения скачков
+    disks = stableSortDisks(disks)
 
-	return disks, nil
+    return disks, nil
 }
 
 // Обновленные функции с поддержкой детального режима
@@ -763,66 +811,73 @@ func getRaidDetails(device string) string {
     return "RAID Array"
 }
 
-// Обновление функции обнаружения свойств Windows
+// detectWindowsDiskProperties определяет свойства диска для Windows систем
 func detectWindowsDiskProperties(drive string, driveType int) (bool, string, string, string, string) {
-	physical := true
-	diskType := "Unknown"
-	model := "Unknown"
-	serial := "Unknown"
-	smartStatus := "UNKNOWN"
+    physical := true
+    diskType := "Unknown"
+    model := "Unknown"
+    serial := "Unknown"
+    smartStatus := "UNKNOWN"
 
-	// Определяем тип по driveType
-	switch driveType {
-	case 2:
-		diskType = "Removable"
-		physical = false
-	case 3:
-		diskType = "Local Disk"
-		physical = true
-	case 4:
-		diskType = "Network"
-		physical = false
-	case 5:
-		diskType = "CD-ROM"
-		physical = false
-	}
+    // Определяем тип по driveType
+    switch driveType {
+    case 2:
+        diskType = "Removable"
+        physical = false
+    case 3:
+        diskType = "Local Disk"
+        physical = true
+    case 4:
+        diskType = "Network"
+        physical = false
+    case 5:
+        diskType = "CD-ROM"
+        physical = false
+    }
 
-	// Получаем дополнительную информацию через wmic
-	if diskType == "Local Disk" || diskType == "Removable" {
-		cmd := exec.Command("wmic", "diskdrive", "get", "model,serialnumber,mediatype,size")
-		output, err := cmd.Output()
-		if err == nil {
-			lines := strings.Split(string(output), "\n")
-			for _, line := range lines {
-				fields := strings.Fields(line)
-				if len(fields) >= 4 {
-					model = fields[0]
-					serial = fields[1]
-					
-					switch fields[2] {
-					case "Fixed hard disk media":
-						diskType = "HDD"
-					case "SSD":
-						diskType = "SSD"
-					case "NVMe":
-						diskType = "NVMe"
-					case "Removable media":
-						diskType = "Removable"
-						physical = false
-					}
-					break
-				}
-			}
-		}
-	}
+    // Получаем дополнительную информацию через wmic
+    if diskType == "Local Disk" || diskType == "Removable" {
+        cmd := exec.Command("wmic", "diskdrive", "get", "Model,SerialNumber,MediaType,InterfaceType", "/format:list")
+        output, err := cmd.Output()
+        if err == nil {
+            lines := strings.Split(string(output), "\n")
+            var currentModel, currentSerial string
+            
+            for _, line := range lines {
+                line = strings.TrimSpace(line)
+                if strings.HasPrefix(line, "Model=") {
+                    currentModel = strings.TrimPrefix(line, "Model=")
+                } else if strings.HasPrefix(line, "SerialNumber=") {
+                    currentSerial = strings.TrimPrefix(line, "SerialNumber=")
+                } else if strings.HasPrefix(line, "MediaType=") {
+                    mediaType := strings.TrimPrefix(line, "MediaType=")
+                    switch mediaType {
+                    case "Fixed hard disk media":
+                        diskType = "HDD"
+                    case "SSD":
+                        diskType = "SSD"
+                    case "External hard disk media":
+                        diskType = "External"
+                    }
+                }
+            }
+            
+            if currentModel != "" {
+                model = currentModel
+            }
+            if currentSerial != "" {
+                serial = currentSerial
+            }
+        }
+    }
 
-	// Сетевые диски
-	if strings.HasPrefix(drive, "\\\\") {
-		diskType = "Network"
-		physical = false
-	}
+    // Сетевые диски
+    if strings.HasPrefix(drive, "\\\\") {
+        diskType = "Network"
+        physical = false
+    }
 
-	return physical, diskType, model, serial, smartStatus
+    return physical, diskType, model, serial, smartStatus
 }
 
 // getBaseDevice возвращает базовое имя устройства без номера раздела
@@ -930,8 +985,8 @@ func formatBytes(bytes uint64) string {
 	}
 	div, exp := uint64(unit), 0
 	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
+			div *= unit
+			exp++
 	}
 	return strconv.FormatFloat(float64(bytes)/float64(div), 'f', 1, 64) + " " + string("KMGTPE"[exp]) + "B"
 }

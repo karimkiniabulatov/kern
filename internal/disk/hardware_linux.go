@@ -3,6 +3,7 @@
 package disk
 
 import (
+	"net/url"
     "os"
     "os/exec"
     "path/filepath"
@@ -70,6 +71,43 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
         SMARTStatus: "UNKNOWN",
     }
     
+    // Получаем модель и серийный номер из udev
+    udevCmd := exec.Command("udevadm", "info", "--query=property", "--name=/dev/" + deviceName)
+    if output, err := udevCmd.Output(); err == nil {
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if strings.HasPrefix(line, "ID_MODEL=") {
+                device.Model = strings.TrimPrefix(line, "ID_MODEL=")
+            } else if strings.HasPrefix(line, "ID_SERIAL_SHORT=") {
+                device.Serial = strings.TrimPrefix(line, "ID_SERIAL_SHORT=")
+            } else if strings.HasPrefix(line, "ID_MODEL_ENC=") {
+                // Если модель не найдена, используем закодированную версию
+                if device.Model == "" {
+                    encoded := strings.TrimPrefix(line, "ID_MODEL_ENC=")
+                    if decoded, err := url.QueryUnescape(encoded); err == nil {
+                        device.Model = decoded
+                    }
+                }
+            }
+        }
+    }
+    
+    // Если модель все еще не найдена, пробуем другие методы
+    if device.Model == "" {
+        // Пробуем через hdparm
+        hdparmCmd := exec.Command("hdparm", "-I", "/dev/"+deviceName)
+        if output, err := hdparmCmd.Output(); err == nil {
+            lines := strings.Split(string(output), "\n")
+            for _, line := range lines {
+                if strings.Contains(line, "Model Number:") {
+                    device.Model = strings.TrimSpace(strings.TrimPrefix(line, "Model Number:"))
+                } else if strings.Contains(line, "Serial Number:") {
+                    device.Serial = strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
+                }
+            }
+        }
+    }
+    
     // Получаем размер в секторах
     sizePath := filepath.Join(devicePath, "size")
     if data, err := os.ReadFile(sizePath); err == nil {
@@ -81,24 +119,30 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
         }
     }
     
-    // Получаем модель
-    modelPath := filepath.Join(devicePath, "device", "model")
-    if data, err := os.ReadFile(modelPath); err == nil {
-        device.Model = strings.TrimSpace(string(data))
+    // Получаем модель из sys (резервный метод)
+    if device.Model == "" {
+        modelPath := filepath.Join(devicePath, "device", "model")
+        if data, err := os.ReadFile(modelPath); err == nil {
+            device.Model = strings.TrimSpace(string(data))
+        }
     }
     
-    // Получаем серийный номер
-    serialPath := filepath.Join(devicePath, "device", "serial")
-    if data, err := os.ReadFile(serialPath); err == nil {
-        device.Serial = strings.TrimSpace(string(data))
+    // Получаем серийный номер из sys (резервный метод)
+    if device.Serial == "" {
+        serialPath := filepath.Join(devicePath, "device", "serial")
+        if data, err := os.ReadFile(serialPath); err == nil {
+            device.Serial = strings.TrimSpace(string(data))
+        }
     }
     
-    // Получаем vendor
-    vendorPath := filepath.Join(devicePath, "device", "vendor")
-    if data, err := os.ReadFile(vendorPath); err == nil {
-        vendor := strings.TrimSpace(string(data))
-        if vendor != "" && device.Model != "" {
-            device.Model = vendor + " " + device.Model
+    // Получаем vendor (резервный метод)
+    if device.Model != "" {
+        vendorPath := filepath.Join(devicePath, "device", "vendor")
+        if data, err := os.ReadFile(vendorPath); err == nil {
+            vendor := strings.TrimSpace(string(data))
+            if vendor != "" && !strings.Contains(device.Model, vendor) {
+                device.Model = vendor + " " + device.Model
+            }
         }
     }
     

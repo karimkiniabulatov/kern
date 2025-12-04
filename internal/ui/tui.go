@@ -423,39 +423,75 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
 func (t *TUI) groupDisksForDisplay(disks []disk.DiskInfo, detailed bool) map[string][]disk.DiskInfo {
     groups := make(map[string][]disk.DiskInfo)
     
-    for _, d := range disks {
-        var groupKey string
+    if detailed {
+        // Счетчик для нумерации физических дисков
+        physicalDiskCounter := 1
         
-        if detailed {
-            // В детальном режиме группируем по физическим устройствам
+        // Сначала собираем физические диски
+        physicalDisks := make(map[string][]disk.DiskInfo)
+        for _, d := range disks {
             if d.Physical && d.Model != "Unknown" && d.Model != "" {
-                // Сокращаем длинные серийные номера
-                serial := d.Serial
-                if len(serial) > 8 && serial != "Unknown" {
-                    serial = serial[:8] + "..."
-                }
-                groupKey = fmt.Sprintf("%s (SN: %s)", d.Model, serial)
-            } else if strings.Contains(strings.ToUpper(d.DiskType), "RAID") {
-                if d.Model != "Unknown" && d.Model != "" {
-                    groupKey = fmt.Sprintf("RAID: %s", d.Model)
+                // Создаем ключ для группировки физических дисков
+                var groupKey string
+                if d.Serial != "Unknown" && d.Serial != "" {
+                    // Сокращаем серийный номер для отображения
+                    serial := d.Serial
+                    if len(serial) > 12 {
+                        serial = serial[:12] + "..."
+                    }
+                    groupKey = fmt.Sprintf("Disk #%d: %s (SN: %s)", physicalDiskCounter, d.Model, serial)
                 } else {
-                    groupKey = "RAID Array"
+                    groupKey = fmt.Sprintf("Disk #%d: %s", physicalDiskCounter, d.Model)
                 }
-            } else if d.DiskType != "Unknown" && d.DiskType != "" {
-                groupKey = fmt.Sprintf("%s Device", d.DiskType)
-            } else {
-                groupKey = "Other Storage"
-            }
-        } else {
-            // В обычном режиме просто список (первые 3 диска)
-            groupKey = "Storage Devices"
-            // Ограничиваем количество дисков в обычном режиме
-            if len(groups[groupKey]) >= 3 {
-                continue
+                
+                // Проверяем, не добавили ли мы уже этот физический диск
+                if _, exists := groups[groupKey]; !exists {
+                    // Ищем все разделы этого физического диска
+                    var partitions []disk.DiskInfo
+                    for _, partition := range disks {
+                        // Проверяем, относится ли раздел к этому физическому диску
+                        if partition.Model == d.Model && partition.Serial == d.Serial {
+                            partitions = append(partitions, partition)
+                        }
+                    }
+                    
+                    // Сортируем разделы по точке монтирования
+                    sort.Slice(partitions, func(i, j int) bool {
+                        if partitions[i].MountedOn == "/" && partitions[j].MountedOn != "/" {
+                            return true
+                        }
+                        return partitions[i].MountedOn < partitions[j].MountedOn
+                    })
+                    
+                    groups[groupKey] = partitions
+                    physicalDiskCounter++
+                }
             }
         }
         
-        groups[groupKey] = append(groups[groupKey], d)
+        // Затем добавляем логические/виртуальные диски
+        for _, d := range disks {
+            // Пропускаем физические диски, которые уже добавлены
+            if d.Physical && d.Model != "Unknown" && d.Model != "" {
+                continue
+            }
+            
+            // Группируем остальные диски по типу
+            groupKey := d.DiskType
+            if groupKey == "" || groupKey == "Unknown" {
+                groupKey = "Other Storage"
+            }
+            groups[groupKey] = append(groups[groupKey], d)
+        }
+    } else {
+        // Обычный режим - просто список (первые 3 диска)
+        groupKey := "Storage Devices"
+        for _, d := range disks {
+            if len(groups[groupKey]) >= 3 {
+                break
+            }
+            groups[groupKey] = append(groups[groupKey], d)
+        }
     }
     
     return groups
@@ -480,52 +516,75 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     }
     
     if detailed {
-        // Детальный режим
-        row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-            t.config.T("disk.filesystem"), d.Filesystem), 
+        // Детальный режим - отображаем полную информацию
+        // Файловая система
+        row = t.printSimple(row, fmt.Sprintf("Filesystem: %s", d.Filesystem), 
             tcell.StyleDefault.Foreground(tcell.ColorAqua))
         
-        // Модель и серийный номер
+        // Модель и серийный номер (если есть)
+        modelInfo := ""
         if d.Model != "Unknown" && d.Model != "" {
-            modelInfo := fmt.Sprintf("  Model: %s", d.Model)
+            modelInfo = fmt.Sprintf("Model: %s", d.Model)
             if d.Serial != "Unknown" && d.Serial != "" {
-                modelInfo += fmt.Sprintf(" (SN: %s)", d.Serial)
+                // Сокращаем длинный серийный номер
+                serial := d.Serial
+                if len(serial) > 16 {
+                    serial = serial[:16] + "..."
+                }
+                modelInfo += fmt.Sprintf(" | SN: %s", serial)
             }
+        }
+        
+        if modelInfo != "" {
             row = t.printSimple(row, modelInfo, 
                 tcell.StyleDefault.Foreground(tcell.ColorGray))
         }
         
-        // Физический/логический статус
-        physStatus := "Logical"
-        if d.Physical {
-            physStatus = "Physical"
-        }
-        
         // Тип и точка монтирования
-        row = t.printSimple(row, fmt.Sprintf("  Type: %s | Mount: %s | %s", 
-            devType, mountPoint, physStatus), 
+        typeInfo := fmt.Sprintf("Type: %s", devType)
+        if d.MountedOn != "" && d.MountedOn != "(unmounted)" {
+            typeInfo += fmt.Sprintf(" | Mount: %s", mountPoint)
+        }
+        row = t.printSimple(row, typeInfo, 
             tcell.StyleDefault.Foreground(tcell.ColorAqua))
-            
-        // SMART статус
+        
+        // SMART статус (если есть)
         if d.SMARTStatus != "UNKNOWN" && d.SMARTStatus != "Unavailable" {
             smartColor := tcell.ColorGreen
             if d.SMARTStatus == "FAILED" {
                 smartColor = tcell.ColorRed
             }
-            row = t.printSimple(row, fmt.Sprintf("  SMART: %s", d.SMARTStatus), 
+            row = t.printSimple(row, fmt.Sprintf("SMART: %s", d.SMARTStatus), 
                 tcell.StyleDefault.Foreground(smartColor))
         }
     } else {
-        // Обычный режим - компактная информация
-        row = t.printSimple(row, fmt.Sprintf("%s: %s (%s)", 
-            d.Filesystem, mountPoint, devType), 
+        // Обычный режим - компактная информация с моделью и серийным номером
+        var diskInfo string
+        
+        // Базовая информация
+        diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
+        
+        // Добавляем модель, если есть
+        if d.Model != "Unknown" && d.Model != "" {
+            diskInfo += fmt.Sprintf(" - %s", d.Model)
+            // Добавляем сокращенный серийный номер, если есть
+            if d.Serial != "Unknown" && d.Serial != "" {
+                serial := d.Serial
+                if len(serial) > 8 {
+                    serial = serial[:8] + "..."
+                }
+                diskInfo += fmt.Sprintf(" [%s]", serial)
+            }
+        }
+        
+        row = t.printSimple(row, diskInfo, 
             tcell.StyleDefault.Foreground(tcell.ColorAqua))
     }
     
-    // Гистограмма использования (ВСЕГДА показываем)
+    // Гистограмма использования
     diskGraph := t.createSolidGraph(d.UsePercent)
-    usageText := fmt.Sprintf("%s: %s / %s %.1f%%", 
-        t.config.T("disk.usage"), d.Used, d.Size, d.UsePercent)
+    usageText := fmt.Sprintf("Usage: %s / %s %.1f%%", 
+        d.Used, d.Size, d.UsePercent)
     
     row = t.printSimple(row, usageText, 
         tcell.StyleDefault.Foreground(usageColor))
