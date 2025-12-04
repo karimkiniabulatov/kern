@@ -420,7 +420,7 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
     return row + 1
 }
 
-ffunc (t *TUI) renderDisk(startRow int, data interface{}) int {
+func (t *TUI) renderDisk(startRow int, data interface{}) int {
     row := startRow
 
     if disks, ok := data.([]disk.DiskInfo); ok {
