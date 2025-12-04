@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
@@ -601,7 +602,7 @@ func parseDFOutput(output string, detailed bool) ([]DiskInfo, error) {
 			}
 
 			// Определяем тип устройства и физические характеристики
-			physical, diskType, model, serial, smartStatus := detectDiskProperties(fields[0])
+			physical, diskType, model, serial, smartStatus, vendor := detectDiskProperties(fields[0])
 
 			disk := DiskInfo{
 				Filesystem: fields[0],
