@@ -1006,7 +1006,7 @@ func (t *TUI) renderAI(startRow int, data interface{}) int {
                     t.config.T("ai.loss"), aiData.Loss), 
                     tcell.StyleDefault.Foreground(tcell.ColorAqua))
                 row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
-                    tconfig.T("ai.accuracy"), accuracyPercent), 
+                    t.config.T("ai.accuracy"), accuracyPercent), 
                     tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
                 // ГИСТОГРАММА НА ОТДЕЛЬНОЙ СТРОКЕ
                 row = t.printSimple(row, fmt.Sprintf("  %s", accuracyGraph), 
