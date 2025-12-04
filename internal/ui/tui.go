@@ -63,7 +63,7 @@ func (t *TUI) Render(data map[string]interface{}) {
 	// Render only enabled modules
 	if t.config.ShowDisk {
 		if diskData, exists := data["disk"]; exists {
-			row = t.renderDisk(row, diskData)
+			row = t.renderDisk(row, diskData, t.config.DetailedDisk)
 		}
 	}
 
@@ -374,7 +374,7 @@ func (t *TUI) renderMemory(startRow int, data interface{}) int {
     return row + 1
 }
 
-func (t *TUI) renderDisk(startRow int, data interface{}) int {
+func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
     row := startRow
 
     if disks, ok := data.([]disk.DiskInfo); ok {
@@ -382,7 +382,7 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
         deviceCount := 0
         mountedCount := 0
         
-        // Сначала фильтруем диски (как в groupDisksForDisplay)
+        // Сначала фильтруем диски
         var filteredDisks []disk.DiskInfo
         for _, d := range disks {
             if !strings.HasPrefix(d.Filesystem, "/dev/") {
@@ -402,63 +402,23 @@ func (t *TUI) renderDisk(startRow int, data interface{}) int {
         // Обновляем заголовок
         row = t.renderHeader(startRow, title)
         
-        // Группируем диски для отображения (используем отфильтрованные диски)
-        groupedDisks := t.groupDisksForDisplay(filteredDisks, t.config.DetailedDisk)
-        
-        for groupName, groupDisks := range groupedDisks {
-            // Заголовок группы
-            if t.config.DetailedDisk && len(groupDisks) > 1 {
-                row = t.renderSubHeader(row, groupName)
+        if detailed {
+            // Детальный режим: группируем диски
+            groupedDisks := disk.GroupDisksByPhysicalDevice(filteredDisks)
+            for groupName, groupDisks := range groupedDisks {
+                // Заголовок группы
+                if len(groupDisks) > 1 {
+                    row = t.renderSubHeader(row, groupName)
+                }
+                for _, d := range groupDisks {
+                    row = t.renderSingleDisk(row, d, detailed)
+                    row++
+                }
             }
-            
-            for _, d := range groupDisks {
-                row = t.renderSingleDisk(row, d, t.config.DetailedDisk)
-                row++
-            }
-        }
-    }
-    return row + 1
-}
-
-func (t *TUI) renderDisk(startRow int, data interface{}) int {
-    row := startRow
-
-    if disks, ok := data.([]disk.DiskInfo); ok {
-        // Динамическое обновление заголовка
-        deviceCount := 0
-        mountedCount := 0
-        
-        // Сначала фильтруем диски (как в groupDisksForDisplay)
-        var filteredDisks []disk.DiskInfo
-        for _, d := range disks {
-            if !strings.HasPrefix(d.Filesystem, "/dev/") {
-                continue
-            }
-            filteredDisks = append(filteredDisks, d)
-            deviceCount++
-            if d.MountedOn != "(unmounted)" && !strings.Contains(d.MountedOn, "unmounted") {
-                mountedCount++
-            }
-        }
-        
-        // Формируем заголовок
-        title := fmt.Sprintf("%s (%d devices, %d mounted)", 
-            t.config.T("disk.title"), deviceCount, mountedCount)
-        
-        // Обновляем заголовок
-        row = t.renderHeader(startRow, title)
-        
-        // Группируем диски для отображения (используем отфильтрованные диски)
-        groupedDisks := t.groupDisksForDisplay(filteredDisks, t.config.DetailedDisk)
-        
-        for groupName, groupDisks := range groupedDisks {
-            // Заголовок группы
-            if t.config.DetailedDisk && len(groupDisks) > 1 {
-                row = t.renderSubHeader(row, groupName)
-            }
-            
-            for _, d := range groupDisks {
-                row = t.renderSingleDisk(row, d, t.config.DetailedDisk)
+        } else {
+            // Обычный режим: показываем диски без группировки
+            for _, d := range filteredDisks {
+                row = t.renderSingleDisk(row, d, detailed)
                 row++
             }
         }
@@ -745,8 +705,6 @@ func (t *TUI) filterMainNetworkInterface(networks []net.NetworkInfo) []net.Netwo
     
     return []net.NetworkInfo{}
 }
-
-
 
 // getConnectionLabel возвращает ASCII обозначение для типа соединения
 func (t *TUI) getConnectionLabel(connectionType string) string {
@@ -1048,7 +1006,7 @@ func (t *TUI) renderAI(startRow int, data interface{}) int {
                     t.config.T("ai.loss"), aiData.Loss), 
                     tcell.StyleDefault.Foreground(tcell.ColorAqua))
                 row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
-                    t.config.T("ai.accuracy"), accuracyPercent), 
+                    tconfig.T("ai.accuracy"), accuracyPercent), 
                     tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
                 // ГИСТОГРАММА НА ОТДЕЛЬНОЙ СТРОКЕ
                 row = t.printSimple(row, fmt.Sprintf("  %s", accuracyGraph), 

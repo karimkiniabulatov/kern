@@ -31,6 +31,11 @@ type DiskInfo struct {
 	SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
 }
 
+// GroupDisksByPhysicalDevice группирует диски по физическим устройствам (экспортируемая версия)
+func GroupDisksByPhysicalDevice(disks []DiskInfo) map[string][]DiskInfo {
+    return groupDisksByPhysicalDevice(disks)
+}
+
 // groupDisksByPhysicalDevice группирует диски по физическим устройствам
 func groupDisksByPhysicalDevice(disks []DiskInfo) map[string][]DiskInfo {
     groups := make(map[string][]DiskInfo)
@@ -63,7 +68,7 @@ func groupDisksByPhysicalDevice(disks []DiskInfo) map[string][]DiskInfo {
 // sortDisks стабильно сортирует диски для отображения
 func sortDisks(disks []DiskInfo) []DiskInfo {
     // Группируем по физическим устройствам
-    groups := groupDisksByPhysicalDevice(disks)
+    groups := GroupDisksByPhysicalDevice(disks)
     
     var sortedDisks []DiskInfo
     
