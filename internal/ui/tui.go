@@ -403,13 +403,33 @@ func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
         row = t.renderHeader(startRow, title)
         
         if detailed {
-            // Детальный режим: группируем диски
+            // Детальный режим: группируем и нумеруем физические устройства
             groupedDisks := disk.GroupDisksByPhysicalDevice(filteredDisks)
-            for groupName, groupDisks := range groupedDisks {
-                // Заголовок группы
-                if len(groupDisks) > 1 {
-                    row = t.renderSubHeader(row, groupName)
+            
+            // Сортируем ключи групп для стабильного порядка
+            var groupKeys []string
+            for key := range groupedDisks {
+                groupKeys = append(groupKeys, key)
+            }
+            sort.Strings(groupKeys)
+            
+            // Счетчик физических устройств
+            physicalDeviceCount := 1
+            
+            for _, key := range groupKeys {
+                groupDisks := groupedDisks[key]
+                
+                // Проверяем, является ли группа физическим устройством
+                if strings.HasPrefix(key, "PHYSICAL:") {
+                    // Заголовок для физического устройства с номером
+                    header := fmt.Sprintf("Storage Device #%d", physicalDeviceCount)
+                    row = t.renderSubHeader(row, header)
+                    physicalDeviceCount++
+                } else if strings.HasPrefix(key, "RAID:") {
+                    // Заголовок для RAID
+                    row = t.renderSubHeader(row, "RAID Array")
                 }
+                
                 for _, d := range groupDisks {
                     row = t.renderSingleDisk(row, d, detailed)
                     row++
@@ -438,36 +458,36 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // Определяем тип устройства для отображения
     devType := t.getDeviceType(d.Filesystem, d.MountedOn, d.DiskType)
     
-    // Основная информация
+    // ОСНОВНАЯ ИНФОРМАЦИЯ С МОДЕЛЬЮ И СЕРИЙНЫМ НОМЕРОМ ДЛЯ ВСЕХ РЕЖИМОВ
     mountPoint := d.MountedOn
     if mountPoint == "/" {
         mountPoint = "ROOT"
     }
     
-    if detailed {
-        // Детальный режим - отображаем полную информацию
-        // Файловая система
-        row = t.printSimple(row, fmt.Sprintf("Filesystem: %s", d.Filesystem), 
-            tcell.StyleDefault.Foreground(tcell.ColorAqua))
-        
-        // Модель и серийный номер (если есть)
-        modelInfo := ""
-        if d.Model != "Unknown" && d.Model != "" {
-            modelInfo = fmt.Sprintf("Model: %s", d.Model)
-            if d.Serial != "Unknown" && d.Serial != "" {
-                // Сокращаем длинный серийный номер
-                serial := d.Serial
-                if len(serial) > 16 {
-                    serial = serial[:16] + "..."
-                }
-                modelInfo += fmt.Sprintf(" | SN: %s", serial)
+    // Строим основную строку с моделью и серийником
+    var diskInfo string
+    diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
+    
+    // Добавляем модель и серийный номер, если они известны
+    if d.Model != "Unknown" && d.Model != "" {
+        diskInfo += fmt.Sprintf(" - %s", d.Model)
+        if d.Serial != "Unknown" && d.Serial != "" {
+            // Сокращаем длинный серийный номер для компактности
+            serial := d.Serial
+            if len(serial) > 8 {
+                serial = serial[:8] + "..."
             }
+            diskInfo += fmt.Sprintf(" [%s]", serial)
         }
+    }
+    
+    row = t.printSimple(row, diskInfo, 
+        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+    
+    if detailed {
+        // Детальный режим - отображаем дополнительную информацию
         
-        if modelInfo != "" {
-            row = t.printSimple(row, modelInfo, 
-                tcell.StyleDefault.Foreground(tcell.ColorGray))
-        }
+        // Модель и серийный номер (если есть) - уже выведены в основной строке
         
         // Тип и точка монтирования
         typeInfo := fmt.Sprintf("Type: %s", devType)
@@ -486,28 +506,6 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
             row = t.printSimple(row, fmt.Sprintf("SMART: %s", d.SMARTStatus), 
                 tcell.StyleDefault.Foreground(smartColor))
         }
-    } else {
-        // Обычный режим - компактная информация с моделью и серийным номером
-        var diskInfo string
-        
-        // Базовая информация
-        diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
-        
-        // Добавляем модель, если есть
-        if d.Model != "Unknown" && d.Model != "" {
-            diskInfo += fmt.Sprintf(" - %s", d.Model)
-            // Добавляем сокращенный серийный номер, если есть
-            if d.Serial != "Unknown" && d.Serial != "" {
-                serial := d.Serial
-                if len(serial) > 8 {
-                    serial = serial[:8] + "..."
-                }
-                diskInfo += fmt.Sprintf(" [%s]", serial)
-            }
-        }
-        
-        row = t.printSimple(row, diskInfo, 
-            tcell.StyleDefault.Foreground(tcell.ColorAqua))
     }
     
     // Гистограмма использования
@@ -524,7 +522,6 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     
     return row
 }
-
 func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
     row := startRow
     

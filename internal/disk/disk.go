@@ -136,48 +136,55 @@ func filterRemovedDisks(current, previous []DiskInfo) []DiskInfo {
 }
 
 // stableSortDisks стабильно сортирует диски для отображения без скачков
+// stableSortDisks стабильно сортирует диски для отображения без скачков
 func stableSortDisks(disks []DiskInfo) []DiskInfo {
-    // Создаем мапу для группировки по физическим устройствам
-    deviceMap := make(map[string][]DiskInfo)
-    var deviceOrder []string
+    // Вместо map[string][]DiskInfo используем упорядоченную структуру
+    type deviceGroup struct {
+        baseDevice string
+        disks      []DiskInfo
+    }
+    
+    var groups []deviceGroup
+    deviceMap := make(map[string]int)
     
     for _, disk := range disks {
-        // Определяем базовое устройство
         baseDevice := getBaseDevice(strings.TrimPrefix(disk.Filesystem, "/dev/"))
         if baseDevice == "" {
             baseDevice = "unknown"
         }
         
-        // Группируем по физическим устройствам
-        if _, exists := deviceMap[baseDevice]; !exists {
-            deviceOrder = append(deviceOrder, baseDevice)
+        idx, exists := deviceMap[baseDevice]
+        if !exists {
+            idx = len(groups)
+            deviceMap[baseDevice] = idx
+            groups = append(groups, deviceGroup{
+                baseDevice: baseDevice,
+                disks:      []DiskInfo{},
+            })
         }
-        deviceMap[baseDevice] = append(deviceMap[baseDevice], disk)
+        groups[idx].disks = append(groups[idx].disks, disk)
     }
     
-    // Сортируем ключи устройств для стабильного порядка
-    sort.Strings(deviceOrder)
+    // Стабильная сортировка групп по имени базового устройства
+    sort.SliceStable(groups, func(i, j int) bool {
+        return groups[i].baseDevice < groups[j].baseDevice
+    })
     
     var sortedDisks []DiskInfo
-    
-    // Собираем диски в стабильном порядке
-    for _, device := range deviceOrder {
-        deviceDisks := deviceMap[device]
-        
-        // Сортируем разделы внутри устройства
-        sort.SliceStable(deviceDisks, func(i, j int) bool {
-            // Сначала системные разделы
-            if deviceDisks[i].MountedOn == "/" && deviceDisks[j].MountedOn != "/" {
+    for _, group := range groups {
+        // Стабильная сортировка дисков внутри группы
+        sort.SliceStable(group.disks, func(i, j int) bool {
+            // Сначала корневой раздел
+            if group.disks[i].MountedOn == "/" && group.disks[j].MountedOn != "/" {
                 return true
             }
-            if deviceDisks[i].MountedOn != "/" && deviceDisks[j].MountedOn == "/" {
+            if group.disks[i].MountedOn != "/" && group.disks[j].MountedOn == "/" {
                 return false
             }
-            // Затем по алфавиту
-            return deviceDisks[i].MountedOn < deviceDisks[j].MountedOn
+            // Затем по алфавиту точек монтирования
+            return group.disks[i].MountedOn < group.disks[j].MountedOn
         })
-        
-        sortedDisks = append(sortedDisks, deviceDisks...)
+        sortedDisks = append(sortedDisks, group.disks...)
     }
     
     return sortedDisks
