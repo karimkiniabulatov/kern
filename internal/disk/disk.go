@@ -18,17 +18,18 @@ var (
 )
 
 type DiskInfo struct {
-	Filesystem string
-	Size       string
-	Used       string
-	Available  string
-	UsePercent float64
-	MountedOn  string
-	Physical   bool   // true = физический, false = логический
-	DiskType   string // "SSD", "HDD", "NVMe", "RAID", "Network", "Unknown"
-	Model      string // Модель диска
-	Serial     string // Серийный номер
-	SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
+    Filesystem string
+    Size       string
+    Used       string
+    Available  string
+    UsePercent float64
+    MountedOn  string
+    Physical   bool   // true = физический, false = логический
+    DiskType   string // "SSD", "HDD", "NVMe", "RAID", "Network", "Unknown"
+    Model      string // Модель диска
+    Serial     string // Серийный номер
+    Vendor     string // Производитель (вендор)
+    SMARTStatus string // SMART-статус: "PASSED", "FAILED", "UNKNOWN", "Unavailable"
 }
 
 // GroupDisksByPhysicalDevice группирует диски по физическим устройствам (экспортируемая версия)
@@ -504,56 +505,55 @@ func filterPrimaryDisks(disks []DiskInfo) []DiskInfo {
 
 // isPrimaryDisk определяет, является ли диск основным
 func isPrimaryDisk(disk DiskInfo) bool {
-	// Критерии для разных ОС
-	switch runtime.GOOS {
-	case "linux":
-		// Основные точки монтирования
-		primaryMounts := []string{"/", "/home", "/boot", "/var", "/usr"}
-		for _, mount := range primaryMounts {
-			if disk.MountedOn == mount {
-				return true
-			}
-		}
-		// Исключаем временные файловые системы
-		if strings.HasPrefix(disk.Filesystem, "tmpfs") || 
-		   strings.HasPrefix(disk.Filesystem, "devtmpfs") ||
-		   strings.Contains(disk.MountedOn, "/mnt/") ||
-		   strings.Contains(disk.MountedOn, "/media/") {
-			return false
-		}
-		// Физические диски считаем основными
-		return disk.Physical
-		
-	case "windows":
-		// Основные системные диски
-		if disk.MountedOn == "C:" || disk.MountedOn == "D:" {
-			return true
-		}
-		// Исключаем сетевые и съемные диски
-		if disk.DiskType == "Network" || strings.HasPrefix(disk.Filesystem, "\\\\") {
-			return false
-		}
-		// Физические диски
-		return disk.Physical
-		
-	case "darwin":
-		// Основные точки монтирования macOS
-		primaryMounts := []string{"/", "/System", "/Users", "/Volumes/Macintosh HD"}
-		for _, mount := range primaryMounts {
-			if disk.MountedOn == mount {
-				return true
-			}
-		}
-		// Исключаем временные и сетевые
-		if strings.Contains(disk.MountedOn, "/Volumes/") && !disk.Physical {
-			return false
-		}
-		return disk.Physical
-		
-	default:
-		// По умолчанию возвращаем физические диски
-		return disk.Physical
-	}
+    // Критерии для разных ОС
+    switch runtime.GOOS {
+    case "linux":
+        // Основные точки монтирования
+        primaryMounts := []string{"/", "/home", "/boot", "/var", "/usr"}
+        for _, mount := range primaryMounts {
+            if disk.MountedOn == mount {
+                return true
+            }
+        }
+        // Исключаем временные файловые системы, НО включаем флешки в /media/ и /mnt/
+        if strings.HasPrefix(disk.Filesystem, "tmpfs") || 
+           strings.HasPrefix(disk.Filesystem, "devtmpfs") ||
+           strings.HasPrefix(disk.Filesystem, "overlay") {
+            return false
+        }
+        // Физические диски считаем основными (включая флешки)
+        return disk.Physical
+        
+    case "windows":
+        // Основные системные диски
+        if disk.MountedOn == "C:" || disk.MountedOn == "D:" {
+            return true
+        }
+        // Исключаем сетевые диски, НО включаем съемные
+        if disk.DiskType == "Network" || strings.HasPrefix(disk.Filesystem, "\\\\") {
+            return false
+        }
+        // Физические диски и съемные
+        return disk.Physical
+        
+    case "darwin":
+        // Основные точки монтирования macOS
+        primaryMounts := []string{"/", "/System", "/Users", "/Volumes/Macintosh HD"}
+        for _, mount := range primaryMounts {
+            if disk.MountedOn == mount {
+                return true
+            }
+        }
+        // Исключаем временные и сетевые
+        if strings.Contains(disk.MountedOn, "/Volumes/") && !disk.Physical {
+            return false
+        }
+        return disk.Physical
+        
+    default:
+        // По умолчанию возвращаем физические диски
+        return disk.Physical
+    }
 }
 
 func getFallbackDiskInfo() []DiskInfo {
@@ -689,12 +689,13 @@ func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
 }
 
 // detectDiskProperties определяет свойства диска для Linux/Unix систем
-func detectDiskProperties(filesystem string) (bool, string, string, string, string) {
+func detectDiskProperties(filesystem string) (bool, string, string, string, string, string) {
     physical := true
     diskType := "Unknown"
     model := "Unknown"
     serial := "Unknown"
     smartStatus := "UNKNOWN"
+    vendor := "Unknown"
 
     // Улучшенное определение RAID
     if strings.HasPrefix(filesystem, "/dev/md") {
@@ -712,7 +713,7 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
     // Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
     device := strings.TrimPrefix(filesystem, "/dev/")
     if device == "" {
-        return physical, diskType, model, serial, smartStatus
+        return physical, diskType, model, serial, smartStatus, vendor
     }
 
     // Получаем базовое устройство (без номера раздела)
@@ -743,6 +744,8 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
 
     // Пытаемся получить дополнительную информацию через lsblk и smartctl (для Linux)
     if runtime.GOOS != "windows" && diskType != "Network" && diskType != "Temporary" && physical {
+        devicePath := filepath.Join("/sys/block", baseDevice)
+        
         // Уточняем тип диска через rotational флаг
         rotationalPath := fmt.Sprintf("/sys/block/%s/queue/rotational", baseDevice)
         if data, err := os.ReadFile(rotationalPath); err == nil {
@@ -766,6 +769,14 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
             }
         }
 
+        // Получаем модель из sys (резервный метод)
+        if model == "" || model == "Unknown" {
+            modelPath := filepath.Join(devicePath, "device", "model")
+            if data, err := os.ReadFile(modelPath); err == nil {
+                model = strings.TrimSpace(string(data))
+            }
+        }
+
         // Получаем SMART-статус
         smartStatus = getSMARTStatus(baseDevice)
 
@@ -775,7 +786,12 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
         }
     }
 
-    return physical, diskType, model, serial, smartStatus
+    // Получаем вендора по модели
+    if model != "" && model != "Unknown" {
+        vendor = getDiskVendor(model)
+    }
+
+    return physical, diskType, model, serial, smartStatus, vendor
 }
 
 // getRaidDetails получает детальную информацию о RAID массиве
@@ -1004,29 +1020,85 @@ func formatBytes(bytes uint64) string {
 }
 
 func shouldSkipFilesystem(filesystem, mountPoint string) bool {
-	// Пропускаем временные файловые системы
-	if strings.HasPrefix(filesystem, "tmpfs") ||
-		strings.HasPrefix(filesystem, "devtmpfs") ||
-		strings.HasPrefix(filesystem, "overlay") ||
-		strings.HasPrefix(filesystem, "shm") ||
-		strings.HasPrefix(filesystem, "udev") {
-		return true
-	}
+    // Пропускаем временные файловые системы
+    if strings.HasPrefix(filesystem, "tmpfs") ||
+        strings.HasPrefix(filesystem, "devtmpfs") ||
+        strings.HasPrefix(filesystem, "overlay") ||
+        strings.HasPrefix(filesystem, "shm") ||
+        strings.HasPrefix(filesystem, "udev") {
+        return true
+    }
 
-	// Пропускаем специальные точки монтирования
-	if mountPoint == "/dev" ||
-		mountPoint == "/sys" ||
-		mountPoint == "/proc" ||
-		mountPoint == "/sys/fs/cgroup" ||
-		strings.HasPrefix(mountPoint, "/var/lib/docker") ||
-		strings.HasPrefix(mountPoint, "/snap") {
-		return true
-	}
+    // Пропускаем специальные точки монтирования, но НЕ пропускаем /media/ и /mnt/ для флешек
+    if mountPoint == "/dev" ||
+        mountPoint == "/sys" ||
+        mountPoint == "/proc" ||
+        mountPoint == "/sys/fs/cgroup" ||
+        strings.HasPrefix(mountPoint, "/var/lib/docker") ||
+        strings.HasPrefix(mountPoint, "/snap") {
+        return true
+    }
 
-	// Пропускаем loop устройства
-	if strings.HasPrefix(filesystem, "/dev/loop") {
-		return true
-	}
+    // Пропускаем loop устройства
+    if strings.HasPrefix(filesystem, "/dev/loop") {
+        return true
+    }
 
-	return false
+    return false
+}
+
+// getDiskVendor определяет вендора по модели диска
+func getDiskVendor(model string) string {
+    if model == "" || model == "Unknown" {
+        return "Unknown"
+    }
+    
+    modelLower := strings.ToLower(model)
+    
+    // Определяем вендора по ключевым словам в модели
+    vendors := map[string][]string{
+        "Seagate": {"seagate", "st", "barracuda", "ironwolf", "skyhawk"},
+        "Western Digital": {"western digital", "wd", "wd ", "my passport", "elements"},
+        "Toshiba": {"toshiba", "mq", "dt", "canvio"},
+        "Hitachi": {"hitachi", "hgst", "ultrastar"},
+        "Samsung": {"samsung", "ssd", "evo", "pro", "qvo"},
+        "Crucial": {"crucial", "mx", "bx", "p"},
+        "Kingston": {"kingston", "kc", "a400", "suv"},
+        "SanDisk": {"sandisk", "ultra", "extreme", "plus"},
+        "Intel": {"intel", "ssd", "optane", "dc"},
+        "Micron": {"micron", "mt", "p", "m600"},
+        "ADATA": {"adata", "sx", "su", "xpg"},
+        "KingSpec": {"kingspec"},
+        "Transcend": {"transcend"},
+        "PNY": {"pny"},
+        "Gigabyte": {"gigabyte", "aorus"},
+        "ASUS": {"asus", "rog"},
+        "MSI": {"msi"},
+        "Corsair": {"corsair", "force", "mp"},
+        "Team Group": {"team group", "team"},
+        "Patriot": {"patriot", "burst", "p210"},
+        "Lexar": {"lexar", "ns"},
+        "Apacer": {"apacer"},
+        "Silicon Power": {"silicon power", "sp"},
+        "GoodRAM": {"goodram"},
+        "Netac": {"netac"},
+        "Colorful": {"colorful"},
+        "Galax": {"galax"},
+        "Hikvision": {"hikvision"},
+        "Dell": {"dell", "poweredge"},
+        "HP": {"hp ", "hewlett packard"},
+        "IBM": {"ibm", "lenovo"},
+        "Fujitsu": {"fujitsu"},
+        "Maxtor": {"maxtor"},
+    }
+    
+    for vendor, keywords := range vendors {
+        for _, keyword := range keywords {
+            if strings.Contains(modelLower, keyword) {
+                return vendor
+            }
+        }
+    }
+    
+    return "Unknown"
 }

@@ -458,36 +458,38 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // Определяем тип устройства для отображения
     devType := t.getDeviceType(d.Filesystem, d.MountedOn, d.DiskType)
     
-    // ОСНОВНАЯ ИНФОРМАЦИЯ С МОДЕЛЬЮ И СЕРИЙНЫМ НОМЕРОМ ДЛЯ ВСЕХ РЕЖИМОВ
+    // Основная строка: файловая система и точка монтирования
     mountPoint := d.MountedOn
     if mountPoint == "/" {
         mountPoint = "ROOT"
     }
     
-    // Строим основную строку с моделью и серийником
-    var diskInfo string
-    diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
+    diskInfo := fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
+    row = t.printSimple(row, diskInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua))
     
-    // Добавляем модель и серийный номер, если они известны
+    // ВЫНЕСЕНО ОТДЕЛЬНО: Модель диска (отдельная строка)
     if d.Model != "Unknown" && d.Model != "" {
-        diskInfo += fmt.Sprintf(" - %s", d.Model)
-        if d.Serial != "Unknown" && d.Serial != "" {
-            // Сокращаем длинный серийный номер для компактности
-            serial := d.Serial
-            if len(serial) > 8 {
-                serial = serial[:8] + "..."
-            }
-            diskInfo += fmt.Sprintf(" [%s]", serial)
-        }
+        modelLine := fmt.Sprintf("Model: %s", d.Model)
+        row = t.printSimple(row, modelLine, tcell.StyleDefault.Foreground(tcell.ColorYellow))
     }
     
-    row = t.printSimple(row, diskInfo, 
-        tcell.StyleDefault.Foreground(tcell.ColorAqua))
+    // ВЫНЕСЕНО ОТДЕЛЬНО: Серийный номер и вендор
+    serialVendorLine := ""
+    if d.Serial != "Unknown" && d.Serial != "" {
+        serialVendorLine = fmt.Sprintf("Serial: %s", d.Serial)
+        if d.Vendor != "Unknown" && d.Vendor != "" {
+            serialVendorLine += fmt.Sprintf(" | Vendor: %s", d.Vendor)
+        }
+    } else if d.Vendor != "Unknown" && d.Vendor != "" {
+        serialVendorLine = fmt.Sprintf("Vendor: %s", d.Vendor)
+    }
+    
+    if serialVendorLine != "" {
+        row = t.printSimple(row, serialVendorLine, tcell.StyleDefault.Foreground(tcell.ColorGray))
+    }
     
     if detailed {
         // Детальный режим - отображаем дополнительную информацию
-        
-        // Модель и серийный номер (если есть) - уже выведены в основной строке
         
         // Тип и точка монтирования
         typeInfo := fmt.Sprintf("Type: %s", devType)
@@ -522,6 +524,7 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     
     return row
 }
+
 func (t *TUI) renderNetwork(startRow int, data interface{}, detailed bool) int {
     row := startRow
     

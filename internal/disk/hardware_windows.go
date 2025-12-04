@@ -18,6 +18,7 @@ type WindowsPhysicalDisk struct {
     Size          uint64 `json:"Size"`
     FriendlyName  string `json:"FriendlyName"`
     SerialNumber  string `json:"SerialNumber"`
+	Manufacturer  string `json:"Manufacturer"` 
     OperationalStatus string `json:"OperationalStatus"`
     HealthStatus  string `json:"HealthStatus"`
 }
@@ -66,7 +67,7 @@ func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
 
     // Команда PowerShell для получения информации о физических дисках
     cmd := exec.Command("powershell", "-Command", 
-        "Get-PhysicalDisk | Select-Object DeviceId, MediaType, BusType, Size, FriendlyName, SerialNumber, OperationalStatus, HealthStatus | ConvertTo-Json")
+        "Get-PhysicalDisk | Select-Object DeviceId, MediaType, BusType, Size, FriendlyName, SerialNumber, OperationalStatus, HealthStatus, Manufacturer | ConvertTo-Json")
 
     output, err := cmd.Output()
     if err != nil {
@@ -96,6 +97,7 @@ func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
             DiskType:    convertMediaType(pd.MediaType),
             Model:       pd.FriendlyName,
             Serial:      pd.SerialNumber,
+            Vendor:      pd.Manufacturer, // Добавляем вендора
             SMARTStatus: convertHealthStatus(pd.HealthStatus),
         }
 
