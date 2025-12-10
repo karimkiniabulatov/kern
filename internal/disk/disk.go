@@ -682,7 +682,7 @@ func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
 				Model:      model,
 				Serial:     serial,
 				SMARTStatus: smartStatus,
-				Vendor:     vendor
+				Vendor:     vendor,
 			}
 			disks = append(disks, disk)
 		}
