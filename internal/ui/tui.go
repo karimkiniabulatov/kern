@@ -378,13 +378,21 @@ func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
     row := startRow
 
     if disks, ok := data.([]disk.DiskInfo); ok {
-        // Фильтруем диски по файловым системам
+        // Динамическое обновление заголовка
+        deviceCount := 0
+        mountedCount := 0
+        
+        // Сначала фильтруем диски
         var filteredDisks []disk.DiskInfo
         for _, d := range disks {
-            if !strings.HasPrefix(d.Filesystem, "/dev/") && !strings.Contains(d.Filesystem, "//") {
+            if !strings.HasPrefix(d.Filesystem, "/dev/") && !strings.HasPrefix(d.Filesystem, "//") {
                 continue
             }
             filteredDisks = append(filteredDisks, d)
+            deviceCount++
+            if d.MountedOn != "(unmounted)" && !strings.Contains(d.MountedOn, "unmounted") && d.MountedOn != "" {
+                mountedCount++
+            }
         }
         
         // Если нет отфильтрованных дисков, показываем все
@@ -393,21 +401,8 @@ func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
         }
         
         // Формируем заголовок
-        deviceCount := len(filteredDisks)
-        mountedCount := 0
-        for _, d := range filteredDisks {
-            if d.MountedOn != "(unmounted)" && !strings.Contains(d.MountedOn, "unmounted") && d.MountedOn != "" {
-                mountedCount++
-            }
-        }
-        
-        // Формируем заголовок с учетом режима
-        title := t.config.T("disk.title")
-        if detailed {
-            title = fmt.Sprintf("%s (%d storage devices)", title, deviceCount)
-        } else {
-            title = fmt.Sprintf("%s (%d mounted)", title, mountedCount)
-        }
+        title := fmt.Sprintf("%s (%d devices, %d mounted)", 
+            t.config.T("disk.title"), deviceCount, mountedCount)
         
         // Обновляем заголовок
         row = t.renderHeader(startRow, title)
@@ -449,21 +444,21 @@ func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
                     }
                 }
                 
+                // Рендерим каждый диск в группе
                 for i, d := range groupDisks {
                     row = t.renderSingleDisk(row, d, detailed)
-                    // Добавляем отступ между дисками в группе, кроме последнего
+                    // Добавляем пустую строку между дисками в группе, кроме последнего
                     if i < len(groupDisks)-1 {
                         row++
                     }
                 }
                 
-                // Добавляем отступ между группами
-                if !strings.HasPrefix(key, "PHYSICAL:") {
-                    row++
-                }
+                // Добавляем пустую строку между группами
+                row++
             }
         } else {
-            // Обычный режим: показываем только смонтированные диски
+            // Обычный режим: показываем диски без группировки
+            // Но фильтруем только смонтированные диски
             var mountedDisks []disk.DiskInfo
             for _, d := range filteredDisks {
                 if d.MountedOn != "(unmounted)" && !strings.Contains(d.MountedOn, "unmounted") && d.MountedOn != "" {
@@ -471,28 +466,33 @@ func (t *TUI) renderDisk(startRow int, data interface{}, detailed bool) int {
                 }
             }
             
-            // Если нет смонтированных, показываем все
+            // Если нет смонтированных дисков, показываем все
             if len(mountedDisks) == 0 {
                 mountedDisks = filteredDisks
             }
             
             for i, d := range mountedDisks {
                 row = t.renderSingleDisk(row, d, detailed)
-                // Добавляем отступ между дисками, кроме последнего
+                // Добавляем пустую строку между дисками, кроме последнего
                 if i < len(mountedDisks)-1 {
                     row++
                 }
             }
         }
+        
+        return row + 1
     } else {
-        // Если данные не в ожидаемом формате
+        // Fallback если данные не соответствуют ожидаемому формату
         row = t.renderHeader(startRow, t.config.T("disk.title"))
         row = t.printSimple(row, "No disk data available", tcell.StyleDefault.Foreground(tcell.ColorGray))
+        return row + 1
     }
-    return row + 1
 }
 
 func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
+    // Определяем, является ли устройство несмонтированным
+    isUnmounted := d.MountedOn == "(unmounted)" || strings.Contains(d.MountedOn, "unmounted") || d.MountedOn == ""
+    
     // Определяем цвет для использования
     usageColor := tcell.ColorLightCoral
     if d.UsePercent < 70 {
@@ -512,7 +512,7 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     
     // Формируем базовую информацию
     var diskInfo string
-    if d.MountedOn != "(unmounted)" && d.MountedOn != "" && !strings.Contains(d.MountedOn, "unmounted") {
+    if !isUnmounted {
         diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
     } else {
         // Для несмонтированных устройств
@@ -554,46 +554,38 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
             row = t.printSimple(row, fmt.Sprintf("SMART: %s", d.SMARTStatus), 
                 tcell.StyleDefault.Foreground(smartColor))
         }
-        
-        // Для несмонтированных устройств показываем только размер
-        if d.MountedOn == "(unmounted)" || strings.Contains(d.MountedOn, "unmounted") || d.MountedOn == "" {
-            if d.Size != "0 B" && d.Size != "" && d.Size != "Unknown" {
-                row = t.printSimple(row, fmt.Sprintf("Size: %s", d.Size), 
-                    tcell.StyleDefault.Foreground(tcell.ColorAqua))
-            }
-            return row
-        }
     }
     
-    // ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ
-    // Проверяем, есть ли данные об использовании
-    if d.UsePercent > 0 || (d.Used != "0 B" && d.Used != "" && d.Size != "0 B" && d.Size != "") {
+    // ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ - ПОКАЗЫВАЕМ ДЛЯ ВСЕХ УСТРОЙСТВ
+    // Проверяем, есть ли данные о размере
+    if d.Size != "" && d.Size != "0 B" && d.Size != "Unknown" {
+        // Для несмонтированных устройств UsePercent = 0, но мы все равно показываем гистограмму
         diskGraph := t.createSolidGraph(d.UsePercent)
         
         // Формируем текст использования
         var usageText string
-        if d.Used != "" && d.Size != "" && d.Used != "0 B" && d.Size != "0 B" {
+        if !isUnmounted && d.Used != "" && d.Used != "0 B" {
+            // Для смонтированных устройств с данными об использовании
             usageText = fmt.Sprintf("Usage: %s / %s %.1f%%", 
                 d.Used, d.Size, d.UsePercent)
+        } else if !isUnmounted {
+            // Для смонтированных устройств без данных об использовании
+            usageText = fmt.Sprintf("Size: %s (usage data not available)", d.Size)
         } else {
-            usageText = fmt.Sprintf("Usage: %.1f%%", d.UsePercent)
+            // Для несмонтированных устройств
+            usageText = fmt.Sprintf("Size: %s (unmounted)", d.Size)
         }
         
         row = t.printSimple(row, usageText, 
             tcell.StyleDefault.Foreground(usageColor))
         
-        // Гистограмма на отдельной строке
-        row = t.printSimple(row, fmt.Sprintf("  %s", diskGraph), 
+        // Гистограмма на отдельной строке - ВСЕГДА показываем, даже если 0%
+        row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
             tcell.StyleDefault.Foreground(usageColor))
     } else {
-        // Для дисков без данных об использовании
-        if d.Size != "0 B" && d.Size != "" && d.Size != "Unknown" {
-            row = t.printSimple(row, fmt.Sprintf("Size: %s (usage data not available)", d.Size), 
-                tcell.StyleDefault.Foreground(tcell.ColorGray))
-        } else {
-            row = t.printSimple(row, "Usage data not available", 
-                tcell.StyleDefault.Foreground(tcell.ColorGray))
-        }
+        // Для устройств без данных о размере
+        row = t.printSimple(row, "Size information not available", 
+            tcell.StyleDefault.Foreground(tcell.ColorGray))
     }
     
     return row
