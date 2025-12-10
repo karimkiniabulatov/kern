@@ -562,7 +562,7 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // Определяем вендор (используем поле Vendor или вычисляем из модели)
     vendor := d.Vendor
     if vendor == "" || vendor == "Unknown" {
-        vendor = getDiskVendor(d.Model)
+        vendor = d.Vendor
     }
     
     if cleanSerial != "" {
@@ -1010,84 +1010,85 @@ func (t *TUI) renderGPU(startRow int, data interface{}) int {
 }
 
 // Helper function to render single GPU info (for legacy format)
+// Helper function to render single GPU info (for legacy format)
 func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
-	row := startRow
-	
-	row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-	
-	if gpuInfo.DriverVersion != "" && gpuInfo.DriverVersion != "Unknown" {
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-	}
-	
-	// Температура - всегда показывать
-	tempPercent := gpuInfo.GPUTemp
-	if tempPercent > 100 {
-		tempPercent = 100
-	}
-	tempGraph := t.createSolidGraph(tempPercent)
-	row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C", 
-		t.config.T("gpu.temperature"), gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed))
-	// Гистограмма на отдельной строке
-	row = t.printSimple(row, fmt.Sprintf("  %s", tempGraph), 
-		tcell.StyleDefault.Foreground(tcell.ColorRed))
+    row := startRow
+    
+    row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.model"), gpuInfo.Model), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+    
+    if gpuInfo.DriverVersion != "" && gpuInfo.DriverVersion != "Unknown" {
+        row = t.printSimple(row, fmt.Sprintf("%s: %s", t.config.T("gpu.driver"), gpuInfo.DriverVersion), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+    }
+    
+    // Температура - всегда показывать
+    tempPercent := gpuInfo.GPUTemp
+    if tempPercent > 100 {
+        tempPercent = 100
+    }
+    tempGraph := t.createSolidGraph(tempPercent)
+    row = t.printSimple(row, fmt.Sprintf("%s: %.1f°C", 
+        t.config.T("gpu.temperature"), gpuInfo.GPUTemp), tcell.StyleDefault.Foreground(tcell.ColorRed))
+    // Гистограмма на отдельной строке
+    row = t.printSimple(row, fmt.Sprintf("  %s", tempGraph), 
+        tcell.StyleDefault.Foreground(tcell.ColorRed))
 
-	// Утилизация - всегда показывать
-	utilGraph := t.createSolidGraph(gpuInfo.Utilization)
-	row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
-		t.config.T("gpu.utilization"), gpuInfo.Utilization), 
-		tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
-	row = t.printSimple(row, fmt.Sprintf("  %s", utilGraph), 
-		tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+    // Утилизация - всегда показывать
+    utilGraph := t.createSolidGraph(gpuInfo.Utilization)
+    row = t.printSimple(row, fmt.Sprintf("%s: %.1f%%", 
+        t.config.T("gpu.utilization"), gpuInfo.Utilization), 
+        tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
+    row = t.printSimple(row, fmt.Sprintf("  %s", utilGraph), 
+        tcell.StyleDefault.Foreground(tcell.ColorLightCoral))
 
-	// Память - всегда показывать, даже если 0
-	if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" {
-		memUsedMB := extractMemoryMB(gpuInfo.MemoryUsed)
-		memTotalMB := extractMemoryMB(gpuInfo.MemoryTotal)
-		if memTotalMB > 0 {
-			memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
-			// Основная строка с данными памяти
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%)", 
-				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
-				memUsagePercent), 
-				tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			// Гистограмма на отдельной строке
-			memGraph := t.createSolidGraph(memUsagePercent)
-			row = t.printSimple(row, fmt.Sprintf("  %s", memGraph), 
-				tcell.StyleDefault.Foreground(tcell.ColorAqua))
-		} else {
-			row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
-				t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
-				tcell.StyleDefault.Foreground(tcell.ColorAqua))
-			// Показываем гистограмму 0% если не удалось рассчитать
-			row = t.printSimple(row, "  0.0% ░░░░░░░░░░░░░░░░░░░░", 
-				tcell.StyleDefault.Foreground(tcell.ColorGray))
-		}
-	} else {
-		// Если память не получена, показываем N/A
-		row = t.printSimple(row, fmt.Sprintf("%s: N/A / N/A", 
-			t.config.T("gpu.memory")), 
-			tcell.StyleDefault.Foreground(tcell.ColorGray))
-		row = t.printSimple(row, "  0.0% ░░░░░░░░░░░░░░░░░░░░", 
-			tcell.StyleDefault.Foreground(tcell.ColorGray))
-	}
-	
-	if gpuInfo.PowerDraw != "" && gpuInfo.PowerDraw != "0 W" {
-		row = t.printSimple(row, fmt.Sprintf("%s: %s", 
-			t.config.T("gpu.power"), gpuInfo.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
-	}
-		
-	if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
-		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
-			t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
-			tconfig.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
-	}
-	
-	return row
+    // Память - всегда показывать, даже если 0
+    if gpuInfo.MemoryUsed != "" && gpuInfo.MemoryTotal != "" {
+        memUsedMB := extractMemoryMB(gpuInfo.MemoryUsed)
+        memTotalMB := extractMemoryMB(gpuInfo.MemoryTotal)
+        if memTotalMB > 0 {
+            memUsagePercent := float64(memUsedMB) / float64(memTotalMB) * 100
+            // Основная строка с данными памяти
+            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s (%.1f%%)", 
+                t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal, 
+                memUsagePercent), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            // Гистограмма на отдельной строке
+            memGraph := t.createSolidGraph(memUsagePercent)
+            row = t.printSimple(row, fmt.Sprintf("  %s", memGraph), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua))
+        } else {
+            row = t.printSimple(row, fmt.Sprintf("%s: %s / %s", 
+                t.config.T("gpu.memory"), gpuInfo.MemoryUsed, gpuInfo.MemoryTotal), 
+                tcell.StyleDefault.Foreground(tcell.ColorAqua))
+            // Показываем гистограмму 0% если не удалось рассчитать
+            row = t.printSimple(row, "  0.0% ░░░░░░░░░░░░░░░░░░░░", 
+                tcell.StyleDefault.Foreground(tcell.ColorGray))
+        }
+    } else {
+        // Если память не получена, показываем N/A
+        row = t.printSimple(row, fmt.Sprintf("%s: N/A / N/A", 
+            t.config.T("gpu.memory")), 
+            tcell.StyleDefault.Foreground(tcell.ColorGray))
+        row = t.printSimple(row, "  0.0% ░░░░░░░░░░░░░░░░░░░░", 
+            tcell.StyleDefault.Foreground(tcell.ColorGray))
+    }
+    
+    if gpuInfo.PowerDraw != "" && gpuInfo.PowerDraw != "0 W" {
+        row = t.printSimple(row, fmt.Sprintf("%s: %s", 
+            t.config.T("gpu.power"), gpuInfo.PowerDraw), tcell.StyleDefault.Foreground(tcell.ColorYellow))
+    }
+        
+    if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
+        row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
+            t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
+            t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+    }
+    
+    return row
 }
 
 // AI training rendering function
 func (t *TUI) renderAI(startRow int, data interface{}) int {
-    row = t.renderHeader(startRow, t.config.T("ai.title"))
+    row := t.renderHeader(startRow, t.config.T("ai.title"))
 
     switch aiData := data.(type) {
     case *ai.AIInfo:
