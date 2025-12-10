@@ -389,97 +389,107 @@ func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
 }
 
 // Новая функция для объединения информации из DF и аппаратных устройств
+// Новая функция для объединения информации из DF и аппаратных устройств
 func mergeDiskInfo(dfDisks, hardwareDisks []DiskInfo) []DiskInfo {
-	var mergedDisks []DiskInfo
-	
-	// Создаем карту аппаратных устройств для быстрого поиска
-	hardwareMap := make(map[string]DiskInfo)
-	for _, hw := range hardwareDisks {
-		// Используем файловую систему или модель как ключ
-		key := hw.Filesystem
-		if key == "" {
-			key = hw.Model
-		}
-		if key != "" && hw.Physical {
-			hardwareMap[key] = hw
-		}
-	}
-	
-	// Объединяем информацию из DF с аппаратными данными
-	for _, dfDisk := range dfDisks {
-		mergedDisk := dfDisk
-		
-		// Ищем соответствующее аппаратное устройство
-		var hwKey string
-		
-		if strings.HasPrefix(dfDisk.Filesystem, "/dev/") {
-			// Для Linux: извлекаем базовое устройство (sda1 -> sda)
-			baseDevice := getBaseDevice(strings.TrimPrefix(dfDisk.Filesystem, "/dev/"))
-			if baseDevice != "" {
-				hwKey = "/dev/" + baseDevice
-			}
-		} else if runtime.GOOS == "windows" {
-			// Для Windows ищем по модели
-			hwKey = dfDisk.Model
-		} else {
-			// Для macOS используем файловую систему
-			hwKey = dfDisk.Filesystem
-		}
-		
-		if hwDisk, exists := hardwareMap[hwKey]; exists {
-			// Обновляем поля аппаратной информации
-			if mergedDisk.Model == "" || mergedDisk.Model == "Unknown" {
-				if hwDisk.Model != "" && hwDisk.Model != "Unknown" {
-					mergedDisk.Model = hwDisk.Model
-				}
-			}
-			
-			if mergedDisk.Serial == "" || mergedDisk.Serial == "Unknown" {
-				if hwDisk.Serial != "" && hwDisk.Serial != "Unknown" {
-					mergedDisk.Serial = hwDisk.Serial
-				}
-			}
-			
-			if mergedDisk.DiskType == "" || mergedDisk.DiskType == "Unknown" {
-				if hwDisk.DiskType != "" && hwDisk.DiskType != "Unknown" {
-					mergedDisk.DiskType = hwDisk.DiskType
-				}
-			}
-			
-			if mergedDisk.SMARTStatus == "" || mergedDisk.SMARTStatus == "UNKNOWN" {
-				if hwDisk.SMARTStatus != "" && hwDisk.SMARTStatus != "UNKNOWN" {
-					mergedDisk.SMARTStatus = hwDisk.SMARTStatus
-				}
-			}
-			
-			if hwDisk.Physical {
-				mergedDisk.Physical = true
-			}
-			
-			// Удаляем устройство из карты, чтобы не дублировать
-			delete(hardwareMap, hwKey)
-		}
-		
-		mergedDisks = append(mergedDisks, mergedDisk)
-	}
-	
-	// Добавляем оставшиеся аппаратные устройства (несмонтированные)
-	for _, hwDisk := range hardwareMap {
-		// Для несмонтированных устройств создаем минимальную информацию
-		if hwDisk.Filesystem == "" {
-			hwDisk.Filesystem = "(unmounted)"
-		}
-		if hwDisk.MountedOn == "" {
-			hwDisk.MountedOn = "(unmounted)"
-		}
-		if hwDisk.Size == "" || hwDisk.Size == "0 B" {
-			hwDisk.Size = "Unknown"
-		}
-		
-		mergedDisks = append(mergedDisks, hwDisk)
-	}
-	
-	return mergedDisks
+    var mergedDisks []DiskInfo
+    
+    // Создаем карту аппаратных устройств для быстрого поиска
+    hardwareMap := make(map[string]DiskInfo)
+    for _, hw := range hardwareDisks {
+        // Используем файловую систему или модель как ключ
+        key := hw.Filesystem
+        if key == "" || key == "Unknown" {
+            key = hw.Model
+        }
+        if key != "" && key != "Unknown" {
+            hardwareMap[key] = hw
+        }
+    }
+    
+    // Объединяем информацию из DF с аппаратными данными
+    for _, dfDisk := range dfDisks {
+        mergedDisk := dfDisk
+        
+        // Ищем соответствующее аппаратное устройство
+        var hwKey string
+        
+        if strings.HasPrefix(dfDisk.Filesystem, "/dev/") {
+            // Для Linux: извлекаем базовое устройство (sda1 -> sda)
+            baseDevice := getBaseDevice(strings.TrimPrefix(dfDisk.Filesystem, "/dev/"))
+            if baseDevice != "" {
+                hwKey = "/dev/" + baseDevice
+            }
+        } else if runtime.GOOS == "windows" {
+            // Для Windows ищем по модели
+            hwKey = dfDisk.Model
+        } else {
+            // Для macOS используем файловую систему
+            hwKey = dfDisk.Filesystem
+        }
+        
+        if hwDisk, exists := hardwareMap[hwKey]; exists {
+            // Обновляем поля аппаратной информации
+            if mergedDisk.Model == "" || mergedDisk.Model == "Unknown" {
+                if hwDisk.Model != "" && hwDisk.Model != "Unknown" {
+                    mergedDisk.Model = hwDisk.Model
+                }
+            }
+            
+            if mergedDisk.Serial == "" || mergedDisk.Serial == "Unknown" {
+                if hwDisk.Serial != "" && hwDisk.Serial != "Unknown" {
+                    mergedDisk.Serial = hwDisk.Serial
+                }
+            }
+            
+            if mergedDisk.DiskType == "" || mergedDisk.DiskType == "Unknown" {
+                if hwDisk.DiskType != "" && hwDisk.DiskType != "Unknown" {
+                    mergedDisk.DiskType = hwDisk.DiskType
+                }
+            }
+            
+            if mergedDisk.SMARTStatus == "" || mergedDisk.SMARTStatus == "UNKNOWN" {
+                if hwDisk.SMARTStatus != "" && hwDisk.SMARTStatus != "UNKNOWN" {
+                    mergedDisk.SMARTStatus = hwDisk.SMARTStatus
+                }
+            }
+            
+            if hwDisk.Vendor != "" && hwDisk.Vendor != "Unknown" {
+                mergedDisk.Vendor = hwDisk.Vendor
+            }
+            
+            if hwDisk.Physical {
+                mergedDisk.Physical = true
+            }
+            
+            // Удаляем устройство из карты, чтобы не дублировать
+            delete(hardwareMap, hwKey)
+        }
+        
+        mergedDisks = append(mergedDisks, mergedDisk)
+    }
+    
+    // Добавляем оставшиеся аппаратные устройства (несмонтированные)
+    for _, hwDisk := range hardwareMap {
+        // Для несмонтированных устройств создаем минимальную информацию
+        if hwDisk.Filesystem == "" {
+            hwDisk.Filesystem = "(unmounted)"
+        }
+        if hwDisk.MountedOn == "" {
+            hwDisk.MountedOn = "(unmounted)"
+        }
+        if hwDisk.Size == "" || hwDisk.Size == "0 B" {
+            hwDisk.Size = "Unknown"
+        }
+        
+        // Устанавливаем флаг несмонтированного устройства
+        hwDisk.UsePercent = 0.0
+        hwDisk.Used = "0 B"
+        hwDisk.Available = hwDisk.Size
+        
+        mergedDisks = append(mergedDisks, hwDisk)
+    }
+    
+    return mergedDisks
 }
 
 // filterPrimaryDisks возвращает только основные диски
