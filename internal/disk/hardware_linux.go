@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"  // ДОБАВЛЕНО: импорт regexp
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -79,20 +79,16 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
         for _, line := range lines {
             if strings.HasPrefix(line, "ID_MODEL=") {
                 model := strings.TrimPrefix(line, "ID_MODEL=")
-                // Обрезаем пробелы и непечатаемые символы
-                device.Model = strings.TrimSpace(model)
-                // Удаляем множественные пробелы
-                device.Model = regexp.MustCompile(`\s+`).ReplaceAllString(device.Model, " ")
+                device.Model = cleanModelName(model)
             } else if strings.HasPrefix(line, "ID_SERIAL_SHORT=") {
                 serial := strings.TrimPrefix(line, "ID_SERIAL_SHORT=")
-                device.Serial = strings.TrimSpace(serial)
+                device.Serial = cleanModelName(serial)
             } else if strings.HasPrefix(line, "ID_MODEL_ENC=") {
                 // Если модель не найдена, используем закодированную версию
-                if device.Model == "" {
+                if device.Model == "" || device.Model == "Unknown" {
                     encoded := strings.TrimPrefix(line, "ID_MODEL_ENC=")
                     if decoded, err := url.QueryUnescape(encoded); err == nil {
-                        decoded = strings.TrimSpace(decoded)
-                        device.Model = regexp.MustCompile(`\s+`).ReplaceAllString(decoded, " ")
+                        device.Model = cleanModelName(decoded)
                     }
                 }
             }
@@ -108,10 +104,10 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
             for _, line := range lines {
                 if strings.Contains(line, "Model Number:") {
                     model := strings.TrimSpace(strings.TrimPrefix(line, "Model Number:"))
-                    device.Model = regexp.MustCompile(`\s+`).ReplaceAllString(model, " ")
+                    device.Model = cleanModelName(model)
                 } else if strings.Contains(line, "Serial Number:") {
                     serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
-                    device.Serial = regexp.MustCompile(`\s+`).ReplaceAllString(serial, " ")
+                    device.Serial = cleanModelName(serial)
                 }
             }
         }
@@ -133,7 +129,7 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
         modelPath := filepath.Join(devicePath, "device", "model")
         if data, err := os.ReadFile(modelPath); err == nil {
             model := strings.TrimSpace(string(data))
-            device.Model = regexp.MustCompile(`\s+`).ReplaceAllString(model, " ")
+            device.Model = cleanModelName(model)
         }
     }
     
@@ -142,25 +138,20 @@ func parseStorageDeviceLinux(devicePath, deviceName string) *DiskInfo {
         serialPath := filepath.Join(devicePath, "device", "serial")
         if data, err := os.ReadFile(serialPath); err == nil {
             serial := strings.TrimSpace(string(data))
-            device.Serial = regexp.MustCompile(`\s+`).ReplaceAllString(serial, " ")
+            device.Serial = cleanModelName(serial)
         }
     }
     
-    // Получаем vendor (резервный метод)
-    if device.Model != "" && device.Model != "Unknown" {
-        vendorPath := filepath.Join(devicePath, "device", "vendor")
-        if data, err := os.ReadFile(vendorPath); err == nil {
-            vendor := strings.TrimSpace(string(data))
-            vendor = regexp.MustCompile(`\s+`).ReplaceAllString(vendor, " ")
-            if vendor != "" && !strings.Contains(device.Model, vendor) {
-                device.Model = vendor + " " + device.Model
-            }
+    // Получаем vendor из sys (резервный метод)
+    vendorPath := filepath.Join(devicePath, "device", "vendor")
+    if data, err := os.ReadFile(vendorPath); err == nil {
+        vendor := strings.TrimSpace(string(data))
+        if vendor != "" && vendor != "Unknown" {
+            // Очищаем вендор от лишних пробелов
+            vendor = cleanModelName(vendor)
+            device.Vendor = vendor
         }
     }
-    
-    // Очищаем модель от лишних пробелов в начале и конце
-    device.Model = strings.TrimSpace(device.Model)
-    device.Serial = strings.TrimSpace(device.Serial)
     
     // Определяем тип (SSD/HDD)
     rotationalPath := filepath.Join(devicePath, "queue", "rotational")

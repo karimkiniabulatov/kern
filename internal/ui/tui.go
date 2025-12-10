@@ -535,25 +535,49 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     
     // ВЫВОДИМ МОДЕЛЬ ДИСКА (отдельная строка)
     if d.Model != "Unknown" && d.Model != "" {
-        // Обрезаем модель если она слишком длинная
-        modelDisplay := d.Model
+        // Очищаем модель от лишних пробелов
+        cleanModel := strings.TrimSpace(d.Model)
+        cleanModel = regexp.MustCompile(`\s+`).ReplaceAllString(cleanModel, " ")
+        
+        // Обрезаем если слишком длинная
         maxModelLength := t.width - 20 // Оставляем место для других данных
-        if len(modelDisplay) > maxModelLength {
-            modelDisplay = modelDisplay[:maxModelLength] + "..."
+        if len(cleanModel) > maxModelLength {
+            cleanModel = cleanModel[:maxModelLength] + "..."
         }
-        modelLine := fmt.Sprintf("Model: %s", modelDisplay)
+        
+        modelLine := fmt.Sprintf("Model: %s", cleanModel)
         row = t.printSimple(row, modelLine, tcell.StyleDefault.Foreground(tcell.ColorYellow))
     }
     
     // ВЫВОДИМ СЕРИЙНЫЙ НОМЕР И ВЕНДОР (отдельная строка)
     serialVendorLine := ""
+    
+    // Очищаем серийный номер
+    cleanSerial := ""
     if d.Serial != "Unknown" && d.Serial != "" {
-        serialVendorLine = fmt.Sprintf("Serial: %s", d.Serial)
-        if d.Vendor != "Unknown" && d.Vendor != "" {
-            serialVendorLine += fmt.Sprintf(" | Vendor: %s", d.Vendor)
+        cleanSerial = strings.TrimSpace(d.Serial)
+        cleanSerial = regexp.MustCompile(`\s+`).ReplaceAllString(cleanSerial, " ")
+    }
+    
+    // Определяем вендор (используем поле Vendor или вычисляем из модели)
+    vendor := d.Vendor
+    if vendor == "" || vendor == "Unknown" {
+        vendor = getDiskVendor(d.Model)
+    }
+    
+    if cleanSerial != "" {
+        serialVendorLine = fmt.Sprintf("Serial: %s", cleanSerial)
+        if vendor != "" && vendor != "Unknown" {
+            // Обрезаем длинные серийники для отображения
+            if len(cleanSerial) > 15 {
+                shortSerial := cleanSerial[:8] + "..."
+                serialVendorLine = fmt.Sprintf("Serial: %s | Vendor: %s", shortSerial, vendor)
+            } else {
+                serialVendorLine = fmt.Sprintf("Serial: %s | Vendor: %s", cleanSerial, vendor)
+            }
         }
-    } else if d.Vendor != "Unknown" && d.Vendor != "" {
-        serialVendorLine = fmt.Sprintf("Vendor: %s", d.Vendor)
+    } else if vendor != "" && vendor != "Unknown" {
+        serialVendorLine = fmt.Sprintf("Vendor: %s", vendor)
     }
     
     if serialVendorLine != "" {
@@ -1055,7 +1079,7 @@ func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 	if gpuInfo.ClockCore != "" && gpuInfo.ClockCore != "0 MHz" && gpuInfo.ClockMemory != "" && gpuInfo.ClockMemory != "0 MHz" {
 		row = t.printSimple(row, fmt.Sprintf("%s: %s | %s: %s", 
 			t.config.T("gpu.clock_core"), gpuInfo.ClockCore, 
-			t.config.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
+			tconfig.T("gpu.clock_memory"), gpuInfo.ClockMemory), tcell.StyleDefault.Foreground(tcell.ColorAqua))
 	}
 	
 	return row
@@ -1063,7 +1087,7 @@ func (t *TUI) renderSingleGPUInfo(startRow int, gpuInfo *gpu.GPUInfo) int {
 
 // AI training rendering function
 func (t *TUI) renderAI(startRow int, data interface{}) int {
-    row := t.renderHeader(startRow, t.config.T("ai.title"))
+    row = t.renderHeader(startRow, t.config.T("ai.title"))
 
     switch aiData := data.(type) {
     case *ai.AIInfo:

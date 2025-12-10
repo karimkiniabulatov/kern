@@ -1061,25 +1061,74 @@ func shouldSkipFilesystem(filesystem, mountPoint string) bool {
     return false
 }
 
+// add this function to clean up model names
+func cleanModelName(model string) string {
+    if model == "" {
+        return "Unknown"
+    }
+    
+    // Удаляем непечатаемые символы и лишние пробелы
+    model = strings.Map(func(r rune) rune {
+        // Удаляем управляющие символы (0x00-0x1F, 0x7F)
+        if r <= 0x1F || r == 0x7F {
+            return -1
+        }
+        // Заменяем нестандартные пробелы на обычные
+        if r == 0xA0 || r == 0x3000 || r == 0x202F {
+            return ' '
+        }
+        return r
+    }, model)
+    
+    // Удаляем лишние пробелы
+    model = strings.TrimSpace(model)
+    model = regexp.MustCompile(`\s+`).ReplaceAllString(model, " ")
+    
+    return model
+}
+
+
 // getDiskVendor определяет вендора по модели диска
 func getDiskVendor(model string) string {
     if model == "" || model == "Unknown" {
         return "Unknown"
     }
     
-    modelLower := strings.ToLower(model)
+    // Сначала очищаем модель
+    cleanModel := cleanModelName(model)
+    modelLower := strings.ToLower(cleanModel)
     
     // Определяем вендора по ключевым словам в модели
+    // Важно: сначала более специфичные совпадения
+    
+    // Western Digital - самый приоритетный для WD дисков
+    if strings.Contains(modelLower, "wdc") || strings.Contains(modelLower, "western digital") || 
+       strings.HasPrefix(modelLower, "wd ") || strings.HasPrefix(modelLower, "wd") ||
+       strings.Contains(modelLower, "wd5000") || strings.Contains(modelLower, "wd ") {
+        return "Western Digital"
+    }
+    
+    // Crucial - только если явно указан
+    if strings.Contains(modelLower, "crucial") && !strings.Contains(modelLower, "wdc") {
+        return "Crucial"
+    }
+    
+    // Intel - только если явно указан
+    if strings.Contains(modelLower, "intel") && !strings.Contains(modelLower, "wdc") {
+        return "Intel"
+    }
+    
+    // Остальные вендоры...
     vendors := map[string][]string{
         "Seagate": {"seagate", "st", "barracuda", "ironwolf", "skyhawk"},
-        "Western Digital": {"western digital", "wd", "wd ", "my passport", "elements"},
+        "Western Digital": {"western digital", "wd ", "my passport", "elements", "wd5000", "wdc"},
         "Toshiba": {"toshiba", "mq", "dt", "canvio"},
         "Hitachi": {"hitachi", "hgst", "ultrastar"},
         "Samsung": {"samsung", "ssd", "evo", "pro", "qvo"},
         "Crucial": {"crucial", "mx", "bx", "p"},
         "Kingston": {"kingston", "kc", "a400", "suv"},
         "SanDisk": {"sandisk", "ultra", "extreme", "plus"},
-        "Intel": {"intel", "ssd", "optane", "dc"},
+        "Intel": {"intel", "optane", "dc"},
         "Micron": {"micron", "mt", "p", "m600"},
         "ADATA": {"adata", "sx", "su", "xpg"},
         "KingSpec": {"kingspec"},
