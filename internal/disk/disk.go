@@ -291,7 +291,10 @@ func getWindowsDiskInfo(detailed bool) ([]DiskInfo, error) {
     if err != nil {
         // Если wmic не работает, пытаемся получить информацию аппаратно
         if detailed {
-            // Вместо вызова detectAllStorageDevicesWindows(detailed) просто возвращаем fallback
+            hardwareDevices, err := detectAllStorageDevices(detailed)
+            if err == nil && len(hardwareDevices) > 0 {
+                return hardwareDevices, nil
+            }
             return getFallbackDiskInfo(), nil
         }
         return nil, err
@@ -330,7 +333,10 @@ func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
     if err != nil {
         // Если df не работает, пытаемся получить информацию аппаратно
         if detailed {
-            // Вместо вызова detectAllStorageDevicesDarwin(detailed) просто возвращаем fallback
+            hardwareDevices, err := detectAllStorageDevices(detailed)
+            if err == nil && len(hardwareDevices) > 0 {
+                return hardwareDevices, nil
+            }
             return getFallbackDiskInfo(), nil
         }
         return nil, err
@@ -370,15 +376,13 @@ func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
     switch runtime.GOOS {
     case "linux":
         // В hardware_linux.go есть функция detectAllStorageDevicesLinux
-        return detectAllStorageDevicesLinux()
+        return detectAllStorageDevicesLinux(detailed)
     case "windows":
-        // В hardware_windows.go функция называется detectStorageDevicesWindows
-        // Возвращаем пустой массив, так как функция не реализована
-        return []DiskInfo{}, nil
+        // В hardware_windows.go функция называется detectAllStorageDevicesWindows
+        return detectAllStorageDevicesWindows(detailed)
     case "darwin":
-        // В hardware_darwin.go функция называется detectStorageDevicesDarwin  
-        // Возвращаем пустой массив, так как функция не реализована
-        return []DiskInfo{}, nil
+        // В hardware_darwin.go функция называется detectAllStorageDevicesDarwin  
+        return detectAllStorageDevicesDarwin(detailed)
     default:
         return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
     }

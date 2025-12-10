@@ -17,7 +17,7 @@ type DiskInfoExtended struct {
 }
 
 // detectAllStorageDevicesDarwin обнаруживает все устройства хранения в macOS
-func detectAllStorageDevicesDarwin() ([]DiskInfo, error) {
+func detectAllStorageDevicesDarwin(detailed bool) ([]DiskInfo, error) {
     var devices []DiskInfo
 
     // Метод 1: system_profiler для получения детальной информации о хранилище
@@ -230,6 +230,7 @@ func getDiskDetails(device string) (DiskInfo, error) {
         Filesystem: device,
         Physical:   true,
         SMARTStatus: "UNKNOWN",
+        Vendor:     "Unknown", // Инициализируем поле Vendor
     }
 
     // Получаем информацию через diskutil info
@@ -248,6 +249,8 @@ func getDiskDetails(device string) (DiskInfo, error) {
             parts := strings.SplitN(line, ":", 2)
             if len(parts) == 2 {
                 disk.Model = strings.TrimSpace(parts[1])
+                // Пытаемся определить производителя из названия модели
+                disk.Vendor = extractVendorFromModel(disk.Model)
             }
         case strings.HasPrefix(line, "Disk Size:"):
             parts := strings.SplitN(line, ":", 2)
@@ -279,6 +282,21 @@ func getDiskDetails(device string) (DiskInfo, error) {
             if len(parts) == 2 {
                 disk.MountedOn = strings.TrimSpace(parts[1])
             }
+        case strings.HasPrefix(line, "Vendor:"):
+            parts := strings.SplitN(line, ":", 2)
+            if len(parts) == 2 {
+                vendor := strings.TrimSpace(parts[1])
+                if vendor != "" {
+                    disk.Vendor = vendor
+                }
+            }
+        }
+    }
+
+    // Если Vendor не найден в diskutil info, пытаемся получить из system_profiler
+    if disk.Vendor == "Unknown" || disk.Vendor == "" {
+        if vendor, err := getVendorFromSystemProfiler(device); err == nil && vendor != "" {
+            disk.Vendor = vendor
         }
     }
 
@@ -291,6 +309,99 @@ func getDiskDetails(device string) (DiskInfo, error) {
 
     return disk, nil
 }
+
+func extractVendorFromModel(model string) string {
+    modelUpper := strings.ToUpper(model)
+    
+    // Список известных производителей
+    vendors := map[string][]string{
+        "Apple":     {"APPLE", "MAC", "IMAC", "MACBOOK", "MAC PRO", "MAC MINI"},
+        "Samsung":   {"SAMSUNG", "EVO", "PRO", "QVO", "SSD 9", "SSD 8"},
+        "WD":        {"WESTERN DIGITAL", "WD", "MY PASSPORT", "MY BOOK", "BLACK", "BLUE", "RED", "GOLD"},
+        "Seagate":   {"SEAGATE", "EXPANSION", "BACKUP PLUS", "IRONWOLF", "BARRACUDA"},
+        "Toshiba":   {"TOSHIBA", "CANVIO", "EXTERNAL"},
+        "SanDisk":   {"SANDISK", "EXTREME", "ULTRA"},
+        "Crucial":   {"CRUCIAL", "MX", "BX", "P"},
+        "Intel":     {"INTEL", "OPTANE", "SSDSC", "SSDPE"},
+        "Kingston":  {"KINGSTON", "KC", "A", "SA", "UV"},
+        "ADATA":     {"ADATA", "SU", "XPG", "SX"},
+        "Transcend": {"TRANSCEND", "TS", "ESD"},
+        "HP":        {"HP ", "HEWLETT"},
+        "Dell":      {"DELL", "POWEREDGE"},
+        "Lenovo":    {"LENOVO", "THINKPAD", "THINKCENTRE"},
+        "HGST":      {"HGST", "HITACHI"},
+        "PNY":       {"PNY", "CS", "XC"},
+        "Corsair":   {"CORSAIR", "FORCE", "MP"},
+    }
+
+    for vendor, keywords := range vendors {
+        for _, keyword := range keywords {
+            if strings.Contains(modelUpper, keyword) {
+                return vendor
+            }
+        }
+    }
+
+    // Проверяем распространенные префиксы
+    if strings.HasPrefix(modelUpper, "APPLE") {
+        return "Apple"
+    } else if strings.HasPrefix(modelUpper, "WD") {
+        return "Western Digital"
+    } else if strings.HasPrefix(modelUpper, "ST") {
+        return "Seagate"
+    } else if strings.HasPrefix(modelUpper, "HTS") || strings.HasPrefix(modelUpper, "HTE") {
+        return "HGST"
+    } else if strings.HasPrefix(modelUpper, "TOSHIBA") {
+        return "Toshiba"
+    }
+
+    return "Unknown"
+}
+
+// getVendorFromSystemProfiler получает информацию о производителе через system_profiler
+func getVendorFromSystemProfiler(device string) (string, error) {
+    // Получаем базовое имя устройства (без /dev/ и номеров разделов)
+    baseDevice := strings.TrimPrefix(device, "/dev/")
+    baseDevice = regexp.MustCompile(`\d+$`).ReplaceAllString(baseDevice, "")
+    
+    // Пробуем получить информацию через system_profiler SPSerialATADataType
+    cmd := exec.Command("system_profiler", "SPSerialATADataType")
+    output, err := cmd.Output()
+    if err != nil {
+        return "", err
+    }
+
+    lines := strings.Split(string(output), "\n")
+    var inDeviceSection bool
+    var currentVendor string
+
+    for _, line := range lines {
+        line = strings.TrimSpace(line)
+        
+        // Ищем раздел для нашего устройства
+        if strings.Contains(line, baseDevice) && strings.Contains(line, "BSD Name") {
+            inDeviceSection = true
+            continue
+        }
+
+        if inDeviceSection {
+            if strings.HasPrefix(line, "Vendor:") {
+                parts := strings.SplitN(line, ":", 2)
+                if len(parts) == 2 {
+                    currentVendor = strings.TrimSpace(parts[1])
+                }
+            }
+            
+            // Конец раздела
+            if line == "" && currentVendor != "" {
+                return currentVendor, nil
+            }
+        }
+    }
+
+    return "", fmt.Errorf("vendor not found in system_profiler")
+}
+
 
 // getMountPoint получает точку монтирования для устройства
 func getMountPoint(device string) (string, error) {

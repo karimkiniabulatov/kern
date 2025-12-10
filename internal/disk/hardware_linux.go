@@ -12,7 +12,7 @@ import (
 )
 
 // detectAllStorageDevicesLinux обнаруживает все устройства хранения в Linux
-func detectAllStorageDevicesLinux() ([]DiskInfo, error) {
+func detectAllStorageDevicesLinux(detailed bool) ([]DiskInfo, error) {
     var devices []DiskInfo
     
     // Сканируем устройства в /sys/block

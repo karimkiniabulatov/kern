@@ -6,7 +6,6 @@ import (
     "encoding/json"
     "fmt"
     "os/exec"
-    "regexp"  // ДОБАВЛЕНО: импорт regexp
     "strconv"
     "strings"
 )
@@ -25,7 +24,7 @@ type WindowsPhysicalDisk struct {
 }
 
 // detectAllStorageDevicesWindows обнаруживает все устройства хранения в Windows
-func detectAllStorageDevicesWindows() ([]DiskInfo, error) {
+func detectAllStorageDevicesWindows(detailed bool) ([]DiskInfo, error) {
     var devices []DiskInfo
 
     // Метод 1: PowerShell для получения детальной информации о физических дисках
@@ -96,7 +95,7 @@ func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
         
         disk := DiskInfo{
             Filesystem:  fmt.Sprintf("PhysicalDisk%d", pd.DeviceId),
-            Size:        formatBytes(pd.Size),
+            Size:        formatBytesWindows(pd.Size),
             Used:        "Unknown",
             Available:   "Unknown",
             UsePercent:  0.0,
@@ -179,7 +178,7 @@ func getStorageDevicesViaWMI() ([]DiskInfo, error) {
             // Размер
             if sizeStr := strings.TrimSpace(fields[2]); sizeStr != "" {
                 if size, err := strconv.ParseUint(sizeStr, 10, 64); err == nil {
-                    disk.Size = formatBytes(size)
+                    disk.Size = formatBytesWindows(size)
                 }
             }
 
@@ -229,8 +228,8 @@ func convertHealthStatus(healthStatus string) string {
     }
 }
 
-// formatBytes форматирует байты в читаемый формат
-func formatBytes(bytes uint64) string {
+// formatBytesWindows форматирует байты в читаемый формат для Windows
+func formatBytesWindows(bytes uint64) string {
     const (
         KB = 1024
         MB = KB * 1024
