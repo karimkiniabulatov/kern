@@ -2,6 +2,7 @@ package disk
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -1213,6 +1214,7 @@ func getRaidUsage(raidDevice string) (float64, string, string) {
 }
 
 // НОВАЯ ФУНКЦИЯ: Улучшает информацию о RAID-дисках
+// НОВАЯ ФУНКЦИЯ: Улучшает информацию о RAID-дисках
 func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
     // Создаем карту RAID-устройств и их использования
     raidUsageMap := make(map[string]struct {
@@ -1221,10 +1223,10 @@ func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
         size       string
     })
     
-    // Сначала собираем информацию о RAID-массивах
+    // Сначала собираем информацию о RAID-разделах (смонтированных)
     for _, disk := range disks {
-        if strings.HasPrefix(disk.Filesystem, "/dev/md") && disk.MountedOn != "(unmounted)" {
-            // Это смонтированный RAID - у него есть данные об использовании
+        if strings.HasPrefix(disk.Filesystem, "/dev/md") && disk.MountedOn != "(unmounted)" && !strings.Contains(disk.MountedOn, "unmounted") {
+            // Это смонтированный RAID-раздел - у него есть данные об использовании
             raidUsageMap[disk.Filesystem] = struct {
                 usePercent float64
                 used       string
@@ -1234,6 +1236,22 @@ func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
                 used:       disk.Used,
                 size:       disk.Size,
             }
+            
+            // Также добавляем базовое устройство RAID (без номера раздела)
+            baseDevice := getBaseDevice(strings.TrimPrefix(disk.Filesystem, "/dev/"))
+            if baseDevice != "" && !strings.Contains(baseDevice, "p") {
+                // Только если это действительно базовое устройство (не раздел)
+                raidKey := "/dev/" + baseDevice
+                raidUsageMap[raidKey] = struct {
+                    usePercent float64
+                    used       string
+                    size       string
+                }{
+                    usePercent: disk.UsePercent,
+                    used:       disk.Used,
+                    size:       disk.Size,
+                }
+            }
         }
     }
     
@@ -1242,8 +1260,8 @@ func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
         disk := &disks[i]
         device := strings.TrimPrefix(disk.Filesystem, "/dev/")
         
-        // Пропускаем уже смонтированные RAID
-        if strings.HasPrefix(disk.Filesystem, "/dev/md") {
+        // Пропускаем уже смонтированные RAID-разделы
+        if strings.HasPrefix(disk.Filesystem, "/dev/md") && disk.MountedOn != "(unmounted)" && !strings.Contains(disk.MountedOn, "unmounted") {
             continue
         }
         
@@ -1279,6 +1297,48 @@ func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    // Теперь обновляем информацию для несмонтированных RAID-массивов
+    for i := range disks {
+        disk := &disks[i]
+        
+        // Пропускаем не RAID устройства
+        if !strings.HasPrefix(disk.Filesystem, "/dev/md") {
+            continue
+        }
+        
+        // Пропускаем уже обработанные (с использованием > 0)
+        if disk.UsePercent > 0 {
+            continue
+        }
+        
+        // Пропускаем смонтированные разделы
+        if disk.MountedOn != "(unmounted)" && !strings.Contains(disk.MountedOn, "unmounted") && disk.MountedOn != "" {
+            continue
+        }
+        
+        // Проверяем, есть ли использование для этого RAID-массива
+        device := strings.TrimPrefix(disk.Filesystem, "/dev/")
+        
+        // Ищем использование в карте
+        for raidKey, raidUsage := range raidUsageMap {
+            raidDevice := strings.TrimPrefix(raidKey, "/dev/")
+            // Проверяем, является ли это использование для этого RAID-массива
+            if strings.HasPrefix(raidDevice, device) || device == getBaseDevice(raidDevice) {
+                disk.UsePercent = raidUsage.usePercent
+                disk.Used = raidUsage.used
+                disk.Size = raidUsage.size
+                // Рассчитываем доступное пространство
+                if usedMB := extractMemoryMB(raidUsage.used); usedMB > 0 {
+                    if totalMB := extractMemoryMB(raidUsage.size); totalMB > 0 {
+                        availableMB := totalMB - usedMB
+                        disk.Available = formatBytes(uint64(availableMB) * 1024 * 1024)
+                    }
+                }
+                break
             }
         }
     }

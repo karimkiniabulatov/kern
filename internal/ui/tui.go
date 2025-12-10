@@ -494,7 +494,10 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     isUnmounted := d.MountedOn == "(unmounted)" || strings.Contains(d.MountedOn, "unmounted") || d.MountedOn == ""
     
     // Определяем, является ли устройство компонентом RAID
-    isRaidComponent := strings.Contains(d.DiskType, "RAID") && !strings.HasPrefix(d.Filesystem, "/dev/md")
+    isRaidComponent := strings.Contains(d.DiskType, "RAID Component") || strings.Contains(d.DiskType, "RAID")
+    
+    // Определяем, является ли устройство RAID-массивом (не компонентом)
+    isRaidArray := strings.Contains(d.DiskType, "RAID") && strings.HasPrefix(d.Filesystem, "/dev/md")
     
     // Определяем цвет для использования
     usageColor := tcell.ColorLightCoral
@@ -521,6 +524,8 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
         // Для несмонтированных устройств
         if isRaidComponent {
             diskInfo = fmt.Sprintf("%s: (RAID component) - %s", d.Filesystem, devType)
+        } else if isRaidArray {
+            diskInfo = fmt.Sprintf("%s: (RAID array) - %s", d.Filesystem, devType)
         } else {
             diskInfo = fmt.Sprintf("%s: (unmounted) - %s", d.Filesystem, devType)
         }
@@ -566,9 +571,9 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ - ПОКАЗЫВАЕМ ДЛЯ ВСЕХ УСТРОЙСТВ
     // Проверяем, есть ли данные о размере
     if d.Size != "" && d.Size != "0 B" && d.Size != "Unknown" {
-        // Для компонентов RAID показываем реальное использование
-        if isRaidComponent && d.UsePercent > 0 {
-            // Для компонентов RAID с известным использованием
+        // Для RAID-компонентов и RAID-массивов показываем реальное использование
+        if (isRaidComponent || isRaidArray) && d.UsePercent > 0 {
+            // Для RAID-компонентов и массивов с известным использованием
             diskGraph := t.createSolidGraph(d.UsePercent)
             
             usageText := fmt.Sprintf("RAID Usage: %s / %s %.1f%%", 
@@ -599,11 +604,11 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
             row = t.printSimple(row, usageText, 
                 tcell.StyleDefault.Foreground(tcell.ColorGray))
         } else {
-            // Для несмонтированных устройств (не RAID компонентов)
+            // Для несмонтированных устройств (не RAID компонентов или массивов)
             if d.UsePercent > 0 {
-                // Если есть данные об использовании (например, из RAID)
+                // Если есть данные об использовании
                 diskGraph := t.createSolidGraph(d.UsePercent)
-                usageText := fmt.Sprintf("Size: %s (RAID usage: %.1f%%)", d.Size, d.UsePercent)
+                usageText := fmt.Sprintf("Size: %s (usage: %.1f%%)", d.Size, d.UsePercent)
                 row = t.printSimple(row, usageText, 
                     tcell.StyleDefault.Foreground(usageColor))
                 row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
