@@ -2,6 +2,7 @@ package disk
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -291,105 +292,105 @@ func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
 }
 
 func getWindowsDiskInfo(detailed bool) ([]DiskInfo, error) {
-	var disks []DiskInfo
-	
-	// Получаем информацию о логических дисках через wmic
-	cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption,drivetype,volumename")
-	output, err := cmd.Output()
-	if err != nil {
-		// Если wmic не работает, пытаемся получить информацию аппаратно
-		if detailed {
-			// Вместо вызова detectAllStorageDevicesWindows(detailed) просто возвращаем fallback
-			return getFallbackDiskInfo(), nil
-		}
-		return nil, err
-	}
-	
-	// Парсим вывод wmic
-	parsedDisks, err := parseWMICOutput(string(output), detailed)
-	if err != nil {
-		return nil, err
-	}
-	
-	// В детальном режиме добавляем аппаратную информацию
-	if detailed {
-		// Получаем аппаратную информацию
-		hardwareDevices, err := detectAllStorageDevices(detailed)
-		if err == nil && len(hardwareDevices) > 0 {
-			// Объединяем информацию
-			disks = mergeDiskInfo(parsedDisks, hardwareDevices)
-		} else {
-			disks = parsedDisks
-		}
-	} else {
-		// В обычном режиме используем только основные диски
-		disks = filterPrimaryDisks(parsedDisks)
-	}
-	
-	return disks, nil
+    var disks []DiskInfo
+    
+    // Получаем информацию о логических дисках через wmic
+    cmd := exec.Command("wmic", "logicaldisk", "get", "size,freespace,caption,drivetype,volumename")
+    output, err := cmd.Output()
+    if err != nil {
+        // Если wmic не работает, пытаемся получить информацию аппаратно
+        if detailed {
+            // Вместо вызова detectAllStorageDevicesWindows(detailed) просто возвращаем fallback
+            return getFallbackDiskInfo(), nil
+        }
+        return nil, err
+    }
+    
+    // Парсим вывод wmic
+    parsedDisks, err := parseWMICOutput(string(output), detailed)
+    if err != nil {
+        return nil, err
+    }
+    
+    // В детальном режиме добавляем аппаратную информацию
+    if detailed {
+        // Получаем аппаратную информацию
+        hardwareDevices, err := detectAllStorageDevices(detailed)
+        if err == nil && len(hardwareDevices) > 0 {
+            // Объединяем информацию
+            disks = mergeDiskInfo(parsedDisks, hardwareDevices)
+        } else {
+            disks = parsedDisks
+        }
+    } else {
+        // В обычном режиме используем только основные диски
+        disks = filterPrimaryDisks(parsedDisks)
+    }
+    
+    return disks, nil
 }
 
 func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
-	var disks []DiskInfo
-	
-	// Базовое получение информации через df
-	cmd := exec.Command("df", "-h")
-	output, err := cmd.Output()
-	if err != nil {
-		// Если df не работает, пытаемся получить информацию аппаратно
-		if detailed {
-			// Вместо вызова detectAllStorageDevicesDarwin(detailed) просто возвращаем fallback
-			return getFallbackDiskInfo(), nil
-		}
-		return nil, err
-	}
-	
-	// Парсим вывод df
-	parsedDisks, err := parseDFOutput(string(output), detailed)
-	if err != nil {
-		return nil, err
-	}
-	
-	// В детальном режиме добавляем аппаратную информацию
-	if detailed {
-		// Получаем аппаратную информацию
-		hardwareDevices, err := detectAllStorageDevices(detailed)
-		if err == nil && len(hardwareDevices) > 0 {
-			// Объединяем информацию
-			disks = mergeDiskInfo(parsedDisks, hardwareDevices)
-		} else {
-			disks = parsedDisks
-		}
-	} else {
-		// В обычном режиме используем только основные диски
-		disks = filterPrimaryDisks(parsedDisks)
-	}
-	
-	return disks, nil
+    var disks []DiskInfo
+    
+    // Базовое получение информации через df
+    cmd := exec.Command("df", "-h")
+    output, err := cmd.Output()
+    if err != nil {
+        // Если df не работает, пытаемся получить информацию аппаратно
+        if detailed {
+            // Вместо вызова detectAllStorageDevicesDarwin(detailed) просто возвращаем fallback
+            return getFallbackDiskInfo(), nil
+        }
+        return nil, err
+    }
+    
+    // Парсим вывод df
+    parsedDisks, err := parseDFOutput(string(output), detailed)
+    if err != nil {
+        return nil, err
+    }
+    
+    // В детальном режиме добавляем аппаратную информацию
+    if detailed {
+        // Получаем аппаратную информацию
+        hardwareDevices, err := detectAllStorageDevices(detailed)
+        if err == nil && len(hardwareDevices) > 0 {
+            // Объединяем информацию
+            disks = mergeDiskInfo(parsedDisks, hardwareDevices)
+        } else {
+            disks = parsedDisks
+        }
+    } else {
+        // В обычном режиме используем только основные диски
+        disks = filterPrimaryDisks(parsedDisks)
+    }
+    
+    return disks, nil
 }
 
 // detectAllStorageDevices определяет все устройства хранения в зависимости от платформы
 func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
-	if !detailed {
-		// В недетальном режиме возвращаем пустой список
-		return []DiskInfo{}, nil
-	}
-	
-	switch runtime.GOOS {
-	case "linux":
-		// В hardware_linux.go есть функция detectAllStorageDevicesLinux
-		return detectAllStorageDevicesLinux()
-	case "windows":
-		// В hardware_windows.go функция называется detectStorageDevicesWindows
-		// Возвращаем пустой массив, так как функция не реализована
-		return []DiskInfo{}, nil
-	case "darwin":
-		// В hardware_darwin.go функция называется detectStorageDevicesDarwin  
-		// Возвращаем пустой массив, так как функция не реализована
-		return []DiskInfo{}, nil
-	default:
-		return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
-	}
+    if !detailed {
+        // В недетальном режиме возвращаем пустой список
+        return []DiskInfo{}, nil
+    }
+    
+    switch runtime.GOOS {
+    case "linux":
+        // В hardware_linux.go есть функция detectAllStorageDevicesLinux
+        return detectAllStorageDevicesLinux()
+    case "windows":
+        // В hardware_windows.go функция называется detectStorageDevicesWindows
+        // Возвращаем пустой массив, так как функция не реализована
+        return []DiskInfo{}, nil
+    case "darwin":
+        // В hardware_darwin.go функция называется detectStorageDevicesDarwin  
+        // Возвращаем пустой массив, так как функция не реализована
+        return []DiskInfo{}, nil
+    default:
+        return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
+    }
 }
 
 // Новая функция для объединения информации из DF и аппаратных устройств
@@ -497,24 +498,24 @@ func mergeDiskInfo(dfDisks, hardwareDisks []DiskInfo) []DiskInfo {
 
 // filterPrimaryDisks возвращает только основные диски
 func filterPrimaryDisks(disks []DiskInfo) []DiskInfo {
-	var primaryDisks []DiskInfo
-	
-	for _, disk := range disks {
-		if isPrimaryDisk(disk) {
-			primaryDisks = append(primaryDisks, disk)
-		}
-	}
-	
-	// Если не найдено основных дисков, возвращаем первые 3
-	if len(primaryDisks) == 0 && len(disks) > 0 {
-		maxDisks := len(disks)
-		if maxDisks > 3 {
-			maxDisks = 3
-		}
-		return disks[:maxDisks]
-	}
-	
-	return primaryDisks
+    var primaryDisks []DiskInfo
+    
+    for _, disk := range disks {
+        if isPrimaryDisk(disk) {
+            primaryDisks = append(primaryDisks, disk)
+        }
+    }
+    
+    // Если не найдено основных дисков, возвращаем первые 3
+    if len(primaryDisks) == 0 && len(disks) > 0 {
+        maxDisks := len(disks)
+        if maxDisks > 3 {
+            maxDisks = 3
+        }
+        return disks[:maxDisks]
+    }
+    
+    return primaryDisks
 }
 
 // isPrimaryDisk определяет, является ли диск основным
@@ -571,135 +572,137 @@ func isPrimaryDisk(disk DiskInfo) bool {
 }
 
 func getFallbackDiskInfo() []DiskInfo {
-	defaultDisk := DiskInfo{
-		Filesystem: "unknown",
-		Size:       "0 B",
-		Used:       "0 B",
-		Available:  "0 B",
-		UsePercent: 0.0,
-		MountedOn:  "/",
-		Physical:   false,
-		DiskType:   "Unknown",
-		Model:      "Unknown",
-		Serial:     "Unknown",
-		SMARTStatus: "UNKNOWN",
-	}
-	return []DiskInfo{defaultDisk}
+    defaultDisk := DiskInfo{
+        Filesystem: "unknown",
+        Size:       "0 B",
+        Used:       "0 B",
+        Available:  "0 B",
+        UsePercent: 0.0,
+        MountedOn:  "/",
+        Physical:   false,
+        DiskType:   "Unknown",
+        Model:      "Unknown",
+        Serial:     "Unknown",
+        SMARTStatus: "UNKNOWN",
+    }
+    return []DiskInfo{defaultDisk}
 }
 
+// Остальные существующие функции остаются без изменений...
+
 func parseDFOutput(output string, detailed bool) ([]DiskInfo, error) {
-	lines := strings.Split(output, "\n")
-	var disks []DiskInfo
+    lines := strings.Split(output, "\n")
+    var disks []DiskInfo
 
-	for i, line := range lines {
-		if i == 0 || strings.TrimSpace(line) == "" {
-			continue // Skip header and empty lines
-		}
+    for i, line := range lines {
+        if i == 0 || strings.TrimSpace(line) == "" {
+            continue // Skip header and empty lines
+        }
 
-		// Split by whitespace, handling multiple spaces
-		re := regexp.MustCompile(`\s+`)
-		fields := re.Split(line, -1)
+        // Split by whitespace, handling multiple spaces
+        re := regexp.MustCompile(`\s+`)
+        fields := re.Split(line, -1)
 
-		if len(fields) >= 6 {
-			usePercentStr := strings.TrimSuffix(fields[4], "%")
-			usePercent, err := strconv.ParseFloat(usePercentStr, 64)
-			if err != nil {
-				usePercent = 0.0
-			}
+        if len(fields) >= 6 {
+            usePercentStr := strings.TrimSuffix(fields[4], "%")
+            usePercent, err := strconv.ParseFloat(usePercentStr, 64)
+            if err != nil {
+                usePercent = 0.0
+            }
 
-			// В детальном режиме не пропускаем файловые системы
-			if !detailed && shouldSkipFilesystem(fields[0], fields[5]) {
-				continue
-			}
+            // В детальном режиме не пропускаем файловые системы
+            if !detailed && shouldSkipFilesystem(fields[0], fields[5]) {
+                continue
+            }
 
-			// Определяем тип устройства и физические характеристики
-			physical, diskType, model, serial, smartStatus, vendor := detectDiskProperties(fields[0])
+            // Определяем тип устройства и физические характеристики
+            physical, diskType, model, serial, smartStatus, vendor := detectDiskProperties(fields[0])
 
-			disk := DiskInfo{
-				Filesystem: fields[0],
-				Size:       fields[1],
-				Used:       fields[2],
-				Available:  fields[3],
-				UsePercent: usePercent,
-				MountedOn:  fields[5],
-				Physical:   physical,
-				DiskType:   diskType,
-				Model:      model,
-				Serial:     serial,
-				SMARTStatus: smartStatus,
-				Vendor:     vendor, // ДОБАВЛЕНО: поле Vendor
-			}
-			disks = append(disks, disk)
-		}
-	}
+            disk := DiskInfo{
+                Filesystem: fields[0],
+                Size:       fields[1],
+                Used:       fields[2],
+                Available:  fields[3],
+                UsePercent: usePercent,
+                MountedOn:  fields[5],
+                Physical:   physical,
+                DiskType:   diskType,
+                Model:      model,
+                Serial:     serial,
+                SMARTStatus: smartStatus,
+                Vendor:     vendor, // ДОБАВЛЕНО: поле Vendor
+            }
+            disks = append(disks, disk)
+        }
+    }
 
-	return disks, nil
+    return disks, nil
 }
 
 func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
-	lines := strings.Split(output, "\n")
-	var disks []DiskInfo
+    lines := strings.Split(output, "\n")
+    var disks []DiskInfo
 
-	for i, line := range lines {
-		if i == 0 || strings.TrimSpace(line) == "" {
-			continue
-		}
+    for i, line := range lines {
+        if i == 0 || strings.TrimSpace(line) == "" {
+            continue
+        }
 
-		re := regexp.MustCompile(`\s+`)
-		fields := re.Split(line, -1)
+        re := regexp.MustCompile(`\s+`)
+        fields := re.Split(line, -1)
 
-		if len(fields) >= 4 {
-			// Поле drivetype: 2=съемный, 3=локальный HDD, 4=сеть, 5=CD-ROM
-			driveType := 3
-			if len(fields) >= 4 {
-				if dt, err := strconv.Atoi(fields[3]); err == nil {
-					driveType = dt
-				}
-			}
+        if len(fields) >= 4 {
+            // Поле drivetype: 2=съемный, 3=локальный HDD, 4=сеть, 5=CD-ROM
+            driveType := 3
+            if len(fields) >= 4 {
+                if dt, err := strconv.Atoi(fields[3]); err == nil {
+                    driveType = dt
+                }
+            }
 
-			// В недетальном режиме пропускаем съемные и сетевые диски
-			if !detailed && (driveType == 2 || driveType == 4 || driveType == 5) {
-				continue
-			}
+            // В недетальном режиме пропускаем съемные и сетевые диски
+            if !detailed && (driveType == 2 || driveType == 4 || driveType == 5) {
+                continue
+            }
 
-			freeSpace, err := strconv.ParseUint(fields[1], 10, 64)
-			if err != nil {
-				continue
-			}
+            freeSpace, err := strconv.ParseUint(fields[1], 10, 64)
+            if err != nil {
+                continue
+            }
 
-			totalSize, err := strconv.ParseUint(fields[2], 10, 64)
-			if err != nil {
-				continue
-			}
+            totalSize, err := strconv.ParseUint(fields[2], 10, 64)
+            if err != nil {
+                continue
+            }
 
-			used := totalSize - freeSpace
-			usePercent := 0.0
-			if totalSize > 0 {
-				usePercent = float64(used) / float64(totalSize) * 100
-			}
+            used := totalSize - freeSpace
+            usePercent := 0.0
+            if totalSize > 0 {
+                usePercent = float64(used) / float64(totalSize) * 100
+            }
 
-			// Для Windows определяем тип устройства - исправлено: добавлена переменная vendor
-			physical, diskType, model, serial, smartStatus, vendor := detectWindowsDiskProperties(fields[0], driveType)
+            // Для Windows определяем тип устройства - исправлено: добавлена переменная vendor
+            physical, diskType, model, serial, smartStatus, vendor := detectWindowsDiskProperties(fields[0], driveType)
 
-			disk := DiskInfo{
-				Filesystem: fields[0],
-				Size:       formatBytes(totalSize),
-				Used:       formatBytes(used),
-				Available:  formatBytes(freeSpace),
-				UsePercent: usePercent,
-				MountedOn:  fields[0],
-				Physical:   physical,
-				DiskType:   diskType,
-				Model:      model,
-				Serial:     serial,
-				SMARTStatus: smartStatus,
-				Vendor:     vendor, // Исправлено: используем полученное значение vendor
-			}
-			disks = append(disks, disk)
-		}
-	}
+            disk := DiskInfo{
+                Filesystem: fields[0],
+                Size:       formatBytes(totalSize),
+                Used:       formatBytes(used),
+                Available:  formatBytes(freeSpace),
+                UsePercent: usePercent,
+                MountedOn:  fields[0],
+                Physical:   physical,
+                DiskType:   diskType,
+                Model:      model,
+                Serial:     serial,
+                SMARTStatus: smartStatus,
+                Vendor:     vendor, // Исправлено: используем полученное значение vendor
+            }
+            disks = append(disks, disk)
+        }
+    }
 
-	return disks, nil
+    return disks, nil
 }
 
 // detectDiskProperties определяет свойства диска для Linux/Unix систем
@@ -806,199 +809,6 @@ func detectDiskProperties(filesystem string) (bool, string, string, string, stri
     }
 
     return physical, diskType, model, serial, smartStatus, vendor
-}
-
-// НОВАЯ ФУНКЦИЯ: Определяет, является ли диск частью RAID
-func isDiskPartOfRaid(device string) (bool, string) {
-    if runtime.GOOS != "linux" {
-        return false, ""
-    }
-    
-    // Проверяем, является ли устройство частью RAID через mdadm
-    cmd := exec.Command("mdadm", "--detail", "--scan")
-    output, err := cmd.Output()
-    if err != nil {
-        return false, ""
-    }
-    
-    lines := strings.Split(string(output), "\n")
-    for _, line := range lines {
-        if strings.Contains(line, device) {
-            // Извлекаем имя RAID-устройства
-            re := regexp.MustCompile(`(/dev/md\d+)`)
-            if matches := re.FindStringSubmatch(line); len(matches) > 1 {
-                return true, matches[1]
-            }
-        }
-    }
-    
-    // Альтернативная проверка через sysfs
-    raidPath := fmt.Sprintf("/sys/block/%s/md", device)
-    if _, err := os.Stat(raidPath); err == nil {
-        // Устройство является частью RAID
-        // Пытаемся определить имя RAID-устройства
-        if links, err := filepath.Glob(fmt.Sprintf("/sys/block/md*/slaves/%s", device)); err == nil && len(links) > 0 {
-            for _, link := range links {
-                parts := strings.Split(link, "/")
-                for i, part := range parts {
-                    if strings.HasPrefix(part, "md") {
-                        return true, "/dev/" + part
-                    }
-                }
-            }
-        }
-    }
-    
-    return false, ""
-}
-
-// НОВАЯ ФУНКЦИЯ: Получает использование RAID-массива
-func getRaidUsage(raidDevice string) (float64, string, string) {
-    if runtime.GOOS != "linux" {
-        return 0.0, "", ""
-    }
-    
-    // Получаем размер RAID через blockdev
-    cmd := exec.Command("blockdev", "--getsize64", raidDevice)
-    sizeOutput, err := cmd.Output()
-    if err != nil {
-        return 0.0, "", ""
-    }
-    
-    sizeStr := strings.TrimSpace(string(sizeOutput))
-    sizeBytes, err := strconv.ParseUint(sizeStr, 10, 64)
-    if err != nil {
-        return 0.0, "", ""
-    }
-    
-    // Пытаемся получить использование через df
-    cmd = exec.Command("df", "-B1", "--output=used,size", raidDevice)
-    dfOutput, err := cmd.Output()
-    if err != nil {
-        // Если df не сработал, возможно RAID не смонтирован
-        return 0.0, formatBytes(sizeBytes), formatBytes(0)
-    }
-    
-    lines := strings.Split(string(dfOutput), "\n")
-    if len(lines) >= 2 {
-        fields := strings.Fields(lines[1])
-        if len(fields) >= 2 {
-            usedBytes, _ := strconv.ParseUint(fields[0], 10, 64)
-            totalBytes, _ := strconv.ParseUint(fields[1], 10, 64)
-            if totalBytes > 0 {
-                usePercent := float64(usedBytes) / float64(totalBytes) * 100
-                return usePercent, formatBytes(usedBytes), formatBytes(totalBytes)
-            }
-        }
-    }
-    
-    return 0.0, formatBytes(0), formatBytes(sizeBytes)
-}
-
-// НОВАЯ ФУНКЦИЯ: Улучшает информацию о RAID-дисках
-func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
-    // Создаем карту RAID-устройств и их использования
-    raidUsageMap := make(map[string]struct {
-        usePercent float64
-        used       string
-        size       string
-    })
-    
-    // Сначала собираем информацию о RAID-массивах
-    for _, disk := range disks {
-        if strings.HasPrefix(disk.Filesystem, "/dev/md") && disk.MountedOn != "(unmounted)" {
-            // Это смонтированный RAID - у него есть данные об использовании
-            raidUsageMap[disk.Filesystem] = struct {
-                usePercent float64
-                used       string
-                size       string
-            }{
-                usePercent: disk.UsePercent,
-                used:       disk.Used,
-                size:       disk.Size,
-            }
-        }
-    }
-    
-    // Теперь проверяем все диски на принадлежность к RAID
-    for i := range disks {
-        disk := &disks[i]
-        device := strings.TrimPrefix(disk.Filesystem, "/dev/")
-        
-        // Пропускаем уже смонтированные RAID
-        if strings.HasPrefix(disk.Filesystem, "/dev/md") {
-            continue
-        }
-        
-        // Проверяем, является ли диск частью RAID
-        if isRaid, raidDevice := isDiskPartOfRaid(device); isRaid {
-            // Обновляем информацию о диске
-            disk.Physical = true
-            disk.DiskType = "RAID Component"
-            
-            // Если у нас есть информация об использовании RAID
-            if raidUsage, exists := raidUsageMap[raidDevice]; exists {
-                disk.UsePercent = raidUsage.usePercent
-                disk.Used = raidUsage.used
-                disk.Size = raidUsage.size
-                // Рассчитываем доступное пространство
-                if usedMB := extractMemoryMB(raidUsage.used); usedMB > 0 {
-                    if totalMB := extractMemoryMB(raidUsage.size); totalMB > 0 {
-                        availableMB := totalMB - usedMB
-                        disk.Available = formatBytes(uint64(availableMB) * 1024 * 1024)
-                    }
-                }
-            } else {
-                // Пытаемся получить использование RAID
-                if usePercent, used, size := getRaidUsage(raidDevice); usePercent > 0 {
-                    disk.UsePercent = usePercent
-                    disk.Used = used
-                    disk.Size = size
-                    // Рассчитываем доступное пространство
-                    if usedMB := extractMemoryMB(used); usedMB > 0 {
-                        if totalMB := extractMemoryMB(size); totalMB > 0 {
-                            availableMB := totalMB - usedMB
-                            disk.Available = formatBytes(uint64(availableMB) * 1024 * 1024)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    return disks
-}
-
-// НОВАЯ ФУНКЦИЯ: Извлекает числовое значение памяти в MB
-func extractMemoryMB(memoryStr string) int {
-    // Пример: "8192 MB" -> 8192, "1.0 GB" -> 1024
-    parts := strings.Fields(memoryStr)
-    if len(parts) < 2 {
-        return 0
-    }
-    
-    valueStr := parts[0]
-    unit := strings.ToUpper(parts[1])
-    
-    value, err := strconv.ParseFloat(valueStr, 64)
-    if err != nil {
-        return 0
-    }
-    
-    switch {
-    case strings.Contains(unit, "GB"):
-        return int(value * 1024)
-    case strings.Contains(unit, "MB"):
-        return int(value)
-    case strings.Contains(unit, "KB"):
-        return int(value / 1024)
-    case strings.Contains(unit, "B"):
-        return int(value / (1024 * 1024))
-    case strings.Contains(unit, "TB"):
-        return int(value * 1024 * 1024)
-    default:
-        return int(value)
-    }
 }
 
 // getRaidDetails получает детальную информацию о RAID массиве
@@ -1123,113 +933,113 @@ func detectWindowsDiskProperties(drive string, driveType int) (bool, string, str
 
 // getBaseDevice возвращает базовое имя устройства без номера раздела
 func getBaseDevice(device string) string {
-	// Убираем цифры в конце для SATA/SCSI устройств (sda1 -> sda)
-	re := regexp.MustCompile(`^([a-z]+)(\d+)$`)
-	if matches := re.FindStringSubmatch(device); matches != nil {
-		return matches[1]
-	}
-	
-	// Убираем часть после 'p' для NVMe устройств (nvme0n1p1 -> nvme0n1)
-	re = regexp.MustCompile(`^(nvme\d+n\d+)p\d+$`)
-	if matches := re.FindStringSubmatch(device); matches != nil {
-		return matches[1]
-	}
-	
-	// Убираем часть после 'p' для MMC устройств (mmcblk0p1 -> mmcblk0)
-	re = regexp.MustCompile(`^(mmcblk\d+)p\d+$`)
-	if matches := re.FindStringSubmatch(device); matches != nil {
-		return matches[1]
-	}
-	
-	return device
+    // Убираем цифры в конце для SATA/SCSI устройств (sda1 -> sda)
+    re := regexp.MustCompile(`^([a-z]+)(\d+)$`)
+    if matches := re.FindStringSubmatch(device); matches != nil {
+        return matches[1]
+    }
+    
+    // Убираем часть после 'p' для NVMe устройств (nvme0n1p1 -> nvme0n1)
+    re = regexp.MustCompile(`^(nvme\d+n\d+)p\d+$`)
+    if matches := re.FindStringSubmatch(device); matches != nil {
+        return matches[1]
+    }
+    
+    // Убираем часть после 'p' для MMC устройств (mmcblk0p1 -> mmcblk0)
+    re = regexp.MustCompile(`^(mmcblk\d+)p\d+$`)
+    if matches := re.FindStringSubmatch(device); matches != nil {
+        return matches[1]
+    }
+    
+    return device
 }
 
 // getSMARTStatus получает SMART-статус диска
 func getSMARTStatus(device string) string {
-	// Пытаемся использовать smartctl для получения SMART-статуса
-	cmd := exec.Command("smartctl", "-H", "/dev/"+device)
-	output, err := cmd.Output()
-	if err != nil {
-		return "Unavailable"
-	}
-	
-	outputStr := string(output)
-	if strings.Contains(outputStr, "PASSED") || strings.Contains(outputStr, "OK") {
-		return "PASSED"
-	} else if strings.Contains(outputStr, "FAILED") {
-		return "FAILED"
-	}
-	
-	return "UNKNOWN"
+    // Пытаемся использовать smartctl для получения SMART-статуса
+    cmd := exec.Command("smartctl", "-H", "/dev/"+device)
+    output, err := cmd.Output()
+    if err != nil {
+        return "Unavailable"
+    }
+    
+    outputStr := string(output)
+    if strings.Contains(outputStr, "PASSED") || strings.Contains(outputStr, "OK") {
+        return "PASSED"
+    } else if strings.Contains(outputStr, "FAILED") {
+        return "FAILED"
+    }
+    
+    return "UNKNOWN"
 }
 
 // Структура для хранения информации из lsblk
 type lsblkInfo struct {
-	diskType string
-	model    string
-	serial   string
+    diskType string
+    model    string
+    serial   string
 }
 
 // getDiskInfoWithLsblk получает информацию о диске через lsblk
 func getDiskInfoWithLsblk(filesystem string) (lsblkInfo, error) {
-	info := lsblkInfo{}
-	
-	// Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
-	device := strings.TrimPrefix(filesystem, "/dev/")
-	if device == "" {
-		return info, exec.ErrNotFound
-	}
+    info := lsblkInfo{}
+    
+    // Извлекаем имя устройства из пути (например, /dev/sda1 -> sda)
+    device := strings.TrimPrefix(filesystem, "/dev/")
+    if device == "" {
+        return info, exec.ErrNotFound
+    }
 
-	// Выполняем lsblk для получения информации об устройстве
-	cmd := exec.Command("lsblk", "-o", "TYPE,MODEL,SERIAL", "-n", "-d", device)
-	output, err := cmd.Output()
-	if err != nil {
-		return info, err
-	}
+    // Выполняем lsblk для получения информации об устройстве
+    cmd := exec.Command("lsblk", "-o", "TYPE,MODEL,SERIAL", "-n", "-d", device)
+    output, err := cmd.Output()
+    if err != nil {
+        return info, err
+    }
 
-	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
-	if len(lines) > 0 {
-		fields := strings.Fields(lines[0])
-		if len(fields) >= 1 {
-			// Определяем тип устройства
-			switch fields[0] {
-			case "disk":
-				info.diskType = "HDD" // Будет уточнено через rotational флаг
-			case "part":
-				info.diskType = "Partition"
-				return info, nil // Для разделов не получаем модель/серийник
-			case "rom":
-				info.diskType = "ROM"
-			case "lvm":
-				info.diskType = "LVM"
-			case "raid":
-				info.diskType = "RAID"
-			}
+    lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+    if len(lines) > 0 {
+        fields := strings.Fields(lines[0])
+        if len(fields) >= 1 {
+            // Определяем тип устройства
+            switch fields[0] {
+            case "disk":
+                info.diskType = "HDD" // Будет уточнено через rotational флаг
+            case "part":
+                info.diskType = "Partition"
+                return info, nil // Для разделов не получаем модель/серийник
+            case "rom":
+                info.diskType = "ROM"
+            case "lvm":
+                info.diskType = "LVM"
+            case "raid":
+                info.diskType = "RAID"
+            }
 
-			// Получаем модель и серийный номер
-			if len(fields) >= 2 {
-				info.model = fields[1]
-			}
-			if len(fields) >= 3 {
-				info.serial = fields[2]
-			}
-		}
-	}
+            // Получаем модель и серийный номер
+            if len(fields) >= 2 {
+                info.model = fields[1]
+            }
+            if len(fields) >= 3 {
+                info.serial = fields[2]
+            }
+        }
+    }
 
-	return info, nil
+    return info, nil
 }
 
 func formatBytes(bytes uint64) string {
-	const unit = 1024
-	if bytes < unit {
-		return strconv.FormatUint(bytes, 10) + " B"
-	}
-	div, exp := uint64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-			div *= unit
-			exp++
-	}
-	return strconv.FormatFloat(float64(bytes)/float64(div), 'f', 1, 64) + " " + string("KMGTPE"[exp]) + "B"
+    const unit = 1024
+    if bytes < unit {
+        return strconv.FormatUint(bytes, 10) + " B"
+    }
+    div, exp := uint64(unit), 0
+    for n := bytes / unit; n >= unit; n /= unit {
+        div *= unit
+        exp++
+    }
+    return strconv.FormatFloat(float64(bytes)/float64(div), 'f', 1, 64) + " " + string("KMGTPE"[exp]) + "B"
 }
 
 func shouldSkipFilesystem(filesystem, mountPoint string) bool {
@@ -1314,4 +1124,197 @@ func getDiskVendor(model string) string {
     }
     
     return "Unknown"
+}
+
+// НОВАЯ ФУНКЦИЯ: Определяет, является ли диск частью RAID
+func isDiskPartOfRaid(device string) (bool, string) {
+    if runtime.GOOS != "linux" {
+        return false, ""
+    }
+    
+    // Проверяем, является ли устройство частью RAID через mdadm
+    cmd := exec.Command("mdadm", "--detail", "--scan")
+    output, err := cmd.Output()
+    if err != nil {
+        return false, ""
+    }
+    
+    lines := strings.Split(string(output), "\n")
+    for _, line := range lines {
+        if strings.Contains(line, device) {
+            // Извлекаем имя RAID-устройства
+            re := regexp.MustCompile(`(/dev/md\d+)`)
+            if matches := re.FindStringSubmatch(line); len(matches) > 1 {
+                return true, matches[1]
+            }
+        }
+    }
+    
+    // Альтернативная проверка через sysfs
+    raidPath := fmt.Sprintf("/sys/block/%s/md", device)
+    if _, err := os.Stat(raidPath); err == nil {
+        // Устройство является частью RAID
+        // Пытаемся определить имя RAID-устройства
+        if links, err := filepath.Glob(fmt.Sprintf("/sys/block/md*/slaves/%s", device)); err == nil && len(links) > 0 {
+            for _, link := range links {
+                parts := strings.Split(link, "/")
+                for _, part := range parts {  // ИСПРАВЛЕНО: убрана неиспользуемая переменная i
+                    if strings.HasPrefix(part, "md") {
+                        return true, "/dev/" + part
+                    }
+                }
+            }
+        }
+    }
+    
+    return false, ""
+}
+
+// НОВАЯ ФУНКЦИЯ: Получает использование RAID-массива
+func getRaidUsage(raidDevice string) (float64, string, string) {
+    if runtime.GOOS != "linux" {
+        return 0.0, "", ""
+    }
+    
+    // Получаем размер RAID через blockdev
+    cmd := exec.Command("blockdev", "--getsize64", raidDevice)
+    sizeOutput, err := cmd.Output()
+    if err != nil {
+        return 0.0, "", ""
+    }
+    
+    sizeStr := strings.TrimSpace(string(sizeOutput))
+    sizeBytes, err := strconv.ParseUint(sizeStr, 10, 64)
+    if err != nil {
+        return 0.0, "", ""
+    }
+    
+    // Пытаемся получить использование через df
+    cmd = exec.Command("df", "-B1", "--output=used,size", raidDevice)
+    dfOutput, err := cmd.Output()
+    if err != nil {
+        // Если df не сработал, возможно RAID не смонтирован
+        return 0.0, formatBytes(sizeBytes), formatBytes(0)
+    }
+    
+    lines := strings.Split(string(dfOutput), "\n")
+    if len(lines) >= 2 {
+        fields := strings.Fields(lines[1])
+        if len(fields) >= 2 {
+            usedBytes, _ := strconv.ParseUint(fields[0], 10, 64)
+            totalBytes, _ := strconv.ParseUint(fields[1], 10, 64)
+            if totalBytes > 0 {
+                usePercent := float64(usedBytes) / float64(totalBytes) * 100
+                return usePercent, formatBytes(usedBytes), formatBytes(totalBytes)
+            }
+        }
+    }
+    
+    return 0.0, formatBytes(sizeBytes), formatBytes(0)
+}
+
+// НОВАЯ ФУНКЦИЯ: Улучшает информацию о RAID-дисках
+func enhanceRaidDiskInfo(disks []DiskInfo) []DiskInfo {
+    // Создаем карту RAID-устройств и их использования
+    raidUsageMap := make(map[string]struct {
+        usePercent float64
+        used       string
+        size       string
+    })
+    
+    // Сначала собираем информацию о RAID-массивах
+    for _, disk := range disks {
+        if strings.HasPrefix(disk.Filesystem, "/dev/md") && disk.MountedOn != "(unmounted)" {
+            // Это смонтированный RAID - у него есть данные об использовании
+            raidUsageMap[disk.Filesystem] = struct {
+                usePercent float64
+                used       string
+                size       string
+            }{
+                usePercent: disk.UsePercent,
+                used:       disk.Used,
+                size:       disk.Size,
+            }
+        }
+    }
+    
+    // Теперь проверяем все диски на принадлежность к RAID
+    for i := range disks {
+        disk := &disks[i]
+        device := strings.TrimPrefix(disk.Filesystem, "/dev/")
+        
+        // Пропускаем уже смонтированные RAID
+        if strings.HasPrefix(disk.Filesystem, "/dev/md") {
+            continue
+        }
+        
+        // Проверяем, является ли диск частью RAID
+        if isRaid, raidDevice := isDiskPartOfRaid(device); isRaid {
+            // Обновляем информацию о диске
+            disk.Physical = true
+            disk.DiskType = "RAID Component"
+            
+            // Если у нас есть информация об использовании RAID
+            if raidUsage, exists := raidUsageMap[raidDevice]; exists {
+                disk.UsePercent = raidUsage.usePercent
+                disk.Used = raidUsage.used
+                disk.Size = raidUsage.size
+                // Рассчитываем доступное пространство
+                if usedMB := extractMemoryMB(raidUsage.used); usedMB > 0 {
+                    if totalMB := extractMemoryMB(raidUsage.size); totalMB > 0 {
+                        availableMB := totalMB - usedMB
+                        disk.Available = formatBytes(uint64(availableMB) * 1024 * 1024)
+                    }
+                }
+            } else {
+                // Пытаемся получить использование RAID
+                if usePercent, used, size := getRaidUsage(raidDevice); usePercent > 0 {
+                    disk.UsePercent = usePercent
+                    disk.Used = used
+                    disk.Size = size
+                    // Рассчитываем доступное пространство
+                    if usedMB := extractMemoryMB(used); usedMB > 0 {
+                        if totalMB := extractMemoryMB(size); totalMB > 0 {
+                            availableMB := totalMB - usedMB
+                            disk.Available = formatBytes(uint64(availableMB) * 1024 * 1024)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return disks
+}
+
+// НОВАЯ ФУНКЦИЯ: Извлекает числовое значение памяти в MB
+func extractMemoryMB(memoryStr string) int {
+    // Пример: "8192 MB" -> 8192, "1.0 GB" -> 1024
+    parts := strings.Fields(memoryStr)
+    if len(parts) < 2 {
+        return 0
+    }
+    
+    valueStr := parts[0]
+    unit := strings.ToUpper(parts[1])
+    
+    value, err := strconv.ParseFloat(valueStr, 64)
+    if err != nil {
+        return 0
+    }
+    
+    switch {
+    case strings.Contains(unit, "GB"):
+        return int(value * 1024)
+    case strings.Contains(unit, "MB"):
+        return int(value)
+    case strings.Contains(unit, "KB"):
+        return int(value / 1024)
+    case strings.Contains(unit, "B"):
+        return int(value / (1024 * 1024))
+    case strings.Contains(unit, "TB"):
+        return int(value * 1024 * 1024)
+    default:
+        return int(value)
+    }
 }
