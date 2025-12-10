@@ -137,7 +137,7 @@ func (t *TUI) renderLogo(startRow int) int {
     cyan := tcell.StyleDefault.Foreground(tcell.ColorTeal).Bold(true)
     // Заменяем printCentered на printSimple для вывода слева
     for i, line := range logo {
-        // Добавляем 2 пробела для отступа от левого края
+        // Добавляем 2 пробела для отступа от левого краю
         t.printSimple(startRow+i, "  "+line, cyan)
     }
     
@@ -493,6 +493,9 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // Определяем, является ли устройство несмонтированным
     isUnmounted := d.MountedOn == "(unmounted)" || strings.Contains(d.MountedOn, "unmounted") || d.MountedOn == ""
     
+    // Определяем, является ли устройство компонентом RAID
+    isRaidComponent := strings.Contains(d.DiskType, "RAID") && !strings.HasPrefix(d.Filesystem, "/dev/md")
+    
     // Определяем цвет для использования
     usageColor := tcell.ColorLightCoral
     if d.UsePercent < 70 {
@@ -516,7 +519,11 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
         diskInfo = fmt.Sprintf("%s: %s (%s)", d.Filesystem, mountPoint, devType)
     } else {
         // Для несмонтированных устройств
-        diskInfo = fmt.Sprintf("%s: (unmounted) - %s", d.Filesystem, devType)
+        if isRaidComponent {
+            diskInfo = fmt.Sprintf("%s: (RAID component) - %s", d.Filesystem, devType)
+        } else {
+            diskInfo = fmt.Sprintf("%s: (unmounted) - %s", d.Filesystem, devType)
+        }
     }
     
     row = t.printSimple(row, diskInfo, tcell.StyleDefault.Foreground(tcell.ColorAqua))
@@ -559,29 +566,55 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     // ГИСТОГРАММА ИСПОЛЬЗОВАНИЯ - ПОКАЗЫВАЕМ ДЛЯ ВСЕХ УСТРОЙСТВ
     // Проверяем, есть ли данные о размере
     if d.Size != "" && d.Size != "0 B" && d.Size != "Unknown" {
-        // Для несмонтированных устройств UsePercent = 0, но мы все равно показываем гистограмму
-        diskGraph := t.createSolidGraph(d.UsePercent)
-        
-        // Формируем текст использования
-        var usageText string
-        if !isUnmounted && d.Used != "" && d.Used != "0 B" {
-            // Для смонтированных устройств с данными об использовании
-            usageText = fmt.Sprintf("Usage: %s / %s %.1f%%", 
+        // Для компонентов RAID показываем реальное использование
+        if isRaidComponent && d.UsePercent > 0 {
+            // Для компонентов RAID с известным использованием
+            diskGraph := t.createSolidGraph(d.UsePercent)
+            
+            usageText := fmt.Sprintf("RAID Usage: %s / %s %.1f%%", 
                 d.Used, d.Size, d.UsePercent)
+            
+            row = t.printSimple(row, usageText, 
+                tcell.StyleDefault.Foreground(usageColor))
+            
+            // Гистограмма на отдельной строке
+            row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
+                tcell.StyleDefault.Foreground(usageColor))
+        } else if !isUnmounted && d.Used != "" && d.Used != "0 B" {
+            // Для смонтированных устройств с данными об использовании
+            diskGraph := t.createSolidGraph(d.UsePercent)
+            
+            usageText := fmt.Sprintf("Usage: %s / %s %.1f%%", 
+                d.Used, d.Size, d.UsePercent)
+            
+            row = t.printSimple(row, usageText, 
+                tcell.StyleDefault.Foreground(usageColor))
+            
+            // Гистограмма на отдельной строке
+            row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
+                tcell.StyleDefault.Foreground(usageColor))
         } else if !isUnmounted {
             // Для смонтированных устройств без данных об использовании
-            usageText = fmt.Sprintf("Size: %s (usage data not available)", d.Size)
+            usageText := fmt.Sprintf("Size: %s (usage data not available)", d.Size)
+            row = t.printSimple(row, usageText, 
+                tcell.StyleDefault.Foreground(tcell.ColorGray))
         } else {
-            // Для несмонтированных устройств
-            usageText = fmt.Sprintf("Size: %s (unmounted)", d.Size)
+            // Для несмонтированных устройств (не RAID компонентов)
+            if d.UsePercent > 0 {
+                // Если есть данные об использовании (например, из RAID)
+                diskGraph := t.createSolidGraph(d.UsePercent)
+                usageText := fmt.Sprintf("Size: %s (RAID usage: %.1f%%)", d.Size, d.UsePercent)
+                row = t.printSimple(row, usageText, 
+                    tcell.StyleDefault.Foreground(usageColor))
+                row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
+                    tcell.StyleDefault.Foreground(usageColor))
+            } else {
+                // Для обычных несмонтированных устройств
+                usageText := fmt.Sprintf("Size: %s (unmounted)", d.Size)
+                row = t.printSimple(row, usageText, 
+                    tcell.StyleDefault.Foreground(tcell.ColorGray))
+            }
         }
-        
-        row = t.printSimple(row, usageText, 
-            tcell.StyleDefault.Foreground(usageColor))
-        
-        // Гистограмма на отдельной строке - ВСЕГДА показываем, даже если 0%
-        row = t.printSimple(row, fmt.Sprintf("  %.1f%% %s", d.UsePercent, diskGraph), 
-            tcell.StyleDefault.Foreground(usageColor))
     } else {
         // Для устройств без данных о размере
         row = t.printSimple(row, "Size information not available", 
