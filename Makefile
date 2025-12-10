@@ -1,7 +1,7 @@
 .PHONY: all build linux windows macos clean install
 
 BINARY_NAME=kern
-VERSION=1.2.3
+# УДАЛИТЬ строку: VERSION=1.2.3 - версия берется из main.go
 
 # Добавить платформо-специфичные флаги
 BUILD_FLAGS_LINUX = -tags linux
@@ -25,7 +25,8 @@ windows:
 
 macos:
 	@echo "Building for MacOS..."
-	GOOS=darwin GOARCH=amd64 go build -o bin/$(BINARY_NAME)-macos ./cmd/kern
+	GOOS=darwin GOARCH=amd64 go build -o bin/$(BINARY_NAME)-macos-amd64 ./cmd/kern
+	GOOS=darwin GOARCH=arm64 go build -o bin/$(BINARY_NAME)-macos-arm64 ./cmd/kern
 
 # Целевые платформы
 build-linux:
@@ -35,7 +36,8 @@ build-windows:
 	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS_WINDOWS) -o bin/kern.exe ./cmd/kern
 
 build-darwin:
-	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-macos ./cmd/kern
+	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-darwin-amd64 ./cmd/kern
+	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-darwin-arm64 ./cmd/kern
 
 release: linux windows macos
 	@echo "Creating release packages..."
@@ -69,4 +71,4 @@ dev-clean:
 .PHONY: docker
 docker:
 	@echo "Building Docker image..."
-	docker build -t kern:$(VERSION) .
+	docker build -t kern:$(shell grep 'const version' cmd/kern/main.go | awk -F'"' '{print $$2}') .

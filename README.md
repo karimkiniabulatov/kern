@@ -32,23 +32,33 @@
 
 #### Linux/macOS
 ```bash
-# Download and install
-curl -L https://github.com/karimkiniabulatov/kern/releases/latest/download/kern-linux -o kern
-chmod +x kern
-sudo mv kern /usr/local/bin/
+# Download the appropriate binary for your platform
+# Linux AMD64
+wget https://github.com/karimkiniabulatov/kern/releases/latest/download/kern-{version}-linux-amd64.tar.gz
+tar -xzf kern-{version}-linux-amd64.tar.gz
+cd kern-linux-amd64
+sudo cp kern /usr/local/bin/
+sudo chmod +x /usr/local/bin/kern
 
-# Or install from source
-git clone https://github.com/karimkiniabulatov/kern
-cd kern
-make build
-sudo make install
+# Linux ARM64
+wget https://github.com/karimkiniabulatov/kern/releases/latest/download/kern-{version}-linux-arm64.tar.gz
+
+# macOS Intel
+wget https://github.com/karimkiniabulatov/kern/releases/latest/download/kern-{version}-macos-amd64.tar.gz
+
+# macOS Apple Silicon
+wget https://github.com/karimkiniabulatov/kern/releases/latest/download/kern-{version}-macos-arm64.tar.gz
 
 -----------------------------------------------------------------------------
 
 Windows
 
-# Download from releases and add to PATH
-# Or use winget (coming soon)
+Windows
+Download kern-{version}-windows-amd64.zip from releases
+
+Extract and run install.bat as Administrator
+
+Or run kern.exe directly
 
 -----------------------------------------------------------------------------
 

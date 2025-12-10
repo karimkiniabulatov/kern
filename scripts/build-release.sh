@@ -2,12 +2,16 @@
 set -e
 
 echo "Building kern - System Monitoring Tool"
-VERSION="1.2.3"
+# УДАЛИТЬ строку: VERSION="1.2.3" - используем версию из main.go
 
 # Определяем корневую директорию проекта
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "Project root: $PROJECT_ROOT"
+
+# Получаем версию из main.go динамически
+VERSION=$(grep 'const version' "$PROJECT_ROOT/cmd/kern/main.go" | awk -F'"' '{print $2}')
+echo "Building version: $VERSION"
 
 # Переходим в корневую директорию проекта
 cd "$PROJECT_ROOT"
@@ -16,14 +20,6 @@ cd "$PROJECT_ROOT"
 MAIN_GO="./cmd/kern/main.go"
 if [ ! -f "$MAIN_GO" ]; then
     echo "Error: main.go not found at $MAIN_GO"
-    echo "Project structure should be:"
-    echo "  kern/"
-    echo "  ├── cmd/"
-    echo "  │   └── kern/"
-    echo "  │       └── main.go"
-    echo "  ├── scripts/"
-    echo "  │   └── build-release.sh"
-    echo "  └── ..."
     exit 1
 fi
 
@@ -38,6 +34,9 @@ build_target() {
     
     echo "Building for $os/$arch..."
     
+    # Создаем целевую директорию
+    mkdir -p "$output_dir"
+    
     if [ "$os" = "windows" ]; then
         GOOS=$os GOARCH=$arch go build -o "$output_dir/kern.exe" -ldflags="-s -w" ./cmd/kern
         GOOS=$os GOARCH=$arch go build -o "$output_dir/kern-service.exe" -ldflags="-s -w -H=windowsgui" ./cmd/kern
@@ -45,21 +44,24 @@ build_target() {
         GOOS=$os GOARCH=$arch go build -o "$output_dir/kern" -ldflags="-s -w" ./cmd/kern
     fi
     
-    # Копируем конфиги
-    mkdir -p "$output_dir/config"
-    cp i18n/active.*.json "$output_dir/config/" 2>/dev/null || echo "No language files found, continuing..."
+    # Копируем конфиги если есть
+    if [ -d "i18n" ]; then
+        mkdir -p "$output_dir/config"
+        cp i18n/active.*.json "$output_dir/config/" 2>/dev/null || echo "No language files found, continuing..."
+    fi
     
     # Создаем README
-    create_readme "$os" "$output_dir"
+    create_readme "$os" "$output_dir" "$VERSION"
 }
 
 # Функция создания README для платформы
 create_readme() {
     local os=$1
     local dir=$2
+    local version=$3
     
     cat > "$dir/README.md" << EOF
-# kern v$VERSION for $os
+# kern v$version for $os
 
 ## Installation
 
@@ -69,7 +71,7 @@ sudo cp kern /usr/local/bin/
 sudo chmod +x /usr/local/bin/kern
 \`\`\`
 
-### MacOS
+### macOS
 \`\`\`bash
 sudo cp kern /usr/local/bin/
 # Or use Homebrew (coming soon)
@@ -87,7 +89,7 @@ kern --all
 # API server
 kern --remote
 
-# Service mode (Linux/Mac)
+# Service mode (Linux/macOS)
 kern --daemon
 
 # Remote monitoring
@@ -163,30 +165,33 @@ EOF
 
 # Создаем директории для сборки
 echo "Creating build directories..."
-mkdir -p dist/{linux,linux-arm64,macos,windows}
+rm -rf dist
+mkdir -p dist/{linux-amd64,linux-arm64,macos-amd64,macos-arm64,windows-amd64}
 mkdir -p build
 
-# Сборка для десктопных платформ
+# Сборка для всех платформ
 echo ""
-echo "=== Building for Desktop Platforms ==="
+echo "=== Building for All Platforms ==="
 
-build_target linux amd64 dist/linux kern
+build_target linux amd64 dist/linux-amd64 kern
 build_target linux arm64 dist/linux-arm64 kern
-build_target darwin amd64 dist/macos kern
-build_target windows amd64 dist/windows kern
+build_target darwin amd64 dist/macos-amd64 kern
+build_target darwin arm64 dist/macos-arm64 kern
+build_target windows amd64 dist/windows-amd64 kern
 
-echo "Desktop builds complete!"
+echo "All builds complete!"
 
-# Создаем архивы для десктопных платформ
+# Создаем архивы для всех платформ
 echo ""
 echo "Creating distribution archives..."
 cd dist
 
-# Архивируем десктопные платформы
-tar -czf kern-$VERSION-linux-amd64.tar.gz linux/*
+# Архивируем все платформы
+tar -czf kern-$VERSION-linux-amd64.tar.gz linux-amd64/*
 tar -czf kern-$VERSION-linux-arm64.tar.gz linux-arm64/*
-tar -czf kern-$VERSION-macos-amd64.tar.gz macos/*
-zip -r kern-$VERSION-windows-amd64.zip windows/*
+tar -czf kern-$VERSION-macos-amd64.tar.gz macos-amd64/*
+tar -czf kern-$VERSION-macos-arm64.tar.gz macos-arm64/*
+zip -r kern-$VERSION-windows-amd64.zip windows-amd64/*
 
 # Создаем общий README
 cat > README.md << EOF
@@ -195,24 +200,26 @@ cat > README.md << EOF
 ## Available Binaries
 
 ### Desktop Platforms
-- kern-linux-amd64 - Linux 64-bit
-- kern-linux-arm64 - Linux ARM64  
-- kern-windows-amd64.exe - Windows 64-bit
-- kern-darwin-amd64 - macOS Intel
-- kern-darwin-arm64 - macOS Apple Silicon
+- kern-linux-amd64.tar.gz - Linux 64-bit
+- kern-linux-arm64.tar.gz - Linux ARM64  
+- kern-macos-amd64.tar.gz - macOS Intel
+- kern-macos-arm64.tar.gz - macOS Apple Silicon
+- kern-windows-amd64.zip - Windows 64-bit
 
 ## Quick Start
 
 ### Linux/macOS
 \`\`\`bash
-chmod +x kern-linux-amd64
-./kern-linux-amd64
+tar -xzf kern-linux-amd64.tar.gz
+cd kern-linux-amd64
+chmod +x kern
+./kern
 \`\`\`
 
 ### Windows
-\`\`\`bash
-kern-windows-amd64.exe
-\`\`\`
+1. Extract kern-windows-amd64.zip
+2. Run \`install.bat\` as Administrator
+3. Or run \`kern.exe\` directly
 
 ## Features
 - CPU, Memory, Disk, Network monitoring
@@ -238,6 +245,7 @@ echo "Distribution archives created:"
 echo "  dist/kern-$VERSION-linux-amd64.tar.gz"
 echo "  dist/kern-$VERSION-linux-arm64.tar.gz" 
 echo "  dist/kern-$VERSION-macos-amd64.tar.gz"
+echo "  dist/kern-$VERSION-macos-arm64.tar.gz"
 echo "  dist/kern-$VERSION-windows-amd64.zip"
 
 echo ""
