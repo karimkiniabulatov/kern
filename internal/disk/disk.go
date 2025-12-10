@@ -247,17 +247,13 @@ func Summary(detailed bool) ([]DiskInfo, error) {
 
 func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
     var disks []DiskInfo
-    
+    var err error
+
     // Базовое получение информации через df
     cmd := exec.Command("df", "-h")
     output, err := cmd.Output()
     if err != nil {
-        // Если df не работает, пытаемся получить информацию аппаратно
-        if detailed {
-            // Вместо вызова detectAllStorageDevices(detailed) просто возвращаем fallback
-            return getFallbackDiskInfo(), nil
-        }
-        return nil, err
+        return getFallbackDiskInfo(), nil
     }
     
     // Парсим вывод df

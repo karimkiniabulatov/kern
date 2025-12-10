@@ -459,22 +459,19 @@ func collectData(cfg *config.Config) map[string]interface{} {
     // Launch goroutines only for enabled modules
     if cfg.ShowDisk {
         go func() {
+            // Убираем использование кэша для дисков - всегда запрашиваем свежие данные
             data, err := disk.Summary(cfg.DetailedDisk)
             if err != nil {
-                // При ошибке возвращаем предыдущие данные
-                diskDataMutex.RLock()
-                // Приводим тип
-                if cached, ok := lastDiskData.([]disk.DiskInfo); ok {
-                    data = cached
-                }
-                diskDataMutex.RUnlock()
-                log.Printf("Error getting disk data: %v. Using cached data.", err)
-            } else {
-                // Обновляем предыдущие данные
-                diskDataMutex.Lock()
-                lastDiskData = data
-                diskDataMutex.Unlock()
+                log.Printf("Error getting disk data: %v", err)
+                // Возвращаем пустые данные вместо кэшированных
+                data = []disk.DiskInfo{}
             }
+            
+            // Всегда обновляем кэш
+            diskDataMutex.Lock()
+            lastDiskData = data
+            diskDataMutex.Unlock()
+            
             resultChan <- result{"disk", data, nil}
         }()
     }

@@ -535,7 +535,13 @@ func (t *TUI) renderSingleDisk(row int, d disk.DiskInfo, detailed bool) int {
     
     // ВЫВОДИМ МОДЕЛЬ ДИСКА (отдельная строка)
     if d.Model != "Unknown" && d.Model != "" {
-        modelLine := fmt.Sprintf("Model: %s", d.Model)
+        // Обрезаем модель если она слишком длинная
+        modelDisplay := d.Model
+        maxModelLength := t.width - 20 // Оставляем место для других данных
+        if len(modelDisplay) > maxModelLength {
+            modelDisplay = modelDisplay[:maxModelLength] + "..."
+        }
+        modelLine := fmt.Sprintf("Model: %s", modelDisplay)
         row = t.printSimple(row, modelLine, tcell.StyleDefault.Foreground(tcell.ColorYellow))
     }
     

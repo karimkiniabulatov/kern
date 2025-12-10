@@ -62,6 +62,7 @@ func detectAllStorageDevicesWindows() ([]DiskInfo, error) {
 }
 
 // getPhysicalDisksViaPowerShell получает информацию о физических дисках через PowerShell
+// getPhysicalDisksViaPowerShell получает информацию о физических дисках через PowerShell
 func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
     var disks []DiskInfo
 
@@ -86,6 +87,13 @@ func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
 
     // Конвертируем в DiskInfo
     for _, pd := range physicalDisks {
+        // Очищаем поля от лишних пробелов
+        friendlyName := strings.TrimSpace(pd.FriendlyName)
+        friendlyName = regexp.MustCompile(`\s+`).ReplaceAllString(friendlyName, " ")
+        
+        serialNumber := strings.TrimSpace(pd.SerialNumber)
+        manufacturer := strings.TrimSpace(pd.Manufacturer)
+        
         disk := DiskInfo{
             Filesystem:  fmt.Sprintf("PhysicalDisk%d", pd.DeviceId),
             Size:        formatBytes(pd.Size),
@@ -95,9 +103,9 @@ func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
             MountedOn:   fmt.Sprintf("Disk %d", pd.DeviceId),
             Physical:    true,
             DiskType:    convertMediaType(pd.MediaType),
-            Model:       pd.FriendlyName,
-            Serial:      pd.SerialNumber,
-            Vendor:      pd.Manufacturer, // Добавляем вендора
+            Model:       friendlyName,
+            Serial:      serialNumber,
+            Vendor:      manufacturer,
             SMARTStatus: convertHealthStatus(pd.HealthStatus),
         }
 
