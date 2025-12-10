@@ -616,6 +616,7 @@ func parseDFOutput(output string, detailed bool) ([]DiskInfo, error) {
 				Model:      model,
 				Serial:     serial,
 				SMARTStatus: smartStatus,
+				Vendor:     vendor, // ДОБАВЛЕНО: поле Vendor
 			}
 			disks = append(disks, disk)
 		}
@@ -681,6 +682,7 @@ func parseWMICOutput(output string, detailed bool) ([]DiskInfo, error) {
 				Model:      model,
 				Serial:     serial,
 				SMARTStatus: smartStatus,
+				Vendor:     vendor
 			}
 			disks = append(disks, disk)
 		}
@@ -841,12 +843,13 @@ func getRaidDetails(device string) string {
 }
 
 // detectWindowsDiskProperties определяет свойства диска для Windows систем
-func detectWindowsDiskProperties(drive string, driveType int) (bool, string, string, string, string) {
+func detectWindowsDiskProperties(drive string, driveType int) (bool, string, string, string, string, string) {
     physical := true
     diskType := "Unknown"
     model := "Unknown"
     serial := "Unknown"
     smartStatus := "UNKNOWN"
+    vendor := "Unknown" // ДОБАВЛЕНО: переменная vendor
 
     // Определяем тип по driveType
     switch driveType {
@@ -866,11 +869,11 @@ func detectWindowsDiskProperties(drive string, driveType int) (bool, string, str
 
     // Получаем дополнительную информацию через wmic
     if diskType == "Local Disk" || diskType == "Removable" {
-        cmd := exec.Command("wmic", "diskdrive", "get", "Model,SerialNumber,MediaType,InterfaceType", "/format:list")
+        cmd := exec.Command("wmic", "diskdrive", "get", "Model,SerialNumber,MediaType,InterfaceType,Manufacturer", "/format:list")
         output, err := cmd.Output()
         if err == nil {
             lines := strings.Split(string(output), "\n")
-            var currentModel, currentSerial string
+            var currentModel, currentSerial, currentManufacturer string
             
             for _, line := range lines {
                 line = strings.TrimSpace(line)
@@ -888,6 +891,8 @@ func detectWindowsDiskProperties(drive string, driveType int) (bool, string, str
                     case "External hard disk media":
                         diskType = "External"
                     }
+                } else if strings.HasPrefix(line, "Manufacturer=") {
+                    currentManufacturer = strings.TrimPrefix(line, "Manufacturer=")
                 }
             }
             
@@ -896,6 +901,9 @@ func detectWindowsDiskProperties(drive string, driveType int) (bool, string, str
             }
             if currentSerial != "" {
                 serial = currentSerial
+            }
+            if currentManufacturer != "" {
+                vendor = currentManufacturer
             }
         }
     }
@@ -906,7 +914,7 @@ func detectWindowsDiskProperties(drive string, driveType int) (bool, string, str
         physical = false
     }
 
-    return physical, diskType, model, serial, smartStatus
+    return physical, diskType, model, serial, smartStatus, vendor // ДОБАВЛЕНО: возвращаем vendor
 }
 
 // getBaseDevice возвращает базовое имя устройства без номера раздела
