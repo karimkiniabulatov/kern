@@ -1,5 +1,5 @@
 {
-  "language": "Ukrainian (Українська)", 
+  "language": "Українська",
   "language_code": "uk",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "Помилка",
       "unknown": "Невідомо",
       "total": "Всього",
-      "used": "Використано", 
+      "used": "Використано",
       "free": "Вільно",
       "available": "Доступно",
       "status": "Статус",
@@ -17,12 +17,12 @@
       "down": "НЕ ПРАЦЮЄ"
     },
     "cpu": {
-      "title": "Інформація про CPU",
+      "title": "Інформація про процесор",
       "model": "Модель",
       "cores": "Ядра",
       "threads": "Потоки",
       "usage": "Використання",
-      "frequency": "Частота", 
+      "frequency": "Частота",
       "load": "Навантаження",
       "load_1min": "1 хв",
       "load_5min": "5 хв",
@@ -30,19 +30,36 @@
       "load_average": "Середнє навантаження"
     },
     "memory": {
-      "title": "Інформація про пам'ять", 
-      "ram": "ОЗП",
-      "swap": "Своп",
+      "active": "Активна",
+      "buffers": "Буфери",
+      "cached": "Кешована",
+      "detailed_usage": "Детальне використання",
+      "inactive": "Неактивна",
+      "title": "Інформація про пам'ять",
+      "ram": "RAM",
+      "swap": "Swap",
       "physical": "Фізична пам'ять",
-      "virtual": "Віртуальна пам'ять"
+      "processes": "Процеси",
+      "virtual": "Віртуальна пам'ять",
+      "modules": "Модулі пам'яті",
+      "shared": "Спільна",
+      "slot": "Слот",
+      "module_type": "Тип",
+      "manufacturer": "Виробник",
+      "memory_speed": "Швидкість"
     },
     "disk": {
       "title": "Інформація про диск",
       "filesystem": "Файлова система",
       "size": "Розмір",
-      "mounted": "Змонтовано на", 
+      "mounted": "Змонтовано на",
       "usage": "Використання",
-      "storage": "Сховище"
+      "storage": "Сховище",
+      "physical": "Фізичний диск",
+      "logical": "Логічний диск",
+      "disk_type": "Тип диска",
+      "model": "Модель",
+      "serial": "Серійний номер"
     },
     "network": {
       "title": "Мережева інформація",
@@ -52,22 +69,31 @@
       "bytes": "байтів",
       "packets": "пакетів",
       "errors": "Помилки",
-      "network_interfaces": "Мережеві інтерфейси"
+      "network_interfaces": "Мережеві інтерфейси",
+      "connection_type": "Тип з'єднання",
+      "max_speed": "Максимальна швидкість",
+      "technology": "Технологія",
+      "signal_strength": "Сила сигналу",
+      "wired": "Провідний",
+      "wireless": "Бездротовий",
+      "bluetooth": "Bluetooth",
+      "cellular": "Стільниковий",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Інформація про GPU",
+      "title": "Інформація про відеокарту",
       "model": "Модель",
       "driver": "Драйвер",
       "temperature": "Температура",
       "memory": "Пам'ять",
       "utilization": "Використання",
       "power": "Потужність",
-      "clock_core": "Тактова частота ядра",
-      "clock_memory": "Тактова частота пам'яті",
+      "clock_core": "Частота ядра",
+      "clock_memory": "Частота пам'яті",
       "fan_speed": "Швидкість вентилятора"
     },
     "ai": {
-      "title": "Навчання ШІ",
+      "title": "AI навчання",
       "framework": "Фреймворк",
       "processes": "Процеси",
       "vram": "VRAM",
@@ -75,27 +101,27 @@
       "batch_size": "Розмір партії",
       "throughput": "Пропускна здатність",
       "epoch": "Епоха",
-      "loss": "Втрати",
+      "loss": "Втрата",
       "accuracy": "Точність",
       "training_time": "Час навчання",
-      "no_training": "Навчання ШІ не виявлено"
+      "no_training": "AI навчання не виявлено"
     },
     "mining": {
       "title": "Інформація про майнінг",
       "algorithm": "Алгоритм",
       "hashrate": "Хешрейт",
-      "shares": "Шери",
+      "shares": "Акції",
       "temperature": "Температура",
       "power": "Потужність",
       "efficiency": "Ефективність",
       "uptime": "Час роботи",
       "revenue_24h": "Дохід за 24 год",
       "pool": "Пул",
-      "not_detected": "Активність майнінгу не виявлено"
+      "not_detected": "Майнінг активність не виявлено"
     },
     "ui": {
       "histogram": "Гістограма",
-      "vertical": "Вертикально", 
+      "vertical": "Вертикально",
       "horizontal": "Горизонтально",
       "loading": "Завантаження...",
       "no_data": "Немає даних",
@@ -106,11 +132,11 @@
       "version": "Версія",
       "all": "Вся інформація",
       "disk_only": "Тільки диск",
-      "cpu_only": "Тільки CPU",
-      "memory_only": "Тільки пам'ять", 
+      "cpu_only": "Тільки процесор",
+      "memory_only": "Тільки пам'ять",
       "network_only": "Тільки мережа",
-      "gpu_only": "Тільки GPU",
-      "ai_only": "Тільки навчання ШІ",
+      "gpu_only": "Тільки відеокарта",
+      "ai_only": "Тільки AI навчання",
       "mining_only": "Тільки майнінг",
       "refresh_rate": "Частота оновлення",
       "language": "Мова",
@@ -118,22 +144,27 @@
       "port": "Порт"
     },
     "errors": {
-      "command_not_found": "Команду не знайдено: %s",
+      "command_not_found": "Команда не знайдена: %s",
       "invalid_port": "Недійсний порт: %d",
-      "invalid_refresh": "Недійсний інтервал оновлення: %d", 
+      "invalid_refresh": "Недійсний інтервал оновлення: %d",
       "config_load_failed": "Не вдалося завантажити конфігурацію",
       "module_failed": "Модуль %s не вдався: %v",
-      "nvidia_smi_not_found": "nvidia-smi не знайдено. Для моніторингу GPU потрібні драйвери NVIDIA",
-      "rocm_smi_not_found": "rocm-smi не знайдено. Для моніторингу AMD GPU потрібен ROCm"
+      "nvidia_smi_not_found": "nvidia-smi не знайдено. Моніторинг GPU NVIDIA вимагає драйверів NVIDIA",
+      "rocm_smi_not_found": "rocm-smi не знайдено. Моніторинг GPU AMD вимагає ROCm"
     },
     "status": {
       "monitoring_started": "Моніторинг розпочато",
-      "updating_every": "Оновлення кожні %d секунд", 
+      "updating_every": "Оновлюється кожні %d секунд",
       "press_ctrl_c": "Натисніть Ctrl+C для виходу",
-      "remote_mode": "Віддалений режим на порті %d",
-      "gpu_detected": "GPU виявлено: %s",
-      "ai_training_detected": "Процеси навчання ШІ виявлено: %d",
-      "mining_detected": "Активність майнінгу виявлено: %s"
+      "remote_mode": "Віддалений режим на порту %d",
+      "gpu_detected": "Відеокарта виявлена: %s",
+      "ai_training_detected": "Процеси AI навчання виявлено: %d",
+      "mining_detected": "Майнінг активність виявлена: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU пристрої",
+      "multiple_cpus": "CPU процесори",
+      "device_number": "Пристрій #%d"
     }
   }
 }

@@ -1,28 +1,28 @@
 {
-  "language": "Polish (Polski)", 
+  "language": "Polski",
   "language_code": "pl",
   "translations": {
     "common": {
-      "title": "kern - Monitor Systemu",
+      "title": "kern - Monitor systemu",
       "refresh": "Odśwież",
       "seconds": "sek",
       "error": "Błąd",
       "unknown": "Nieznany",
       "total": "Razem",
-      "used": "Używane", 
+      "used": "Użyte",
       "free": "Wolne",
       "available": "Dostępne",
       "status": "Status",
       "up": "DZIAŁA",
-      "down": "NIEDZIAŁA"
+      "down": "WYŁĄCZONY"
     },
     "cpu": {
-      "title": "Informacje o CPU",
+      "title": "Informacje o procesorze",
       "model": "Model",
       "cores": "Rdzenie",
       "threads": "Wątki",
       "usage": "Użycie",
-      "frequency": "Częstotliwość", 
+      "frequency": "Częstotliwość",
       "load": "Obciążenie",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Średnie obciążenie"
     },
     "memory": {
-      "title": "Informacje o pamięci", 
+      "active": "Aktywne",
+      "buffers": "Bufory",
+      "cached": "Pamięć podręczna",
+      "detailed_usage": "Szczegółowe użycie",
+      "inactive": "Nieaktywne",
+      "title": "Informacje o pamięci",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Pamięć fizyczna",
-      "virtual": "Pamięć wirtualna"
+      "processes": "Procesy",
+      "virtual": "Pamięć wirtualna",
+      "modules": "Moduły pamięci",
+      "shared": "Współdzielone",
+      "slot": "Gniazdo",
+      "module_type": "Typ",
+      "manufacturer": "Producent",
+      "memory_speed": "Prędkość"
     },
     "disk": {
       "title": "Informacje o dysku",
       "filesystem": "System plików",
       "size": "Rozmiar",
-      "mounted": "Zamontowany na", 
+      "mounted": "Zamontowany w",
       "usage": "Użycie",
-      "storage": "Przechowywanie"
+      "storage": "Przechowywanie",
+      "physical": "Dysk fizyczny",
+      "logical": "Dysk logiczny",
+      "disk_type": "Typ dysku",
+      "model": "Model",
+      "serial": "Numer seryjny"
     },
     "network": {
       "title": "Informacje o sieci",
@@ -52,10 +69,19 @@
       "bytes": "bajty",
       "packets": "pakiety",
       "errors": "Błędy",
-      "network_interfaces": "Interfejsy sieciowe"
+      "network_interfaces": "Interfejsy sieciowe",
+      "connection_type": "Typ połączenia",
+      "max_speed": "Maksymalna prędkość",
+      "technology": "Technologia",
+      "signal_strength": "Siła sygnału",
+      "wired": "Przewodowe",
+      "wireless": "Bezprzewodowe",
+      "bluetooth": "Bluetooth",
+      "cellular": "Komórkowe",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Informacje o GPU",
+      "title": "Informacje o karcie graficznej",
       "model": "Model",
       "driver": "Sterownik",
       "temperature": "Temperatura",
@@ -81,7 +107,7 @@
       "no_training": "Nie wykryto szkolenia AI"
     },
     "mining": {
-      "title": "Informacje o kopaniu",
+      "title": "Informacje o wydobyciu",
       "algorithm": "Algorytm",
       "hashrate": "Hashrate",
       "shares": "Udziały",
@@ -89,13 +115,13 @@
       "power": "Moc",
       "efficiency": "Wydajność",
       "uptime": "Czas pracy",
-      "revenue_24h": "Zysk 24h",
+      "revenue_24h": "Przychód 24h",
       "pool": "Pool",
-      "not_detected": "Nie wykryto aktywności kopania"
+      "not_detected": "Nie wykryto aktywności wydobywczej"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Pionowy", 
+      "vertical": "Pionowy",
       "horizontal": "Poziomy",
       "loading": "Ładowanie...",
       "no_data": "Brak danych",
@@ -106,12 +132,12 @@
       "version": "Wersja",
       "all": "Wszystkie informacje",
       "disk_only": "Tylko dysk",
-      "cpu_only": "Tylko CPU",
-      "memory_only": "Tylko pamięć", 
+      "cpu_only": "Tylko procesor",
+      "memory_only": "Tylko pamięć",
       "network_only": "Tylko sieć",
-      "gpu_only": "Tylko GPU",
+      "gpu_only": "Tylko karta graficzna",
       "ai_only": "Tylko szkolenie AI",
-      "mining_only": "Tylko kopanie",
+      "mining_only": "Tylko wydobycie",
       "refresh_rate": "Częstotliwość odświeżania",
       "language": "Język",
       "remote": "Tryb zdalny",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Nie znaleziono polecenia: %s",
       "invalid_port": "Nieprawidłowy port: %d",
-      "invalid_refresh": "Nieprawidłowy interwał odświeżania: %d", 
+      "invalid_refresh": "Nieprawidłowy interwał odświeżania: %d",
       "config_load_failed": "Nie udało się załadować konfiguracji",
       "module_failed": "Moduł %s nie powiódł się: %v",
-      "nvidia_smi_not_found": "Nie znaleziono nvidia-smi. Monitorowanie GPU wymaga sterowników NVIDIA",
-      "rocm_smi_not_found": "Nie znaleziono rocm-smi. Monitorowanie AMD GPU wymaga ROCm"
+      "nvidia_smi_not_found": "Nie znaleziono nvidia-smi. Monitorowanie GPU NVIDIA wymaga sterowników NVIDIA",
+      "rocm_smi_not_found": "Nie znaleziono rocm-smi. Monitorowanie GPU AMD wymaga ROCm"
     },
     "status": {
       "monitoring_started": "Rozpoczęto monitorowanie",
-      "updating_every": "Aktualizacja co %d sekund", 
+      "updating_every": "Aktualizacja co %d sekund",
       "press_ctrl_c": "Naciśnij Ctrl+C, aby wyjść",
       "remote_mode": "Tryb zdalny na porcie %d",
-      "gpu_detected": "Wykryto GPU: %s",
+      "gpu_detected": "Wykryto kartę graficzną: %s",
       "ai_training_detected": "Wykryto procesy szkolenia AI: %d",
-      "mining_detected": "Wykryto aktywność kopania: %s"
+      "mining_detected": "Wykryto aktywność wydobywczą: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Urządzenia GPU",
+      "multiple_cpus": "Procesory CPU",
+      "device_number": "Urządzenie #%d"
     }
   }
 }

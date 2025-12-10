@@ -1,15 +1,15 @@
 {
-  "language": "Indonesian (Bahasa Indonesia)", 
+  "language": "Bahasa Indonesia",
   "language_code": "id",
   "translations": {
     "common": {
-      "title": "kern - Monitor Sistem",
+      "title": "kern - Pemantau Sistem",
       "refresh": "Segarkan",
       "seconds": "detik",
       "error": "Kesalahan",
       "unknown": "Tidak diketahui",
       "total": "Total",
-      "used": "Digunakan", 
+      "used": "Digunakan",
       "free": "Bebas",
       "available": "Tersedia",
       "status": "Status",
@@ -19,10 +19,10 @@
     "cpu": {
       "title": "Informasi CPU",
       "model": "Model",
-      "cores": "Core",
+      "cores": "Inti",
       "threads": "Thread",
       "usage": "Penggunaan",
-      "frequency": "Frekuensi", 
+      "frequency": "Frekuensi",
       "load": "Beban",
       "load_1min": "1 menit",
       "load_5min": "5 menit",
@@ -30,29 +30,55 @@
       "load_average": "Rata-rata Beban"
     },
     "memory": {
-      "title": "Informasi Memori", 
+      "active": "Aktif",
+      "buffers": "Buffer",
+      "cached": "Cache",
+      "detailed_usage": "Penggunaan Detail",
+      "inactive": "Nonaktif",
+      "title": "Informasi Memori",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memori Fisik",
-      "virtual": "Memori Virtual"
+      "processes": "Proses",
+      "virtual": "Memori Virtual",
+      "modules": "Modul Memori",
+      "shared": "Dibagikan",
+      "slot": "Slot",
+      "module_type": "Tipe",
+      "manufacturer": "Pabrikan",
+      "memory_speed": "Kecepatan"
     },
     "disk": {
       "title": "Informasi Disk",
-      "filesystem": "Sistem file",
+      "filesystem": "Sistem File",
       "size": "Ukuran",
-      "mounted": "Terpasang di", 
+      "mounted": "Terpasang di",
       "usage": "Penggunaan",
-      "storage": "Penyimpanan"
+      "storage": "Penyimpanan",
+      "physical": "Disk Fisik",
+      "logical": "Disk Logis",
+      "disk_type": "Tipe Disk",
+      "model": "Model",
+      "serial": "Serial"
     },
     "network": {
       "title": "Informasi Jaringan",
       "interface": "Antarmuka",
       "received": "Diterima",
       "sent": "Dikirim",
-      "bytes": "byte",
+      "bytes": "bytes",
       "packets": "paket",
       "errors": "Kesalahan",
-      "network_interfaces": "Antarmuka Jaringan"
+      "network_interfaces": "Antarmuka Jaringan",
+      "connection_type": "Tipe Koneksi",
+      "max_speed": "Kecepatan Maksimum",
+      "technology": "Teknologi",
+      "signal_strength": "Kekuatan Sinyal",
+      "wired": "Kabel",
+      "wireless": "Nirkabel",
+      "bluetooth": "Bluetooth",
+      "cellular": "Seluler",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Informasi GPU",
@@ -62,7 +88,7 @@
       "memory": "Memori",
       "utilization": "Utilisasi",
       "power": "Daya",
-      "clock_core": "Clock Core",
+      "clock_core": "Clock Inti",
       "clock_memory": "Clock Memori",
       "fan_speed": "Kecepatan Kipas"
     },
@@ -78,7 +104,7 @@
       "loss": "Loss",
       "accuracy": "Akurasi",
       "training_time": "Waktu Pelatihan",
-      "no_training": "Tidak ada pelatihan AI yang terdeteksi"
+      "no_training": "Tidak terdeteksi pelatihan AI"
     },
     "mining": {
       "title": "Informasi Mining",
@@ -89,13 +115,13 @@
       "power": "Daya",
       "efficiency": "Efisiensi",
       "uptime": "Uptime",
-      "revenue_24h": "Pendapatan 24 jam",
+      "revenue_24h": "Pendapatan 24 Jam",
       "pool": "Pool",
-      "not_detected": "Tidak ada aktivitas mining yang terdeteksi"
+      "not_detected": "Tidak terdeteksi aktivitas mining"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Vertikal", 
+      "vertical": "Vertikal",
       "horizontal": "Horizontal",
       "loading": "Memuat...",
       "no_data": "Tidak ada data",
@@ -107,33 +133,38 @@
       "all": "Semua informasi",
       "disk_only": "Hanya disk",
       "cpu_only": "Hanya CPU",
-      "memory_only": "Hanya memori", 
+      "memory_only": "Hanya memori",
       "network_only": "Hanya jaringan",
       "gpu_only": "Hanya GPU",
       "ai_only": "Hanya pelatihan AI",
       "mining_only": "Hanya mining",
-      "refresh_rate": "Tingkat penyegaran",
+      "refresh_rate": "Laju penyegaran",
       "language": "Bahasa",
-      "remote": "Mode remote",
+      "remote": "Mode jarak jauh",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Perintah tidak ditemukan: %s",
       "invalid_port": "Port tidak valid: %d",
-      "invalid_refresh": "Interval penyegaran tidak valid: %d", 
+      "invalid_refresh": "Interval penyegaran tidak valid: %d",
       "config_load_failed": "Gagal memuat konfigurasi",
       "module_failed": "Modul %s gagal: %v",
-      "nvidia_smi_not_found": "nvidia-smi tidak ditemukan. Pemantauan GPU memerlukan driver NVIDIA",
-      "rocm_smi_not_found": "rocm-smi tidak ditemukan. Pemantauan AMD GPU memerlukan ROCm"
+      "nvidia_smi_not_found": "nvidia-smi tidak ditemukan. Pemantauan GPU NVIDIA memerlukan driver NVIDIA",
+      "rocm_smi_not_found": "rocm-smi tidak ditemukan. Pemantauan GPU AMD memerlukan ROCm"
     },
     "status": {
       "monitoring_started": "Pemantauan dimulai",
-      "updating_every": "Memperbarui setiap %d detik", 
+      "updating_every": "Memperbarui setiap %d detik",
       "press_ctrl_c": "Tekan Ctrl+C untuk keluar",
-      "remote_mode": "Mode remote pada port %d",
+      "remote_mode": "Mode jarak jauh pada port %d",
       "gpu_detected": "GPU terdeteksi: %s",
       "ai_training_detected": "Proses pelatihan AI terdeteksi: %d",
       "mining_detected": "Aktivitas mining terdeteksi: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Perangkat GPU",
+      "multiple_cpus": "Prosesor CPU",
+      "device_number": "Perangkat #%d"
     }
   }
 }

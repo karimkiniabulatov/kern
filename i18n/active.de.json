@@ -1,15 +1,15 @@
 {
-  "language": "German (Deutsch)", 
+  "language": "Deutsch",
   "language_code": "de",
   "translations": {
     "common": {
       "title": "kern - Systemmonitor",
       "refresh": "Aktualisieren",
-      "seconds": "Sek",
+      "seconds": "Sek.",
       "error": "Fehler",
       "unknown": "Unbekannt",
       "total": "Gesamt",
-      "used": "Verwendet", 
+      "used": "Verwendet",
       "free": "Frei",
       "available": "Verfügbar",
       "status": "Status",
@@ -21,28 +21,45 @@
       "model": "Modell",
       "cores": "Kerne",
       "threads": "Threads",
-      "usage": "Nutzung",
-      "frequency": "Frequenz", 
+      "usage": "Auslastung",
+      "frequency": "Frequenz",
       "load": "Last",
-      "load_1min": "1 Min",
-      "load_5min": "5 Min",
-      "load_15min": "15 Min",
+      "load_1min": "1 Min.",
+      "load_5min": "5 Min.",
+      "load_15min": "15 Min.",
       "load_average": "Durchschnittslast"
     },
     "memory": {
-      "title": "Speicherinformationen", 
+      "active": "Aktiv",
+      "buffers": "Puffer",
+      "cached": "Cache",
+      "detailed_usage": "Detaillierte Auslastung",
+      "inactive": "Inaktiv",
+      "title": "Speicherinformationen",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Physischer Speicher",
-      "virtual": "Virtueller Speicher"
+      "processes": "Prozesse",
+      "virtual": "Virtueller Speicher",
+      "modules": "Speichermodule",
+      "shared": "Gemeinsam genutzt",
+      "slot": "Steckplatz",
+      "module_type": "Typ",
+      "manufacturer": "Hersteller",
+      "memory_speed": "Geschwindigkeit"
     },
     "disk": {
       "title": "Festplatteninformationen",
       "filesystem": "Dateisystem",
       "size": "Größe",
-      "mounted": "Eingehängt auf", 
-      "usage": "Nutzung",
-      "storage": "Speicher"
+      "mounted": "Eingehängt auf",
+      "usage": "Auslastung",
+      "storage": "Speicher",
+      "physical": "Physische Festplatte",
+      "logical": "Logische Festplatte",
+      "disk_type": "Festplattentyp",
+      "model": "Modell",
+      "serial": "Seriennummer"
     },
     "network": {
       "title": "Netzwerkinformationen",
@@ -52,7 +69,16 @@
       "bytes": "Bytes",
       "packets": "Pakete",
       "errors": "Fehler",
-      "network_interfaces": "Netzwerkschnittstellen"
+      "network_interfaces": "Netzwerkschnittstellen",
+      "connection_type": "Verbindungstyp",
+      "max_speed": "Maximale Geschwindigkeit",
+      "technology": "Technologie",
+      "signal_strength": "Signalstärke",
+      "wired": "Kabelgebunden",
+      "wireless": "Drahtlos",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobilfunk",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU-Informationen",
@@ -62,8 +88,8 @@
       "memory": "Speicher",
       "utilization": "Auslastung",
       "power": "Leistung",
-      "clock_core": "Takt Kern",
-      "clock_memory": "Takt Speicher",
+      "clock_core": "Kern-Takt",
+      "clock_memory": "Speicher-Takt",
       "fan_speed": "Lüftergeschwindigkeit"
     },
     "ai": {
@@ -85,17 +111,17 @@
       "algorithm": "Algorithmus",
       "hashrate": "Hashrate",
       "shares": "Shares",
-      "temperature": "Temperatura",
+      "temperature": "Temperatur",
       "power": "Leistung",
       "efficiency": "Effizienz",
       "uptime": "Betriebszeit",
-      "revenue_24h": "24h Ertrag",
+      "revenue_24h": "24h-Einnahmen",
       "pool": "Pool",
       "not_detected": "Keine Mining-Aktivität erkannt"
     },
     "ui": {
       "histogram": "Histogramm",
-      "vertical": "Vertikal", 
+      "vertical": "Vertikal",
       "horizontal": "Horizontal",
       "loading": "Lädt...",
       "no_data": "Keine Daten",
@@ -107,7 +133,7 @@
       "all": "Alle Informationen",
       "disk_only": "Nur Festplatte",
       "cpu_only": "Nur CPU",
-      "memory_only": "Nur Speicher", 
+      "memory_only": "Nur Speicher",
       "network_only": "Nur Netzwerk",
       "gpu_only": "Nur GPU",
       "ai_only": "Nur KI-Training",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Befehl nicht gefunden: %s",
       "invalid_port": "Ungültiger Port: %d",
-      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d", 
+      "invalid_refresh": "Ungültiges Aktualisierungsintervall: %d",
       "config_load_failed": "Konfiguration konnte nicht geladen werden",
       "module_failed": "Modul %s fehlgeschlagen: %v",
       "nvidia_smi_not_found": "nvidia-smi nicht gefunden. GPU-Überwachung erfordert NVIDIA-Treiber",
-      "rocm_smi_not_found": "rocm-smi nicht gefunden. AMD GPU-Überwachung erfordert ROCm"
+      "rocm_smi_not_found": "rocm-smi nicht gefunden. AMD-GPU-Überwachung erfordert ROCm"
     },
     "status": {
       "monitoring_started": "Überwachung gestartet",
-      "updating_every": "Aktualisiere alle %d Sekunden", 
+      "updating_every": "Aktualisiert alle %d Sekunden",
       "press_ctrl_c": "Drücken Sie Strg+C zum Beenden",
       "remote_mode": "Fernmodus auf Port %d",
       "gpu_detected": "GPU erkannt: %s",
       "ai_training_detected": "KI-Trainingsprozesse erkannt: %d",
       "mining_detected": "Mining-Aktivität erkannt: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU-Geräte",
+      "multiple_cpus": "CPU-Prozessoren",
+      "device_number": "Gerät #%d"
     }
   }
 }

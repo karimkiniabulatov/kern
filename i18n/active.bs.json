@@ -1,28 +1,28 @@
 {
-  "language": "Bosnian (Bosanski)", 
+  "language": "Bosanski",
   "language_code": "bs",
   "translations": {
     "common": {
-      "title": "kern - Sistem monitor",
+      "title": "kern - Monitor sistema",
       "refresh": "Osvježi",
       "seconds": "sek",
       "error": "Greška",
       "unknown": "Nepoznato",
       "total": "Ukupno",
-      "used": "Korišteno", 
+      "used": "Iskorišteno",
       "free": "Slobodno",
       "available": "Dostupno",
       "status": "Status",
-      "up": "UKLJUČENO",
-      "down": "ISKLJUČENO"
+      "up": "RADI",
+      "down": "NE RADI"
     },
     "cpu": {
-      "title": "Informacije o CPU",
+      "title": "CPU informacije",
       "model": "Model",
       "cores": "Jezgra",
       "threads": "Niti",
       "usage": "Korištenje",
-      "frequency": "Frekvencija", 
+      "frequency": "Frekvencija",
       "load": "Opterećenje",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Prosječno opterećenje"
     },
     "memory": {
-      "title": "Informacije o memoriji", 
+      "active": "Aktívno",
+      "buffers": "Međuspremnici",
+      "cached": "Keširano",
+      "detailed_usage": "Detaljna upotreba",
+      "inactive": "Neaktívno",
+      "title": "Informacije o memoriji",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fizička memorija",
-      "virtual": "Virtuelna memorija"
+      "processes": "Procesi",
+      "virtual": "Virtuelna memorija",
+      "modules": "Memorijski moduli",
+      "shared": "Dijeljeno",
+      "slot": "Slot",
+      "module_type": "Tip",
+      "manufacturer": "Proizvođač",
+      "memory_speed": "Brzina"
     },
     "disk": {
       "title": "Informacije o disku",
       "filesystem": "Fajl sistem",
       "size": "Veličina",
-      "mounted": "Montirano na", 
+      "mounted": "Montirano na",
       "usage": "Korištenje",
-      "storage": "Skladištenje"
+      "storage": "Skladištenje",
+      "physical": "Fizički disk",
+      "logical": "Logički disk",
+      "disk_type": "Tip diska",
+      "model": "Model",
+      "serial": "Serijski broj"
     },
     "network": {
       "title": "Mrežne informacije",
@@ -52,33 +69,42 @@
       "bytes": "bajtova",
       "packets": "paketa",
       "errors": "Greške",
-      "network_interfaces": "Mrežni interfejsi"
+      "network_interfaces": "Mrežni interfejsi",
+      "connection_type": "Tip veze",
+      "max_speed": "Maksimalna brzina",
+      "technology": "Tehnologija",
+      "signal_strength": "Jačina signala",
+      "wired": "Žičano",
+      "wireless": "Bežično",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobilno",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Informacije o GPU",
+      "title": "GPU informacije",
       "model": "Model",
-      "driver": "Draјver",
+      "driver": "Drajver",
       "temperature": "Temperatura",
       "memory": "Memorija",
-      "utilization": "Iskorištenost",
+      "utilization": "Iskorištenje",
       "power": "Snaga",
       "clock_core": "Takt jezgra",
       "clock_memory": "Takt memorije",
       "fan_speed": "Brzina ventilatora"
     },
     "ai": {
-      "title": "AI trening",
+      "title": "AI obuka",
       "framework": "Okvir",
       "processes": "Procesi",
       "vram": "VRAM",
       "model": "Model",
       "batch_size": "Veličina serije",
-      "throughput": "Propusnost",
+      "throughput": "Protok",
       "epoch": "Epoha",
       "loss": "Gubitak",
       "accuracy": "Tačnost",
-      "training_time": "Vrijeme treninga",
-      "no_training": "Nije otkriven AI trening"
+      "training_time": "Vrijeme obuke",
+      "no_training": "Nije detektovana AI obuka"
     },
     "mining": {
       "title": "Informacije o rudarenju",
@@ -89,14 +115,14 @@
       "power": "Snaga",
       "efficiency": "Efikasnost",
       "uptime": "Vrijeme rada",
-      "revenue_24h": "24h prihod",
+      "revenue_24h": "24-satni prihod",
       "pool": "Pool",
-      "not_detected": "Nije otkrivena aktivnost rudarenja"
+      "not_detected": "Nije detektovana aktivnost rudarenja"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Okomito", 
-      "horizontal": "Vodoravno",
+      "vertical": "Vertikalno",
+      "horizontal": "Horizontalno",
       "loading": "Učitavanje...",
       "no_data": "Nema podataka",
       "percent": "posto"
@@ -107,33 +133,38 @@
       "all": "Sve informacije",
       "disk_only": "Samo disk",
       "cpu_only": "Samo CPU",
-      "memory_only": "Samo memorija", 
+      "memory_only": "Samo memorija",
       "network_only": "Samo mreža",
       "gpu_only": "Samo GPU",
-      "ai_only": "Samo AI trening",
+      "ai_only": "Samo AI obuka",
       "mining_only": "Samo rudarenje",
       "refresh_rate": "Brzina osvježavanja",
       "language": "Jezik",
-      "remote": "Udaljeni mod",
+      "remote": "Daljinski način",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Komanda nije pronađena: %s",
       "invalid_port": "Nevažeći port: %d",
-      "invalid_refresh": "Nevažeći interval osvježavanja: %d", 
+      "invalid_refresh": "Nevažeći interval osvježavanja: %d",
       "config_load_failed": "Učitavanje konfiguracije nije uspjelo",
       "module_failed": "Modul %s nije uspio: %v",
-      "nvidia_smi_not_found": "nvidia-smi nije pronađen. Praćenje GPU zahtijeva NVIDIA draјvere",
+      "nvidia_smi_not_found": "nvidia-smi nije pronađen. Praćenje GPU zahtijeva NVIDIA drajvere",
       "rocm_smi_not_found": "rocm-smi nije pronađen. Praćenje AMD GPU zahtijeva ROCm"
     },
     "status": {
       "monitoring_started": "Praćenje je pokrenuto",
-      "updating_every": "Ažuriranje svakih %d sekundi", 
+      "updating_every": "Ažuriranje svakih %d sekundi",
       "press_ctrl_c": "Pritisnite Ctrl+C za izlaz",
-      "remote_mode": "Udaljeni mod na portu %d",
+      "remote_mode": "Daljinski način rada na portu %d",
       "gpu_detected": "GPU otkriven: %s",
-      "ai_training_detected": "AI trening procesi otkriveni: %d",
+      "ai_training_detected": "AI obuka procesi otkriveni: %d",
       "mining_detected": "Aktivnost rudarenja otkrivena: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU uređaji",
+      "multiple_cpus": "CPU procesori",
+      "device_number": "Uređaj #%d"
     }
   }
 }

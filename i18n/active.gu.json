@@ -1,16 +1,16 @@
 {
-  "language": "Gujarati (ગુજરાતી)", 
+  "language": "ગુજરાતી",
   "language_code": "gu",
   "translations": {
     "common": {
       "title": "kern - સિસ્ટમ મોનિટર",
       "refresh": "રીફ્રેશ",
-      "seconds": "સેકંડ",
+      "seconds": "સેકન્ડ",
       "error": "ભૂલ",
       "unknown": "અજ્ઞાત",
       "total": "કુલ",
-      "used": "વપરાયેલ", 
-      "free": "મફત",
+      "used": "વપરાયેલ",
+      "free": "મુક્ત",
       "available": "ઉપલબ્ધ",
       "status": "સ્થિતિ",
       "up": "ચાલુ",
@@ -19,10 +19,10 @@
     "cpu": {
       "title": "CPU માહિતી",
       "model": "મોડેલ",
-      "cores": "કોર",
-      "threads": "થ્રેડ",
-      "usage": "વપરાશ",
-      "frequency": "ફ્રીક્વન્સી", 
+      "cores": "કોર્સ",
+      "threads": "થ્રેડ્સ",
+      "usage": "ઉપયોગ",
+      "frequency": "ફ્રીક્વન્સી",
       "load": "લોડ",
       "load_1min": "1 મિનિટ",
       "load_5min": "5 મિનિટ",
@@ -30,29 +30,55 @@
       "load_average": "સરેરાશ લોડ"
     },
     "memory": {
-      "title": "મેમરી માહિતી", 
+      "active": "સક્રિય",
+      "buffers": "બફર્સ",
+      "cached": "કેશ કરેલ",
+      "detailed_usage": "વિગતવાર ઉપયોગ",
+      "inactive": "નિષ્ક્રિય",
+      "title": "મેમરી માહિતી",
       "ram": "RAM",
-      "swap": "સ્વેપ",
-      "physical": "ફિઝિકલ મેમરી",
-      "virtual": "વર્ચ્યુઅલ મેમરી"
+      "swap": "Swap",
+      "physical": "ભૌતિક મેમરી",
+      "processes": "પ્રક્રિયાઓ",
+      "virtual": "વર્ચ્યુઅલ મેમરી",
+      "modules": "મેમરી મોડ્યુલ્સ",
+      "shared": "શેર કરેલ",
+      "slot": "સ્લોટ",
+      "module_type": "પ્રકાર",
+      "manufacturer": "નિર્માતા",
+      "memory_speed": "ઝડપ"
     },
     "disk": {
       "title": "ડિસ્ક માહિતી",
       "filesystem": "ફાઇલ સિસ્ટમ",
-      "size": "કદ",
-      "mounted": "માઉન્ટેડ ઓન", 
-      "usage": "વપરાશ",
-      "storage": "સંગ્રહ"
+      "size": "માપ",
+      "mounted": "માઉન્ટ થયેલ",
+      "usage": "ઉપયોગ",
+      "storage": "સ્ટોરેજ",
+      "physical": "ભૌતિક ડિસ્ક",
+      "logical": "લોજિકલ ડિસ્ક",
+      "disk_type": "ડિસ્ક પ્રકાર",
+      "model": "મોડેલ",
+      "serial": "સિરીયલ"
     },
     "network": {
       "title": "નેટવર્ક માહિતી",
       "interface": "ઇન્ટરફેસ",
-      "received": "મળેલ",
+      "received": "પ્રાપ્ત",
       "sent": "મોકલેલ",
-      "bytes": "બાઇટ",
-      "packets": "પેકેટ",
+      "bytes": "બાઇટ્સ",
+      "packets": "પેકેટ્સ",
       "errors": "ભૂલો",
-      "network_interfaces": "નેટવર્ક ઇન્ટરફેસ"
+      "network_interfaces": "નેટવર્ક ઇન્ટરફેસ",
+      "connection_type": "કનેક્શન પ્રકાર",
+      "max_speed": "મહત્તમ ઝડપ",
+      "technology": "ટેક્નોલોજી",
+      "signal_strength": "સિગ્નલ સ્ટ્રેંથ",
+      "wired": "વાયર્ડ",
+      "wireless": "વાયરલેસ",
+      "bluetooth": "બ્લૂટૂથ",
+      "cellular": "સેલ્યુલર",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU માહિતી",
@@ -67,35 +93,35 @@
       "fan_speed": "ફેન સ્પીડ"
     },
     "ai": {
-      "title": "AI ટ્રેનિંગ",
+      "title": "AI તાલીમ",
       "framework": "ફ્રેમવર્ક",
-      "processes": "પ્રોસેસ",
+      "processes": "પ્રક્રિયાઓ",
       "vram": "VRAM",
       "model": "મોડેલ",
-      "batch_size": "બેચ સાઇઝ",
-      "throughput": "થ્રુપુટ",
+      "batch_size": "બેચ સાઈઝ",
+      "throughput": "થ્રૂપુટ",
       "epoch": "યુગ",
       "loss": "લોસ",
       "accuracy": "ચોકસાઈ",
-      "training_time": "ટ્રેનિંગ સમય",
-      "no_training": "AI ટ્રેનિંગ મળી નથી"
+      "training_time": "તાલીમ સમય",
+      "no_training": "AI તાલીમ મળી નથી"
     },
     "mining": {
       "title": "માઇનિંગ માહિતી",
-      "algorithm": "એલ્ગોરિધમ",
-      "hashrate": "હેશ રેટ",
-      "shares": "શેર",
+      "algorithm": "અલ્ગોરિધમ",
+      "hashrate": "હેશરેટ",
+      "shares": "શેર્સ",
       "temperature": "તાપમાન",
       "power": "પાવર",
       "efficiency": "કાર્યક્ષમતા",
       "uptime": "અપટાઇમ",
-      "revenue_24h": "24ક કમાણી",
+      "revenue_24h": "24 કલાક આવક",
       "pool": "પૂલ",
-      "not_detected": "માઇનિંગ એક્ટિવિટી મળી નથી"
+      "not_detected": "માઇનિંગ પ્રવૃત્તિ મળી નથી"
     },
     "ui": {
       "histogram": "હિસ્ટોગ્રામ",
-      "vertical": "ઊભી", 
+      "vertical": "ઊભી",
       "horizontal": "આડી",
       "loading": "લોડ થાય છે...",
       "no_data": "કોઈ ડેટા નથી",
@@ -107,10 +133,10 @@
       "all": "બધી માહિતી",
       "disk_only": "ફક્ત ડિસ્ક",
       "cpu_only": "ફક્ત CPU",
-      "memory_only": "ફક્ત મેમરી", 
+      "memory_only": "ફક્ત મેમરી",
       "network_only": "ફક્ત નેટવર્ક",
       "gpu_only": "ફક્ત GPU",
-      "ai_only": "ફક્ત AI ટ્રેનિંગ",
+      "ai_only": "ફક્ત AI તાલીમ",
       "mining_only": "ફક્ત માઇનિંગ",
       "refresh_rate": "રીફ્રેશ રેટ",
       "language": "ભાષા",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "કમાન્ડ મળી નથી: %s",
       "invalid_port": "અમાન્ય પોર્ટ: %d",
-      "invalid_refresh": "અમાન્ય રીફ્રેશ ઇન્ટરવલ: %d", 
-      "config_load_failed": "કોન્ફિગ લોડ ન થઈ શકી",
+      "invalid_refresh": "અમાન્ય રીફ્રેશ ઇન્ટરવલ: %d",
+      "config_load_failed": "કોન્ફિગ લોડ કરવામાં નિષ્ફળ",
       "module_failed": "મોડ્યુલ %s નિષ્ફળ: %v",
-      "nvidia_smi_not_found": "nvidia-smi મળ્યું નથી. GPU મોનિટરિંગ માટે NVIDIA ડ્રાઇવર જરૂરી",
-      "rocm_smi_not_found": "rocm-smi મળ્યું નથી. AMD GPU મોનિટરિંગ માટે ROCm જરૂરી"
+      "nvidia_smi_not_found": "nvidia-smi મળી નથી. GPU મોનિટરિંગ માટે NVIDIA ડ્રાઇવર્સ જરૂરી છે",
+      "rocm_smi_not_found": "rocm-smi મળી નથી. AMD GPU મોનિટરિંગ માટે ROCm જરૂરી છે"
     },
     "status": {
-      "monitoring_started": "મોનિટરિંગ શરૂ થઈ",
-      "updating_every": "દરેક %d સેકંડે અપડેટ થાય છે", 
+      "monitoring_started": "મોનિટરિંગ શરૂ થયું",
+      "updating_every": "દરેક %d સેકન્ડમાં અપડેટ થાય છે",
       "press_ctrl_c": "બહાર નીકળવા Ctrl+C દબાવો",
       "remote_mode": "પોર્ટ %d પર રિમોટ મોડ",
       "gpu_detected": "GPU મળ્યું: %s",
-      "ai_training_detected": "AI ટ્રેનિંગ પ્રોસેસ મળ્યા: %d",
-      "mining_detected": "માઇનિંગ એક્ટિવિટી મળી: %s"
+      "ai_training_detected": "AI તાલીમ પ્રક્રિયાઓ મળી: %d",
+      "mining_detected": "માઇનિંગ પ્રવૃત્તિ મળી: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU ઉપકરણો",
+      "multiple_cpus": "CPU પ્રોસેસર",
+      "device_number": "ઉપકરણ #%d"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Portuguese (Português)", 
+  "language": "Português",
   "language_code": "pt",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "Erro",
       "unknown": "Desconhecido",
       "total": "Total",
-      "used": "Usado", 
+      "used": "Usado",
       "free": "Livre",
       "available": "Disponível",
       "status": "Status",
@@ -22,7 +22,7 @@
       "cores": "Núcleos",
       "threads": "Threads",
       "usage": "Uso",
-      "frequency": "Frequência", 
+      "frequency": "Frequência",
       "load": "Carga",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Carga Média"
     },
     "memory": {
-      "title": "Informações de Memória", 
+      "active": "Ativo",
+      "buffers": "Buffers",
+      "cached": "Cache",
+      "detailed_usage": "Uso Detalhado",
+      "inactive": "Inativo",
+      "title": "Informações de Memória",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memória Física",
-      "virtual": "Memória Virtual"
+      "processes": "Processos",
+      "virtual": "Memória Virtual",
+      "modules": "Módulos de Memória",
+      "shared": "Compartilhada",
+      "slot": "Slot",
+      "module_type": "Tipo",
+      "manufacturer": "Fabricante",
+      "memory_speed": "Velocidade"
     },
     "disk": {
       "title": "Informações do Disco",
-      "filesystem": "Sistema de arquivos",
+      "filesystem": "Sistema de Arquivos",
       "size": "Tamanho",
-      "mounted": "Montado em", 
+      "mounted": "Montado em",
       "usage": "Uso",
-      "storage": "Armazenamento"
+      "storage": "Armazenamento",
+      "physical": "Disco Físico",
+      "logical": "Disco Lógico",
+      "disk_type": "Tipo de Disco",
+      "model": "Modelo",
+      "serial": "Serial"
     },
     "network": {
       "title": "Informações de Rede",
@@ -52,7 +69,16 @@
       "bytes": "bytes",
       "packets": "pacotes",
       "errors": "Erros",
-      "network_interfaces": "Interfaces de Rede"
+      "network_interfaces": "Interfaces de Rede",
+      "connection_type": "Tipo de Conexão",
+      "max_speed": "Velocidade Máxima",
+      "technology": "Tecnologia",
+      "signal_strength": "Força do Sinal",
+      "wired": "Cabeadas",
+      "wireless": "Sem Fio",
+      "bluetooth": "Bluetooth",
+      "cellular": "Celular",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Informações da GPU",
@@ -73,10 +99,10 @@
       "vram": "VRAM",
       "model": "Modelo",
       "batch_size": "Tamanho do Lote",
-      "throughput": "Taxa de Transferência",
+      "throughput": "Vazão",
       "epoch": "Época",
       "loss": "Perda",
-      "accuracy": "Precisão",
+      "accuracy": "Acurácia",
       "training_time": "Tempo de Treinamento",
       "no_training": "Nenhum treinamento de IA detectado"
     },
@@ -95,7 +121,7 @@
     },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Horizontal",
       "loading": "Carregando...",
       "no_data": "Sem dados",
@@ -107,7 +133,7 @@
       "all": "Todas as informações",
       "disk_only": "Apenas disco",
       "cpu_only": "Apenas CPU",
-      "memory_only": "Apenas memória", 
+      "memory_only": "Apenas memória",
       "network_only": "Apenas rede",
       "gpu_only": "Apenas GPU",
       "ai_only": "Apenas treinamento de IA",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Comando não encontrado: %s",
       "invalid_port": "Porta inválida: %d",
-      "invalid_refresh": "Intervalo de atualização inválido: %d", 
+      "invalid_refresh": "Intervalo de atualização inválido: %d",
       "config_load_failed": "Falha ao carregar configuração",
       "module_failed": "Módulo %s falhou: %v",
       "nvidia_smi_not_found": "nvidia-smi não encontrado. Monitoramento de GPU requer drivers NVIDIA",
-      "rocm_smi_not_found": "rocm-smi não encontrado. Monitoramento de AMD GPU requer ROCm"
+      "rocm_smi_not_found": "rocm-smi não encontrado. Monitoramento de GPU AMD requer ROCm"
     },
     "status": {
       "monitoring_started": "Monitoramento iniciado",
-      "updating_every": "Atualizando a cada %d segundos", 
+      "updating_every": "Atualizando a cada %d segundos",
       "press_ctrl_c": "Pressione Ctrl+C para sair",
       "remote_mode": "Modo remoto na porta %d",
       "gpu_detected": "GPU detectada: %s",
       "ai_training_detected": "Processos de treinamento de IA detectados: %d",
       "mining_detected": "Atividade de mineração detectada: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Dispositivos GPU",
+      "multiple_cpus": "Processadores CPU",
+      "device_number": "Dispositivo #%d"
     }
   }
 }

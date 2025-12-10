@@ -1,20 +1,20 @@
 {
-  "language": "Tamil (தமிழ்)", 
+  "language": "தமிழ்",
   "language_code": "ta",
   "translations": {
     "common": {
-      "title": "kern - கணினி கண்காணிப்பான்",
+      "title": "kern - கணினி மானிட்டர்",
       "refresh": "புதுப்பி",
-      "seconds": "விநாடி",
+      "seconds": "விநாடிகள்",
       "error": "பிழை",
-      "unknown": "அறியப்படாத",
+      "unknown": "அறியப்படாதது",
       "total": "மொத்தம்",
-      "used": "பயன்படுத்தப்பட்டது", 
-      "free": "இலவசம்",
+      "used": "பயன்படுத்தப்பட்டது",
+      "free": "காலி",
       "available": "கிடைக்கும்",
       "status": "நிலை",
       "up": "இயங்குகிறது",
-      "down": "இயங்கவில்லை"
+      "down": "நிறுத்தப்பட்டது"
     },
     "cpu": {
       "title": "CPU தகவல்",
@@ -22,27 +22,44 @@
       "cores": "கோர்கள்",
       "threads": "நூல்கள்",
       "usage": "பயன்பாடு",
-      "frequency": "அதிர்வெண்", 
+      "frequency": "அதிர்வெண்",
       "load": "சுமை",
       "load_1min": "1 நிமிடம்",
-      "load_5min": "5 நிமிடம்",
-      "load_15min": "15 நிமிடம்",
+      "load_5min": "5 நிமிடங்கள்",
+      "load_15min": "15 நிமிடங்கள்",
       "load_average": "சராசரி சுமை"
     },
     "memory": {
-      "title": "நினைவக தகவல்", 
+      "active": "செயலில்",
+      "buffers": "பஃப்பர்கள்",
+      "cached": "தற்காலிக நினைவகம்",
+      "detailed_usage": "விரிவான பயன்பாடு",
+      "inactive": "செயலற்ற",
+      "title": "நினைவக தகவல்",
       "ram": "RAM",
-      "swap": "இடமாற்றம்",
+      "swap": "Swap",
       "physical": "உடல் நினைவகம்",
-      "virtual": "மெய்நிகர் நினைவகம்"
+      "processes": "செயல்முறைகள்",
+      "virtual": "மெய்நிகர் நினைவகம்",
+      "modules": "நினைவக தொகுதிகள்",
+      "shared": "பகிரப்பட்ட",
+      "slot": "இடம்",
+      "module_type": "வகை",
+      "manufacturer": "உற்பத்தியாளர்",
+      "memory_speed": "வேகம்"
     },
     "disk": {
       "title": "வட்டு தகவல்",
-      "filesystem": "கோப்பு முறைமை",
+      "filesystem": "கோப்பு முறை",
       "size": "அளவு",
-      "mounted": "ஏற்றப்பட்டது", 
+      "mounted": "ஏற்றப்பட்டது",
       "usage": "பயன்பாடு",
-      "storage": "சேமிப்பு"
+      "storage": "சேமிப்பு",
+      "physical": "உடல் வட்டு",
+      "logical": "தர்க்க வட்டு",
+      "disk_type": "வட்டு வகை",
+      "model": "மாதிரி",
+      "serial": "தொடர் எண்"
     },
     "network": {
       "title": "பிணைய தகவல்",
@@ -52,7 +69,16 @@
       "bytes": "பைட்டுகள்",
       "packets": "பாக்கெட்டுகள்",
       "errors": "பிழைகள்",
-      "network_interfaces": "பிணைய இடைமுகங்கள்"
+      "network_interfaces": "பிணைய இடைமுகங்கள்",
+      "connection_type": "இணைப்பு வகை",
+      "max_speed": "அதிகபட்ச வேகம்",
+      "technology": "தொழில்நுட்பம்",
+      "signal_strength": "சிக்னல் வலிமை",
+      "wired": "கம்பி",
+      "wireless": "கம்பியில்லா",
+      "bluetooth": "ப்ளூடூத்",
+      "cellular": "செலுலர்",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU தகவல்",
@@ -61,7 +87,7 @@
       "temperature": "வெப்பநிலை",
       "memory": "நினைவகம்",
       "utilization": "பயன்பாடு",
-      "power": "சக்தி",
+      "power": "மின்சக்தி",
       "clock_core": "கோர் கடிகாரம்",
       "clock_memory": "நினைவக கடிகாரம்",
       "fan_speed": "காற்றாடி வேகம்"
@@ -72,9 +98,9 @@
       "processes": "செயல்முறைகள்",
       "vram": "VRAM",
       "model": "மாதிரி",
-      "batch_size": "தொகுதி அளவு",
-      "throughput": "முழக்கம்",
-      "epoch": "யுகம்",
+      "batch_size": "குழு அளவு",
+      "throughput": "முடிவு வீதம்",
+      "epoch": "எபோக்",
       "loss": "இழப்பு",
       "accuracy": "துல்லியம்",
       "training_time": "பயிற்சி நேரம்",
@@ -83,19 +109,19 @@
     "mining": {
       "title": "சுரங்க தகவல்",
       "algorithm": "அல்காரிதம்",
-      "hashrate": "ஹாஷ் விகிதம்",
+      "hashrate": "ஹாஷ்ரேட்",
       "shares": "பங்குகள்",
       "temperature": "வெப்பநிலை",
-      "power": "சக்தி",
+      "power": "மின்சக்தி",
       "efficiency": "திறன்",
       "uptime": "இயக்க நேரம்",
-      "revenue_24h": "24மணி வருமானம்",
+      "revenue_24h": "24 மணி வருமானம்",
       "pool": "குளம்",
       "not_detected": "சுரங்க செயல்பாடு கண்டறியப்படவில்லை"
     },
     "ui": {
-      "histogram": "வரைவி",
-      "vertical": "செங்குத்து", 
+      "histogram": "வரிச்சட்டம்",
+      "vertical": "செங்குத்து",
       "horizontal": "கிடைமட்ட",
       "loading": "ஏற்றுகிறது...",
       "no_data": "தரவு இல்லை",
@@ -107,33 +133,38 @@
       "all": "அனைத்து தகவல்கள்",
       "disk_only": "வட்டு மட்டும்",
       "cpu_only": "CPU மட்டும்",
-      "memory_only": "நினைவகம் மட்டும்", 
+      "memory_only": "நினைவகம் மட்டும்",
       "network_only": "பிணையம் மட்டும்",
       "gpu_only": "GPU மட்டும்",
       "ai_only": "AI பயிற்சி மட்டும்",
       "mining_only": "சுரங்கம் மட்டும்",
       "refresh_rate": "புதுப்பிப்பு விகிதம்",
       "language": "மொழி",
-      "remote": "தொலை தூர முறை",
+      "remote": "தொலை முறை",
       "port": "போர்ட்"
     },
     "errors": {
       "command_not_found": "கட்டளை காணப்படவில்லை: %s",
       "invalid_port": "தவறான போர்ட்: %d",
-      "invalid_refresh": "தவறான புதுப்பிப்பு இடைவெளி: %d", 
-      "config_load_failed": "கட்டமைப்பை ஏற்ற முடியவில்லை",
+      "invalid_refresh": "தவறான புதுப்பிப்பு இடைவெளி: %d",
+      "config_load_failed": "கட்டமைப்பு ஏற்ற முடியவில்லை",
       "module_failed": "தொகுதி %s தோல்வியடைந்தது: %v",
-      "nvidia_smi_not_found": "nvidia-smi காணப்படவில்லை. GPU கண்காணிப்புக்கு NVIDIA இயக்கிகள் தேவை",
-      "rocm_smi_not_found": "rocm-smi காணப்படவில்லை. AMD GPU கண்காணிப்புக்கு ROCm தேவை"
+      "nvidia_smi_not_found": "nvidia-smi காணப்படவில்லை. GPU மானிட்டரிங் க்கு NVIDIA இயக்கிகள் தேவை",
+      "rocm_smi_not_found": "rocm-smi காணப்படவில்லை. AMD GPU மானிட்டரிங் க்கு ROCm தேவை"
     },
     "status": {
       "monitoring_started": "கண்காணிப்பு தொடங்கப்பட்டது",
-      "updating_every": "ஒவ்வொரு %d விநாடிகளுக்கும் புதுப்பிக்கப்படுகிறது", 
+      "updating_every": "ஒவ்வொரு %d விநாடிகளுக்கும் புதுப்பிக்கப்படுகிறது",
       "press_ctrl_c": "வெளியேற Ctrl+C அழுத்தவும்",
-      "remote_mode": "போர்ட் %d இல் தொலை தூர முறை",
+      "remote_mode": "%d போர்ட்டில் தொலை முறை",
       "gpu_detected": "GPU கண்டறியப்பட்டது: %s",
       "ai_training_detected": "AI பயிற்சி செயல்முறைகள் கண்டறியப்பட்டன: %d",
       "mining_detected": "சுரங்க செயல்பாடு கண்டறியப்பட்டது: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU சாதனங்கள்",
+      "multiple_cpus": "CPU செயலிகள்",
+      "device_number": "சாதனம் #%d"
     }
   }
 }

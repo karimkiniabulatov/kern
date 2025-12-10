@@ -1,20 +1,20 @@
 {
-  "language": "Georgian (ქართული)", 
+  "language": "ქართული",
   "language_code": "ka",
   "translations": {
     "common": {
       "title": "kern - სისტემის მონიტორი",
       "refresh": "განახლება",
-      "seconds": "წმ",
+      "seconds": "წამი",
       "error": "შეცდომა",
       "unknown": "უცნობი",
       "total": "სულ",
-      "used": "გამოყენებული", 
+      "used": "გამოყენებული",
       "free": "თავისუფალი",
       "available": "ხელმისაწვდომი",
       "status": "სტატუსი",
-      "up": "ჩართული",
-      "down": "გამორთული"
+      "up": "ჩართულია",
+      "down": "გამორთულია"
     },
     "cpu": {
       "title": "CPU ინფორმაცია",
@@ -22,7 +22,7 @@
       "cores": "ბირთვები",
       "threads": "ნაკადები",
       "usage": "გამოყენება",
-      "frequency": "სიხშირე", 
+      "frequency": "სიხშირე",
       "load": "დატვირთვა",
       "load_1min": "1 წთ",
       "load_5min": "5 წთ",
@@ -30,19 +30,36 @@
       "load_average": "საშუალო დატვირთვა"
     },
     "memory": {
-      "title": "მეხსიერების ინფორმაცია", 
+      "active": "აქტიური",
+      "buffers": "ბუფერები",
+      "cached": "კეში",
+      "detailed_usage": "დეტალური გამოყენება",
+      "inactive": "არააქტიური",
+      "title": "მეხსიერების ინფორმაცია",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "ფიზიკური მეხსიერება",
-      "virtual": "ვირტუალური მეხსიერება"
+      "processes": "პროცესები",
+      "virtual": "ვირტუალური მეხსიერება",
+      "modules": "მეხსიერების მოდულები",
+      "shared": "გაზიარებული",
+      "slot": "სლოტი",
+      "module_type": "ტიპი",
+      "manufacturer": "მწარმოებელი",
+      "memory_speed": "სიჩქარე"
     },
     "disk": {
       "title": "დისკის ინფორმაცია",
       "filesystem": "ფაილური სისტემა",
       "size": "ზომა",
-      "mounted": "მონტაჟებულია", 
+      "mounted": "დამონტაჟებულია",
       "usage": "გამოყენება",
-      "storage": "შენახვა"
+      "storage": "საცავი",
+      "physical": "ფიზიკური დისკი",
+      "logical": "ლოგიკური დისკი",
+      "disk_type": "დისკის ტიპი",
+      "model": "მოდელი",
+      "serial": "სერიული ნომერი"
     },
     "network": {
       "title": "ქსელის ინფორმაცია",
@@ -52,7 +69,16 @@
       "bytes": "ბაიტი",
       "packets": "პაკეტი",
       "errors": "შეცდომები",
-      "network_interfaces": "ქსელის ინტერფეისები"
+      "network_interfaces": "ქსელის ინტერფეისები",
+      "connection_type": "კავშირის ტიპი",
+      "max_speed": "მაქსიმალური სიჩქარე",
+      "technology": "ტექნოლოგია",
+      "signal_strength": "სიგნალის სიძლიერე",
+      "wired": "სადენიანი",
+      "wireless": "უსადენო",
+      "bluetooth": "Bluetooth",
+      "cellular": "მობილური",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU ინფორმაცია",
@@ -62,40 +88,40 @@
       "memory": "მეხსიერება",
       "utilization": "გამოყენება",
       "power": "სიმძლავრე",
-      "clock_core": "ბირთვის სიხშირე",
-      "clock_memory": "მეხსიერების სიხშირე",
-      "fan_speed": "გულშემატკივრის სიჩქარე"
+      "clock_core": "ბირთვის საათი",
+      "clock_memory": "მეხსიერების საათი",
+      "fan_speed": "პროპელერის სიჩქარე"
     },
     "ai": {
       "title": "AI ტრენინგი",
-      "framework": "ფრეიმვორკი",
+      "framework": "ფარგალი",
       "processes": "პროცესები",
       "vram": "VRAM",
       "model": "მოდელი",
-      "batch_size": "ბაჩის ზომა",
+      "batch_size": "პარტიის ზომა",
       "throughput": "გამტარუნარიანობა",
       "epoch": "ეპოქა",
       "loss": "დანაკარგი",
       "accuracy": "სიზუსტე",
       "training_time": "ტრენინგის დრო",
-      "no_training": "AI ტრენინგი არ აღმოჩენილა"
+      "no_training": "AI ტრენინგი არ არის აღმოჩენილი"
     },
     "mining": {
       "title": "მაინინგის ინფორმაცია",
       "algorithm": "ალგორითმი",
       "hashrate": "ჰეშრეიტი",
-      "shares": "წილი",
+      "shares": "აქციები",
       "temperature": "ტემპერატურა",
       "power": "სიმძლავრე",
       "efficiency": "ეფექტურობა",
       "uptime": "მუშაობის დრო",
-      "revenue_24h": "24ს შემოსავალი",
-      "pool": "პული",
-      "not_detected": "მაინინგის აქტივობა არ აღმოჩენილა"
+      "revenue_24h": "24 საათის შემოსავალი",
+      "pool": "პულიო",
+      "not_detected": "მაინინგის აქტივობა არ არის აღმოჩენილი"
     },
     "ui": {
       "histogram": "ჰისტოგრამა",
-      "vertical": "ვერტიკალური", 
+      "vertical": "ვერტიკალური",
       "horizontal": "ჰორიზონტალური",
       "loading": "იტვირთება...",
       "no_data": "მონაცემები არ არის",
@@ -107,7 +133,7 @@
       "all": "ყველა ინფორმაცია",
       "disk_only": "მხოლოდ დისკი",
       "cpu_only": "მხოლოდ CPU",
-      "memory_only": "მხოლოდ მეხსიერება", 
+      "memory_only": "მხოლოდ მეხსიერება",
       "network_only": "მხოლოდ ქსელი",
       "gpu_only": "მხოლოდ GPU",
       "ai_only": "მხოლოდ AI ტრენინგი",
@@ -120,7 +146,7 @@
     "errors": {
       "command_not_found": "ბრძანება არ მოიძებნა: %s",
       "invalid_port": "არასწორი პორტი: %d",
-      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d", 
+      "invalid_refresh": "არასწორი განახლების ინტერვალი: %d",
       "config_load_failed": "კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
       "module_failed": "მოდული %s ვერ მოხერხდა: %v",
       "nvidia_smi_not_found": "nvidia-smi არ მოიძებნა. GPU მონიტორინგისთვის საჭიროა NVIDIA დრაივერები",
@@ -128,12 +154,17 @@
     },
     "status": {
       "monitoring_started": "მონიტორინგი დაიწყო",
-      "updating_every": "განახლება ყოველ %d წამში", 
+      "updating_every": "განახლდება ყოველ %d წამში",
       "press_ctrl_c": "გასასვლელად დააჭირეთ Ctrl+C",
-      "remote_mode": "დისტანციური რეჟიმი პორტზე %d",
+      "remote_mode": "დისტანციური რეჟიმი %d პორტზე",
       "gpu_detected": "GPU აღმოჩენილია: %s",
       "ai_training_detected": "AI ტრენინგის პროცესები აღმოჩენილია: %d",
       "mining_detected": "მაინინგის აქტივობა აღმოჩენილია: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU მოწყობილობები",
+      "multiple_cpus": "CPU პროცესორები",
+      "device_number": "მოწყობილობა #%d"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Belarusian (Беларуская)", 
+  "language": "Беларуская",
   "language_code": "be",
   "translations": {
     "common": {
@@ -9,53 +9,79 @@
       "error": "Памылка",
       "unknown": "Невядома",
       "total": "Усяго",
-      "used": "Выкарыстана", 
+      "used": "Выкарыстана",
       "free": "Вольна",
       "available": "Даступна",
-      "status": "Статус",
+      "status": "Стан",
       "up": "УКЛЮЧАНА",
       "down": "ВЫКЛЮЧАНА"
     },
     "cpu": {
-      "title": "Інфармацыя пра CPU",
+      "title": "Інфармацыя пра працэсар",
       "model": "Мадэль",
       "cores": "Ядры",
       "threads": "Патокі",
       "usage": "Выкарыстанне",
-      "frequency": "Частата", 
-      "load": "Нагрузка",
+      "frequency": "Частата",
+      "load": "Загрузка",
       "load_1min": "1 хв",
       "load_5min": "5 хв",
       "load_15min": "15 хв",
-      "load_average": "Сярэдняя нагрузка"
+      "load_average": "Сярэдняя загрузка"
     },
     "memory": {
-      "title": "Інфармацыя пра памяць", 
+      "active": "Актыўная",
+      "buffers": "Буферы",
+      "cached": "Кэшаваная",
+      "detailed_usage": "Падрабязнае выкарыстанне",
+      "inactive": "Неактыўная",
+      "title": "Інфармацыя пра памяць",
       "ram": "RAM",
-      "swap": "Своп",
+      "swap": "Swap",
       "physical": "Фізічная памяць",
-      "virtual": "Віртуальная памяць"
+      "processes": "Працэсы",
+      "virtual": "Віртуальная памяць",
+      "modules": "Модулі памяці",
+      "shared": "Агульная",
+      "slot": "Слот",
+      "module_type": "Тып",
+      "manufacturer": "Вытворца",
+      "memory_speed": "Хуткасць"
     },
     "disk": {
       "title": "Інфармацыя пра дыск",
       "filesystem": "Файлавая сістэма",
       "size": "Памер",
-      "mounted": "Смандзіравана на", 
+      "mounted": "Прымацаваны да",
       "usage": "Выкарыстанне",
-      "storage": "Сховішча"
+      "storage": "Сховішча",
+      "physical": "Фізічны дыск",
+      "logical": "Лагічны дыск",
+      "disk_type": "Тып дыска",
+      "model": "Мадэль",
+      "serial": "Серыйны нумар"
     },
     "network": {
-      "title": "Інфармацыя пра сетку",
+      "title": "Сеткавая інфармацыя",
       "interface": "Інтэрфейс",
       "received": "Атрымана",
       "sent": "Адпраўлена",
       "bytes": "байт",
       "packets": "пакет",
       "errors": "Памылкі",
-      "network_interfaces": "Сеткавыя інтэрфейсы"
+      "network_interfaces": "Сеткавыя інтэрфейсы",
+      "connection_type": "Тып падлучэння",
+      "max_speed": "Максімальная хуткасць",
+      "technology": "Тэхналогія",
+      "signal_strength": "Сіла сігналу",
+      "wired": "Правадное",
+      "wireless": "Бесправадное",
+      "bluetooth": "Bluetooth",
+      "cellular": "Сотавае",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Інфармацыя пра GPU",
+      "title": "Інфармацыя пра відэакарту",
       "model": "Мадэль",
       "driver": "Драйвер",
       "temperature": "Тэмпература",
@@ -78,7 +104,7 @@
       "loss": "Страты",
       "accuracy": "Дакладнасць",
       "training_time": "Час навучання",
-      "no_training": "AI навучанне не знойдзена"
+      "no_training": "AI навучанне не выяўлена"
     },
     "mining": {
       "title": "Інфармацыя пра майнінг",
@@ -89,14 +115,14 @@
       "power": "Магутнасць",
       "efficiency": "Эфектыўнасць",
       "uptime": "Час працы",
-      "revenue_24h": "Прыбытак за 24г",
-      "pool": "Пул",
-      "not_detected": "Майнінг актыўнасць не знойдзена"
+      "revenue_24h": "Даход за 24 гадзіны",
+      "pool": "Пулы",
+      "not_detected": "Майнінг-дзейнасць не выяўлена"
     },
     "ui": {
       "histogram": "Гістаграма",
-      "vertical": "Вертыкальны", 
-      "horizontal": "Гарызантальны",
+      "vertical": "Вертыкальна",
+      "horizontal": "Гарызантальна",
       "loading": "Загрузка...",
       "no_data": "Няма дадзеных",
       "percent": "працэнт"
@@ -106,34 +132,39 @@
       "version": "Версія",
       "all": "Уся інфармацыя",
       "disk_only": "Толькі дыск",
-      "cpu_only": "Толькі CPU",
-      "memory_only": "Толькі памяць", 
+      "cpu_only": "Толькі працэсар",
+      "memory_only": "Толькі памяць",
       "network_only": "Толькі сетка",
-      "gpu_only": "Толькі GPU",
+      "gpu_only": "Толькі відэакарта",
       "ai_only": "Толькі AI навучанне",
       "mining_only": "Толькі майнінг",
-      "refresh_rate": "Хуткасць абнаўлення",
+      "refresh_rate": "Частата абнаўлення",
       "language": "Мова",
       "remote": "Выдалены рэжым",
       "port": "Порт"
     },
     "errors": {
       "command_not_found": "Каманда не знойдзена: %s",
-      "invalid_port": "Несапраўдны порт: %d",
-      "invalid_refresh": "Несапраўдны інтэрвал абнаўлення: %d", 
+      "invalid_port": "Няправільны порт: %d",
+      "invalid_refresh": "Няправільны інтэрвал абнаўлення: %d",
       "config_load_failed": "Не ўдалося загрузіць канфігурацыю",
-      "module_failed": "Модуль %s не ўдаўся: %v",
-      "nvidia_smi_not_found": "nvidia-smi не знойдзены. Для маніторынгу GPU патрэбныя драйверы NVIDIA",
-      "rocm_smi_not_found": "rocm-smi не знойдзены. Для маніторынгу AMD GPU патрэбны ROCm"
+      "module_failed": "Модуль %s пацярпеў няўдачу: %v",
+      "nvidia_smi_not_found": "nvidia-smi не знойдзены. Для маніторынгу GPU NVIDIA патрабуюцца драйверы NVIDIA",
+      "rocm_smi_not_found": "rocm-smi не знойдзены. Для маніторынгу AMD GPU патрабуецца ROCm"
     },
     "status": {
       "monitoring_started": "Маніторынг пачаты",
-      "updating_every": "Абнаўляецца кожныя %d секунд", 
+      "updating_every": "Абнаўляецца кожныя %d секунд",
       "press_ctrl_c": "Націсніце Ctrl+C для выхаду",
       "remote_mode": "Выдалены рэжым на порце %d",
-      "gpu_detected": "GPU знойдзены: %s",
-      "ai_training_detected": "Працэсы AI навучання знойдзены: %d",
-      "mining_detected": "Майнінг актыўнасць знойдзена: %s"
+      "gpu_detected": "Відэакарта выяўлена: %s",
+      "ai_training_detected": "Працэсы AI навучання выяўлены: %d",
+      "mining_detected": "Майнінг-дзейнасць выяўлена: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU прылады",
+      "multiple_cpus": "Працэсары",
+      "device_number": "Прылада #%d"
     }
   }
 }

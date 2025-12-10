@@ -1,15 +1,15 @@
 {
-  "language": "French (Français)", 
+  "language": "Français",
   "language_code": "fr",
   "translations": {
     "common": {
       "title": "kern - Moniteur Système",
-      "refresh": "Actualiser",
+      "refresh": "Rafraîchir",
       "seconds": "sec",
       "error": "Erreur",
       "unknown": "Inconnu",
       "total": "Total",
-      "used": "Utilisé", 
+      "used": "Utilisé",
       "free": "Libre",
       "available": "Disponible",
       "status": "Statut",
@@ -22,7 +22,7 @@
       "cores": "Cœurs",
       "threads": "Threads",
       "usage": "Utilisation",
-      "frequency": "Fréquence", 
+      "frequency": "Fréquence",
       "load": "Charge",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Charge Moyenne"
     },
     "memory": {
-      "title": "Informations Mémoire", 
+      "active": "Actif",
+      "buffers": "Tampons",
+      "cached": "Cache",
+      "detailed_usage": "Utilisation Détaillée",
+      "inactive": "Inactif",
+      "title": "Informations Mémoire",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Mémoire Physique",
-      "virtual": "Mémoire Virtuelle"
+      "processes": "Processus",
+      "virtual": "Mémoire Virtuelle",
+      "modules": "Modules Mémoire",
+      "shared": "Partagée",
+      "slot": "Emplacement",
+      "module_type": "Type",
+      "manufacturer": "Fabricant",
+      "memory_speed": "Vitesse"
     },
     "disk": {
-      "title": "Informations Disque",
-      "filesystem": "Système de fichiers",
+      "title": "Informations du Disque",
+      "filesystem": "Système de Fichiers",
       "size": "Taille",
-      "mounted": "Monté sur", 
+      "mounted": "Monté sur",
       "usage": "Utilisation",
-      "storage": "Stockage"
+      "storage": "Stockage",
+      "physical": "Disque Physique",
+      "logical": "Disque Logique",
+      "disk_type": "Type de Disque",
+      "model": "Modèle",
+      "serial": "Numéro de Série"
     },
     "network": {
       "title": "Informations Réseau",
@@ -52,17 +69,26 @@
       "bytes": "octets",
       "packets": "paquets",
       "errors": "Erreurs",
-      "network_interfaces": "Interfaces Réseau"
+      "network_interfaces": "Interfaces Réseau",
+      "connection_type": "Type de Connexion",
+      "max_speed": "Vitesse Maximale",
+      "technology": "Technologie",
+      "signal_strength": "Force du Signal",
+      "wired": "Filaire",
+      "wireless": "Sans Fil",
+      "bluetooth": "Bluetooth",
+      "cellular": "Cellulaire",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Informations GPU",
+      "title": "Informations du GPU",
       "model": "Modèle",
       "driver": "Pilote",
       "temperature": "Température",
       "memory": "Mémoire",
       "utilization": "Utilisation",
       "power": "Puissance",
-      "clock_core": "Horloge Cœur",
+      "clock_core": "Horloge Noyau",
       "clock_memory": "Horloge Mémoire",
       "fan_speed": "Vitesse Ventilateur"
     },
@@ -81,7 +107,7 @@
       "no_training": "Aucun entraînement IA détecté"
     },
     "mining": {
-      "title": "Informations Minage",
+      "title": "Informations de Minage",
       "algorithm": "Algorithme",
       "hashrate": "Taux de Hash",
       "shares": "Parts",
@@ -89,13 +115,13 @@
       "power": "Puissance",
       "efficiency": "Efficacité",
       "uptime": "Temps de Fonctionnement",
-      "revenue_24h": "Revenu 24h",
+      "revenue_24h": "Revenus 24h",
       "pool": "Pool",
       "not_detected": "Aucune activité de minage détectée"
     },
     "ui": {
       "histogram": "Histogramme",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Horizontal",
       "loading": "Chargement...",
       "no_data": "Aucune donnée",
@@ -107,7 +133,7 @@
       "all": "Toutes les informations",
       "disk_only": "Disque uniquement",
       "cpu_only": "CPU uniquement",
-      "memory_only": "Mémoire uniquement", 
+      "memory_only": "Mémoire uniquement",
       "network_only": "Réseau uniquement",
       "gpu_only": "GPU uniquement",
       "ai_only": "Entraînement IA uniquement",
@@ -118,22 +144,27 @@
       "port": "Port"
     },
     "errors": {
-      "command_not_found": "Commande non trouvée: %s",
-      "invalid_port": "Port invalide: %d",
-      "invalid_refresh": "Intervalle de rafraîchissement invalide: %d", 
+      "command_not_found": "Commande non trouvée : %s",
+      "invalid_port": "Port invalide : %d",
+      "invalid_refresh": "Intervalle de rafraîchissement invalide : %d",
       "config_load_failed": "Échec du chargement de la configuration",
-      "module_failed": "Module %s échoué: %v",
+      "module_failed": "Module %s a échoué : %v",
       "nvidia_smi_not_found": "nvidia-smi non trouvé. La surveillance GPU nécessite les pilotes NVIDIA",
-      "rocm_smi_not_found": "rocm-smi non trouvé. La surveillance AMD GPU nécessite ROCm"
+      "rocm_smi_not_found": "rocm-smi non trouvé. La surveillance GPU AMD nécessite ROCm"
     },
     "status": {
       "monitoring_started": "Surveillance démarrée",
-      "updating_every": "Mise à jour toutes les %d secondes", 
+      "updating_every": "Mise à jour toutes les %d secondes",
       "press_ctrl_c": "Appuyez sur Ctrl+C pour quitter",
       "remote_mode": "Mode distant sur le port %d",
-      "gpu_detected": "GPU détecté: %s",
-      "ai_training_detected": "Processus d'entraînement IA détectés: %d",
-      "mining_detected": "Activité de minage détectée: %s"
+      "gpu_detected": "GPU détecté : %s",
+      "ai_training_detected": "Processus d'entraînement IA détectés : %d",
+      "mining_detected": "Activité de minage détectée : %s"
+    },
+    "devices": {
+      "multiple_gpus": "Périphériques GPU",
+      "multiple_cpus": "Processeurs CPU",
+      "device_number": "Périphérique #%d"
     }
   }
 }

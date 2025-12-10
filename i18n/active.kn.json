@@ -1,20 +1,20 @@
 {
-  "language": "Kannada (ಕನ್ನಡ)", 
+  "language": "ಕನ್ನಡ",
   "language_code": "kn",
   "translations": {
     "common": {
       "title": "kern - ಸಿಸ್ಟಮ್ ಮಾನಿಟರ್",
       "refresh": "ರಿಫ್ರೆಶ್",
-      "seconds": "ಸೆಕೆಂಡ್",
+      "seconds": "ಸೆಕೆಂಡುಗಳು",
       "error": "ದೋಷ",
       "unknown": "ಅಜ್ಞಾತ",
       "total": "ಒಟ್ಟು",
-      "used": "ಬಳಸಲಾಗಿದೆ", 
-      "free": "ಉಚಿತ",
+      "used": "ಬಳಸಲಾಗಿದೆ",
+      "free": "ಮುಕ್ತ",
       "available": "ಲಭ್ಯವಿದೆ",
       "status": "ಸ್ಥಿತಿ",
-      "up": "ಚಾಲೂನಿ",
-      "down": "ಚಾಲೂನಿ"
+      "up": "ಚಾಲೂ",
+      "down": "ನಿಲ್ಲಿಸಲಾಗಿದೆ"
     },
     "cpu": {
       "title": "CPU ಮಾಹಿತಿ",
@@ -22,7 +22,7 @@
       "cores": "ಕೋರ್ಗಳು",
       "threads": "ಥ್ರೆಡ್ಗಳು",
       "usage": "ಬಳಕೆ",
-      "frequency": "ಆವರ್ತನ", 
+      "frequency": "ಆವರ್ತನ",
       "load": "ಲೋಡ್",
       "load_1min": "1 ನಿಮಿಷ",
       "load_5min": "5 ನಿಮಿಷ",
@@ -30,110 +30,62 @@
       "load_average": "ಸರಾಸರಿ ಲೋಡ್"
     },
     "memory": {
-      "title": "ಮೆಮೊರಿ ಮಾಹಿತಿ", 
+      "active": "ಸಕ್ರಿಯ",
+      "buffers": "ಬಫರ್ಗಳು",
+      "cached": "ಕ್ಯಾಶ್ ಮಾಡಲಾಗಿದೆ",
+      "detailed_usage": "ವಿವರವಾದ ಬಳಕೆ",
+      "inactive": "ನಿಷ್ಕ್ರಿಯ",
+      "title": "ಮೆಮರಿ ಮಾಹಿತಿ",
       "ram": "RAM",
-      "swap": "ಸ್ವಾಪ್",
-      "physical": "ಭೌತಿಕ ಮೆಮೊರಿ",
-      "virtual": "ವರ್ಚುವಲ್ ಮೆಮೊರಿ"
+      "swap": "Swap",
+      "physical": "ಭೌತಿಕ ಮೆಮರಿ",
+      "processes": "ಪ್ರಕ್ರಿಯೆಗಳು",
+      "virtual": "ವರ್ಚುವಲ್ ಮೆಮರಿ",
+      "modules": "ಮೆಮರಿ ಮಾಡ್ಯೂಲ್ಗಳು",
+      "shared": "ಹಂಚಿಕೆ",
+      "slot": "ಸ್ಲಾಟ್",
+      "module_type": "ತರಹ",
+      "manufacturer": "ನಿರ್ಮಾಪಕ",
+      "memory_speed": "ವೇಗ"
     },
     "disk": {
       "title": "ಡಿಸ್ಕ್ ಮಾಹಿತಿ",
       "filesystem": "ಫೈಲ್ ಸಿಸ್ಟಮ್",
       "size": "ಗಾತ್ರ",
-      "mounted": "ಮೌಂಟ್ ಮಾಡಲಾಗಿದೆ", 
+      "mounted": "ಮೌಂಟ್ ಆಗಿದೆ",
       "usage": "ಬಳಕೆ",
-      "storage": "ಸಂಗ್ರಹಣೆ"
+      "storage": "ಸಂಗ್ರಹಣೆ",
+      "physical": "ಭೌತಿಕ ಡಿಸ್ಕ್",
+      "logical": "ತಾರ್ಕಿಕ ಡಿಸ್ಕ್",
+      "disk_type": "ಡಿಸ್ಕ್ ಪ್ರಕಾರ",
+      "model": "ಮಾದರಿ",
+      "serial": "ಸೀರಿಯಲ್"
     },
     "network": {
       "title": "ನೆಟ್ವರ್ಕ್ ಮಾಹಿತಿ",
       "interface": "ಇಂಟರ್ಫೇಸ್",
-      "received": "ಪಡೆದ",
-      "sent": "ಕಳುಹಿಸಿದ",
+      "received": "ಪಡೆಯಲಾಗಿದೆ",
+      "sent": "ಕಳುಹಿಸಲಾಗಿದೆ",
       "bytes": "ಬೈಟ್ಗಳು",
       "packets": "ಪ್ಯಾಕೆಟ್ಗಳು",
       "errors": "ದೋಷಗಳು",
-      "network_interfaces": "ನೆಟ್ವರ್ಕ್ ಇಂಟರ್ಫೇಸ್ಗಳು"
+      "network_interfaces": "ನೆಟ್ವರ್ಕ್ ಇಂಟರ್ಫೇಸ್ಗಳು",
+      "connection_type": "ಸಂಪರ್ಕ ಪ್ರಕಾರ",
+      "max_speed": "ಗರಿಷ್ಠ ವೇಗ",
+      "technology": "ತಂತ್ರಜ್ಞಾನ",
+      "signal_strength": "ಸಿಗ್ನಲ್ ಶಕ್ತಿ",
+      "wired": "ತಂತಿ",
+      "wireless": "ವೈರ್ಲೆಸ್",
+      "bluetooth": "ಬ್ಲೂಟೂತ್",
+      "cellular": "ಸೆಲ್ಯುಲಾರ್",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU ಮಾಹಿತಿ",
       "model": "ಮಾದರಿ",
       "driver": "ಡ್ರೈವರ್",
       "temperature": "ತಾಪಮಾನ",
-      "memory": "ಮೆಮೊರಿ",
+      "memory": "ಮೆಮರಿ",
       "utilization": "ಬಳಕೆ",
       "power": "ಪವರ್",
-      "clock_core": "ಕೋರ್ ಕ್ಲಾಕ್",
-      "clock_memory": "ಮೆಮೊರಿ ಕ್ಲಾಕ್",
-      "fan_speed": "ಫ್ಯಾನ್ ಸ್ಪೀಡ್"
-    },
-    "ai": {
-      "title": "AI ತರಬೇತಿ",
-      "framework": "ಫ್ರೇಮ್ವರ್ಕ್",
-      "processes": "ಪ್ರಕ್ರಿಯೆಗಳು",
-      "vram": "VRAM",
-      "model": "ಮಾದರಿ",
-      "batch_size": "ಬ್ಯಾಚ್ ಗಾತ್ರ",
-      "throughput": "ಥ್ರೂಪುಟ್",
-      "epoch": "ಯುಗ",
-      "loss": "ಲಾಸ್",
-      "accuracy": "ನಿಖರತೆ",
-      "training_time": "ತರಬೇತಿ ಸಮಯ",
-      "no_training": "AI ತರಬೇತಿ ಕಂಡುಬಂದಿಲ್ಲ"
-    },
-    "mining": {
-      "title": "ಮೈನಿಂಗ್ ಮಾಹಿತಿ",
-      "algorithm": "ಅಲ್ಗಾರಿದಮ್",
-      "hashrate": "ಹ್ಯಾಶ್ ರೇಟ್",
-      "shares": "ಶೇರುಗಳು",
-      "temperature": "ತಾಪಮಾನ",
-      "power": "ಪವರ್",
-      "efficiency": "ದಕ್ಷತೆ",
-      "uptime": "ಅಪ್ಟೈಮ್",
-      "revenue_24h": "24ಗಂಟೆ ಆದಾಯ",
-      "pool": "ಪೂಲ್",
-      "not_detected": "ಮೈನಿಂಗ್ ಚಟುವಟಿಕೆ ಕಂಡುಬಂದಿಲ್ಲ"
-    },
-    "ui": {
-      "histogram": "ಹಿಸ್ಟೋಗ್ರಾಂ",
-      "vertical": "ಲಂಬ", 
-      "horizontal": "ಅಡ್ಡ",
-      "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
-      "no_data": "ಡೇಟಾ ಇಲ್ಲ",
-      "percent": "ಶೇಕಡಾ"
-    },
-    "commands": {
-      "help": "ಸಹಾಯ",
-      "version": "ವರ್ಷನ್",
-      "all": "ಎಲ್ಲಾ ಮಾಹಿತಿ",
-      "disk_only": "ಡಿಸ್ಕ್ ಮಾತ್ರ",
-      "cpu_only": "CPU ಮಾತ್ರ",
-      "memory_only": "ಮೆಮೊರಿ ಮಾತ್ರ", 
-      "network_only": "ನೆಟ್ವರ್ಕ್ ಮಾತ್ರ",
-      "gpu_only": "GPU ಮಾತ್ರ",
-      "ai_only": "AI ತರಬೇತಿ ಮಾತ್ರ",
-      "mining_only": "ಮೈನಿಂಗ್ ಮಾತ್ರ",
-      "refresh_rate": "ರಿಫ್ರೆಶ್ ರೇಟ್",
-      "language": "ಭಾಷೆ",
-      "remote": "ರಿಮೋಟ್ ಮೋಡ್",
-      "port": "ಪೋರ್ಟ್"
-    },
-    "errors": {
-      "command_not_found": "ಕಮಾಂಡ್ ಕಂಡುಬಂದಿಲ್ಲ: %s",
-      "invalid_port": "ಅಮಾನ್ಯ ಪೋರ್ಟ್: %d",
-      "invalid_refresh": "ಅಮಾನ್ಯ ರಿಫ್ರೆಶ್ ಇಂಟರ್ವಲ್: %d", 
-      "config_load_failed": "ಕಾನ್ಫಿಗರೇಶನ್ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ",
-      "module_failed": "ಮಾಡ್ಯೂಲ್ %s ವಿಫಲವಾಗಿದೆ: %v",
-      "nvidia_smi_not_found": "nvidia-smi ಕಂಡುಬಂದಿಲ್ಲ. GPU ಮಾನಿಟರಿಂಗ್ ಗೆ NVIDIA ಡ್ರೈವರ್‌ಗಳು ಅಗತ್ಯವಿದೆ",
-      "rocm_smi_not_found": "rocm-smi ಕಂಡುಬಂದಿಲ್ಲ. AMD GPU ಮಾನಿಟರಿಂಗ್ ಗೆ ROCm ಅಗತ್ಯವಿದೆ"
-    },
-    "status": {
-      "monitoring_started": "ಮಾನಿಟರಿಂಗ್ ಪ್ರಾರಂಭವಾಗಿದೆ",
-      "updating_every": "ಪ್ರತಿ %d ಸೆಕೆಂಡ್‌ಗೆ ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತಿದೆ", 
-      "press_ctrl_c": "ನಿರ್ಗಮಿಸಲು Ctrl+C ಒತ್ತಿರಿ",
-      "remote_mode": "ಪೋರ್ಟ್ %d ನಲ್ಲಿ ರಿಮೋಟ್ ಮೋಡ್",
-      "gpu_detected": "GPU ಕಂಡುಬಂದಿದೆ: %s",
-      "ai_training_detected": "AI ತರಬೇತಿ ಪ್ರಕ್ರಿಯೆಗಳು ಕಂಡುಬಂದಿವೆ: %d",
-      "mining_detected": "ಮೈನಿಂಗ್ ಚಟುವಟಿಕೆ ಕಂಡುಬಂದಿದೆ: %s"
-    }
-  }
-}
+      "clock_core":

@@ -1,18 +1,18 @@
 {
-  "language": "Hebrew (עברית)", 
+  "language": "עברית",
   "language_code": "he",
   "translations": {
     "common": {
       "title": "kern - מוניטור מערכת",
       "refresh": "רענן",
-      "seconds": "שנ'",
+      "seconds": "שניות",
       "error": "שגיאה",
       "unknown": "לא ידוע",
       "total": "סה\"כ",
-      "used": "משומש", 
-      "free": "פנוי",
+      "used": "משומש",
+      "free": "חופשי",
       "available": "זמין",
-      "status": "סטטוס",
+      "status": "מצב",
       "up": "פועל",
       "down": "לא פועל"
     },
@@ -20,29 +20,46 @@
       "title": "מידע מעבד",
       "model": "דגם",
       "cores": "ליבות",
-      "threads": "הליכים",
+      "threads": "חוטים",
       "usage": "שימוש",
-      "frequency": "תדירות", 
+      "frequency": "תדירות",
       "load": "עומס",
-      "load_1min": "1 דק'",
-      "load_5min": "5 דק'",
-      "load_15min": "15 דק'",
+      "load_1min": "1 דקה",
+      "load_5min": "5 דקות",
+      "load_15min": "15 דקות",
       "load_average": "עומס ממוצע"
     },
     "memory": {
-      "title": "מידע זיכרון", 
-      "ram": "זיכרון",
-      "swap": "החלפה",
+      "active": "פעיל",
+      "buffers": "מאגרים",
+      "cached": "מטמון",
+      "detailed_usage": "שימוש מפורט",
+      "inactive": "לא פעיל",
+      "title": "מידע זיכרון",
+      "ram": "RAM",
+      "swap": "Swap",
       "physical": "זיכרון פיזי",
-      "virtual": "זיכרון וירטואלי"
+      "processes": "תהליכים",
+      "virtual": "זיכרון וירטואלי",
+      "modules": "מודולי זיכרון",
+      "shared": "משותף",
+      "slot": "חריץ",
+      "module_type": "סוג",
+      "manufacturer": "יצרן",
+      "memory_speed": "מהירות"
     },
     "disk": {
       "title": "מידע דיסק",
       "filesystem": "מערכת קבצים",
       "size": "גודל",
-      "mounted": "מותקן על", 
+      "mounted": "מורכבת על",
       "usage": "שימוש",
-      "storage": "אחסון"
+      "storage": "אחסון",
+      "physical": "דיסק פיזי",
+      "logical": "דיסק לוגי",
+      "disk_type": "סוג דיסק",
+      "model": "דגם",
+      "serial": "מספר סידורי"
     },
     "network": {
       "title": "מידע רשת",
@@ -50,20 +67,29 @@
       "received": "התקבל",
       "sent": "נשלח",
       "bytes": "בייטים",
-      "packets": "מנות",
+      "packets": "חבילות",
       "errors": "שגיאות",
-      "network_interfaces": "ממשקי רשת"
+      "network_interfaces": "ממשקי רשת",
+      "connection_type": "סוג חיבור",
+      "max_speed": "מהירות מקסימלית",
+      "technology": "טכנולוגיה",
+      "signal_strength": "עוצמת אות",
+      "wired": "חוטי",
+      "wireless": "אלחוטי",
+      "bluetooth": "בלוטות'",
+      "cellular": "סלולרי",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "מידע כרטיס מסך",
       "model": "דגם",
-      "driver": "דרייבר",
+      "driver": "מנהל התקן",
       "temperature": "טמפרטורה",
       "memory": "זיכרון",
       "utilization": "ניצול",
       "power": "הספק",
-      "clock_core": "קצב ליבה",
-      "clock_memory": "קצב זיכרון",
+      "clock_core": "מהירות ליבה",
+      "clock_memory": "מהירות זיכרון",
       "fan_speed": "מהירות מאוורר"
     },
     "ai": {
@@ -71,11 +97,11 @@
       "framework": "מסגרת",
       "processes": "תהליכים",
       "vram": "VRAM",
-      "model": "דגם",
+      "model": "מודל",
       "batch_size": "גודל אצווה",
       "throughput": "תפוקה",
       "epoch": "עידן",
-      "loss": "אובדן",
+      "loss": "הפסד",
       "accuracy": "דיוק",
       "training_time": "זמן אימון",
       "no_training": "לא אותר אימון בינה מלאכותית"
@@ -89,13 +115,13 @@
       "power": "הספק",
       "efficiency": "יעילות",
       "uptime": "זמן פעולה",
-      "revenue_24h": "הכנסות 24ש'",
+      "revenue_24h": "הכנסות 24 שעות",
       "pool": "בריכה",
       "not_detected": "לא אותרה פעילות כרייה"
     },
     "ui": {
       "histogram": "היסטוגרמה",
-      "vertical": "אנכי", 
+      "vertical": "אנכי",
       "horizontal": "אופקי",
       "loading": "טוען...",
       "no_data": "אין נתונים",
@@ -107,7 +133,7 @@
       "all": "כל המידע",
       "disk_only": "רק דיסק",
       "cpu_only": "רק מעבד",
-      "memory_only": "רק זיכרון", 
+      "memory_only": "רק זיכרון",
       "network_only": "רק רשת",
       "gpu_only": "רק כרטיס מסך",
       "ai_only": "רק אימון בינה מלאכותית",
@@ -118,22 +144,27 @@
       "port": "פורט"
     },
     "errors": {
-      "command_not_found": "פקודה לא נמצאה: %s",
+      "command_not_found": "הפקודה לא נמצאה: %s",
       "invalid_port": "פורט לא תקין: %d",
-      "invalid_refresh": "מרווח רענון לא תקין: %d", 
-      "config_load_failed": "טעינת תצורה נכשלה",
-      "module_failed": "מודול %s נכשל: %v",
-      "nvidia_smi_not_found": "nvidia-smi לא נמצא. ניטור כרטיס מסך דורש דרייברי NVIDIA",
-      "rocm_smi_not_found": "rocm-smi לא נמצא. ניטור AMD GPU דורש ROCm"
+      "invalid_refresh": "מרווח רענון לא תקין: %d",
+      "config_load_failed": "טעינת התצורה נכשלה",
+      "module_failed": "המודול %s נכשל: %v",
+      "nvidia_smi_not_found": "nvidia-smi לא נמצא. ניטור כרטיסי מסך NVIDIA דורש מנהלי התקן NVIDIA",
+      "rocm_smi_not_found": "rocm-smi לא נמצא. ניטור כרטיסי מסך AMD דורש ROCm"
     },
     "status": {
-      "monitoring_started": "ניטור החל",
-      "updating_every": "מתעדכן כל %d שניות", 
+      "monitoring_started": "הניטור החל",
+      "updating_every": "מתעדכן כל %d שניות",
       "press_ctrl_c": "לחץ Ctrl+C כדי לצאת",
       "remote_mode": "מצב מרוחק בפורט %d",
       "gpu_detected": "כרטיס מסך אותר: %s",
       "ai_training_detected": "תהליכי אימון בינה מלאכותית אותרו: %d",
       "mining_detected": "פעילות כרייה אותרה: %s"
+    },
+    "devices": {
+      "multiple_gpus": "התקני כרטיס מסך",
+      "multiple_cpus": "מעבדים",
+      "device_number": "התקן #%d"
     }
   }
 }

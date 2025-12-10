@@ -15,7 +15,7 @@ show_logo() {
  ██║  ██╗███████╗██║  ██║██║ ╚████║
  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
 EOF
-    echo "kern v1.2.0 - System Monitoring Tool"
+    echo "kern v1.2.3 - System Monitoring Tool"
     echo -e "\033[0m"
 }
 
@@ -24,21 +24,9 @@ show_logo
 echo "Installing kern system monitor..."
 
 # Check if Go is installed
-if ! command -v go &> /dev/null; then
-    echo "Go is not installed. Installing Go..."
-    if command -v apt &> /dev/null; then
-        sudo apt update
-        sudo apt install -y golang-go
-    elif command -v yum &> /dev/null; then
-        sudo yum install -y golang
-    elif command -v dnf &> /dev/null; then
-        sudo dnf install -y golang
-    elif command -v pacman &> /dev/null; then
-        sudo pacman -S go
-    else
-        echo "Please install Go manually from https://golang.org/dl/"
-        exit 1
-    fi
+if ! command -v go > /dev/null 2>&1; then
+    echo "Go is not installed. Please install Go 1.21+ first."
+    exit 1
 fi
 
 # Check required system tools
@@ -46,6 +34,7 @@ for tool in df lscpu free ip; do
     if ! command -v $tool &> /dev/null; then
         echo "Installing required tool: $tool"
         if command -v apt &> /dev/null; then
+            sudo apt update
             sudo apt install -y procps net-tools util-linux iproute2
             break
         elif command -v yum &> /dev/null; then
@@ -78,11 +67,6 @@ cd "$(dirname "$0")/.."
 
 # Clean up any previous builds
 rm -f kern kern-test
-
-# Always recreate dependencies to avoid go.sum issues
-echo "Resetting Go modules for clean build..."
-rm -f go.sum
-go clean -modcache 2>/dev/null || true
 
 # Download all dependencies
 echo "Downloading Go dependencies..."

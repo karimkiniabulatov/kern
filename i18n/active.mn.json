@@ -1,28 +1,28 @@
 {
-  "language": "Mongolian (Монгол)", 
+  "language": "Монгол",
   "language_code": "mn",
   "translations": {
     "common": {
-      "title": "kern - Системийн хянагч",
+      "title": "kern - Системийн монитор",
       "refresh": "Шинэчлэх",
       "seconds": "сек",
       "error": "Алдаа",
       "unknown": "Тодорхойгүй",
       "total": "Нийт",
-      "used": "Ашиглагдсан", 
+      "used": "Ашиглагдсан",
       "free": "Чөлөөт",
       "available": "Боломжтой",
       "status": "Төлөв",
       "up": "АСААЛТТАЙ",
-      "down": "УНТАЛТТАЙ"
+      "down": "УНТААЛТТАЙ"
     },
     "cpu": {
       "title": "CPU мэдээлэл",
       "model": "Загвар",
-      "cores": "Цөм",
-      "threads": "Утас",
+      "cores": "Цөмүүд",
+      "threads": "Утаснууд",
       "usage": "Хэрэглээ",
-      "frequency": "Давтамж", 
+      "frequency": "Давтамж",
       "load": "Ачаалал",
       "load_1min": "1 мин",
       "load_5min": "5 мин",
@@ -30,19 +30,36 @@
       "load_average": "Дундаж ачаалал"
     },
     "memory": {
-      "title": "Санах ойн мэдээлэл", 
+      "active": "Идэвхтэй",
+      "buffers": "Буферүүд",
+      "cached": "Кэшлэгдсэн",
+      "detailed_usage": "Дэлгэрэнгүй хэрэглээ",
+      "inactive": "Идэвхгүй",
+      "title": "Санах ойн мэдээлэл",
       "ram": "RAM",
-      "swap": "Солилцоо",
+      "swap": "Swap",
       "physical": "Физик санах ой",
-      "virtual": "Виртуал санах ой"
+      "processes": "Процессууд",
+      "virtual": "Виртуал санах ой",
+      "modules": "Санах ойн модуль",
+      "shared": "Хуваалцсан",
+      "slot": "Слот",
+      "module_type": "Төрөл",
+      "manufacturer": "Үйлдвэрлэгч",
+      "memory_speed": "Хурд"
     },
     "disk": {
       "title": "Дискийн мэдээлэл",
       "filesystem": "Файлын систем",
       "size": "Хэмжээ",
-      "mounted": "Суулгасан", 
+      "mounted": "Суурилуулсан",
       "usage": "Хэрэглээ",
-      "storage": "Хадгалах"
+      "storage": "Хадгалалт",
+      "physical": "Физик диск",
+      "logical": "Логик диск",
+      "disk_type": "Дискний төрөл",
+      "model": "Загвар",
+      "serial": "Серийн дугаар"
     },
     "network": {
       "title": "Сүлжээний мэдээлэл",
@@ -52,18 +69,27 @@
       "bytes": "байт",
       "packets": "пакет",
       "errors": "Алдаанууд",
-      "network_interfaces": "Сүлжээний интерфейсүүд"
+      "network_interfaces": "Сүлжээний интерфейс",
+      "connection_type": "Холболтын төрөл",
+      "max_speed": "Дээд хурд",
+      "technology": "Технологи",
+      "signal_strength": "Дамжуулагчийн хүч",
+      "wired": "Утастай",
+      "wireless": "Утасгүй",
+      "bluetooth": "Блютүүт",
+      "cellular": "Гар утасны",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU мэдээлэл",
       "model": "Загвар",
-      "driver": "Жолооч",
+      "driver": "Драйвер",
       "temperature": "Температур",
       "memory": "Санах ой",
       "utilization": "Ашиглалт",
       "power": "Хүч",
-      "clock_core": "Цөмийн хурд",
-      "clock_memory": "Санах ойн хурд",
+      "clock_core": "Цөмийн цаг",
+      "clock_memory": "Санах ойн цаг",
       "fan_speed": "Сэнсний хурд"
     },
     "ai": {
@@ -73,29 +99,29 @@
       "vram": "VRAM",
       "model": "Загвар",
       "batch_size": "Багцийн хэмжээ",
-      "throughput": "Пропуск чадвар",
+      "throughput": "Пропуск",
       "epoch": "Эпох",
       "loss": "Алдагдал",
       "accuracy": "Нарийвчлал",
       "training_time": "Сургалтын хугацаа",
-      "no_training": "AI сургалт илрээгүй"
+      "no_training": "AI сургалт илэрсэнгүй"
     },
     "mining": {
-      "title": "Олборлолтын мэдээлэл",
+      "title": "Майнингийн мэдээлэл",
       "algorithm": "Алгоритм",
-      "hashrate": "Хеш хурд",
-      "shares": "Хувьцаа",
+      "hashrate": "Хэш хурд",
+      "shares": "Хувьцаанууд",
       "temperature": "Температур",
       "power": "Хүч",
       "efficiency": "Үр ашиг",
       "uptime": "Ажиллах хугацаа",
-      "revenue_24h": "24ц орлого",
-      "pool": "Уусмал",
-      "not_detected": "Олборлолтын үйл ажиллагаа илрээгүй"
+      "revenue_24h": "24 цагийн орлого",
+      "pool": "Сан",
+      "not_detected": "Майнингийн үйл ажиллагаа илэрсэнгүй"
     },
     "ui": {
       "histogram": "Гистограм",
-      "vertical": "Босоо", 
+      "vertical": "Босоо",
       "horizontal": "Хэвтээ",
       "loading": "Уншиж байна...",
       "no_data": "Өгөгдөл байхгүй",
@@ -107,33 +133,38 @@
       "all": "Бүх мэдээлэл",
       "disk_only": "Зөвхөн диск",
       "cpu_only": "Зөвхөн CPU",
-      "memory_only": "Зөвхөн санах ой", 
+      "memory_only": "Зөвхөн санах ой",
       "network_only": "Зөвхөн сүлжээ",
       "gpu_only": "Зөвхөн GPU",
       "ai_only": "Зөвхөн AI сургалт",
-      "mining_only": "Зөвхөн олборлолт",
+      "mining_only": "Зөвхөн майнинг",
       "refresh_rate": "Шинэчлэх хурд",
       "language": "Хэл",
       "remote": "Алсын горим",
       "port": "Порт"
     },
     "errors": {
-      "command_not_found": "Комманд олдсонгүй: %s",
+      "command_not_found": "Команд олдсонгүй: %s",
       "invalid_port": "Буруу порт: %d",
-      "invalid_refresh": "Буруу шинэчлэх интервал: %d", 
-      "config_load_failed": "Тохиргоог ачаалж чадсангүй",
-      "module_failed": "Модуль %s амжилтгүй: %v",
-      "nvidia_smi_not_found": "nvidia-smi олдсонгүй. GPU хянахын тулд NVIDIA жолооч шаардлагатай",
-      "rocm_smi_not_found": "rocm-smi олдсонгүй. AMD GPU хянахын тулд ROCm шаардлагатай"
+      "invalid_refresh": "Буруу шинэчлэх интервал: %d",
+      "config_load_failed": "Тохиргоог ачаалахад амжилтгүй",
+      "module_failed": "%s модуль амжилтгүй: %v",
+      "nvidia_smi_not_found": "nvidia-smi олдсонгүй. GPU мониторинг нь NVIDIA драйвер шаарддаг",
+      "rocm_smi_not_found": "rocm-smi олдсонгүй. AMD GPU мониторинг нь ROCm шаарддаг"
     },
     "status": {
-      "monitoring_started": "Хяналт эхлэв",
-      "updating_every": "%d секунд тутам шинэчлэгдэнэ", 
+      "monitoring_started": "Мониторинг эхлэв",
+      "updating_every": "%d секунд тутам шинэчлэгдэнэ",
       "press_ctrl_c": "Гарахын тулд Ctrl+C дарна уу",
-      "remote_mode": "%d порт дээр алсын горим",
-      "gpu_detected": "GPU илрээ: %s",
-      "ai_training_detected": "AI сургалтын процессууд илрээ: %d",
-      "mining_detected": "Олборлолтын үйл ажиллагаа илрээ: %s"
+      "remote_mode": "%d порт дээрх алсын горим",
+      "gpu_detected": "GPU илэрсэн: %s",
+      "ai_training_detected": "AI сургалтын процессууд илэрсэн: %d",
+      "mining_detected": "Майнингийн үйл ажиллагаа илэрсэн: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU төхөөрөмжүүд",
+      "multiple_cpus": "CPU процессорууд",
+      "device_number": "Төхөөрөмж #%d"
     }
   }
 }

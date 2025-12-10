@@ -1,5 +1,5 @@
 {
-  "language": "Croatian (Hrvatski)", 
+  "language": "Hrvatski",
   "language_code": "hr",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Greška",
       "unknown": "Nepoznato",
       "total": "Ukupno",
-      "used": "Korišteno", 
+      "used": "Iskorišteno",
       "free": "Slobodno",
       "available": "Dostupno",
       "status": "Status",
-      "up": "AKTIVNO",
-      "down": "NEAKTIVNO"
+      "up": "UPALJENO",
+      "down": "UGAŠENO"
     },
     "cpu": {
-      "title": "Informacije o CPU-u",
+      "title": "CPU informacije",
       "model": "Model",
       "cores": "Jezgre",
       "threads": "Dretve",
       "usage": "Korištenje",
-      "frequency": "Frekvencija", 
+      "frequency": "Frekvencija",
       "load": "Opterećenje",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Prosječno opterećenje"
     },
     "memory": {
-      "title": "Informacije o memoriji", 
+      "active": "Aktivno",
+      "buffers": "Međuspremnici",
+      "cached": "Priručna memorija",
+      "detailed_usage": "Detaljna upotreba",
+      "inactive": "Neaktivno",
+      "title": "Informacije o memoriji",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fizička memorija",
-      "virtual": "Virtualna memorija"
+      "processes": "Procesi",
+      "virtual": "Virtualna memorija",
+      "modules": "Memorijski moduli",
+      "shared": "Dijeljeno",
+      "slot": "Utor",
+      "module_type": "Tip",
+      "manufacturer": "Proizvođač",
+      "memory_speed": "Brzina"
     },
     "disk": {
       "title": "Informacije o disku",
       "filesystem": "Datotečni sustav",
       "size": "Veličina",
-      "mounted": "Montiran na", 
+      "mounted": "Montirano na",
       "usage": "Korištenje",
-      "storage": "Pohrana"
+      "storage": "Pohrana",
+      "physical": "Fizički disk",
+      "logical": "Logički disk",
+      "disk_type": "Tip diska",
+      "model": "Model",
+      "serial": "Serijski broj"
     },
     "network": {
       "title": "Mrežne informacije",
@@ -52,15 +69,24 @@
       "bytes": "bajtova",
       "packets": "paketa",
       "errors": "Greške",
-      "network_interfaces": "Mrežna sučelja"
+      "network_interfaces": "Mrežna sučelja",
+      "connection_type": "Tip veze",
+      "max_speed": "Maksimalna brzina",
+      "technology": "Tehnologija",
+      "signal_strength": "Jačina signala",
+      "wired": "Žičana",
+      "wireless": "Bežična",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobilna",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Informacije o GPU-u",
+      "title": "GPU informacije",
       "model": "Model",
       "driver": "Upravljački program",
       "temperature": "Temperatura",
       "memory": "Memorija",
-      "utilization": "Iskorištenost",
+      "utilization": "Iskorištenje",
       "power": "Snaga",
       "clock_core": "Brzina jezgre",
       "clock_memory": "Brzina memorije",
@@ -73,7 +99,7 @@
       "vram": "VRAM",
       "model": "Model",
       "batch_size": "Veličina serije",
-      "throughput": "Propusnost",
+      "throughput": "Protok",
       "epoch": "Epoha",
       "loss": "Gubitak",
       "accuracy": "Točnost",
@@ -89,17 +115,17 @@
       "power": "Snaga",
       "efficiency": "Učinkovitost",
       "uptime": "Vrijeme rada",
-      "revenue_24h": "24h prihod",
+      "revenue_24h": "24-satni prihod",
       "pool": "Pool",
       "not_detected": "Nije otkrivena aktivnost rudarenja"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Okomito", 
-      "horizontal": "Vodoravno",
+      "vertical": "Vertikalno",
+      "horizontal": "Horizontalno",
       "loading": "Učitavanje...",
       "no_data": "Nema podataka",
-      "percent": "postotak"
+      "percent": "posto"
     },
     "commands": {
       "help": "Pomoć",
@@ -107,20 +133,20 @@
       "all": "Sve informacije",
       "disk_only": "Samo disk",
       "cpu_only": "Samo CPU",
-      "memory_only": "Samo memorija", 
+      "memory_only": "Samo memorija",
       "network_only": "Samo mreža",
       "gpu_only": "Samo GPU",
       "ai_only": "Samo AI trening",
       "mining_only": "Samo rudarenje",
       "refresh_rate": "Brzina osvježavanja",
       "language": "Jezik",
-      "remote": "Udaljeni način rada",
+      "remote": "Daljinski način",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Naredba nije pronađena: %s",
       "invalid_port": "Nevažeći port: %d",
-      "invalid_refresh": "Nevažeći interval osvježavanja: %d", 
+      "invalid_refresh": "Nevažeći interval osvježavanja: %d",
       "config_load_failed": "Učitavanje konfiguracije nije uspjelo",
       "module_failed": "Modul %s nije uspio: %v",
       "nvidia_smi_not_found": "nvidia-smi nije pronađen. Praćenje GPU-a zahtijeva NVIDIA upravljačke programe",
@@ -128,12 +154,17 @@
     },
     "status": {
       "monitoring_started": "Praćenje je pokrenuto",
-      "updating_every": "Ažuriranje svakih %d sekundi", 
+      "updating_every": "Ažuriranje svakih %d sekundi",
       "press_ctrl_c": "Pritisnite Ctrl+C za izlaz",
-      "remote_mode": "Udaljeni način rada na portu %d",
+      "remote_mode": "Daljinski način rada na portu %d",
       "gpu_detected": "GPU otkriven: %s",
       "ai_training_detected": "AI trening procesi otkriveni: %d",
       "mining_detected": "Aktivnost rudarenja otkrivena: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU uređaji",
+      "multiple_cpus": "CPU procesori",
+      "device_number": "Uređaj #%d"
     }
   }
 }

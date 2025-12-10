@@ -1,5 +1,5 @@
 {
-  "language": "Czech (Čeština)", 
+  "language": "Čeština",
   "language_code": "cs",
   "translations": {
     "common": {
@@ -7,9 +7,9 @@
       "refresh": "Obnovit",
       "seconds": "sek",
       "error": "Chyba",
-      "unknown": "Neznámé",
+      "unknown": "Neznámý",
       "total": "Celkem",
-      "used": "Použito", 
+      "used": "Použito",
       "free": "Volné",
       "available": "Dostupné",
       "status": "Stav",
@@ -17,12 +17,12 @@
       "down": "VYPNUTO"
     },
     "cpu": {
-      "title": "Informace o CPU",
+      "title": "Informace o procesoru",
       "model": "Model",
       "cores": "Jádra",
       "threads": "Vlákna",
       "usage": "Využití",
-      "frequency": "Frekvence", 
+      "frequency": "Frekvence",
       "load": "Zatížení",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,32 +30,58 @@
       "load_average": "Průměrné zatížení"
     },
     "memory": {
-      "title": "Informace o paměti", 
+      "active": "Aktivní",
+      "buffers": "Vyrovnávací paměti",
+      "cached": "Vyrovnávací paměť",
+      "detailed_usage": "Podrobné využití",
+      "inactive": "Neaktivní",
+      "title": "Informace o paměti",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fyzická paměť",
-      "virtual": "Virtuální paměť"
+      "processes": "Procesy",
+      "virtual": "Virtuální paměť",
+      "modules": "Paměťové moduly",
+      "shared": "Sdílené",
+      "slot": "Slot",
+      "module_type": "Typ",
+      "manufacturer": "Výrobce",
+      "memory_speed": "Rychlost"
     },
     "disk": {
       "title": "Informace o disku",
       "filesystem": "Souborový systém",
       "size": "Velikost",
-      "mounted": "Připojeno na", 
+      "mounted": "Připojeno v",
       "usage": "Využití",
-      "storage": "Úložiště"
+      "storage": "Úložiště",
+      "physical": "Fyzický disk",
+      "logical": "Logický disk",
+      "disk_type": "Typ disku",
+      "model": "Model",
+      "serial": "Sériové číslo"
     },
     "network": {
-      "title": "Informace o síti",
+      "title": "Síťové informace",
       "interface": "Rozhraní",
       "received": "Přijato",
       "sent": "Odesláno",
       "bytes": "bajtů",
       "packets": "paketů",
       "errors": "Chyby",
-      "network_interfaces": "Síťová rozhraní"
+      "network_interfaces": "Síťová rozhraní",
+      "connection_type": "Typ připojení",
+      "max_speed": "Maximální rychlost",
+      "technology": "Technologie",
+      "signal_strength": "Síla signálu",
+      "wired": "Drátové",
+      "wireless": "Bezdrátové",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobilní",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "Informace o GPU",
+      "title": "Informace o grafické kartě",
       "model": "Model",
       "driver": "Ovladač",
       "temperature": "Teplota",
@@ -89,13 +115,13 @@
       "power": "Výkon",
       "efficiency": "Efektivita",
       "uptime": "Doba provozu",
-      "revenue_24h": "24h výnos",
+      "revenue_24h": "Výnos 24h",
       "pool": "Pool",
       "not_detected": "Nebyla detekována těžební aktivita"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Vertikální", 
+      "vertical": "Vertikální",
       "horizontal": "Horizontální",
       "loading": "Načítání...",
       "no_data": "Žádná data",
@@ -107,33 +133,38 @@
       "all": "Všechny informace",
       "disk_only": "Pouze disk",
       "cpu_only": "Pouze CPU",
-      "memory_only": "Pouze paměť", 
+      "memory_only": "Pouze paměť",
       "network_only": "Pouze síť",
       "gpu_only": "Pouze GPU",
       "ai_only": "Pouze AI trénink",
       "mining_only": "Pouze těžba",
       "refresh_rate": "Obnovovací frekvence",
       "language": "Jazyk",
-      "remote": "Vzdálený režim",
+      "remote": "Režim vzdáleného přístupu",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Příkaz nebyl nalezen: %s",
       "invalid_port": "Neplatný port: %d",
-      "invalid_refresh": "Neplatný interval obnovení: %d", 
+      "invalid_refresh": "Neplatný interval obnovení: %d",
       "config_load_failed": "Nepodařilo se načíst konfiguraci",
       "module_failed": "Modul %s selhal: %v",
-      "nvidia_smi_not_found": "nvidia-smi nebyl nalezen. Sledování GPU vyžaduje ovladače NVIDIA",
-      "rocm_smi_not_found": "rocm-smi nebyl nalezen. Sledování AMD GPU vyžaduje ROCm"
+      "nvidia_smi_not_found": "nvidia-smi nebyl nalezen. Monitorování GPU NVIDIA vyžaduje ovladače NVIDIA",
+      "rocm_smi_not_found": "rocm-smi nebyl nalezen. Monitorování GPU AMD vyžaduje ROCm"
     },
     "status": {
-      "monitoring_started": "Sledování zahájeno",
-      "updating_every": "Aktualizace každých %d sekund", 
+      "monitoring_started": "Monitorování zahájeno",
+      "updating_every": "Aktualizace každých %d sekund",
       "press_ctrl_c": "Stiskněte Ctrl+C pro ukončení",
-      "remote_mode": "Vzdálený režim na portu %d",
+      "remote_mode": "Režim vzdáleného přístupu na portu %d",
       "gpu_detected": "GPU detekováno: %s",
       "ai_training_detected": "Detekovány AI tréninkové procesy: %d",
       "mining_detected": "Detekována těžební aktivita: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU zařízení",
+      "multiple_cpus": "CPU procesory",
+      "device_number": "Zařízení #%d"
     }
   }
 }

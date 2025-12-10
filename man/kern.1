@@ -1,56 +1,56 @@
-.TH KERN 1 "2025-11-03" "kern v1.2.1" "System Monitoring Tool"
+.TH KERN 1 "2025-11-30" "kern v1.2.3" "System Monitoring Tool"
 .SH NAME
-kern \- real-time system monitoring tool with TUI and REST API
+kern - real-time system monitoring tool with TUI and REST API
 
 .SH SYNOPSIS
 .B kern
 [\fIOPTIONS\fR]
 .br
 .B kern
-\fB\-a\fR | \fB\-\-all\fR
+\fB-a\fR | \fB--all\fR
 .br
 .B kern
-\fB\-c\fR | \fB\-\-cpu\fR
+\fB-c\fR | \fB--cpu\fR
 .br
 .B kern
-\fB\-d\fR | \fB\-\-disk\fR
+\fB-d\fR | \fB--disk\fR
 .br
 .B kern
-\fB\-m\fR | \fB\-\-mem\fR
+\fB-m\fR | \fB--mem\fR
 .br
 .B kern
-\fB\-n\fR | \fB\-\-net\fR
+\fB-n\fR | \fB--net\fR
 .br
 .B kern
-\fB\-g\fR | \fB\-\-gpu\fR
+\fB-g\fR | \fB--gpu\fR
 .br
 .B kern
-\fB\-\-ai\fR
+\fB--ai\fR
 .br
 .B kern
-\fB\-\-mining\fR
+\fB--mining\fR
 .br
 .B kern
-\fB\-r\fR [\fIPORT\fR] | \fB\-\-remote\fR [\fIPORT\fR]
+\fB-r\fR [\fIPORT\fR] | \fB--remote\fR [\fIPORT\fR]
 .br
 .B kern
-\fB\-\-api\fR \fIURL\fR
+\fB--api\fR \fIURL\fR
 .br
 .B kern
-\fB\-\-ssh\fR \fIHOST\fR
+\fB--ssh\fR \fIHOST\fR
 
 .SH DESCRIPTION
 .B kern
-is a comprehensive system monitoring tool that provides real-time information 
-about system resources including disk usage, CPU performance, memory utilization, 
+is a comprehensive system monitoring tool that provides real-time information
+about system resources including disk usage, CPU performance, memory utilization,
 network statistics, GPU metrics, AI training processes, and cryptocurrency mining activity.
 
 The tool features a professional Terminal User Interface (TUI) with double buffering
-to eliminate screen flickering, support for multiple languages with automatic download 
+to eliminate screen flickering, support for multiple languages with automatic download
 capability, and multi-protocol remote monitoring via HTTP, HTTPS, and SSH.
 
 .B kern
-automatically starts a background API server on port 28126 during installation, 
+automatically starts a background API server on port 28126 during installation,
 providing immediate access to monitoring data via REST API without any manual configuration.
 
 .B kern
@@ -63,7 +63,7 @@ supports the following platforms:
 .B Linux:
 AMD64, ARM64, ARMv7 architectures
 
-.B macOS:  
+.B macOS:
 Intel and Apple Silicon (AMD64, ARM64)
 
 .B Windows:
@@ -73,92 +73,113 @@ AMD64 architecture
 .B kern
 supports 50+ languages with automatic download capability.
 .SS Supported Languages
-ar(Arabic), ba(Bashkir), be(Belarusian), bg(Bulgarian), bn(Bengali), bo(Tibetan), bs(Bosnian), cs(Czech), cv(Chuvash), da(Danish), de(German), el(Greek), en(English), es(Spanish), et(Estonian), fa(Persian), fi(Finnish), fr(French), gu(Gujarati), he(Hebrew), hi(Hindi), hr(Croatian), hu(Hungarian), hy(Armenian), id(Indonesian), it(Italian), ja(Japanese), ka(Georgian), kk(Kazakh), ko(Korean), ky(Kyrgyz), lt(Lithuanian), lv(Latvian), mk(Macedonian), ml(Malayalam), mn(Mongolian), mr(Marathi), ms(Malay), nb(Norwegian Bokmål), ne(Nepali), nl(Dutch), pl(Polish), pt(Portuguese), ro(Romanian), ru(Russian), si(Sinhala), sk(Slovak), sl(Slovenian), sq(Albanian), sr(Serbian), sv(Swedish), ta(Tamil), te(Telugu), th(Thai), tl(Tagalog), tr(Turkish), tt(Tatar), uk(Ukrainian), ur(Urdu), uz(Uzbek), vi(Vietnamese), zh(Chinese)
+ar (Arabic), ba (Bashkir), be (Belarusian), bg (Bulgarian), bn (Bengali), bo (Tibetan), bs (Bosnian), cs (Czech), cv (Chuvash), da (Danish), de (German), egy (Egyptian), el (Greek), en (English), es (Spanish), et (Estonian), fa (Persian), fi (Finnish), fr (French), gu (Gujarati), he (Hebrew), hi (Hindi), hr (Croatian), hu (Hungarian), hy (Armenian), id (Indonesian), it (Italian), ja (Japanese), ka (Georgian), kk (Kazakh), kn (Kannada), ko (Korean), la (Latin), lt (Lithuanian), lv (Latvian), mhr (Mari), mk (Macedonian), ml (Malayalam), mn (Mongolian), mo (Moldovan), mr (Marathi), ne (Nepali), nl (Dutch), no (Norwegian), pa (Punjabi), pl (Polish), pt (Portuguese), ro (Romanian), sk (Slovak), sl (Slovenian), sq (Albanian), sr (Serbian), sv (Swedish), ta (Tamil), te (Telugu), th (Thai), tr (Turkish), tt (Tatar), uk (Ukrainian), ur (Urdu), vi (Vietnamese), yue (Cantonese), zh (Chinese)
 
 For correct display of non-Latin alphabets, the corresponding language fonts must be installed on your system.
 
 .SH OPTIONS
 .TP
-.BR \-a ", " \-\-all
+.BR -a ", " --all
 Show all system information. This is the default behavior on first run.
 .TP
-.BR \-c ", " \-\-cpu
+.BR -c ", " --cpu
 Show CPU information only, including model, cores, threads, usage percentage, frequency, and load averages.
 .TP
-.BR \-d ", " \-\-disk
+.BR -d ", " --disk
 Show disk information only, including filesystem type, size, usage, and mount points.
 .TP
-.BR \-m ", " \-\-mem
+.BR -m ", " --mem
 Show memory information only, including RAM and swap usage with visual graphs.
 .TP
-.BR \-n ", " \-\-net
+.BR -n ", " --net
 Show network information only, including interface status, IP/MAC addresses, and traffic statistics.
 .TP
-.BR \-g ", " \-\-gpu
+.BR -g ", " --gpu
 Show GPU information only. Requires NVIDIA drivers (nvidia-smi) or AMD ROCm (rocm-smi).
 .TP
-.B \-\-ai
+.B --ai
 Show AI training information only, including framework detection, VRAM usage, and training metrics.
 .TP
-.B \-\-mining
+.B --mining
 Show cryptocurrency mining information only, including algorithm, hashrate, and efficiency metrics.
 .TP
-.BR \-v ", " \-\-version
+.BR --detailed ", " -de
+Show detailed CPU core information including individual core usage percentages. This setting is not persisted between sessions.
+.TP
+.BR --detailed-mem ", " -dm
+Show detailed memory module information including slot, size, type, speed, and usage percentages. This setting is not persisted between sessions.
+.TP
+.BR --detailed-net ", " -dn
+Show detailed network interface information including connection type, technology, signal strength, and vendor. This setting is not persisted between sessions.
+.TP
+.BR -v ", " --version
 Show version information and application logo.
 .TP
-.BR \-h ", " \-\-help
+.BR -h ", " --help
 Show comprehensive help message.
 .TP
-.BI \-\-refresh= SECONDS
+.BI --refresh= SECONDS
 Set refresh interval in seconds. Default is 2 seconds. Minimum is 1 second.
 .TP
-.BI \-l " LANG" "\fR, " \-\-lang " LANG"
-Set interface language. Language pack must be downloaded first using \fB\-\-download-lang\fR. Use \fB\-\-list-languages\fR to see all supported codes.
+.BI -l " LANG" "\fR, " --lang " LANG"
+Set interface language. Language pack must be downloaded first using \fB--download-lang\fR. Use \fB--list-languages\fR to see all supported codes.
 .TP
-.BI \-r " [PORT]" "\fR, " \-\-remote " [PORT]"
+.BI -r " [PORT]" "\fR, " --remote " [PORT]"
 Start remote API server on specified port. Default port is 28126 if not specified.
 .TP
-.B \-\-detailed
-Show detailed CPU core information including individual core usage percentages.
-.TP
-.BI \-\-api " URL"
+.BI --api " URL"
 Monitor remote server via HTTP/HTTPS API. URL should be in format http://host:port or https://host:port.
 .TP
-.BI \-\-ssh " HOST"
+.BI --ssh " HOST"
 Monitor remote server via SSH. Format should be user@hostname.
 .TP
-.BI \-\-download-lang " CODE"
+.BI --download-lang " CODE"
 Download language pack for specified language code.
 .TP
-.B \-\-list-languages
+.B --list-languages
 List all supported language codes.
 .TP
-.B \-\-logo
+.B --logo
 Show application logo during monitoring.
 .TP
-.B \-\-daemon
+.B --daemon
 Start kern as a daemon service.
 .TP
-.B \-\-start-service
+.B --start-service
 Start the kern daemon service.
 .TP
-.B \-\-stop-service
+.B --stop-service
 Stop the kern daemon service.
 .TP
-.B \-\-restart-service
+.B --restart-service
 Restart the kern daemon service.
 .TP
-.B \-\-service-status
+.B --service-status
 Show daemon service status.
 .TP
-.B \-\-enable-service
+.B --enable-service
 Enable auto-start on system boot.
 .TP
-.B \-\-disable-service
+.B --disable-service
 Disable auto-start on system boot.
 .TP
-.B \-\-ensure-running
+.B --ensure-running
 Ensure daemon service is running.
+.TP
+.B --pause
+Pause kern application.
+.TP
+.B --resume
+Resume kern application.
+.TP
+.B --stop-app
+Stop kern application.
+.TP
+.B --restart-app
+Restart kern application.
+.TP
+.BI --remote-port " PORT"
+Start API server on custom port (used with --remote).
 
 .SH EXAMPLES
 .TP
@@ -218,7 +239,7 @@ Daemon service configuration.
 .B /var/log/kern-daemon.log
 Daemon log file (Linux/macOS).
 .TP
-.B %TEMP%\\kern-daemon.log
+.B %TEMP%\kern-daemon.log
 Daemon log file (Windows).
 
 .SH ENVIRONMENT

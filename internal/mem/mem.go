@@ -1,103 +1,938 @@
 package mem
 
 import (
+	"bytes"
+	"fmt"
+	"os"
 	"os/exec"
-	"regexp"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
+
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type MemoryInfo struct {
-	Total           string
-	Used            string
-	Free            string
-	Available       string
-	SwapTotal       string
-	SwapUsed        string
-	SwapFree        string
-	UsagePercent    float64
+	Total            string
+	Used             string
+	UsedBytes        uint64  // НОВОЕ: размер в байтах для точных вычислений
+	Free             string
+	Available        string
+	AvailableBytes   uint64  // НОВОЕ: размер в байтах
+	SwapTotal        string
+	SwapUsed         string
+	SwapFree         string
+	UsagePercent     float64
 	SwapUsagePercent float64
+	Modules          []MemoryModule
+	
+	// НОВЫЕ ПОЛЯ для детальной информации
+	UsedByProcesses  string  // Память, используемая процессами (исключая кэш/буферы)
+	Cached           string  // Кэшированная память
+	Buffers          string  // Буферы
+	Active           string  // Активная память
+	Inactive         string  // Неактивная память
+	Shared           string  // Разделяемая память
 }
+
+type MemoryModule struct {
+	Slot         string
+	Size         string
+	SizeBytes    uint64
+	Type         string
+	Speed        string
+	Manufacturer string
+	PartNumber   string
+	SerialNumber string // ДОБАВЛЕНО: серийный номер
+	Timings      string
+	UsagePercent float64
+}
+
+var (
+    lastMemUpdate   time.Time
+    memCache        *MemoryInfo
+    memMutex        sync.RWMutex
+    cacheDuration   = 1 * time.Second // Увеличиваем кэш до 1 секунды для стабильности
+)
 
 func Summary() (*MemoryInfo, error) {
-	// Используем free для получения информации о памяти
-	cmd := exec.Command("free", "-h")
-	output, err := cmd.Output()
+    memMutex.RLock()
+    now := time.Now()
+    if memCache != nil && now.Sub(lastMemUpdate) < cacheDuration {
+        defer memMutex.RUnlock()
+        return memCache, nil
+    }
+    memMutex.RUnlock()
+
+    info, err := getMemoryInfo()
+    if err != nil {
+        // Возвращаем кэшированные данные при ошибке, если они есть
+        memMutex.RLock()
+        if memCache != nil {
+            defer memMutex.RUnlock()
+            return memCache, nil
+        }
+        memMutex.RUnlock()
+        
+        // Или создаем минимальный набор данных
+        return &MemoryInfo{
+            Total:            "0",
+            Used:             "0",
+            UsedBytes:        0,
+            Free:             "0",
+            Available:        "0",
+            AvailableBytes:   0,
+            SwapTotal:        "0",
+            SwapUsed:         "0",
+            SwapFree:         "0",
+            UsagePercent:     0.0,
+            SwapUsagePercent: 0.0,
+            Modules:          []MemoryModule{},
+            UsedByProcesses:  "0",
+            Cached:           "0",
+            Buffers:          "0",
+            Active:           "0",
+            Inactive:         "0",
+            Shared:           "0",
+        }, nil
+    }
+
+    memMutex.Lock()
+    memCache = info
+    lastMemUpdate = now
+    memMutex.Unlock()
+
+    return info, nil
+}
+
+
+func getMemoryInfo() (*MemoryInfo, error) {
+    virtMem, err := mem.VirtualMemory()
+    if err != nil {
+        return nil, err
+    }
+
+    swapMem, err := mem.SwapMemory()
+    if err != nil {
+        return nil, err
+    }
+
+    // ИСПРАВЛЕННЫЙ РАСЧЕТ: используем реально доступную память для расчета использования
+    usedMemory := virtMem.Total - virtMem.Available
+    usagePercent := float64(usedMemory) / float64(virtMem.Total) * 100
+    
+    // Гарантируем корректные границы
+    if usagePercent < 0 {
+        usagePercent = 0.0
+    }
+    if usagePercent > 100 {
+        usagePercent = 100.0
+    }
+
+    // Память, используемая только процессами (исключая кэш)
+    usedByProcesses := virtMem.Used
+
+    modules, err := getMemoryModules()
+    if err != nil {
+        modules = []MemoryModule{}
+    }
+
+    // Анализируем архитектуру памяти
+    modules = analyzeMemoryArchitecture(modules, virtMem.Total)
+
+    // Получаем детальную информацию о памяти
+    cached, buffers, active, inactive, shared := getDetailedMemoryInfo()
+
+    // Используем улучшенный расчет для всех модулей (известных и неизвестных)
+    modules = calculateUnknownModuleUsage(modules, virtMem.Total, usedMemory)
+
+    // Дополнительно гарантируем, что все модули имеют метку размера
+    for i := range modules {
+        if modules[i].Size == "" || modules[i].SizeBytes == 0 {
+            modules[i].Size = "не опознан"
+            modules[i].SizeBytes = 0
+        }
+    }
+
+    info := &MemoryInfo{
+        Total:            formatBytes(virtMem.Total),
+        Used:             formatBytes(usedMemory),
+        UsedBytes:        usedMemory,
+        Free:             formatBytes(virtMem.Free),
+        Available:        formatBytes(virtMem.Available),
+        AvailableBytes:   virtMem.Available,
+        SwapTotal:        formatBytes(swapMem.Total),
+        SwapUsed:         formatBytes(swapMem.Used),
+        SwapFree:         formatBytes(swapMem.Free),
+        UsagePercent:     usagePercent, // Используем корректное значение из gopsutil
+        SwapUsagePercent: swapMem.UsedPercent,
+        Modules:          modules,
+        UsedByProcesses:  formatBytes(usedByProcesses),
+        Cached:           formatBytes(cached),
+        Buffers:          formatBytes(buffers),
+        Active:           formatBytes(active),
+        Inactive:         formatBytes(inactive),
+        Shared:           formatBytes(shared),
+    }
+
+    // Дополнительная проверка для Swap
+    if info.SwapUsagePercent < 0 {
+        info.SwapUsagePercent = 0.0
+    }
+
+    return info, nil
+}
+
+// НОВАЯ ФУНКЦИЯ: Анализ архитектуры памяти
+func analyzeMemoryArchitecture(modules []MemoryModule, totalMemory uint64) []MemoryModule {
+    if len(modules) == 0 || totalMemory == 0 {
+        return modules
+    }
+
+    // Считаем общий размер известных модулей
+    var knownSize uint64
+    var unknownSlots int
+    var knownModules []MemoryModule
+    
+    for _, module := range modules {
+        if module.SizeBytes > 0 {
+            knownSize += module.SizeBytes
+            knownModules = append(knownModules, module)
+        } else {
+            unknownSlots++
+        }
+    }
+
+    // Если есть неизвестные слоты и известная память не совпадает с общей
+    if unknownSlots > 0 {
+        // Не вычисляем предполагаемые размеры для неизвестных модулей
+        // Они остаются с SizeBytes = 0 и Size = "Unknown" или ""
+        // Загруженность будет установлена позже на основе известных модулей
+    }
+
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ: Получение детальной информации о памяти
+func getDetailedMemoryInfo() (uint64, uint64, uint64, uint64, uint64) {
+	var cached, buffers, active, inactive, shared uint64
+
+	switch runtime.GOOS {
+	case "linux":
+		data, err := os.ReadFile("/proc/meminfo")
+		if err != nil {
+			// Возвращаем нулевые значения при ошибке
+			return 0, 0, 0, 0, 0
+		}
+		lines := strings.Split(string(data), "\n")
+		for _, line := range lines {
+			fields := strings.Fields(line)
+			if len(fields) < 2 {
+				continue
+			}
+			
+			value, err := strconv.ParseUint(fields[1], 10, 64)
+			if err != nil {
+				continue
+			}
+			value *= 1024 // Конвертируем из KB в байты
+
+			switch fields[0] {
+			case "Cached:":
+				cached = value
+			case "Buffers:":
+				buffers = value
+			case "Active:":
+				active = value
+			case "Inactive:":
+				inactive = value
+			case "Shmem:":
+				shared = value
+			}
+		}
+	case "windows":
+		// Для Windows используем другую логику
+		if output, err := exec.Command("wmic", "OS", "get", "FreePhysicalMemory,TotalVisibleMemorySize", "/value").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			var freeMem, totalMem uint64
+			
+			for _, line := range lines {
+				if strings.HasPrefix(line, "FreePhysicalMemory=") {
+					if val, err := strconv.ParseUint(strings.TrimPrefix(line, "FreePhysicalMemory="), 10, 64); err == nil {
+						freeMem = val * 1024 // KB to bytes
+					}
+				} else if strings.HasPrefix(line, "TotalVisibleMemorySize=") {
+					if val, err := strconv.ParseUint(strings.TrimPrefix(line, "TotalVisibleMemorySize="), 10, 64); err == nil {
+						totalMem = val * 1024 // KB to bytes
+					}
+				}
+			}
+			
+			// Для Windows приблизительные значения
+			if totalMem > 0 && freeMem > 0 {
+				used := totalMem - freeMem
+				cached = used * 20 / 100 // Предполагаем 20% кэша
+				buffers = used * 5 / 100 // Предполагаем 5% буферов
+				active = used * 70 / 100 // Предполагаем 70% активной памяти
+			}
+		}
+	case "darwin":
+		// Для macOS используем vm_stat
+		if output, err := exec.Command("vm_stat").Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			pageSize := uint64(4096) // Стандартный размер страницы в macOS
+			
+			for _, line := range lines {
+				fields := strings.Fields(line)
+				if len(fields) < 2 {
+					continue
+				}
+				
+				value, err := strconv.ParseUint(strings.TrimSuffix(fields[1], "."), 10, 64)
+				if err != nil {
+					continue
+				}
+				value *= pageSize
+				
+				switch fields[0] {
+				case "Pages", "Pages:":
+					// Общая информация
+				case "FileCache:":
+					cached = value
+				case "Purgeable":
+					inactive = value
+				}
+			}
+		}
+	}
+
+	return cached, buffers, active, inactive, shared
+}
+
+func getMemoryModules() ([]MemoryModule, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return parseDMIDecode()
+	case "windows":
+		return parseWMICMemory()
+	case "darwin":
+		return parseMacMemory()
+	default:
+		return []MemoryModule{}, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+}
+
+func parseDMIDecode() ([]MemoryModule, error) {
+	// Проверяем доступность dmidecode
+	if _, err := exec.LookPath("dmidecode"); err != nil {
+		return []MemoryModule{}, fmt.Errorf("dmidecode not available")
+	}
+
+	cmd := exec.Command("sudo", "dmidecode", "--type", "memory")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
 	if err != nil {
-		return nil, err
-	}
-
-	return parseFreeOutput(string(output))
-}
-
-func parseFreeOutput(output string) (*MemoryInfo, error) {
-	lines := strings.Split(output, "\n")
-	info := &MemoryInfo{}
-
-	// Получаем raw данные для расчета процентов
-	cmdRaw := exec.Command("free")
-	outputRaw, err := cmdRaw.Output()
-	if err == nil {
-		info.UsagePercent, info.SwapUsagePercent = calculateUsagePercent(string(outputRaw))
-	}
-
-	// Парсим основную память
-	if len(lines) >= 2 {
-		memFields := parseFreeLine(lines[1])
-		if len(memFields) >= 7 {
-			info.Total = memFields[1]
-			info.Used = memFields[2]
-			info.Free = memFields[3]
-			info.Available = memFields[6]
+		// Пробуем без sudo
+		cmd = exec.Command("dmidecode", "--type", "memory")
+		cmd.Stdout = &out
+		err = cmd.Run()
+		if err != nil {
+			return []MemoryModule{}, err
 		}
 	}
 
-	// Парсим swap
-	if len(lines) >= 3 {
-		swapFields := parseFreeLine(lines[2])
-		if len(swapFields) >= 5 {
-			info.SwapTotal = swapFields[1]
-			info.SwapUsed = swapFields[2]
-			info.SwapFree = swapFields[3]
-		}
+	output := out.String()
+	return parseDMIDecodeOutput(output), nil
+}
+
+func parseDMIDecodeOutput(output string) []MemoryModule {
+    var modules []MemoryModule
+    blocks := strings.Split(output, "Memory Device")
+    
+    for i := 1; i < len(blocks); i++ {
+        module := MemoryModule{}
+        lines := strings.Split(blocks[i], "\n")
+        
+        for _, line := range lines {
+            line = strings.TrimSpace(line)
+            
+            switch {
+            case strings.HasPrefix(line, "Size:"):
+                sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+                module.Size = sizeStr
+                module.SizeBytes = parseMemorySize(sizeStr)
+            case strings.HasPrefix(line, "Type:"):
+                module.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
+            case strings.HasPrefix(line, "Speed:"):
+                module.Speed = strings.TrimSpace(strings.TrimPrefix(line, "Speed:"))
+            case strings.HasPrefix(line, "Manufacturer:"):
+                module.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
+            case strings.HasPrefix(line, "Part Number:"):
+                module.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+            case strings.HasPrefix(line, "Serial Number:"):
+                serial := strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
+                if serial != "" && serial != "Unknown" && serial != "Not Specified" {
+                    module.SerialNumber = serial
+                }
+            case strings.HasPrefix(line, "Locator:"):
+                module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Locator:"))
+            case strings.HasPrefix(line, "Bank Locator:"):
+                if module.Slot == "" {
+                    module.Slot = strings.TrimSpace(strings.TrimPrefix(line, "Bank Locator:"))
+                }
+            }
+        }
+        
+        // ИСПРАВЛЕНИЕ: Принимаем ВСЕ модули, включая нераспознанные
+        if module.Slot != "" {
+            // Если размер не определен, помечаем как "Не распознан"
+            if module.Size == "" || module.Size == "No Module Installed" {
+                module.Size = "Не распознан"
+                module.SizeBytes = 0
+            }
+            
+            // Для нераспознанных модулей устанавливаем Type как "Unknown"
+            if module.Type == "" {
+                module.Type = "Unknown"
+            }
+            
+            modules = append(modules, module)
+        }
+    }
+    
+    return modules
+}
+
+// В функции parseDMIDecodeOutput ИСПРАВИТЬ обработку нераспознанных модулей:
+func calculateUnknownModuleUsage(modules []MemoryModule, totalSystemMemory uint64, usedSystemMemory uint64) []MemoryModule {
+    if len(modules) == 0 || totalSystemMemory == 0 {
+        return modules
+    }
+
+    // Считаем общий размер известных модулей
+    var knownSize uint64
+    var knownModulesList []MemoryModule
+    var unknownModulesList []int
+    
+    for i, module := range modules {
+        if module.SizeBytes > 0 {
+            knownSize += module.SizeBytes
+            knownModulesList = append(knownModulesList, module)
+        } else {
+            unknownModulesList = append(unknownModulesList, i)
+        }
+    }
+
+    // Вычисляем системное использование в процентах
+    systemUsagePercent := float64(usedSystemMemory) / float64(totalSystemMemory) * 100
+    
+    // Для известных модулей распределяем использование пропорционально размеру
+    for i := range modules {
+        if modules[i].SizeBytes > 0 {
+            // Рассчитываем долю модуля в общей известной памяти
+            moduleShare := float64(modules[i].SizeBytes) / float64(knownSize)
+            // Распределяем системное использование пропорционально
+            modules[i].UsagePercent = systemUsagePercent * moduleShare
+        }
+    }
+    
+    // Для нераспознанных модулей вычисляем оставшееся использование
+    if len(unknownModulesList) > 0 {
+        // Считаем общее использование известных модулей
+        var totalKnownUsage float64
+        for _, module := range modules {
+            if module.SizeBytes > 0 {
+                totalKnownUsage += module.UsagePercent
+            }
+        }
+        
+        // Оставшееся использование распределяем между нераспознанными модулями поровну
+        remainingUsage := systemUsagePercent - totalKnownUsage
+        if remainingUsage < 0 {
+            remainingUsage = 0
+        }
+        
+        usagePerUnknown := remainingUsage / float64(len(unknownModulesList))
+        for _, idx := range unknownModulesList {
+            modules[idx].UsagePercent = usagePerUnknown
+            
+            // Устанавливаем метку "не опознан" для отображения
+            if modules[idx].Size == "" {
+                modules[idx].Size = "не опознан"
+            }
+        }
+    }
+    
+    // Гарантируем корректные границы для всех модулей
+    for i := range modules {
+        if modules[i].UsagePercent < 0 {
+            modules[i].UsagePercent = 0.0
+        }
+        if modules[i].UsagePercent > 100 {
+            modules[i].UsagePercent = 100.0
+        }
+    }
+
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для строгой проверки уникальности
+func isTrulyUniqueModule(modules []MemoryModule, slot string, serial string) bool {
+    for _, m := range modules {
+        // Считаем уникальным, если отличается слот ИЛИ серийный номер
+        if m.Slot == slot && m.SerialNumber == serial {
+            return false
+        }
+        // Если слот тот же, но серийный номер разный - это разные модули
+        if m.Slot == slot && m.SerialNumber != serial {
+            return true // это другой модуль в том же слоте? маловероятно, но возможно
+        }
+    }
+    return true
+}
+
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ: Расчет использования модуля
+func calculateModuleUsage(moduleSize uint64, totalSystemMemory uint64, usedSystemMemory uint64) float64 {
+    if totalSystemMemory == 0 || moduleSize == 0 {
+        return 0.0
+    }
+    
+    // Распределяем общее использование пропорционально размеру модуля
+    moduleShare := float64(moduleSize) / float64(totalSystemMemory)
+    moduleUsed := float64(usedSystemMemory) * moduleShare
+    usagePercent := (moduleUsed / float64(moduleSize)) * 100
+    
+    // Гарантируем корректные границы
+    if usagePercent < 0 {
+        return 0.0
+    }
+    if usagePercent > 100 {
+        return 100.0
+    }
+    return usagePercent
+}
+
+// Улучшенная функция для альтернативного получения информации о памяти
+func parseAlternativeMemoryInfo() []MemoryModule {
+    var modules []MemoryModule
+    
+    // Пробуем разные методы получения информации о памяти
+    switch runtime.GOOS {
+    case "linux":
+        // Метод 1: Попробуем через lshw
+        if output, err := exec.Command("lshw", "-class", "memory", "-quiet").Output(); err == nil {
+            modules = parseLshwOutput(string(output))
+        }
+        
+        // Метод 2: Если lshw не сработал, пробуем через /proc/meminfo и dmidecode без sudo
+        if len(modules) == 0 {
+            if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
+                modules = parseDMIDecodeOutput(string(output))
+            }
+        }
+        
+        // Метод 3: Парсим /sys/bus/drivers для получения информации о слотах
+        if len(modules) == 0 {
+            modules = parseSysfsMemoryInfo()
+        }
+        
+    case "windows":
+        // Для Windows используем WMI
+        cmd := exec.Command("wmic", "memorychip", "get", "BankLabel,Capacity,Speed,MemoryType,Manufacturer,PartNumber,SerialNumber", "/format:csv")
+        if output, err := cmd.Output(); err == nil {
+            modules = parseWMICMemoryOutput(string(output))
+        }
+    }
+    
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для парсинга информации из sysfs (Linux)
+func parseSysfsMemoryInfo() []MemoryModule {
+    var modules []MemoryModule
+    
+    // Ищем информацию о памяти в /sys/devices
+    sysfsPath := "/sys/devices/system/edac/mc"
+    if _, err := os.Stat(sysfsPath); err == nil {
+        // Есть информация о контроллере памяти
+        mcDirs, err := filepath.Glob(filepath.Join(sysfsPath, "mc*"))
+        if err == nil {
+            for _, mcDir := range mcDirs {
+                dimmDirs, _ := filepath.Glob(filepath.Join(mcDir, "dimm*"))
+                for i, dimmDir := range dimmDirs {
+                    module := MemoryModule{
+                        Slot:  fmt.Sprintf("DIMM%d", i),
+                        Size:  "Unknown",
+                        Type:  "DDR",
+                    }
+                    
+                    // Пытаемся получить размер из разных мест
+                    if sizeFile, err := os.ReadFile(filepath.Join(dimmDir, "size")); err == nil {
+                        if sizeMB, err := strconv.Atoi(strings.TrimSpace(string(sizeFile))); err == nil {
+                            module.SizeBytes = uint64(sizeMB) * 1024 * 1024
+                            module.Size = formatBytes(module.SizeBytes)
+                        }
+                    }
+                    
+                    modules = append(modules, module)
+                }
+            }
+        }
+    }
+    
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для парсинга вывода lshw
+func parseLshwOutput(output string) []MemoryModule {
+    var modules []MemoryModule
+    lines := strings.Split(output, "\n")
+    moduleCount := 0
+    
+    for _, line := range lines {
+        if strings.Contains(line, "memory") && (strings.Contains(line, "GiB") || strings.Contains(line, "MiB")) {
+            fields := strings.Fields(line)
+            if len(fields) >= 3 {
+                module := MemoryModule{
+                    Slot:  fmt.Sprintf("DIMM%d", moduleCount),
+                    Size:  fields[2],
+                    Type:  "DDR4", // Предполагаем
+                    Speed: "Unknown",
+                }
+                module.SizeBytes = parseMemorySize(module.Size)
+                modules = append(modules, module)
+                moduleCount++
+            }
+        }
+    }
+    
+    return modules
+}
+
+// НОВАЯ ФУНКЦИЯ для парсинга вывода WMIC
+func parseWMICMemoryOutput(output string) []MemoryModule {
+    var modules []MemoryModule
+    lines := strings.Split(output, "\n")
+    
+    for i, line := range lines {
+        if i == 0 || strings.TrimSpace(line) == "" {
+            continue
+        }
+        fields := strings.Split(line, ",")
+        if len(fields) >= 7 {
+            module := MemoryModule{
+                Slot:         strings.TrimSpace(fields[1]),
+                Manufacturer: strings.TrimSpace(fields[5]),
+                PartNumber:   strings.TrimSpace(fields[6]),
+                SerialNumber: strings.TrimSpace(fields[7]),
+            }
+            
+            // Parse capacity
+            if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
+                module.SizeBytes = capacity
+                module.Size = formatBytes(capacity)
+            }
+            
+            // Parse memory type
+            if memType, err := strconv.Atoi(strings.TrimSpace(fields[3])); err == nil {
+                module.Type = memoryTypeToString(memType)
+            }
+            
+            // Parse speed
+            if speed, err := strconv.Atoi(strings.TrimSpace(fields[4])); err == nil {
+                module.Speed = fmt.Sprintf("%d MHz", speed)
+            }
+            
+            modules = append(modules, module)
+        }
+    }
+    
+    return modules
+}
+
+func parseWMICMemory() ([]MemoryModule, error) {
+	cmd := exec.Command("wmic", "memorychip", "get", 
+		"BankLabel,Capacity,MemoryType,Speed,Manufacturer,PartNumber,SerialNumber", "/format:csv")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return []MemoryModule{}, err
 	}
 
-	return info, nil
+	output := out.String()
+	return parseWMICOutput(output), nil
 }
 
-func parseFreeLine(line string) []string {
-	re := regexp.MustCompile(`\s+`)
-	fields := re.Split(strings.TrimSpace(line), -1)
-	return fields
-}
-
-func calculateUsagePercent(output string) (float64, float64) {
+func parseWMICOutput(output string) []MemoryModule {
+	var modules []MemoryModule
 	lines := strings.Split(output, "\n")
-	var memPercent, swapPercent float64
+	
+	for _, line := range lines[1:] {
+		fields := strings.Split(line, ",")
+		if len(fields) < 7 {
+			continue
+		}
+		
+		module := MemoryModule{
+			Slot:         strings.TrimSpace(fields[1]),
+			Manufacturer: strings.TrimSpace(fields[4]),
+			PartNumber:   strings.TrimSpace(fields[5]),
+			SerialNumber: strings.TrimSpace(fields[6]), // Добавляем серийный номер
+		}
+		
+		// Parse capacity
+		if capacity, err := strconv.ParseUint(strings.TrimSpace(fields[2]), 10, 64); err == nil {
+			module.SizeBytes = capacity
+			module.Size = formatBytes(capacity)
+		}
+		
+		// Parse memory type
+		if memType, err := strconv.Atoi(strings.TrimSpace(fields[3])); err == nil {
+			module.Type = memoryTypeToString(memType)
+		}
+		
+		// Parse speed
+		if speed, err := strconv.Atoi(strings.TrimSpace(fields[4])); err == nil {
+			module.Speed = fmt.Sprintf("%d MHz", speed)
+		}
+		
+		modules = append(modules, module)
+	}
+	
+	return modules
+}
 
-	// Memory usage
-	if len(lines) >= 2 {
-		memFields := parseFreeLine(lines[1])
-		if len(memFields) >= 7 {
-			total, _ := strconv.ParseFloat(memFields[1], 64)
-			used, _ := strconv.ParseFloat(memFields[2], 64)
-			if total > 0 {
-				memPercent = (used / total) * 100
+func parseMacMemory() ([]MemoryModule, error) {
+	cmd := exec.Command("system_profiler", "SPMemoryDataType")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return []MemoryModule{}, err
+	}
+
+	output := out.String()
+	return parseMacMemoryOutput(output), nil
+}
+
+func parseMacMemoryOutput(output string) []MemoryModule {
+	var modules []MemoryModule
+	
+	lines := strings.Split(output, "\n")
+	var currentModule MemoryModule
+	
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		
+		switch {
+		case strings.HasPrefix(line, "BANK"):
+			if currentModule.Slot != "" {
+				modules = append(modules, currentModule)
+			}
+			currentModule = MemoryModule{Slot: strings.TrimSpace(line)}
+			
+		case strings.HasPrefix(line, "Size:"):
+			sizeStr := strings.TrimSpace(strings.TrimPrefix(line, "Size:"))
+			currentModule.Size = sizeStr
+			currentModule.SizeBytes = parseMemorySize(sizeStr)
+		case strings.HasPrefix(line, "Type:"):
+			currentModule.Type = strings.TrimSpace(strings.TrimPrefix(line, "Type:"))
+		case strings.HasPrefix(line, "Speed:"):
+			currentModule.Speed = strings.TrimSpace(strings.TrimPrefix(line, "Speed:"))
+		case strings.HasPrefix(line, "Manufacturer:"):
+			currentModule.Manufacturer = strings.TrimSpace(strings.TrimPrefix(line, "Manufacturer:"))
+		case strings.HasPrefix(line, "Part Number:"):
+			currentModule.PartNumber = strings.TrimSpace(strings.TrimPrefix(line, "Part Number:"))
+		case strings.HasPrefix(line, "Serial Number:"):
+			currentModule.SerialNumber = strings.TrimSpace(strings.TrimPrefix(line, "Serial Number:"))
+		}
+	}
+	
+	if currentModule.Slot != "" {
+		modules = append(modules, currentModule)
+	}
+	
+	return modules
+}
+
+// Функция parseMemorySize без изменений...
+func parseMemorySize(sizeStr string) uint64 {
+	if sizeStr == "" || sizeStr == "No Module Installed" {
+		return 0
+	}
+
+	sizeStr = strings.ToLower(strings.TrimSpace(sizeStr))
+	
+	var value float64
+	var unit string
+	
+	_, err := fmt.Sscanf(sizeStr, "%f %s", &value, &unit)
+	if err != nil {
+		for i, char := range sizeStr {
+			if char < '0' || char > '9' {
+				if char == '.' {
+					continue
+				}
+				valueStr := sizeStr[:i]
+				unit = sizeStr[i:]
+				value, _ = strconv.ParseFloat(valueStr, 64)
+				break
 			}
 		}
 	}
 
-	// Swap usage
-	if len(lines) >= 3 {
-		swapFields := parseFreeLine(lines[2])
-		if len(swapFields) >= 5 {
-			total, _ := strconv.ParseFloat(swapFields[1], 64)
-			used, _ := strconv.ParseFloat(swapFields[2], 64)
-			if total > 0 {
-				swapPercent = (used / total) * 100
-			}
-		}
+	switch unit {
+	case "tb", "t":
+		return uint64(value * 1024 * 1024 * 1024 * 1024)
+	case "gb", "g":
+		return uint64(value * 1024 * 1024 * 1024)
+	case "mb", "m":
+		return uint64(value * 1024 * 1024)
+	case "kb", "k":
+		return uint64(value * 1024)
+	default:
+		return uint64(value)
+	}
+}
+
+func memoryTypeToString(memType int) string {
+	switch memType {
+	case 20: return "DDR"
+	case 21: return "DDR2"
+	case 24: return "DDR3"
+	case 26: return "DDR4"
+	case 34: return "DDR5"
+	default: return fmt.Sprintf("Unknown (%d)", memType)
+	}
+}
+
+func formatBytes(bytes uint64) string {
+	const (
+		KB = 1024
+		MB = KB * 1024
+		GB = MB * 1024
+		TB = GB * 1024
+	)
+
+	var (
+		value float64
+		unit  string
+	)
+
+	switch {
+	case bytes >= TB:
+		value = float64(bytes) / TB
+		unit = "T"
+	case bytes >= GB:
+		value = float64(bytes) / GB
+		unit = "G"
+	case bytes >= MB:
+		value = float64(bytes) / MB
+		unit = "M"
+	case bytes >= KB:
+		value = float64(bytes) / KB
+		unit = "K"
+	default:
+		return strconv.FormatUint(bytes, 10) + "B"
 	}
 
-	return memPercent, swapPercent
+	str := strconv.FormatFloat(value, 'f', 1, 64)
+	if strings.HasSuffix(str, ".0") {
+		str = str[:len(str)-2]
+	}
+	return str + unit
+}
+
+// НОВАЯ ФУНКЦИЯ: Детальный анализ архитектуры памяти
+func DetectMemoryArchitecture() string {
+    switch runtime.GOOS {
+    case "linux":
+        return analyzeLinuxMemoryArchitecture()
+    case "windows":
+        return analyzeWindowsMemoryArchitecture()
+    case "darwin":
+        return analyzeMacMemoryArchitecture()
+    default:
+        return "Standard Architecture"
+    }
+}
+
+// Анализ архитектуры для Linux
+func analyzeLinuxMemoryArchitecture() string {
+    // Анализ через dmidecode
+    if output, err := exec.Command("dmidecode", "-t", "memory").Output(); err == nil {
+        outputStr := string(output)
+        
+        // Определяем тип архитектуры
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture" 
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "DDR2") {
+            return "DDR2 Architecture"
+        }
+        
+        // Проверяем наличие нескольких каналов
+        if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") {
+            return "Dual Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") && 
+                  strings.Contains(outputStr, "ChannelC") {
+            return "Triple Channel Architecture"
+        } else if strings.Contains(outputStr, "ChannelA") && strings.Contains(outputStr, "ChannelB") &&
+                  strings.Contains(outputStr, "ChannelC") && strings.Contains(outputStr, "ChannelD") {
+            return "Quad Channel Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для Windows
+func analyzeWindowsMemoryArchitecture() string {
+    cmd := exec.Command("wmic", "memorychip", "get", "MemoryType,ConfiguredClockSpeed,DataWidth", "/format:csv")
+    if output, err := cmd.Output(); err == nil {
+        outputStr := string(output)
+        
+        // Анализируем тип памяти и скорость
+        if strings.Contains(outputStr, "34") { // DDR5
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "26") { // DDR4
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "24") { // DDR3
+            return "DDR3 Architecture"
+        } else if strings.Contains(outputStr, "21") { // DDR2
+            return "DDR2 Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
+}
+
+// Анализ архитектуры для macOS
+func analyzeMacMemoryArchitecture() string {
+    if output, err := exec.Command("system_profiler", "SPMemoryDataType").Output(); err == nil {
+        outputStr := string(output)
+        
+        if strings.Contains(outputStr, "DDR5") {
+            return "DDR5 Architecture"
+        } else if strings.Contains(outputStr, "DDR4") {
+            return "DDR4 Architecture"
+        } else if strings.Contains(outputStr, "DDR3") {
+            return "DDR3 Architecture"
+        }
+        
+        // Проверяем унифицированную память Apple Silicon
+        if strings.Contains(outputStr, "Unified") {
+            return "Apple Unified Memory Architecture"
+        }
+    }
+    
+    return "Standard Architecture"
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Spanish (Español)", 
+  "language": "Español",
   "language_code": "es",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Error",
       "unknown": "Desconocido",
       "total": "Total",
-      "used": "Usado", 
+      "used": "Usado",
       "free": "Libre",
       "available": "Disponible",
       "status": "Estado",
-      "up": "ARRIBA",
-      "down": "ABAJO"
+      "up": "ACTIVO",
+      "down": "INACTIVO"
     },
     "cpu": {
       "title": "Información de la CPU",
@@ -22,7 +22,7 @@
       "cores": "Núcleos",
       "threads": "Hilos",
       "usage": "Uso",
-      "frequency": "Frecuencia", 
+      "frequency": "Frecuencia",
       "load": "Carga",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Carga Promedio"
     },
     "memory": {
-      "title": "Información de la Memoria", 
+      "active": "Activo",
+      "buffers": "Búferes",
+      "cached": "En caché",
+      "detailed_usage": "Uso Detallado",
+      "inactive": "Inactivo",
+      "title": "Información de la Memoria",
       "ram": "RAM",
-      "swap": "Intercambio",
+      "swap": "Swap",
       "physical": "Memoria Física",
-      "virtual": "Memoria Virtual"
+      "processes": "Procesos",
+      "virtual": "Memoria Virtual",
+      "modules": "Módulos de Memoria",
+      "shared": "Compartida",
+      "slot": "Ranura",
+      "module_type": "Tipo",
+      "manufacturer": "Fabricante",
+      "memory_speed": "Velocidad"
     },
     "disk": {
       "title": "Información del Disco",
-      "filesystem": "Sistema de archivos",
+      "filesystem": "Sistema de Archivos",
       "size": "Tamaño",
-      "mounted": "Montado en", 
+      "mounted": "Montado en",
       "usage": "Uso",
-      "storage": "Almacenamiento"
+      "storage": "Almacenamiento",
+      "physical": "Disco Físico",
+      "logical": "Disco Lógico",
+      "disk_type": "Tipo de Disco",
+      "model": "Modelo",
+      "serial": "Número de Serie"
     },
     "network": {
       "title": "Información de la Red",
@@ -52,7 +69,16 @@
       "bytes": "bytes",
       "packets": "paquetes",
       "errors": "Errores",
-      "network_interfaces": "Interfaces de Red"
+      "network_interfaces": "Interfaces de Red",
+      "connection_type": "Tipo de Conexión",
+      "max_speed": "Velocidad Máxima",
+      "technology": "Tecnología",
+      "signal_strength": "Intensidad de la Señal",
+      "wired": "Cableado",
+      "wireless": "Inalámbrico",
+      "bluetooth": "Bluetooth",
+      "cellular": "Cellular",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Información de la GPU",
@@ -68,11 +94,11 @@
     },
     "ai": {
       "title": "Entrenamiento de IA",
-      "framework": "Marco de trabajo",
+      "framework": "Framework",
       "processes": "Procesos",
       "vram": "VRAM",
       "model": "Modelo",
-      "batch_size": "Tamaño del Lote",
+      "batch_size": "Tamaño de Lote",
       "throughput": "Rendimiento",
       "epoch": "Época",
       "loss": "Pérdida",
@@ -84,18 +110,18 @@
       "title": "Información de Minería",
       "algorithm": "Algoritmo",
       "hashrate": "Tasa de Hash",
-      "shares": "Comparticiones",
+      "shares": "Compartidos",
       "temperature": "Temperatura",
       "power": "Potencia",
       "efficiency": "Eficiencia",
-      "uptime": "Tiempo de Actividad",
+      "uptime": "Tiempo Activo",
       "revenue_24h": "Ingresos 24h",
-      "pool": "Grupo",
+      "pool": "Pool",
       "not_detected": "No se detectó actividad de minería"
     },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Horizontal",
       "loading": "Cargando...",
       "no_data": "Sin datos",
@@ -107,7 +133,7 @@
       "all": "Toda la información",
       "disk_only": "Solo disco",
       "cpu_only": "Solo CPU",
-      "memory_only": "Solo memoria", 
+      "memory_only": "Solo memoria",
       "network_only": "Solo red",
       "gpu_only": "Solo GPU",
       "ai_only": "Solo entrenamiento de IA",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Comando no encontrado: %s",
       "invalid_port": "Puerto inválido: %d",
-      "invalid_refresh": "Intervalo de actualización inválido: %d", 
+      "invalid_refresh": "Intervalo de actualización inválido: %d",
       "config_load_failed": "Error al cargar la configuración",
       "module_failed": "Módulo %s falló: %v",
       "nvidia_smi_not_found": "nvidia-smi no encontrado. El monitoreo de GPU requiere controladores NVIDIA",
-      "rocm_smi_not_found": "rocm-smi no encontrado. El monitoreo de AMD GPU requiere ROCm"
+      "rocm_smi_not_found": "rocm-smi no encontrado. El monitoreo de GPU AMD requiere ROCm"
     },
     "status": {
       "monitoring_started": "Monitoreo iniciado",
-      "updating_every": "Actualizando cada %d segundos", 
+      "updating_every": "Actualizando cada %d segundos",
       "press_ctrl_c": "Presione Ctrl+C para salir",
       "remote_mode": "Modo remoto en el puerto %d",
       "gpu_detected": "GPU detectada: %s",
       "ai_training_detected": "Procesos de entrenamiento de IA detectados: %d",
       "mining_detected": "Actividad de minería detectada: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Dispositivos GPU",
+      "multiple_cpus": "Procesadores CPU",
+      "device_number": "Dispositivo #%d"
     }
   }
 }

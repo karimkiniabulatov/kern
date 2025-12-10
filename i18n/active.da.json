@@ -1,20 +1,20 @@
 {
-  "language": "Danish (Dansk)", 
+  "language": "Dansk",
   "language_code": "da",
   "translations": {
     "common": {
-      "title": "kern - Systemovervågning",
+      "title": "kern - Systemovervåger",
       "refresh": "Opdater",
       "seconds": "sek",
       "error": "Fejl",
       "unknown": "Ukendt",
       "total": "Total",
-      "used": "Brugt", 
+      "used": "Brugt",
       "free": "Ledig",
       "available": "Tilgængelig",
       "status": "Status",
       "up": "OP",
-      "down": "NED"
+      "down": "NEDE"
     },
     "cpu": {
       "title": "CPU-information",
@@ -22,7 +22,7 @@
       "cores": "Kerner",
       "threads": "Tråde",
       "usage": "Brug",
-      "frequency": "Frekvens", 
+      "frequency": "Frekvens",
       "load": "Belastning",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Gennemsnitlig belastning"
     },
     "memory": {
-      "title": "Hukommelsesinformation", 
+      "active": "Aktiv",
+      "buffers": "Buffere",
+      "cached": "Cachet",
+      "detailed_usage": "Detaljeret brug",
+      "inactive": "Inaktiv",
+      "title": "Hukommelsesinformation",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysisk hukommelse",
-      "virtual": "Virtuel hukommelse"
+      "processes": "Processer",
+      "virtual": "Virtuel hukommelse",
+      "modules": "Hukommelsesmoduler",
+      "shared": "Delt",
+      "slot": "Slot",
+      "module_type": "Type",
+      "manufacturer": "Producent",
+      "memory_speed": "Hastighed"
     },
     "disk": {
       "title": "Diskinformation",
       "filesystem": "Filsystem",
       "size": "Størrelse",
-      "mounted": "Monteret på", 
+      "mounted": "Monteret på",
       "usage": "Brug",
-      "storage": "Lagring"
+      "storage": "Opbevaring",
+      "physical": "Fysisk disk",
+      "logical": "Logisk disk",
+      "disk_type": "Disktype",
+      "model": "Model",
+      "serial": "Serienummer"
     },
     "network": {
       "title": "Netværksinformation",
@@ -52,7 +69,16 @@
       "bytes": "bytes",
       "packets": "pakker",
       "errors": "Fejl",
-      "network_interfaces": "Netværksinterfaces"
+      "network_interfaces": "Netværksinterfaces",
+      "connection_type": "Forbindelsestype",
+      "max_speed": "Maksimal hastighed",
+      "technology": "Teknologi",
+      "signal_strength": "Signalstyrke",
+      "wired": "Trådbundet",
+      "wireless": "Trådløs",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobil",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU-information",
@@ -60,10 +86,10 @@
       "driver": "Driver",
       "temperature": "Temperatur",
       "memory": "Hukommelse",
-      "utilization": "Udbnyttelse",
-      "power": "Effekt",
-      "clock_core": "Kernehastighed",
-      "clock_memory": "Hukommelseshastighed",
+      "utilization": "Udnyttelse",
+      "power": "Strøm",
+      "clock_core": "Kerneklo",
+      "clock_memory": "Hukommelsesklok",
       "fan_speed": "Ventilatorhastighed"
     },
     "ai": {
@@ -78,7 +104,7 @@
       "loss": "Tab",
       "accuracy": "Nøjagtighed",
       "training_time": "Træningstid",
-      "no_training": "Ingen AI-træning registreret"
+      "no_training": "Ingen AI-træning fundet"
     },
     "mining": {
       "title": "Mining-information",
@@ -86,17 +112,17 @@
       "hashrate": "Hashrate",
       "shares": "Andele",
       "temperature": "Temperatur",
-      "power": "Effekt",
+      "power": "Strøm",
       "efficiency": "Effektivitet",
       "uptime": "Oppetid",
-      "revenue_24h": "24h indtægt",
+      "revenue_24h": "24t indtægt",
       "pool": "Pool",
-      "not_detected": "Ingen mining-aktivitet registreret"
+      "not_detected": "Ingen mining-aktivitet fundet"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Lodret", 
-      "horizontal": "Vandret",
+      "vertical": "Vertikal",
+      "horizontal": "Horisontal",
       "loading": "Indlæser...",
       "no_data": "Ingen data",
       "percent": "procent"
@@ -104,36 +130,41 @@
     "commands": {
       "help": "Hjælp",
       "version": "Version",
-      "all": "Al information",
+      "all": "Alle oplysninger",
       "disk_only": "Kun disk",
       "cpu_only": "Kun CPU",
-      "memory_only": "Kun hukommelse", 
+      "memory_only": "Kun hukommelse",
       "network_only": "Kun netværk",
       "gpu_only": "Kun GPU",
       "ai_only": "Kun AI-træning",
       "mining_only": "Kun mining",
-      "refresh_rate": "Opdateringsfrekvens",
+      "refresh_rate": "Opdateringsrate",
       "language": "Sprog",
-      "remote": "Fjernmodus",
+      "remote": "Fjernmode",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Kommando ikke fundet: %s",
       "invalid_port": "Ugyldig port: %d",
-      "invalid_refresh": "Ugyldigt opdateringsinterval: %d", 
+      "invalid_refresh": "Ugyldigt opdateringsinterval: %d",
       "config_load_failed": "Kunne ikke indlæse konfiguration",
-      "module_failed": "Modul %s fejlede: %v",
+      "module_failed": "Modul %s mislykkedes: %v",
       "nvidia_smi_not_found": "nvidia-smi ikke fundet. GPU-overvågning kræver NVIDIA-drivere",
       "rocm_smi_not_found": "rocm-smi ikke fundet. AMD GPU-overvågning kræver ROCm"
     },
     "status": {
       "monitoring_started": "Overvågning startet",
-      "updating_every": "Opdaterer hver %d sekund", 
+      "updating_every": "Opdateres hver %d sekund",
       "press_ctrl_c": "Tryk Ctrl+C for at afslutte",
-      "remote_mode": "Fjernmodus på port %d",
-      "gpu_detected": "GPU registreret: %s",
-      "ai_training_detected": "AI-træningsprocesser registreret: %d",
-      "mining_detected": "Mining-aktivitet registreret: %s"
+      "remote_mode": "Fjernmode på port %d",
+      "gpu_detected": "GPU fundet: %s",
+      "ai_training_detected": "AI-træningsprocesser fundet: %d",
+      "mining_detected": "Mining-aktivitet fundet: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU-enheder",
+      "multiple_cpus": "CPU-processorer",
+      "device_number": "Enhed #%d"
     }
   }
 }

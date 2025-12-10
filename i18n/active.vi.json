@@ -1,15 +1,15 @@
 {
-  "language": "Vietnamese (Tiếng Việt)", 
+  "language": "Tiếng Việt",
   "language_code": "vi",
   "translations": {
     "common": {
-      "title": "kern - Giám sát Hệ thống",
+      "title": "kern - Trình theo dõi hệ thống",
       "refresh": "Làm mới",
       "seconds": "giây",
       "error": "Lỗi",
       "unknown": "Không xác định",
       "total": "Tổng",
-      "used": "Đã dùng", 
+      "used": "Đã dùng",
       "free": "Trống",
       "available": "Khả dụng",
       "status": "Trạng thái",
@@ -19,10 +19,10 @@
     "cpu": {
       "title": "Thông tin CPU",
       "model": "Model",
-      "cores": "Nhân",
+      "cores": "Lõi",
       "threads": "Luồng",
       "usage": "Sử dụng",
-      "frequency": "Tần số", 
+      "frequency": "Tần số",
       "load": "Tải",
       "load_1min": "1 phút",
       "load_5min": "5 phút",
@@ -30,29 +30,55 @@
       "load_average": "Tải trung bình"
     },
     "memory": {
-      "title": "Thông tin Bộ nhớ", 
+      "active": "Đang hoạt động",
+      "buffers": "Bộ đệm",
+      "cached": "Đã cache",
+      "detailed_usage": "Sử dụng chi tiết",
+      "inactive": "Không hoạt động",
+      "title": "Thông tin bộ nhớ",
       "ram": "RAM",
       "swap": "Swap",
-      "physical": "Bộ nhớ Vật lý",
-      "virtual": "Bộ nhớ Ảo"
+      "physical": "Bộ nhớ vật lý",
+      "processes": "Tiến trình",
+      "virtual": "Bộ nhớ ảo",
+      "modules": "Mô-đun bộ nhớ",
+      "shared": "Chia sẻ",
+      "slot": "Khe cắm",
+      "module_type": "Loại",
+      "manufacturer": "Nhà sản xuất",
+      "memory_speed": "Tốc độ"
     },
     "disk": {
-      "title": "Thông tin Đĩa",
+      "title": "Thông tin đĩa",
       "filesystem": "Hệ thống tập tin",
       "size": "Kích thước",
-      "mounted": "Được gắn vào", 
+      "mounted": "Được gắn tại",
       "usage": "Sử dụng",
-      "storage": "Lưu trữ"
+      "storage": "Lưu trữ",
+      "physical": "Đĩa vật lý",
+      "logical": "Đĩa logic",
+      "disk_type": "Loại đĩa",
+      "model": "Model",
+      "serial": "Số serial"
     },
     "network": {
-      "title": "Thông tin Mạng",
+      "title": "Thông tin mạng",
       "interface": "Giao diện",
       "received": "Đã nhận",
       "sent": "Đã gửi",
-      "bytes": "byte",
-      "packets": "gói tin",
+      "bytes": "bytes",
+      "packets": "gói",
       "errors": "Lỗi",
-      "network_interfaces": "Giao diện Mạng"
+      "network_interfaces": "Giao diện mạng",
+      "connection_type": "Loại kết nối",
+      "max_speed": "Tốc độ tối đa",
+      "technology": "Công nghệ",
+      "signal_strength": "Cường độ tín hiệu",
+      "wired": "Có dây",
+      "wireless": "Không dây",
+      "bluetooth": "Bluetooth",
+      "cellular": "Di động",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Thông tin GPU",
@@ -64,38 +90,38 @@
       "power": "Công suất",
       "clock_core": "Xung nhân",
       "clock_memory": "Xung bộ nhớ",
-      "fan_speed": "Tốc độ Quạt"
+      "fan_speed": "Tốc độ quạt"
     },
     "ai": {
       "title": "Huấn luyện AI",
       "framework": "Framework",
-      "processes": "Quy trình",
+      "processes": "Tiến trình",
       "vram": "VRAM",
       "model": "Model",
-      "batch_size": "Kích thước Batch",
+      "batch_size": "Kích thước batch",
       "throughput": "Thông lượng",
       "epoch": "Epoch",
-      "loss": "Mất mát",
+      "loss": "Loss",
       "accuracy": "Độ chính xác",
-      "training_time": "Thời gian Huấn luyện",
+      "training_time": "Thời gian huấn luyện",
       "no_training": "Không phát hiện huấn luyện AI"
     },
     "mining": {
-      "title": "Thông tin Khai thác",
+      "title": "Thông tin mining",
       "algorithm": "Thuật toán",
       "hashrate": "Hashrate",
-      "shares": "Cổ phần",
+      "shares": "Shares",
       "temperature": "Nhiệt độ",
       "power": "Công suất",
       "efficiency": "Hiệu suất",
       "uptime": "Thời gian hoạt động",
       "revenue_24h": "Doanh thu 24h",
       "pool": "Pool",
-      "not_detected": "Không phát hiện hoạt động khai thác"
+      "not_detected": "Không phát hiện hoạt động mining"
     },
     "ui": {
-      "histogram": "Biểu đồ",
-      "vertical": "Dọc", 
+      "histogram": "Biểu đồ tần suất",
+      "vertical": "Dọc",
       "horizontal": "Ngang",
       "loading": "Đang tải...",
       "no_data": "Không có dữ liệu",
@@ -107,11 +133,11 @@
       "all": "Tất cả thông tin",
       "disk_only": "Chỉ đĩa",
       "cpu_only": "Chỉ CPU",
-      "memory_only": "Chỉ bộ nhớ", 
+      "memory_only": "Chỉ bộ nhớ",
       "network_only": "Chỉ mạng",
       "gpu_only": "Chỉ GPU",
       "ai_only": "Chỉ huấn luyện AI",
-      "mining_only": "Chỉ khai thác",
+      "mining_only": "Chỉ mining",
       "refresh_rate": "Tốc độ làm mới",
       "language": "Ngôn ngữ",
       "remote": "Chế độ từ xa",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Không tìm thấy lệnh: %s",
       "invalid_port": "Cổng không hợp lệ: %d",
-      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d", 
-      "config_load_failed": "Không thể tải cấu hình",
+      "invalid_refresh": "Khoảng thời gian làm mới không hợp lệ: %d",
+      "config_load_failed": "Không tải được cấu hình",
       "module_failed": "Mô-đun %s thất bại: %v",
-      "nvidia_smi_not_found": "Không tìm thấy nvidia-smi. Giám sát GPU yêu cầu trình điều khiển NVIDIA",
-      "rocm_smi_not_found": "Không tìm thấy rocm-smi. Giám sát AMD GPU yêu cầu ROCm"
+      "nvidia_smi_not_found": "Không tìm thấy nvidia-smi. Giám sát GPU NVIDIA yêu cầu driver NVIDIA",
+      "rocm_smi_not_found": "Không tìm thấy rocm-smi. Giám sát GPU AMD yêu cầu ROCm"
     },
     "status": {
       "monitoring_started": "Đã bắt đầu giám sát",
-      "updating_every": "Cập nhật mỗi %d giây", 
+      "updating_every": "Cập nhật mỗi %d giây",
       "press_ctrl_c": "Nhấn Ctrl+C để thoát",
       "remote_mode": "Chế độ từ xa trên cổng %d",
       "gpu_detected": "Đã phát hiện GPU: %s",
-      "ai_training_detected": "Đã phát hiện quy trình huấn luyện AI: %d",
-      "mining_detected": "Đã phát hiện hoạt động khai thác: %s"
+      "ai_training_detected": "Đã phát hiện tiến trình huấn luyện AI: %d",
+      "mining_detected": "Đã phát hiện hoạt động mining: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Thiết bị GPU",
+      "multiple_cpus": "Bộ xử lý CPU",
+      "device_number": "Thiết bị #%d"
     }
   }
 }

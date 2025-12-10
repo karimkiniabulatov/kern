@@ -1,5 +1,5 @@
 {
-  "language": "Greek (Ελληνικά)", 
+  "language": "Ελληνικά",
   "language_code": "el",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "Σφάλμα",
       "unknown": "Άγνωστο",
       "total": "Σύνολο",
-      "used": "Χρησιμοποιημένο", 
+      "used": "Χρησιμοποιημένο",
       "free": "Ελεύθερο",
       "available": "Διαθέσιμο",
       "status": "Κατάσταση",
@@ -22,7 +22,7 @@
       "cores": "Πυρήνες",
       "threads": "Νήματα",
       "usage": "Χρήση",
-      "frequency": "Συχνότητα", 
+      "frequency": "Συχνότητα",
       "load": "Φόρτωση",
       "load_1min": "1 λεπ",
       "load_5min": "5 λεπ",
@@ -30,29 +30,55 @@
       "load_average": "Μέσος φόρτος"
     },
     "memory": {
-      "title": "Πληροφορίες μνήμης", 
+      "active": "Ενεργό",
+      "buffers": "Προσωρινή μνήμη",
+      "cached": "Προσωρινή αποθήκευση",
+      "detailed_usage": "Λεπτομερής χρήση",
+      "inactive": "Ανενεργό",
+      "title": "Πληροφορίες μνήμης",
       "ram": "RAM",
-      "swap": "Εναλλαγή",
+      "swap": "Swap",
       "physical": "Φυσική μνήμη",
-      "virtual": "Εικονική μνήμη"
+      "processes": "Διεργασίες",
+      "virtual": "Εικονική μνήμη",
+      "modules": "Μονάδες μνήμης",
+      "shared": "Κοινόχρηστο",
+      "slot": "Θήκη",
+      "module_type": "Τύπος",
+      "manufacturer": "Κατασκευαστής",
+      "memory_speed": "Ταχύτητα"
     },
     "disk": {
       "title": "Πληροφορίες δίσκου",
       "filesystem": "Σύστημα αρχείων",
       "size": "Μέγεθος",
-      "mounted": "Προσαρτημένο σε", 
+      "mounted": "Προσαρτημένο σε",
       "usage": "Χρήση",
-      "storage": "Αποθήκευση"
+      "storage": "Αποθήκευση",
+      "physical": "Φυσικός δίσκος",
+      "logical": "Λογικός δίσκος",
+      "disk_type": "Τύπος δίσκου",
+      "model": "Μοντέλο",
+      "serial": "Σειριακός αριθμός"
     },
     "network": {
       "title": "Πληροφορίες δικτύου",
-      "interface": "Διεπαφή",
-      "received": "Ληφθέντα",
-      "sent": "Αποσταλμένα",
-      "bytes": "bytes",
+      "interface": "Διασύνδεση",
+      "received": "Ελήφθη",
+      "sent": "Αποστάλθηκε",
+      "bytes": "byte",
       "packets": "πακέτα",
       "errors": "Σφάλματα",
-      "network_interfaces": "Διεπαφές δικτύου"
+      "network_interfaces": "Διασυνδέσεις δικτύου",
+      "connection_type": "Τύπος σύνδεσης",
+      "max_speed": "Μέγιστη ταχύτητα",
+      "technology": "Τεχνολογία",
+      "signal_strength": "Ένταση σήματος",
+      "wired": "Καλωδιακή",
+      "wireless": "Ασύρματη",
+      "bluetooth": "Bluetooth",
+      "cellular": "Κινητή",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Πληροφορίες GPU",
@@ -62,8 +88,8 @@
       "memory": "Μνήμη",
       "utilization": "Χρήση",
       "power": "Ισχύς",
-      "clock_core": "Συχνότητα πυρήνα",
-      "clock_memory": "Συχνότητα μνήμης",
+      "clock_core": "Ρυθμός πυρήνα",
+      "clock_memory": "Ρυθμός μνήμης",
       "fan_speed": "Ταχύτητα ανεμιστήρα"
     },
     "ai": {
@@ -72,8 +98,8 @@
       "processes": "Διεργασίες",
       "vram": "VRAM",
       "model": "Μοντέλο",
-      "batch_size": "Μέγεθος παρτίδας",
-      "throughput": "Ρυθμός μεταφοράς",
+      "batch_size": "Μέγεθος δέσμης",
+      "throughput": "Διακίνηση",
       "epoch": "Εποχή",
       "loss": "Απώλεια",
       "accuracy": "Ακρίβεια",
@@ -83,20 +109,20 @@
     "mining": {
       "title": "Πληροφορίες εξόρυξης",
       "algorithm": "Αλγόριθμος",
-      "hashrate": "Ρυθμός κατακερματισμού",
+      "hashrate": "Hashrate",
       "shares": "Μερίδια",
       "temperature": "Θερμοκρασία",
       "power": "Ισχύς",
       "efficiency": "Αποδοτικότητα",
       "uptime": "Χρόνος λειτουργίας",
-      "revenue_24h": "Έσοδα 24ωρου",
-      "pool": "Ομάδα",
+      "revenue_24h": "Έσοδα 24 ωρών",
+      "pool": "Pool",
       "not_detected": "Δεν εντοπίστηκε δραστηριότητα εξόρυξης"
     },
     "ui": {
       "histogram": "Ιστόγραμμα",
-      "vertical": "Κατακόρυφα", 
-      "horizontal": "Οριζόντια",
+      "vertical": "Κάθετο",
+      "horizontal": "Οριζόντιο",
       "loading": "Φόρτωση...",
       "no_data": "Χωρίς δεδομένα",
       "percent": "τοις εκατό"
@@ -107,7 +133,7 @@
       "all": "Όλες οι πληροφορίες",
       "disk_only": "Μόνο δίσκος",
       "cpu_only": "Μόνο CPU",
-      "memory_only": "Μόνο μνήμη", 
+      "memory_only": "Μόνο μνήμη",
       "network_only": "Μόνο δίκτυο",
       "gpu_only": "Μόνο GPU",
       "ai_only": "Μόνο εκπαίδευση AI",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Η εντολή δεν βρέθηκε: %s",
       "invalid_port": "Μη έγκυρη θύρα: %d",
-      "invalid_refresh": "Μη έγκυρο διάστημα ανανέωσης: %d", 
-      "config_load_failed": "Αποτυχία φόρτωσης διαμόρφωσης",
-      "module_failed": "Η μονάδα %s απέτυχε: %v",
-      "nvidia_smi_not_found": "Το nvidia-smi δεν βρέθηκε. Η παρακολούθηση GPU απαιτεί προγράμματα οδήγησης NVIDIA",
+      "invalid_refresh": "Μη έγκυρο διάστημα ανανέωσης: %d",
+      "config_load_failed": "Αποτυχία φόρτωσης ρυθμίσεων",
+      "module_failed": "Αποτυχία ενότητας %s: %v",
+      "nvidia_smi_not_found": "Το nvidia-smi δεν βρέθηκε. Η παρακολούθηση GPU απαιτεί οδηγούς NVIDIA",
       "rocm_smi_not_found": "Το rocm-smi δεν βρέθηκε. Η παρακολούθηση AMD GPU απαιτεί ROCm"
     },
     "status": {
       "monitoring_started": "Η παρακολούθηση ξεκίνησε",
-      "updating_every": "Ενημέρωση κάθε %d δευτερόλεπτα", 
+      "updating_every": "Ενημέρωση κάθε %d δευτερόλεπτα",
       "press_ctrl_c": "Πατήστε Ctrl+C για έξοδο",
       "remote_mode": "Απομακρυσμένη λειτουργία στη θύρα %d",
       "gpu_detected": "Εντοπίστηκε GPU: %s",
       "ai_training_detected": "Εντοπίστηκαν διεργασίες εκπαίδευσης AI: %d",
       "mining_detected": "Εντοπίστηκε δραστηριότητα εξόρυξης: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Συσκευές GPU",
+      "multiple_cpus": "Επεξεργαστές CPU",
+      "device_number": "Συσκευή #%d"
     }
   }
 }

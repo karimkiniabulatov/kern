@@ -1,48 +1,65 @@
 {
-  "language": "Korean (한국어)", 
+  "language": "한국어",
   "language_code": "ko",
   "translations": {
     "common": {
       "title": "kern - 시스템 모니터",
-      "refresh": "새로 고침",
+      "refresh": "새로고침",
       "seconds": "초",
       "error": "오류",
       "unknown": "알 수 없음",
       "total": "총계",
-      "used": "사용됨", 
-      "free": "여유",
+      "used": "사용됨",
+      "free": "사용 가능",
       "available": "사용 가능",
       "status": "상태",
-      "up": "온라인",
-      "down": "오프라인"
+      "up": "작동 중",
+      "down": "중지"
     },
     "cpu": {
       "title": "CPU 정보",
       "model": "모델",
-      "cores": "코어",
-      "threads": "스레드",
+      "cores": "코어 수",
+      "threads": "스레드 수",
       "usage": "사용률",
-      "frequency": "주파수", 
-      "load": "로드",
+      "frequency": "주파수",
+      "load": "부하",
       "load_1min": "1분",
       "load_5min": "5분",
       "load_15min": "15분",
-      "load_average": "평균 로드"
+      "load_average": "평균 부하"
     },
     "memory": {
-      "title": "메모리 정보", 
+      "active": "활성",
+      "buffers": "버퍼",
+      "cached": "캐시",
+      "detailed_usage": "세부 사용량",
+      "inactive": "비활성",
+      "title": "메모리 정보",
       "ram": "RAM",
       "swap": "스왑",
       "physical": "물리적 메모리",
-      "virtual": "가상 메모리"
+      "processes": "프로세스",
+      "virtual": "가상 메모리",
+      "modules": "메모리 모듈",
+      "shared": "공유",
+      "slot": "슬롯",
+      "module_type": "유형",
+      "manufacturer": "제조사",
+      "memory_speed": "속도"
     },
     "disk": {
       "title": "디스크 정보",
       "filesystem": "파일 시스템",
       "size": "크기",
-      "mounted": "마운트 위치", 
+      "mounted": "마운트 지점",
       "usage": "사용률",
-      "storage": "저장소"
+      "storage": "저장소",
+      "physical": "물리적 디스크",
+      "logical": "논리적 디스크",
+      "disk_type": "디스크 유형",
+      "model": "모델",
+      "serial": "일련번호"
     },
     "network": {
       "title": "네트워크 정보",
@@ -52,7 +69,16 @@
       "bytes": "바이트",
       "packets": "패킷",
       "errors": "오류",
-      "network_interfaces": "네트워크 인터페이스"
+      "network_interfaces": "네트워크 인터페이스",
+      "connection_type": "연결 유형",
+      "max_speed": "최대 속도",
+      "technology": "기술",
+      "signal_strength": "신호 강도",
+      "wired": "유선",
+      "wireless": "무선",
+      "bluetooth": "블루투스",
+      "cellular": "셀룰러",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU 정보",
@@ -95,7 +121,7 @@
     },
     "ui": {
       "histogram": "히스토그램",
-      "vertical": "수직", 
+      "vertical": "수직",
       "horizontal": "수평",
       "loading": "로딩 중...",
       "no_data": "데이터 없음",
@@ -107,33 +133,38 @@
       "all": "모든 정보",
       "disk_only": "디스크만",
       "cpu_only": "CPU만",
-      "memory_only": "메모리만", 
+      "memory_only": "메모리만",
       "network_only": "네트워크만",
       "gpu_only": "GPU만",
       "ai_only": "AI 학습만",
       "mining_only": "마이닝만",
-      "refresh_rate": "새로 고침 빈도",
+      "refresh_rate": "새로고침 주기",
       "language": "언어",
       "remote": "원격 모드",
       "port": "포트"
     },
     "errors": {
-      "command_not_found": "명령을 찾을 수 없음: %s",
+      "command_not_found": "명령어를 찾을 수 없음: %s",
       "invalid_port": "잘못된 포트: %d",
-      "invalid_refresh": "잘못된 새로 고침 간격: %d", 
-      "config_load_failed": "구성 로드 실패",
+      "invalid_refresh": "잘못된 새로고침 간격: %d",
+      "config_load_failed": "구성을 불러오지 못했습니다",
       "module_failed": "모듈 %s 실패: %v",
       "nvidia_smi_not_found": "nvidia-smi를 찾을 수 없습니다. GPU 모니터링에는 NVIDIA 드라이버가 필요합니다",
       "rocm_smi_not_found": "rocm-smi를 찾을 수 없습니다. AMD GPU 모니터링에는 ROCm이 필요합니다"
     },
     "status": {
       "monitoring_started": "모니터링 시작됨",
-      "updating_every": "%d초마다 업데이트", 
-      "press_ctrl_c": "Ctrl+C를 눌러 종료",
-      "remote_mode": "원격 모드, 포트 %d",
-      "gpu_detected": "GPU 감지: %s",
-      "ai_training_detected": "AI 학습 프로세스 감지: %d",
-      "mining_detected": "마이닝 활동 감지: %s"
+      "updating_every": "%d초마다 업데이트",
+      "press_ctrl_c": "종료하려면 Ctrl+C를 누르세요",
+      "remote_mode": "원격 모드 포트 %d",
+      "gpu_detected": "GPU 감지됨: %s",
+      "ai_training_detected": "AI 학습 프로세스 감지됨: %d",
+      "mining_detected": "마이닝 활동 감지됨: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU 장치",
+      "multiple_cpus": "CPU 프로세서",
+      "device_number": "장치 #%d"
     }
   }
 }

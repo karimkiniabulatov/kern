@@ -1,5 +1,5 @@
 {
-  "language": "Lithuanian (Lietuvių)", 
+  "language": "Lietuvių",
   "language_code": "lt",
   "translations": {
     "common": {
@@ -9,20 +9,20 @@
       "error": "Klaida",
       "unknown": "Nežinoma",
       "total": "Iš viso",
-      "used": "Naudojama", 
+      "used": "Naudojama",
       "free": "Laisva",
       "available": "Prieinama",
       "status": "Būsena",
-      "up": "ĮJUNGTAS",
-      "down": "IŠJUNGTAS"
+      "up": "VEIKIA",
+      "down": "NEVEIKIA"
     },
     "cpu": {
       "title": "CPU informacija",
       "model": "Modelis",
-      "cores": "Branduoliai",
+      "cores": "Šerdys",
       "threads": "Siūlai",
       "usage": "Naudojimas",
-      "frequency": "Dažnis", 
+      "frequency": "Dažnis",
       "load": "Apkrova",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Vidutinė apkrova"
     },
     "memory": {
-      "title": "Atminties informacija", 
+      "active": "Aktyvus",
+      "buffers": "Buferiai",
+      "cached": "Talpykloje",
+      "detailed_usage": "Detalus naudojimas",
+      "inactive": "Neaktyvus",
+      "title": "Atminties informacija",
       "ram": "RAM",
-      "swap": "Mainas",
+      "swap": "Swap",
       "physical": "Fizinė atmintis",
-      "virtual": "Virtuali atmintis"
+      "processes": "Procesai",
+      "virtual": "Virtuali atmintis",
+      "modules": "Atminties moduliai",
+      "shared": "Bendrinama",
+      "slot": "Lizdas",
+      "module_type": "Tipas",
+      "manufacturer": "Gamintojas",
+      "memory_speed": "Greitis"
     },
     "disk": {
       "title": "Disko informacija",
       "filesystem": "Failų sistema",
       "size": "Dydis",
-      "mounted": "Prijungtas prie", 
+      "mounted": "Prijungta prie",
       "usage": "Naudojimas",
-      "storage": "Saugykla"
+      "storage": "Saugykla",
+      "physical": "Fizinis diskas",
+      "logical": "Loginis diskas",
+      "disk_type": "Disko tipas",
+      "model": "Modelis",
+      "serial": "Serijos numeris"
     },
     "network": {
       "title": "Tinklo informacija",
@@ -52,7 +69,16 @@
       "bytes": "baitų",
       "packets": "paketų",
       "errors": "Klaidos",
-      "network_interfaces": "Tinklo sąsajos"
+      "network_interfaces": "Tinklo sąsajos",
+      "connection_type": "Ryšio tipas",
+      "max_speed": "Maksimalus greitis",
+      "technology": "Technologija",
+      "signal_strength": "Signalo stiprumas",
+      "wired": "Laidinis",
+      "wireless": "Belaidis",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobilusis",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU informacija",
@@ -62,9 +88,9 @@
       "memory": "Atmintis",
       "utilization": "Naudojimas",
       "power": "Galia",
-      "clock_core": "Branduolio dažnis",
+      "clock_core": "Šerdies dažnis",
       "clock_memory": "Atminties dažnis",
-      "fan_speed": "Ventiliatoriaus greitis"
+      "fan_speed": "Vėdinimo greitis"
     },
     "ai": {
       "title": "AI mokymas",
@@ -75,29 +101,29 @@
       "batch_size": "Partijos dydis",
       "throughput": "Pralaidumas",
       "epoch": "Epocha",
-      "loss": "Nuostoliai",
+      "loss": "Nuostolis",
       "accuracy": "Tikslumas",
       "training_time": "Mokymo laikas",
       "no_training": "Nerastas AI mokymas"
     },
     "mining": {
-      "title": "Kasimo informacija",
+      "title": "Mining informacija",
       "algorithm": "Algoritmas",
-      "hashrate": "Hash greitis",
-      "shares": "Akcijos",
+      "hashrate": "Hashrate",
+      "shares": "Dalinės akcijos",
       "temperature": "Temperatūra",
       "power": "Galia",
       "efficiency": "Efektyvumas",
       "uptime": "Veikimo laikas",
-      "revenue_24h": "24h pajamos",
-      "pool": "Baseinas",
-      "not_detected": "Nerasta kasimo veikla"
+      "revenue_24h": "24 val. pajamos",
+      "pool": "Pool",
+      "not_detected": "Nerasta mining veikla"
     },
     "ui": {
       "histogram": "Histograma",
-      "vertical": "Vertikaliai", 
+      "vertical": "Vertikaliai",
       "horizontal": "Horizontaliai",
-      "loading": "Kraunama...",
+      "loading": "Įkeliama...",
       "no_data": "Nėra duomenų",
       "percent": "procentų"
     },
@@ -107,11 +133,11 @@
       "all": "Visa informacija",
       "disk_only": "Tik diskas",
       "cpu_only": "Tik CPU",
-      "memory_only": "Tik atmintis", 
+      "memory_only": "Tik atmintis",
       "network_only": "Tik tinklas",
       "gpu_only": "Tik GPU",
       "ai_only": "Tik AI mokymas",
-      "mining_only": "Tik kasimas",
+      "mining_only": "Tik mining",
       "refresh_rate": "Atnaujinimo dažnis",
       "language": "Kalba",
       "remote": "Nuotolinis režimas",
@@ -119,21 +145,26 @@
     },
     "errors": {
       "command_not_found": "Komanda nerasta: %s",
-      "invalid_port": "Neteisingas prievadas: %d",
-      "invalid_refresh": "Neteisingas atnaujinimo intervalas: %d", 
+      "invalid_port": "Netinkamas prievadas: %d",
+      "invalid_refresh": "Netinkamas atnaujinimo intervalas: %d",
       "config_load_failed": "Nepavyko įkelti konfigūracijos",
       "module_failed": "Modulis %s nepavyko: %v",
-      "nvidia_smi_not_found": "nvidia-smi nerastas. GPU stebėjimui reikalingos NVIDIA tvarkyklės",
-      "rocm_smi_not_found": "rocm-smi nerastas. AMD GPU stebėjimui reikalingas ROCm"
+      "nvidia_smi_not_found": "nvidia-smi nerastas. GPU stebėjimui reikia NVIDIA tvarkyklių",
+      "rocm_smi_not_found": "rocm-smi nerastas. AMD GPU stebėjimui reikia ROCm"
     },
     "status": {
       "monitoring_started": "Stebėjimas pradėtas",
-      "updating_every": "Atnaujinama kas %d sekundės", 
+      "updating_every": "Atnaujinama kas %d sekundes",
       "press_ctrl_c": "Paspauskite Ctrl+C, kad išeitumėte",
       "remote_mode": "Nuotolinis režimas prievade %d",
       "gpu_detected": "GPU aptiktas: %s",
       "ai_training_detected": "AI mokymo procesai aptikti: %d",
-      "mining_detected": "Kasimo veikla aptikta: %s"
+      "mining_detected": "Mining veikla aptikta: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU įrenginiai",
+      "multiple_cpus": "CPU procesoriai",
+      "device_number": "Įrenginys #%d"
     }
   }
 }

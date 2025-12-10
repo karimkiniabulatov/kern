@@ -1,28 +1,28 @@
 {
-  "language": "Estonian (Eesti)", 
+  "language": "Eesti",
   "language_code": "et",
   "translations": {
     "common": {
-      "title": "kern - Süsteemimonitor",
+      "title": "kern - Süsteemi monitor",
       "refresh": "Värskenda",
       "seconds": "sek",
       "error": "Viga",
       "unknown": "Tundmatu",
       "total": "Kokku",
-      "used": "Kasutatud", 
+      "used": "Kasutatud",
       "free": "Vaba",
       "available": "Saadaval",
-      "status": "Olek",
-      "up": "SEES",
-      "down": "VÄLJAS"
+      "status": "Staatus",
+      "up": "TOIMIB",
+      "down": "EI TOIMI"
     },
     "cpu": {
-      "title": "CPU informatsioon",
+      "title": "CPU teave",
       "model": "Mudel",
       "cores": "Tuumad",
-      "threads": "Lõimed",
+      "threads": "Niidid",
       "usage": "Kasutus",
-      "frequency": "Sagedus", 
+      "frequency": "Sagedus",
       "load": "Koormus",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,40 +30,66 @@
       "load_average": "Keskmine koormus"
     },
     "memory": {
-      "title": "Mälu informatsioon", 
+      "active": "Aktiivne",
+      "buffers": "Puhvrid",
+      "cached": "Vahemälu",
+      "detailed_usage": "Üksikasjalik kasutus",
+      "inactive": "Passiivne",
+      "title": "Mälu teave",
       "ram": "RAM",
-      "swap": "Vahemälu",
+      "swap": "Swap",
       "physical": "Füüsiline mälu",
-      "virtual": "Virtuaalmälu"
+      "processes": "Protsessid",
+      "virtual": "Virtuaalmälu",
+      "modules": "Mälumoodulid",
+      "shared": "Jagatud",
+      "slot": "Pesa",
+      "module_type": "Tüüp",
+      "manufacturer": "Tootja",
+      "memory_speed": "Kiirus"
     },
     "disk": {
-      "title": "Ketta informatsioon",
+      "title": "Ketta teave",
       "filesystem": "Failisüsteem",
       "size": "Suurus",
-      "mounted": "Paigaldatud", 
+      "mounted": "Hangkinnatud",
       "usage": "Kasutus",
-      "storage": "Salvestus"
+      "storage": "Salvestus",
+      "physical": "Füüsiline ketas",
+      "logical": "Loogiline ketas",
+      "disk_type": "Ketta tüüp",
+      "model": "Mudel",
+      "serial": "Seerianumber"
     },
     "network": {
-      "title": "Võrgu informatsioon",
+      "title": "Võrgu teave",
       "interface": "Liides",
-      "received": "Vastu võetud",
+      "received": "Vastuvõetud",
       "sent": "Saadetud",
       "bytes": "baiti",
       "packets": "paketti",
-      "errors": "Vead",
-      "network_interfaces": "Võrguliidesed"
+      "errors": "Veateated",
+      "network_interfaces": "Võrguliidesed",
+      "connection_type": "Ühenduse tüüp",
+      "max_speed": "Maksimaalne kiirus",
+      "technology": "Tehnoloogia",
+      "signal_strength": "Signaali tugevus",
+      "wired": "Juhtmega",
+      "wireless": "Juhtmeta",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobiilside",
+      "vpn": "VPN"
     },
     "gpu": {
-      "title": "GPU informatsioon",
+      "title": "GPU teave",
       "model": "Mudel",
       "driver": "Draiver",
       "temperature": "Temperatuur",
       "memory": "Mälu",
       "utilization": "Kasutamine",
       "power": "Võimsus",
-      "clock_core": "Tuuma taktsagedus",
-      "clock_memory": "Mälu taktsagedus",
+      "clock_core": "Tuumasagedus",
+      "clock_memory": "Mälusagedus",
       "fan_speed": "Ventilaatori kiirus"
     },
     "ai": {
@@ -81,10 +107,10 @@
       "no_training": "AI treeningut ei tuvastatud"
     },
     "mining": {
-      "title": "Kaevandamise informatsioon",
+      "title": "Kaevandamise teave",
       "algorithm": "Algoritm",
-      "hashrate": "Hash kiirus",
-      "shares": "Osad",
+      "hashrate": "Hashrate",
+      "shares": "Aktsiad",
       "temperature": "Temperatuur",
       "power": "Võimsus",
       "efficiency": "Tõhusus",
@@ -95,7 +121,7 @@
     },
     "ui": {
       "histogram": "Histogramm",
-      "vertical": "Vertikaalne", 
+      "vertical": "Vertikaalne",
       "horizontal": "Horisontaalne",
       "loading": "Laadimine...",
       "no_data": "Andmeid pole",
@@ -104,10 +130,10 @@
     "commands": {
       "help": "Abi",
       "version": "Versioon",
-      "all": "Kogu informatsioon",
-      "disk_only": "Ainult ketas",
+      "all": "Kogu teave",
+      "disk_only": "Ainult kettad",
       "cpu_only": "Ainult CPU",
-      "memory_only": "Ainult mälu", 
+      "memory_only": "Ainult mälu",
       "network_only": "Ainult võrk",
       "gpu_only": "Ainult GPU",
       "ai_only": "Ainult AI treening",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Käsku ei leitud: %s",
       "invalid_port": "Vigane port: %d",
-      "invalid_refresh": "Vigane värskendusintervall: %d", 
-      "config_load_failed": "Seadistuse laadimine ebaõnnestus",
+      "invalid_refresh": "Vigane värskendusintervall: %d",
+      "config_load_failed": "Konfiguratsiooni laadimine ebaõnnestus",
       "module_failed": "Moodul %s ebaõnnestus: %v",
       "nvidia_smi_not_found": "nvidia-smi ei leitud. GPU jälgimine nõuab NVIDIA draivereid",
       "rocm_smi_not_found": "rocm-smi ei leitud. AMD GPU jälgimine nõuab ROCm"
     },
     "status": {
       "monitoring_started": "Jälgimine alustatud",
-      "updating_every": "Uuendamine iga %d sekundi järel", 
+      "updating_every": "Uuendatakse iga %d sekundi järel",
       "press_ctrl_c": "Väljumiseks vajutage Ctrl+C",
       "remote_mode": "Kaugrežiim pordil %d",
       "gpu_detected": "GPU tuvastatud: %s",
       "ai_training_detected": "AI treeningu protsessid tuvastatud: %d",
       "mining_detected": "Kaevandamise tegevus tuvastatud: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU seadmed",
+      "multiple_cpus": "CPU protsessorid",
+      "device_number": "Seade #%d"
     }
   }
 }

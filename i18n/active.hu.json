@@ -1,5 +1,5 @@
 {
-  "language": "Hungarian (Magyar)", 
+  "language": "Magyar",
   "language_code": "hu",
   "translations": {
     "common": {
@@ -9,12 +9,12 @@
       "error": "Hiba",
       "unknown": "Ismeretlen",
       "total": "Összesen",
-      "used": "Használt", 
+      "used": "Felhasznált",
       "free": "Szabad",
       "available": "Elérhető",
       "status": "Állapot",
-      "up": "BEKAPCSOLVA",
-      "down": "KIKAPCSOLVA"
+      "up": "MŰKÖDIK",
+      "down": "LEÁLLÍTVA"
     },
     "cpu": {
       "title": "CPU információk",
@@ -22,7 +22,7 @@
       "cores": "Magok",
       "threads": "Szálak",
       "usage": "Használat",
-      "frequency": "Frekvencia", 
+      "frequency": "Frekvencia",
       "load": "Terhelés",
       "load_1min": "1 perc",
       "load_5min": "5 perc",
@@ -30,29 +30,55 @@
       "load_average": "Átlagos terhelés"
     },
     "memory": {
-      "title": "Memória információk", 
+      "active": "Aktív",
+      "buffers": "Pufferek",
+      "cached": "Gyorsítótárazva",
+      "detailed_usage": "Részletes használat",
+      "inactive": "Inaktív",
+      "title": "Memória információk",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fizikai memória",
-      "virtual": "Virtuális memória"
+      "processes": "Folyamatok",
+      "virtual": "Virtuális memória",
+      "modules": "Memória modulok",
+      "shared": "Megosztott",
+      "slot": "Foglalat",
+      "module_type": "Típus",
+      "manufacturer": "Gyártó",
+      "memory_speed": "Sebesség"
     },
     "disk": {
       "title": "Lemez információk",
       "filesystem": "Fájlrendszer",
       "size": "Méret",
-      "mounted": "Csatolva", 
+      "mounted": "Csatolva",
       "usage": "Használat",
-      "storage": "Tároló"
+      "storage": "Tárolás",
+      "physical": "Fizikai lemez",
+      "logical": "Logikai lemez",
+      "disk_type": "Lemez típus",
+      "model": "Modell",
+      "serial": "Sorozatszám"
     },
     "network": {
-      "title": "Hálózat információk",
+      "title": "Hálózati információk",
       "interface": "Interfész",
       "received": "Fogadott",
       "sent": "Küldött",
       "bytes": "bájt",
       "packets": "csomag",
       "errors": "Hibák",
-      "network_interfaces": "Hálózati interfészek"
+      "network_interfaces": "Hálózati interfészek",
+      "connection_type": "Kapcsolat típusa",
+      "max_speed": "Maximális sebesség",
+      "technology": "Technológia",
+      "signal_strength": "Jelerősség",
+      "wired": "Vezetékes",
+      "wireless": "Vezeték nélküli",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobil",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU információk",
@@ -64,7 +90,7 @@
       "power": "Teljesítmény",
       "clock_core": "Mag órajel",
       "clock_memory": "Memória órajel",
-      "fan_speed": "Ventilátor sebesség"
+      "fan_speed": "Ventillátor sebesség"
     },
     "ai": {
       "title": "AI képzés",
@@ -72,7 +98,7 @@
       "processes": "Folyamatok",
       "vram": "VRAM",
       "model": "Modell",
-      "batch_size": "Batch méret",
+      "batch_size": "Köteg méret",
       "throughput": "Átviteli sebesség",
       "epoch": "Epoha",
       "loss": "Veszteség",
@@ -83,19 +109,19 @@
     "mining": {
       "title": "Bányászat információk",
       "algorithm": "Algoritmus",
-      "hashrate": "Hash sebesség",
+      "hashrate": "Hashráta",
       "shares": "Részvények",
       "temperature": "Hőmérséklet",
       "power": "Teljesítmény",
       "efficiency": "Hatékonyság",
       "uptime": "Üzemidő",
-      "revenue_24h": "24h bevétel",
+      "revenue_24h": "24 óra bevétel",
       "pool": "Pool",
-      "not_detected": "Nem észlelhető bányászati tevékenység"
+      "not_detected": "Nem észlelhető bányászat aktivitás"
     },
     "ui": {
       "histogram": "Hisztogram",
-      "vertical": "Függőleges", 
+      "vertical": "Függőleges",
       "horizontal": "Vízszintes",
       "loading": "Betöltés...",
       "no_data": "Nincs adat",
@@ -104,10 +130,10 @@
     "commands": {
       "help": "Súgó",
       "version": "Verzió",
-      "all": "Összes információ",
+      "all": "Minden információ",
       "disk_only": "Csak lemez",
       "cpu_only": "Csak CPU",
-      "memory_only": "Csak memória", 
+      "memory_only": "Csak memória",
       "network_only": "Csak hálózat",
       "gpu_only": "Csak GPU",
       "ai_only": "Csak AI képzés",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Parancs nem található: %s",
       "invalid_port": "Érvénytelen port: %d",
-      "invalid_refresh": "Érvénytelen frissítési időköz: %d", 
+      "invalid_refresh": "Érvénytelen frissítési intervallum: %d",
       "config_load_failed": "Konfiguráció betöltése sikertelen",
-      "module_failed": "%s modul hibás: %v",
-      "nvidia_smi_not_found": "nvidia-smi nem található. GPU megfigyeléshez NVIDIA meghajtók szükségesek",
-      "rocm_smi_not_found": "rocm-smi nem található. AMD GPU megfigyeléshez ROCm szükséges"
+      "module_failed": "%s modul sikertelen: %v",
+      "nvidia_smi_not_found": "nvidia-smi nem található. GPU monitorozáshoz NVIDIA meghajtók szükségesek",
+      "rocm_smi_not_found": "rocm-smi nem található. AMD GPU monitorozáshoz ROCm szükséges"
     },
     "status": {
-      "monitoring_started": "Megfigyelés elindítva",
-      "updating_every": "Frissítés %d másodpercenként", 
-      "press_ctrl_c": "Nyomja meg a Ctrl+C-t a kilépéshez",
+      "monitoring_started": "Monitorozás elindítva",
+      "updating_every": "Frissítés minden %d másodpercben",
+      "press_ctrl_c": "Nyomd meg a Ctrl+C-t a kilépéshez",
       "remote_mode": "Távoli mód a %d porton",
       "gpu_detected": "GPU észlelve: %s",
       "ai_training_detected": "AI képzési folyamatok észlelve: %d",
-      "mining_detected": "Bányászati tevékenység észlelve: %s"
+      "mining_detected": "Bányászat aktivitás észlelve: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU eszközök",
+      "multiple_cpus": "CPU processzorok",
+      "device_number": "Eszköz #%d"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "language": "Arabic (العربية)", 
+  "language": "العربية",
   "language_code": "ar",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "خطأ",
       "unknown": "غير معروف",
       "total": "الإجمالي",
-      "used": "مستخدم", 
+      "used": "مستخدم",
       "free": "حر",
       "available": "متاح",
       "status": "الحالة",
@@ -22,7 +22,7 @@
       "cores": "النوى",
       "threads": "المهام",
       "usage": "الاستخدام",
-      "frequency": "التردد", 
+      "frequency": "التردد",
       "load": "الحمل",
       "load_1min": "1 دقيقة",
       "load_5min": "5 دقائق",
@@ -30,52 +30,78 @@
       "load_average": "متوسط الحمل"
     },
     "memory": {
-      "title": "معلومات الذاكرة", 
+      "active": "نشط",
+      "buffers": "مخازن مؤقتة",
+      "cached": "مخزن مؤقت",
+      "detailed_usage": "استخدام مفصل",
+      "inactive": "غير نشط",
+      "title": "معلومات الذاكرة",
       "ram": "الذاكرة العشوائية",
       "swap": "التبديل",
       "physical": "الذاكرة الفعلية",
-      "virtual": "الذاكرة الافتراضية"
+      "processes": "العمليات",
+      "virtual": "ذاكرة افتراضية",
+      "modules": "وحدات الذاكرة",
+      "shared": "مشترك",
+      "slot": "فتحة",
+      "module_type": "النوع",
+      "manufacturer": "الشركة المصنعة",
+      "memory_speed": "السرعة"
     },
     "disk": {
       "title": "معلومات القرص",
       "filesystem": "نظام الملفات",
       "size": "الحجم",
-      "mounted": "مثبت على", 
+      "mounted": "مثبت على",
       "usage": "الاستخدام",
-      "storage": "التخزين"
+      "storage": "تخزين",
+      "physical": "القرص الفعلي",
+      "logical": "القرص المنطقي",
+      "disk_type": "نوع القرص",
+      "model": "الموديل",
+      "serial": "الرقم التسلسلي"
     },
     "network": {
       "title": "معلومات الشبكة",
       "interface": "الواجهة",
-      "received": "مستلم",
+      "received": "مستقبل",
       "sent": "مرسل",
       "bytes": "بايت",
       "packets": "حزم",
       "errors": "أخطاء",
-      "network_interfaces": "واجهات الشبكة"
+      "network_interfaces": "واجهات الشبكة",
+      "connection_type": "نوع الاتصال",
+      "max_speed": "السرعة القصوى",
+      "technology": "التكنولوجيا",
+      "signal_strength": "قوة الإشارة",
+      "wired": "سلكي",
+      "wireless": "لاسلكي",
+      "bluetooth": "بلوتوث",
+      "cellular": "خلوي",
+      "vpn": "شبكة افتراضية خاصة"
     },
     "gpu": {
-      "title": "معلومات كارت الشاشة",
+      "title": "معلومات بطاقة الرسومات",
       "model": "الموديل",
       "driver": "برنامج التشغيل",
       "temperature": "درجة الحرارة",
       "memory": "الذاكرة",
-      "utilization": "الاستخدام",
+      "utilization": "معدل الاستخدام",
       "power": "الطاقة",
-      "clock_core": "سرعة النواة",
-      "clock_memory": "سرعة الذاكرة",
+      "clock_core": "توقيت النواة",
+      "clock_memory": "توقيت الذاكرة",
       "fan_speed": "سرعة المروحة"
     },
     "ai": {
       "title": "تدريب الذكاء الاصطناعي",
-      "framework": "الإطار",
+      "framework": "إطار العمل",
       "processes": "العمليات",
-      "vram": "الذاكرة الظاهرية",
+      "vram": "ذاكرة الفيديو",
       "model": "النموذج",
       "batch_size": "حجم الدفعة",
       "throughput": "الإنتاجية",
-      "epoch": "الدورة",
-      "loss": "الفقد",
+      "epoch": "العصر",
+      "loss": "الخسارة",
       "accuracy": "الدقة",
       "training_time": "وقت التدريب",
       "no_training": "لم يتم اكتشاف تدريب للذكاء الاصطناعي"
@@ -84,22 +110,22 @@
       "title": "معلومات التعدين",
       "algorithm": "الخوارزمية",
       "hashrate": "معدل الهاش",
-      "shares": "الحصص",
+      "shares": "المشاركات",
       "temperature": "درجة الحرارة",
       "power": "الطاقة",
       "efficiency": "الكفاءة",
-      "uptime": "وقت التشغيل",
-      "revenue_24h": "الإيراد 24 ساعة",
+      "uptime": "زمن التشغيل",
+      "revenue_24h": "الإيرادات خلال 24 ساعة",
       "pool": "المجمع",
       "not_detected": "لم يتم اكتشاف نشاط تعدين"
     },
     "ui": {
-      "histogram": "الرسم البياني",
-      "vertical": "عمودي", 
+      "histogram": "رسم بياني",
+      "vertical": "عمودي",
       "horizontal": "أفقي",
       "loading": "جاري التحميل...",
       "no_data": "لا توجد بيانات",
-      "percent": "نسبة مئوية"
+      "percent": "في المئة"
     },
     "commands": {
       "help": "مساعدة",
@@ -107,9 +133,9 @@
       "all": "جميع المعلومات",
       "disk_only": "القرص فقط",
       "cpu_only": "المعالج فقط",
-      "memory_only": "الذاكرة فقط", 
+      "memory_only": "الذاكرة فقط",
       "network_only": "الشبكة فقط",
-      "gpu_only": "كارت الشاشة فقط",
+      "gpu_only": "بطاقة الرسومات فقط",
       "ai_only": "تدريب الذكاء الاصطناعي فقط",
       "mining_only": "التعدين فقط",
       "refresh_rate": "معدل التحديث",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "الأمر غير موجود: %s",
       "invalid_port": "منفذ غير صالح: %d",
-      "invalid_refresh": "فاصل تحديث غير صالح: %d", 
-      "config_load_failed": "فشل تحميل الإعدادات",
+      "invalid_refresh": "فاصل تحديث غير صالح: %d",
+      "config_load_failed": "فشل تحميل التكوين",
       "module_failed": "فشل الوحدة %s: %v",
-      "nvidia_smi_not_found": "nvidia-smi غير موجود. مراقبة كارت الشاشة تتطلب برامج تشغيل NVIDIA",
-      "rocm_smi_not_found": "rocm-smi غير موجود. مراقبة AMD GPU تتطلب ROCm"
+      "nvidia_smi_not_found": "nvidia-smi غير موجود. يتطلب مراقبة بطاقة NVIDIA برامج تشغيل NVIDIA",
+      "rocm_smi_not_found": "rocm-smi غير موجود. يتطلب مراقبة بطاقة AMD ROCm"
     },
     "status": {
       "monitoring_started": "بدأ المراقبة",
-      "updating_every": "يتم التحديث كل %d ثانية", 
+      "updating_every": "يتم التحديث كل %d ثانية",
       "press_ctrl_c": "اضغط على Ctrl+C للخروج",
       "remote_mode": "الوضع البعيد على المنفذ %d",
-      "gpu_detected": "تم اكتشاف كارت الشاشة: %s",
+      "gpu_detected": "تم اكتشاف بطاقة رسومات: %s",
       "ai_training_detected": "تم اكتشاف عمليات تدريب الذكاء الاصطناعي: %d",
       "mining_detected": "تم اكتشاف نشاط تعدين: %s"
+    },
+    "devices": {
+      "multiple_gpus": "أجهزة بطاقات الرسومات",
+      "multiple_cpus": "معالجات",
+      "device_number": "الجهاز #%d"
     }
   }
 }

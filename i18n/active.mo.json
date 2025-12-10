@@ -1,15 +1,15 @@
 {
-  "language": "Moldovan (Moldovenească)", 
+  "language": "Moldovenească",
   "language_code": "mo",
   "translations": {
     "common": {
-      "title": "kern - Monitor de Sistem",
-      "refresh": "Reîmprospătați",
+      "title": "kern - Monitor de sistem",
+      "refresh": "Reîmprospătează",
       "seconds": "sec",
       "error": "Eroare",
       "unknown": "Necunoscut",
       "total": "Total",
-      "used": "Folosit", 
+      "used": "Utilizat",
       "free": "Liber",
       "available": "Disponibil",
       "status": "Stare",
@@ -20,9 +20,9 @@
       "title": "Informații CPU",
       "model": "Model",
       "cores": "Nuclee",
-      "threads": "Fire",
+      "threads": "Fire de execuție",
       "usage": "Utilizare",
-      "frequency": "Frecvență", 
+      "frequency": "Frecvență",
       "load": "Încărcare",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,29 +30,55 @@
       "load_average": "Încărcare medie"
     },
     "memory": {
-      "title": "Informații Memorie", 
+      "active": "Activ",
+      "buffers": "Bufferi",
+      "cached": "Cache",
+      "detailed_usage": "Utilizare detaliată",
+      "inactive": "Inactiv",
+      "title": "Informații memorie",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Memorie fizică",
-      "virtual": "Memorie virtuală"
+      "processes": "Procese",
+      "virtual": "Memorie virtuală",
+      "modules": "Module memorie",
+      "shared": "Partajat",
+      "slot": "Slot",
+      "module_type": "Tip",
+      "manufacturer": "Producător",
+      "memory_speed": "Viteză"
     },
     "disk": {
-      "title": "Informații Disc",
+      "title": "Informații disc",
       "filesystem": "Sistem de fișiere",
       "size": "Dimensiune",
-      "mounted": "Montat pe", 
+      "mounted": "Montat pe",
       "usage": "Utilizare",
-      "storage": "Stocare"
+      "storage": "Stocare",
+      "physical": "Disc fizic",
+      "logical": "Disc logic",
+      "disk_type": "Tip disc",
+      "model": "Model",
+      "serial": "Serial"
     },
     "network": {
-      "title": "Informații Rețea",
+      "title": "Informații rețea",
       "interface": "Interfață",
       "received": "Primit",
       "sent": "Trimis",
-      "bytes": "biți",
+      "bytes": "octeți",
       "packets": "pachete",
       "errors": "Erori",
-      "network_interfaces": "Interfețe de rețea"
+      "network_interfaces": "Interfețe de rețea",
+      "connection_type": "Tip conexiune",
+      "max_speed": "Viteză maximă",
+      "technology": "Tehnologie",
+      "signal_strength": "Putere semnal",
+      "wired": "Cablat",
+      "wireless": "Fără fir",
+      "bluetooth": "Bluetooth",
+      "cellular": "Cellular",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "Informații GPU",
@@ -78,24 +104,24 @@
       "loss": "Pierdere",
       "accuracy": "Acuratețe",
       "training_time": "Timp antrenament",
-      "no_training": "Nu s-a detectat antrenament AI"
+      "no_training": "Nu a fost detectat antrenament AI"
     },
     "mining": {
-      "title": "Informații Minare",
+      "title": "Informații mining",
       "algorithm": "Algoritm",
-      "hashrate": "Rată hash",
+      "hashrate": "Hashrate",
       "shares": "Acțiuni",
       "temperature": "Temperatură",
       "power": "Putere",
       "efficiency": "Eficiență",
-      "uptime": "Timp funcționare",
+      "uptime": "Timp de funcționare",
       "revenue_24h": "Venit 24h",
       "pool": "Pool",
-      "not_detected": "Nu s-a detectat activitate de minare"
+      "not_detected": "Nu a fost detectată activitate de mining"
     },
     "ui": {
       "histogram": "Histogramă",
-      "vertical": "Vertical", 
+      "vertical": "Vertical",
       "horizontal": "Orizontal",
       "loading": "Se încarcă...",
       "no_data": "Nu există date",
@@ -107,33 +133,38 @@
       "all": "Toate informațiile",
       "disk_only": "Doar disc",
       "cpu_only": "Doar CPU",
-      "memory_only": "Doar memorie", 
+      "memory_only": "Doar memorie",
       "network_only": "Doar rețea",
       "gpu_only": "Doar GPU",
       "ai_only": "Doar antrenament AI",
-      "mining_only": "Doar minare",
+      "mining_only": "Doar mining",
       "refresh_rate": "Rată reîmprospătare",
       "language": "Limbă",
-      "remote": "Mod remote",
+      "remote": "Mod la distanță",
       "port": "Port"
     },
     "errors": {
       "command_not_found": "Comandă negăsită: %s",
       "invalid_port": "Port invalid: %d",
-      "invalid_refresh": "Interval reîmprospătare invalid: %d", 
+      "invalid_refresh": "Interval de reîmprospătare invalid: %d",
       "config_load_failed": "Nu s-a putut încărca configurația",
       "module_failed": "Modulul %s a eșuat: %v",
-      "nvidia_smi_not_found": "nvidia-smi negăsit. Monitorizarea GPU necesită drivere NVIDIA",
-      "rocm_smi_not_found": "rocm-smi negăsit. Monitorizarea AMD GPU necesită ROCm"
+      "nvidia_smi_not_found": "nvidia-smi negăsit. Monitorizarea GPU NVIDIA necesită drivere NVIDIA",
+      "rocm_smi_not_found": "rocm-smi negăsit. Monitorizarea GPU AMD necesită ROCm"
     },
     "status": {
-      "monitoring_started": "Monitorizarea a început",
-      "updating_every": "Se actualizează la fiecare %d secunde", 
+      "monitoring_started": "Monitorizare începută",
+      "updating_every": "Se actualizează la fiecare %d secunde",
       "press_ctrl_c": "Apăsați Ctrl+C pentru a ieși",
-      "remote_mode": "Mod remote pe portul %d",
+      "remote_mode": "Mod la distanță pe portul %d",
       "gpu_detected": "GPU detectat: %s",
       "ai_training_detected": "Procese de antrenament AI detectate: %d",
-      "mining_detected": "Activitate de minare detectată: %s"
+      "mining_detected": "Activitate de mining detectată: %s"
+    },
+    "devices": {
+      "multiple_gpus": "Dispozitive GPU",
+      "multiple_cpus": "Procesoare CPU",
+      "device_number": "Dispozitiv #%d"
     }
   }
 }

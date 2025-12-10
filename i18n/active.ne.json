@@ -1,16 +1,16 @@
 {
-  "language": "Nepali (नेपाली)", 
+  "language": "नेपाली",
   "language_code": "ne",
   "translations": {
     "common": {
       "title": "kern - प्रणाली मोनिटर",
-      "refresh": "रिफ्रेस",
+      "refresh": "ताजा पार्नुहोस्",
       "seconds": "सेकेन्ड",
       "error": "त्रुटि",
       "unknown": "अज्ञात",
-      "total": "कुल",
-      "used": "प्रयोग गरिएको", 
-      "free": "स्वतन्त्र",
+      "total": "जम्मा",
+      "used": "प्रयोग गरियो",
+      "free": "खाली",
       "available": "उपलब्ध",
       "status": "स्थिति",
       "up": "चालू",
@@ -19,10 +19,10 @@
     "cpu": {
       "title": "CPU जानकारी",
       "model": "मोडेल",
-      "cores": "कोर",
-      "threads": "थ्रेड",
+      "cores": "कोरहरू",
+      "threads": "थ्रेडहरू",
       "usage": "प्रयोग",
-      "frequency": "आवृत्ति", 
+      "frequency": "आवृत्ति",
       "load": "लोड",
       "load_1min": "1 मिनेट",
       "load_5min": "5 मिनेट",
@@ -30,29 +30,55 @@
       "load_average": "औसत लोड"
     },
     "memory": {
-      "title": "मेमोरी जानकारी", 
+      "active": "सक्रिय",
+      "buffers": "बफरहरू",
+      "cached": "क्याच गरिएको",
+      "detailed_usage": "विस्तृत प्रयोग",
+      "inactive": "निष्क्रिय",
+      "title": "मेमोरी जानकारी",
       "ram": "RAM",
-      "swap": "स्व्याप",
+      "swap": "Swap",
       "physical": "भौतिक मेमोरी",
-      "virtual": "भर्चुअल मेमोरी"
+      "processes": "प्रक्रियाहरू",
+      "virtual": "भर्चुअल मेमोरी",
+      "modules": "मेमोरी मोड्युलहरू",
+      "shared": "साझा गरिएको",
+      "slot": "स्लट",
+      "module_type": "प्रकार",
+      "manufacturer": "निर्माता",
+      "memory_speed": "गति"
     },
     "disk": {
       "title": "डिस्क जानकारी",
       "filesystem": "फाइल प्रणाली",
       "size": "आकार",
-      "mounted": "माउन्ट गरिएको", 
+      "mounted": "माउन्ट गरियो",
       "usage": "प्रयोग",
-      "storage": "भण्डारण"
+      "storage": "स्टोरेज",
+      "physical": "भौतिक डिस्क",
+      "logical": "लजिकल डिस्क",
+      "disk_type": "डिस्क प्रकार",
+      "model": "मोडेल",
+      "serial": "सिरियल"
     },
     "network": {
       "title": "नेटवर्क जानकारी",
       "interface": "इन्टरफेस",
-      "received": "प्राप्त",
+      "received": "प्राप्त गरियो",
       "sent": "पठाइयो",
       "bytes": "बाइट",
       "packets": "प्याकेट",
       "errors": "त्रुटिहरू",
-      "network_interfaces": "नेटवर्क इन्टरफेस"
+      "network_interfaces": "नेटवर्क इन्टरफेसहरू",
+      "connection_type": "जडान प्रकार",
+      "max_speed": "अधिकतम गति",
+      "technology": "प्रविधि",
+      "signal_strength": "सिग्नल शक्ति",
+      "wired": "तारयुक्त",
+      "wireless": "ताररहित",
+      "bluetooth": "ब्लुटुथ",
+      "cellular": "सेल्युलर",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU जानकारी",
@@ -64,41 +90,41 @@
       "power": "पावर",
       "clock_core": "कोर क्लक",
       "clock_memory": "मेमोरी क्लक",
-      "fan_speed": "फ्यान स्पीड"
+      "fan_speed": "फ्यान गति"
     },
     "ai": {
-      "title": "AI तालिम",
+      "title": "AI प्रशिक्षण",
       "framework": "फ्रेमवर्क",
       "processes": "प्रक्रियाहरू",
       "vram": "VRAM",
       "model": "मोडेल",
-      "batch_size": "ब्याच आकार",
+      "batch_size": "ब्याच साइज",
       "throughput": "थ्रुपुट",
       "epoch": "युग",
       "loss": "हानि",
-      "accuracy": "शुद्धता",
-      "training_time": "तालिम समय",
-      "no_training": "AI तालिम फेला परेन"
+      "accuracy": "सटीकता",
+      "training_time": "प्रशिक्षण समय",
+      "no_training": "AI प्रशिक्षण भेटिएन"
     },
     "mining": {
-      "title": "खनन जानकारी",
-      "algorithm": "एल्गोरिथ्म",
-      "hashrate": "ह्याश दर",
-      "shares": "शेयर",
+      "title": "माइनिंग जानकारी",
+      "algorithm": "अल्गोरिदम",
+      "hashrate": "ह्याश्रेट",
+      "shares": "शेयरहरू",
       "temperature": "तापक्रम",
       "power": "पावर",
       "efficiency": "दक्षता",
       "uptime": "अपटाइम",
-      "revenue_24h": "24घण्टा आय",
+      "revenue_24h": "24 घण्टा आम्दानी",
       "pool": "पूल",
-      "not_detected": "खनन गतिविधि फेला परेन"
+      "not_detected": "माइनिंग गतिविधि भेटिएन"
     },
     "ui": {
       "histogram": "हिस्टोग्राम",
-      "vertical": "ठाडो", 
+      "vertical": "ठाडो",
       "horizontal": "तेर्सो",
       "loading": "लोड हुदैछ...",
-      "no_data": "कुनै डाटा छैन",
+      "no_data": "डाटा छैन",
       "percent": "प्रतिशत"
     },
     "commands": {
@@ -107,33 +133,38 @@
       "all": "सबै जानकारी",
       "disk_only": "डिस्क मात्र",
       "cpu_only": "CPU मात्र",
-      "memory_only": "मेमोरी मात्र", 
+      "memory_only": "मेमोरी मात्र",
       "network_only": "नेटवर्क मात्र",
       "gpu_only": "GPU मात्र",
-      "ai_only": "AI तालिम मात्र",
-      "mining_only": "खनन मात्र",
-      "refresh_rate": "रिफ्रेस दर",
+      "ai_only": "AI प्रशिक्षण मात्र",
+      "mining_only": "माइनिंग मात्र",
+      "refresh_rate": "रिफ्रेश रेट",
       "language": "भाषा",
       "remote": "रिमोट मोड",
       "port": "पोर्ट"
     },
     "errors": {
-      "command_not_found": "आदेश फेला परेन: %s",
+      "command_not_found": "आदेश भेटिएन: %s",
       "invalid_port": "अमान्य पोर्ट: %d",
-      "invalid_refresh": "अमान्य रिफ्रेस अन्तराल: %d", 
+      "invalid_refresh": "अमान्य रिफ्रेश अन्तराल: %d",
       "config_load_failed": "कन्फिग लोड गर्न असफल",
-      "module_failed": "मोड्युल %s असफल: %v",
-      "nvidia_smi_not_found": "nvidia-smi फेला परेन। GPU मोनिटरिङ्गको लागि NVIDIA ड्राइभर चाहिन्छ",
-      "rocm_smi_not_found": "rocm-smi फेला परेन। AMD GPU मोनिटरिङ्गको लागि ROCm चाहिन्छ"
+      "module_failed": "मोड्युल %s असफल भयो: %v",
+      "nvidia_smi_not_found": "nvidia-smi भेटिएन। GPU मोनिटरिंगको लागि NVIDIA ड्राइभर आवश्यक",
+      "rocm_smi_not_found": "rocm-smi भेटिएन। AMD GPU मोनिटरिंगको लागि ROCm आवश्यक"
     },
     "status": {
-      "monitoring_started": "मोनिटरिङ्ग सुरु भयो",
-      "updating_every": "हरेक %d सेकेन्डमा अपडेट हुदैछ", 
+      "monitoring_started": "मोनिटरिंग सुरु भयो",
+      "updating_every": "प्रत्येक %d सेकेन्डमा अपडेट हुदैछ",
       "press_ctrl_c": "निस्कन Ctrl+C थिच्नुहोस्",
       "remote_mode": "पोर्ट %d मा रिमोट मोड",
-      "gpu_detected": "GPU फेला पर्यो: %s",
-      "ai_training_detected": "AI तालिम प्रक्रिया फेला पर्यो: %d",
-      "mining_detected": "खनन गतिविधि फेला पर्यो: %s"
+      "gpu_detected": "GPU भेटियो: %s",
+      "ai_training_detected": "AI प्रशिक्षण प्रक्रियाहरू भेटियो: %d",
+      "mining_detected": "माइनिंग गतिविधि भेटियो: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU उपकरणहरू",
+      "multiple_cpus": "CPU प्रोसेसरहरू",
+      "device_number": "उपकरण #%d"
     }
   }
 }

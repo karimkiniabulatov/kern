@@ -1,5 +1,5 @@
 {
-  "language": "Dutch (Nederlands)", 
+  "language": "Nederlands",
   "language_code": "nl",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "Fout",
       "unknown": "Onbekend",
       "total": "Totaal",
-      "used": "Gebruikt", 
+      "used": "Gebruikt",
       "free": "Vrij",
       "available": "Beschikbaar",
       "status": "Status",
@@ -22,7 +22,7 @@
       "cores": "Kernen",
       "threads": "Threads",
       "usage": "Gebruik",
-      "frequency": "Frequentie", 
+      "frequency": "Frequentie",
       "load": "Belasting",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,19 +30,36 @@
       "load_average": "Gemiddelde belasting"
     },
     "memory": {
-      "title": "Geheugeninformatie", 
+      "active": "Actief",
+      "buffers": "Buffers",
+      "cached": "Gecached",
+      "detailed_usage": "Gedetailleerd gebruik",
+      "inactive": "Inactief",
+      "title": "Geheugeninformatie",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysiek geheugen",
-      "virtual": "Virtueel geheugen"
+      "processes": "Processen",
+      "virtual": "Virtueel geheugen",
+      "modules": "Geheugenmodules",
+      "shared": "Gedeeld",
+      "slot": "Slot",
+      "module_type": "Type",
+      "manufacturer": "Fabrikant",
+      "memory_speed": "Snelheid"
     },
     "disk": {
       "title": "Schijfinformatie",
       "filesystem": "Bestandssysteem",
       "size": "Grootte",
-      "mounted": "Gemonteerd op", 
+      "mounted": "Gemonteerd op",
       "usage": "Gebruik",
-      "storage": "Opslag"
+      "storage": "Opslag",
+      "physical": "Fysieke schijf",
+      "logical": "Logische schijf",
+      "disk_type": "Schijftype",
+      "model": "Model",
+      "serial": "Serienummer"
     },
     "network": {
       "title": "Netwerkinformatie",
@@ -52,7 +69,16 @@
       "bytes": "bytes",
       "packets": "pakketten",
       "errors": "Fouten",
-      "network_interfaces": "Netwerkinterfaces"
+      "network_interfaces": "Netwerkinterfaces",
+      "connection_type": "Verbindingstype",
+      "max_speed": "Maximale snelheid",
+      "technology": "Technologie",
+      "signal_strength": "Signaalsterkte",
+      "wired": "Bedraad",
+      "wireless": "Draadloos",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobiel",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU-informatie",
@@ -95,7 +121,7 @@
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Verticaal", 
+      "vertical": "Verticaal",
       "horizontal": "Horizontaal",
       "loading": "Laden...",
       "no_data": "Geen gegevens",
@@ -107,7 +133,7 @@
       "all": "Alle informatie",
       "disk_only": "Alleen schijf",
       "cpu_only": "Alleen CPU",
-      "memory_only": "Alleen geheugen", 
+      "memory_only": "Alleen geheugen",
       "network_only": "Alleen netwerk",
       "gpu_only": "Alleen GPU",
       "ai_only": "Alleen AI-training",
@@ -118,9 +144,9 @@
       "port": "Poort"
     },
     "errors": {
-      "command_not_found": "Opdracht niet gevonden: %s",
+      "command_not_found": "Commando niet gevonden: %s",
       "invalid_port": "Ongeldige poort: %d",
-      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d", 
+      "invalid_refresh": "Ongeldig vernieuwingsinterval: %d",
       "config_load_failed": "Configuratie laden mislukt",
       "module_failed": "Module %s mislukt: %v",
       "nvidia_smi_not_found": "nvidia-smi niet gevonden. GPU-monitoring vereist NVIDIA-stuurprogramma's",
@@ -128,12 +154,17 @@
     },
     "status": {
       "monitoring_started": "Monitoring gestart",
-      "updating_every": "Bijwerken elke %d seconden", 
+      "updating_every": "Bijwerken elke %d seconden",
       "press_ctrl_c": "Druk op Ctrl+C om af te sluiten",
       "remote_mode": "Externe modus op poort %d",
       "gpu_detected": "GPU gedetecteerd: %s",
       "ai_training_detected": "AI-trainingsprocessen gedetecteerd: %d",
       "mining_detected": "Mining-activiteit gedetecteerd: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU-apparaten",
+      "multiple_cpus": "CPU-processors",
+      "device_number": "Apparaat #%d"
     }
   }
 }

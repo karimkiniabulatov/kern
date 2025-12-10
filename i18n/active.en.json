@@ -30,11 +30,23 @@
       "load_average": "Load Average"
     },
     "memory": {
+	  "active": "Active",
+	  "buffers": "Buffers",
+	  "cached": "Cached",
+	  "detailed_usage": "Detailed Usage",
+	  "inactive": "Inactive",
       "title": "Memory Information", 
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Physical Memory",
-      "virtual": "Virtual Memory"
+	  "processes": "Processes",
+      "virtual": "Virtual Memory",
+      "modules": "Memory Modules",
+	  "shared": "Shared"
+      "slot": "Slot",
+      "module_type": "Type",
+      "manufacturer": "Manufacturer",
+      "memory_speed": "Speed"
     },
     "disk": {
       "title": "Disk Information",
@@ -42,7 +54,12 @@
       "size": "Size",
       "mounted": "Mounted on", 
       "usage": "Usage",
-      "storage": "Storage"
+      "storage": "Storage",
+      "physical": "Physical Disk",
+      "logical": "Logical Disk",
+      "disk_type": "Disk Type",
+      "model": "Model",
+      "serial": "Serial"
     },
     "network": {
       "title": "Network Information",
@@ -52,7 +69,16 @@
       "bytes": "bytes",
       "packets": "packets",
       "errors": "Errors",
-      "network_interfaces": "Network Interfaces"
+      "network_interfaces": "Network Interfaces",
+      "connection_type": "Connection Type",
+      "max_speed": "Max Speed",
+      "technology": "Technology",
+      "signal_strength": "Signal Strength",
+      "wired": "Wired",
+      "wireless": "Wireless",
+      "bluetooth": "Bluetooth",
+      "cellular": "Cellular",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU Information",
@@ -134,6 +160,11 @@
       "gpu_detected": "GPU detected: %s",
       "ai_training_detected": "AI training processes detected: %d",
       "mining_detected": "Mining activity detected: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU Devices",
+      "multiple_cpus": "CPU Processors", 
+      "device_number": "Device #%d"
     }
   }
 }

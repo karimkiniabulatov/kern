@@ -1,5 +1,5 @@
 {
-  "language": "Norwegian (Norsk)", 
+  "language": "Norsk",
   "language_code": "no",
   "translations": {
     "common": {
@@ -9,7 +9,7 @@
       "error": "Feil",
       "unknown": "Ukjent",
       "total": "Totalt",
-      "used": "Brukt", 
+      "used": "Brukt",
       "free": "Ledig",
       "available": "Tilgjengelig",
       "status": "Status",
@@ -22,7 +22,7 @@
       "cores": "Kjerner",
       "threads": "Tråder",
       "usage": "Bruk",
-      "frequency": "Frekvens", 
+      "frequency": "Frekvens",
       "load": "Belastning",
       "load_1min": "1 min",
       "load_5min": "5 min",
@@ -30,29 +30,55 @@
       "load_average": "Gjennomsnittlig belastning"
     },
     "memory": {
-      "title": "Minneinformasjon", 
+      "active": "Aktiv",
+      "buffers": "Buffere",
+      "cached": "Mellomlagret",
+      "detailed_usage": "Detaljert bruk",
+      "inactive": "Inaktiv",
+      "title": "Minneinformasjon",
       "ram": "RAM",
       "swap": "Swap",
       "physical": "Fysisk minne",
-      "virtual": "Virtuelt minne"
+      "processes": "Prosesser",
+      "virtual": "Virtuelt minne",
+      "modules": "Minnemoduler",
+      "shared": "Delt",
+      "slot": "Spor",
+      "module_type": "Type",
+      "manufacturer": "Produsent",
+      "memory_speed": "Hastighet"
     },
     "disk": {
       "title": "Diskinformasjon",
       "filesystem": "Filsystem",
       "size": "Størrelse",
-      "mounted": "Montert på", 
+      "mounted": "Montert på",
       "usage": "Bruk",
-      "storage": "Lagring"
+      "storage": "Lagring",
+      "physical": "Fysisk disk",
+      "logical": "Logisk disk",
+      "disk_type": "Disktype",
+      "model": "Modell",
+      "serial": "Serienummer"
     },
     "network": {
       "title": "Nettverksinformasjon",
       "interface": "Grensesnitt",
       "received": "Mottatt",
       "sent": "Sendt",
-      "bytes": "bytes",
+      "bytes": "byte",
       "packets": "pakker",
       "errors": "Feil",
-      "network_interfaces": "Nettverksgrensesnitt"
+      "network_interfaces": "Nettverksgrensesnitt",
+      "connection_type": "Tilkoblingstype",
+      "max_speed": "Maksimal hastighet",
+      "technology": "Teknologi",
+      "signal_strength": "Signalsyrke",
+      "wired": "Trådbundet",
+      "wireless": "Trådløst",
+      "bluetooth": "Bluetooth",
+      "cellular": "Mobil",
+      "vpn": "VPN"
     },
     "gpu": {
       "title": "GPU-informasjon",
@@ -61,7 +87,7 @@
       "temperature": "Temperatur",
       "memory": "Minne",
       "utilization": "Utnyttelse",
-      "power": "Effekt",
+      "power": "Strøm",
       "clock_core": "Kjerneklokke",
       "clock_memory": "Minneklokke",
       "fan_speed": "Viftehastighet"
@@ -77,26 +103,26 @@
       "epoch": "Epoke",
       "loss": "Tap",
       "accuracy": "Nøyaktighet",
-      "training_time": "Treningstid",
+      "training_time": "Trenings tid",
       "no_training": "Ingen AI-trening oppdaget"
     },
     "mining": {
       "title": "Mining-informasjon",
       "algorithm": "Algoritme",
-      "hashrate": "Hashhastighet",
+      "hashrate": "Hashrate",
       "shares": "Andeler",
       "temperature": "Temperatur",
-      "power": "Effekt",
+      "power": "Strøm",
       "efficiency": "Effektivitet",
       "uptime": "Oppetid",
-      "revenue_24h": "24h inntekt",
+      "revenue_24h": "24t inntekt",
       "pool": "Pool",
       "not_detected": "Ingen mining-aktivitet oppdaget"
     },
     "ui": {
       "histogram": "Histogram",
-      "vertical": "Loddrett", 
-      "horizontal": "Vannrett",
+      "vertical": "Vertikal",
+      "horizontal": "Horisontal",
       "loading": "Laster...",
       "no_data": "Ingen data",
       "percent": "prosent"
@@ -107,7 +133,7 @@
       "all": "All informasjon",
       "disk_only": "Kun disk",
       "cpu_only": "Kun CPU",
-      "memory_only": "Kun minne", 
+      "memory_only": "Kun minne",
       "network_only": "Kun nettverk",
       "gpu_only": "Kun GPU",
       "ai_only": "Kun AI-trening",
@@ -120,20 +146,25 @@
     "errors": {
       "command_not_found": "Kommando ikke funnet: %s",
       "invalid_port": "Ugyldig port: %d",
-      "invalid_refresh": "Ugyldig oppdateringsintervall: %d", 
+      "invalid_refresh": "Ugyldig oppdateringsintervall: %d",
       "config_load_failed": "Kunne ikke laste konfigurasjon",
-      "module_failed": "Modul %s feilet: %v",
-      "nvidia_smi_not_found": "nvidia-smi ikke funnet. GPU-overvåkning krever NVIDIA-drivere",
-      "rocm_smi_not_found": "rocm-smi ikke funnet. AMD GPU-overvåkning krever ROCm"
+      "module_failed": "Modul %s mislyktes: %v",
+      "nvidia_smi_not_found": "nvidia-smi ikke funnet. GPU-overvåking krever NVIDIA-drivere",
+      "rocm_smi_not_found": "rocm-smi ikke funnet. AMD GPU-overvåking krever ROCm"
     },
     "status": {
-      "monitoring_started": "Overvåkning startet",
-      "updating_every": "Oppdaterer hver %d sekund", 
+      "monitoring_started": "Overvåking startet",
+      "updating_every": "Oppdateres hver %d sekund",
       "press_ctrl_c": "Trykk Ctrl+C for å avslutte",
       "remote_mode": "Fjernmodus på port %d",
       "gpu_detected": "GPU oppdaget: %s",
       "ai_training_detected": "AI-treningsprosesser oppdaget: %d",
       "mining_detected": "Mining-aktivitet oppdaget: %s"
+    },
+    "devices": {
+      "multiple_gpus": "GPU-enheter",
+      "multiple_cpus": "CPU-prosessorer",
+      "device_number": "Enhet #%d"
     }
   }
 }
