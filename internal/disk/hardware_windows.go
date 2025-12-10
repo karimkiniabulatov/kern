@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "fmt"
     "os/exec"
+    "regexp"  // ДОБАВЛЕНО: импорт regexp
     "strconv"
     "strings"
 )
@@ -61,7 +62,6 @@ func detectAllStorageDevicesWindows() ([]DiskInfo, error) {
     return devices, nil
 }
 
-// getPhysicalDisksViaPowerShell получает информацию о физических дисках через PowerShell
 // getPhysicalDisksViaPowerShell получает информацию о физических дисках через PowerShell
 func getPhysicalDisksViaPowerShell() ([]DiskInfo, error) {
     var disks []DiskInfo

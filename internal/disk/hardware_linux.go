@@ -4,11 +4,12 @@ package disk
 
 import (
 	"net/url"
-    "os"
-    "os/exec"
-    "path/filepath"
-    "strconv"
-    "strings"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"  // ДОБАВЛЕНО: импорт regexp
+	"strconv"
+	"strings"
 )
 
 // detectAllStorageDevicesLinux обнаруживает все устройства хранения в Linux

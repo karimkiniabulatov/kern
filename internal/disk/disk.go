@@ -217,10 +217,6 @@ func Summary(detailed bool) ([]DiskInfo, error) {
         return getFallbackDiskInfo(), nil
     }
 
-    // Фильтруем отключенные диски
-    if len(previousDisks) > 0 {
-        disks = filterRemovedDisks(disks, previousDisks)
-    }
     
     // Обновляем кэш
     previousDisks = disks
