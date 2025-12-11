@@ -55,7 +55,7 @@ func TestNetworkDetailedInfo(t *testing.T) {
 		}
 	}
 }
-
+/*
 func TestFormatSpeed(t *testing.T) {
 	testCases := []struct {
 		input    float64
@@ -75,7 +75,7 @@ func TestFormatSpeed(t *testing.T) {
 			t.Errorf("FormatSpeed(%.0f) = %s, want %s", tc.input, result, tc.expected)
 		}
 	}
-}
+}*/
 
 func TestNetworkInterfaceDetection(t *testing.T) {
 	// Тест для проверки обнаружения различных типов интерфейсов

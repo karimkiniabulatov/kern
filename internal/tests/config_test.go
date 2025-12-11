@@ -47,7 +47,7 @@ func TestModulePreferences(t *testing.T) {
 	cfg := config.GetDefaultConfig("en")
 	
 	// Test updating last used modules
-	cfg.UpdateLastUsedModules(true, false, true, false, true, false, true)
+	cfg.UpdateLastUsedModules(true, false, true, false, true, false, true, false) // Добавлен 8-й параметр
 	
 	if cfg.LastUsedModules == nil {
 		t.Error("LastUsedModules should not be nil")
