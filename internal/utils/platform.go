@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"os"
     "os/exec"
     "runtime"
     "strings"
@@ -14,27 +13,6 @@ func IsCommandAvailable(name string) bool {
 }
 
 // GetOSVersion возвращает детальную информацию об ОС
-/*
-func GetOSVersion() string {
-    switch runtime.GOOS {
-    case "linux":
-        if data, err := os.ReadFile("/etc/os-release"); err == nil {
-            return parseOSRelease(string(data))
-        }
-    case "windows":
-        cmd := exec.Command("systeminfo")
-        if output, err := cmd.Output(); err == nil {
-            return parseWindowsSystemInfo(string(output))
-        }
-    case "darwin":
-        cmd := exec.Command("sw_vers")
-        if output, err := cmd.Output(); err == nil {
-            return parseMacOSVersion(string(output))
-        }
-    }
-    return runtime.GOOS
-}
-*/
 func GetOSVersion() string {
     return runtime.GOOS
 }

@@ -2,7 +2,6 @@ package tests
 
 import (
 	"testing"
-	"strings"
 )
 
 func TestModuleIntegration(t *testing.T) {
