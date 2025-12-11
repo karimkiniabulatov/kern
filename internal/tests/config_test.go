@@ -92,7 +92,7 @@ func TestLastUsedModules(t *testing.T) {
     cfg := config.GetDefaultConfig("en")
     
     // Обновить последние использованные модули
-    cfg.UpdateLastUsedModules(true, false, true, false, true, false, true, false, true)
+    cfg.UpdateLastUsedModules(true, false, true, false, true, false, true, false)
     
     if cfg.LastUsedModules == nil {
         t.Error("LastUsedModules should not be nil after update")

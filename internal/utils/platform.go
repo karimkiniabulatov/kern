@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
     "os/exec"
     "runtime"
     "strings"
@@ -13,6 +14,7 @@ func IsCommandAvailable(name string) bool {
 }
 
 // GetOSVersion возвращает детальную информацию об ОС
+/*
 func GetOSVersion() string {
     switch runtime.GOOS {
     case "linux":
@@ -30,6 +32,10 @@ func GetOSVersion() string {
             return parseMacOSVersion(string(output))
         }
     }
+    return runtime.GOOS
+}
+*/
+func GetOSVersion() string {
     return runtime.GOOS
 }
 
