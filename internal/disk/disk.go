@@ -18,6 +18,16 @@ var (
 	diskCacheMutex sync.RWMutex
 )
 
+// Добавить после импортов в disk.go
+var (
+    detectAllStorageDevicesWindowsFunc = func(bool) ([]DiskInfo, error) { 
+        return nil, fmt.Errorf("detectAllStorageDevicesWindows not implemented on %s", runtime.GOOS) 
+    }
+    detectAllStorageDevicesDarwinFunc = func(bool) ([]DiskInfo, error) { 
+        return nil, fmt.Errorf("detectAllStorageDevicesDarwin not implemented on %s", runtime.GOOS) 
+    }
+)
+
 type DiskInfo struct {
     Filesystem string
     Size       string
@@ -369,20 +379,16 @@ func getDarwinDiskInfo(detailed bool) ([]DiskInfo, error) {
 // detectAllStorageDevices определяет все устройства хранения в зависимости от платформы
 func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
     if !detailed {
-        // В недетальном режиме возвращаем пустой список
         return []DiskInfo{}, nil
     }
     
     switch runtime.GOOS {
     case "linux":
-        // В hardware_linux.go есть функция detectAllStorageDevicesLinux
         return detectAllStorageDevicesLinux(detailed)
     case "windows":
-        // В hardware_windows.go функция называется detectAllStorageDevicesWindows
-        return detectAllStorageDevicesWindows(detailed)
+        return detectAllStorageDevicesWindowsFunc(detailed) // Изменено
     case "darwin":
-        // В hardware_darwin.go функция называется detectAllStorageDevicesDarwin  
-        return detectAllStorageDevicesDarwin(detailed)
+        return detectAllStorageDevicesDarwinFunc(detailed) // Изменено
     default:
         return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
     }

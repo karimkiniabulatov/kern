@@ -23,9 +23,12 @@ show_logo
 
 echo "Installing kern system monitor..."
 
-# Check if Go is installed
-if ! command -v go > /dev/null 2>&1; then
-    echo "Go is not installed. Please install Go 1.21+ first."
+# Проверка Go версии
+GO_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+REQUIRED_GO_VERSION="1.21"
+
+if [ "$(printf '%s\n' "$REQUIRED_GO_VERSION" "$GO_VERSION" | sort -V | head -n1)" != "$REQUIRED_GO_VERSION" ]; then
+    echo "Go version $GO_VERSION is less than required $REQUIRED_GO_VERSION"
     exit 1
 fi
 

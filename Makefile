@@ -30,14 +30,14 @@ macos:
 
 # Целевые платформы
 build-linux:
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS_LINUX) -o bin/kern-linux ./cmd/kern
+	GOOS=linux GOARCH=amd64 go build -tags linux -o bin/kern-linux ./cmd/kern
 
 build-windows:
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS_WINDOWS) -o bin/kern.exe ./cmd/kern
+	GOOS=windows GOARCH=amd64 go build -tags windows -o bin/kern.exe ./cmd/kern
 
 build-darwin:
-	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-darwin-amd64 ./cmd/kern
-	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS_DARWIN) -o bin/kern-darwin-arm64 ./cmd/kern
+	GOOS=darwin GOARCH=amd64 go build -tags darwin -o bin/kern-darwin-amd64 ./cmd/kern
+	GOOS=darwin GOARCH=arm64 go build -tags darwin -o bin/kern-darwin-arm64 ./cmd/kern
 
 release: linux windows macos
 	@echo "Creating release packages..."

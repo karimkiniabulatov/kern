@@ -250,3 +250,8 @@ func formatBytesWindows(bytes uint64) string {
         return fmt.Sprintf("%d B", bytes)
     }
 }
+
+func init() {
+    // Регистрируем реализацию для Windows
+    detectAllStorageDevicesWindowsFunc = detectAllStorageDevicesWindows
+}

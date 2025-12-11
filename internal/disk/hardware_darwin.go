@@ -521,3 +521,8 @@ func convertMacSMARTStatus(status string) string {
         return "UNKNOWN"
     }
 }
+
+func init() {
+    // Регистрируем реализацию для Darwin (macOS)
+    detectAllStorageDevicesDarwinFunc = detectAllStorageDevicesDarwin
+}
