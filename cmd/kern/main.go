@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os/signal"
-	"regexp"
 	"runtime"
 	"strings"
 	"sync"
