@@ -20,13 +20,19 @@ var (
 
 // Добавить после импортов в disk.go
 var (
-    detectAllStorageDevicesWindowsFunc = func(bool) ([]DiskInfo, error) { 
-        return nil, fmt.Errorf("detectAllStorageDevicesWindows not implemented on %s", runtime.GOOS) 
+    // Функции для платформо-специфичного обнаружения устройств
+    detectAllStorageDevicesLinuxFunc = func(detailed bool) ([]DiskInfo, error) {
+        return []DiskInfo{}, nil
     }
-    detectAllStorageDevicesDarwinFunc = func(bool) ([]DiskInfo, error) { 
-        return nil, fmt.Errorf("detectAllStorageDevicesDarwin not implemented on %s", runtime.GOOS) 
+    detectAllStorageDevicesWindowsFunc = func(detailed bool) ([]DiskInfo, error) {
+        return []DiskInfo{}, nil
+    }
+    detectAllStorageDevicesDarwinFunc = func(detailed bool) ([]DiskInfo, error) {
+        return []DiskInfo{}, nil
     }
 )
+
+
 
 type DiskInfo struct {
     Filesystem string
@@ -268,10 +274,10 @@ func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
         return nil, err
     }
     
-    // В детальном режиме добавляем аппаратную информацию
-    if detailed {
-        // Получаем аппаратную информацию
-        hardwareDevices, err := detectAllStorageDevices(detailed)
+    // В детальном режиме пытаемся получить аппаратную информацию
+    if detailed && runtime.GOOS == "linux" {
+        // Получаем аппаратную информацию только для Linux
+        hardwareDevices, err := detectAllStorageDevicesLinux(detailed)
         if err == nil && len(hardwareDevices) > 0 {
             // Объединяем информацию из df и аппаратную информацию
             disks = mergeDiskInfo(parsedDisks, hardwareDevices)
@@ -285,7 +291,7 @@ func getLinuxDiskInfo(detailed bool) ([]DiskInfo, error) {
     }
     
     // ДОБАВЛЕНО: Для детального режима определяем RAID-диски и их использование
-    if detailed {
+    if detailed && runtime.GOOS == "linux" {
         disks = enhanceRaidDiskInfo(disks)
     }
     
@@ -384,11 +390,11 @@ func detectAllStorageDevices(detailed bool) ([]DiskInfo, error) {
     
     switch runtime.GOOS {
     case "linux":
-        return detectAllStorageDevicesLinux(detailed)
+        return detectAllStorageDevicesLinuxFunc(detailed)
     case "windows":
-        return detectAllStorageDevicesWindowsFunc(detailed) // Изменено
+        return detectAllStorageDevicesWindowsFunc(detailed)
     case "darwin":
-        return detectAllStorageDevicesDarwinFunc(detailed) // Изменено
+        return detectAllStorageDevicesDarwinFunc(detailed)
     default:
         return []DiskInfo{}, fmt.Errorf("storage device detection not supported on %s", runtime.GOOS)
     }

@@ -210,3 +210,8 @@ func isUSBDevice(devicePath string) bool {
     
     return false
 }
+
+func init() {
+    // Регистрируем реализацию для Linux
+    detectAllStorageDevicesLinuxFunc = detectAllStorageDevicesLinux
+}
